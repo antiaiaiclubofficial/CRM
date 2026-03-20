@@ -3,11 +3,31 @@
 import React, { useState } from 'react';
 import MembershipCard from '@/components/MembershipCard';
 import PetList from '@/components/PetList';
+import PetManagement from '@/components/PetManagement';
 import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
+  const [pets, setPets] = useState([
+    { id: 1, name: 'น้องปุย', breed: 'Pomeranian', color: 'bg-orange-100', icon: '🐶' },
+    { id: 2, name: 'น้องกะทิ', breed: 'Persian Cat', color: 'bg-blue-100', icon: '🐱' },
+    { id: 3, name: 'น้องถุงทอง', breed: 'Golden', color: 'bg-yellow-100', icon: '🐕' },
+    { id: 4, name: 'น้องมี่', breed: 'Scottish Fold', color: 'bg-pink-100', icon: '🐈' },
+  ]);
+
+  const handleAddPet = (newPet: any) => {
+    const id = pets.length > 0 ? Math.max(...pets.map(p => p.id)) + 1 : 1;
+    setPets([...pets, { ...newPet, id }]);
+  };
+
+  const handleEditPet = (id: number, updatedData: any) => {
+    setPets(pets.map(p => p.id === id ? { ...p, ...updatedData } : p));
+  };
+
+  const handleDeletePet = (id: number) => {
+    setPets(pets.filter(p => p.id !== id));
+  };
 
   return (
     <div className="max-w-[390px] min-h-[844px] mx-auto bg-[#FFF9F0] relative shadow-2xl overflow-hidden flex flex-col font-['Prompt']">
@@ -48,29 +68,26 @@ const Index = () => {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-6"
             >
-              {/* Membership Card */}
               <MembershipCard />
 
-              {/* Quick Actions Grid */}
               <div className="grid grid-cols-2 gap-4">
                 <button className="bg-white p-4 rounded-3xl shadow-sm border border-slate-50 flex flex-col items-center gap-2 group active:scale-95 transition-all">
-                  <div className="w-12 h-12 bg-mint-100 bg-[#B2F2BB]/30 rounded-2xl flex items-center justify-center text-mint-600">
+                  <div className="w-12 h-12 bg-[#B2F2BB]/30 rounded-2xl flex items-center justify-center">
                     <Calendar className="text-emerald-500" />
                   </div>
                   <span className="font-bold text-sm text-slate-700">จองคิวอาบน้ำ</span>
                 </button>
                 <button className="bg-white p-4 rounded-3xl shadow-sm border border-slate-50 flex flex-col items-center gap-2 group active:scale-95 transition-all">
-                  <div className="w-12 h-12 bg-pink-100 bg-[#FFD8E4]/30 rounded-2xl flex items-center justify-center text-pink-600">
+                  <div className="w-12 h-12 bg-[#FFD8E4]/30 rounded-2xl flex items-center justify-center">
                     <Gift className="text-pink-500" />
                   </div>
                   <span className="font-bold text-sm text-slate-700">แลกของรางวัล</span>
                 </button>
               </div>
 
-              {/* My Pets Section */}
-              <PetList />
+              {/* My Pets Section (Using shared state) */}
+              <PetList pets={pets} />
 
-              {/* Latest Promotion Banner */}
               <div className="bg-[#FFE3BC]/40 p-5 rounded-[2rem] border border-[#FFE3BC] flex items-center gap-4">
                 <div className="p-3 bg-white rounded-2xl shadow-sm">
                   <Megaphone className="text-amber-500" />
@@ -83,7 +100,23 @@ const Index = () => {
             </motion.div>
           )}
 
-          {activeTab !== 'home' && (
+          {activeTab === 'pets' && (
+            <motion.div
+              key="pets-tab"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <PetManagement 
+                pets={pets} 
+                onAdd={handleAddPet} 
+                onEdit={handleEditPet} 
+                onDelete={handleDeletePet} 
+              />
+            </motion.div>
+          )}
+
+          {(activeTab !== 'home' && activeTab !== 'pets') && (
             <motion.div
               key="other"
               initial={{ opacity: 0, scale: 0.95 }}

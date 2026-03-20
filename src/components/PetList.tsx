@@ -3,14 +3,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const pets = [
-  { id: 1, name: 'น้องปุย', breed: 'Pomeranian', color: 'bg-orange-100', icon: '🐶' },
-  { id: 2, name: 'น้องกะทิ', breed: 'Persian Cat', color: 'bg-blue-100', icon: '🐱' },
-  { id: 3, name: 'น้องถุงทอง', breed: 'Golden', color: 'bg-yellow-100', icon: '🐕' },
-  { id: 4, name: 'น้องมี่', breed: 'Scottish Fold', color: 'bg-pink-100', icon: '🐈' },
-];
+interface Pet {
+  id: number;
+  name: string;
+  breed: string;
+  color: string;
+  icon: string;
+}
 
-const PetList = () => {
+interface PetListProps {
+  pets: Pet[];
+}
+
+const PetList = ({ pets }: PetListProps) => {
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4 px-1">
