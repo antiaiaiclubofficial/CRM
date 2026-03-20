@@ -27,11 +27,11 @@ const Index = () => {
           <p className="text-slate-500 text-sm">วันนี้พาน้องๆ ไปสปากันเถอะ ✨</p>
         </div>
         <div className="relative">
-          <div className="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden bg-pink-100">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sara" alt="Profile" />
+          <div className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sara" alt="Profile" className="w-full h-full object-cover" />
           </div>
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
-            <span className="text-[8px] text-white font-bold">2</span>
+          <div className="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
+            <span className="text-[10px] text-white font-bold">2</span>
           </div>
         </div>
       </header>
