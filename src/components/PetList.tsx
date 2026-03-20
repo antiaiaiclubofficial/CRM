@@ -13,9 +13,10 @@ interface Pet {
 
 interface PetListProps {
   pets: Pet[];
+  onPetClick?: (petName: string) => void;
 }
 
-const PetList = ({ pets }: PetListProps) => {
+const PetList = ({ pets, onPetClick }: PetListProps) => {
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4 px-1">
@@ -28,7 +29,9 @@ const PetList = ({ pets }: PetListProps) => {
           <motion.div 
             key={pet.id}
             whileHover={{ scale: 1.05 }}
-            className="flex-shrink-0 w-32 bg-white p-4 rounded-3xl shadow-sm border border-slate-50 text-center"
+            whileTap={{ scale: 0.95 }}
+            onClick={() => onPetClick?.(pet.name)}
+            className="flex-shrink-0 w-32 bg-white p-4 rounded-3xl shadow-sm border border-slate-50 text-center cursor-pointer active:bg-slate-50 transition-colors"
           >
             <div className={`w-16 h-16 ${pet.color} rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner`}>
               {pet.icon}

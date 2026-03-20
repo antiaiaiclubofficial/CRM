@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
+  const [selectedPetName, setSelectedPetName] = useState<string | null>(null);
   const [pets, setPets] = useState([
     { 
       id: 1, 
@@ -50,6 +51,11 @@ const Index = () => {
 
   const handleDeletePet = (id: number) => {
     setPets(pets.filter(p => p.id !== id));
+  };
+
+  const handlePetSelection = (name: string) => {
+    setSelectedPetName(name);
+    setActiveTab('history');
   };
 
   return (
@@ -108,7 +114,10 @@ const Index = () => {
                 </button>
               </div>
 
-              <PetList pets={pets} />
+              <PetList 
+                pets={pets} 
+                onPetClick={handlePetSelection}
+              />
 
               <div className="bg-[#FFE3BC]/40 p-5 rounded-[2rem] border border-[#FFE3BC] flex items-center gap-4">
                 <div className="p-3 bg-white rounded-2xl shadow-sm">
@@ -145,7 +154,10 @@ const Index = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <ServiceHistory />
+              <ServiceHistory 
+                filterPetName={selectedPetName} 
+                onClearFilter={() => setSelectedPetName(null)}
+              />
             </motion.div>
           )}
 
@@ -172,7 +184,7 @@ const Index = () => {
           active={activeTab === 'home'} 
           icon={<Home size={22} />} 
           label="หน้าแรก" 
-          onClick={() => setActiveTab('home')} 
+          onClick={() => { setActiveTab('home'); setSelectedPetName(null); }} 
         />
         <NavButton 
           active={activeTab === 'level'} 
