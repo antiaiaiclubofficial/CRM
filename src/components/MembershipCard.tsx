@@ -7,53 +7,51 @@ import { motion } from 'framer-motion';
 const MembershipCard = () => {
   return (
     <motion.div 
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="relative overflow-hidden p-8 rounded-[2.5rem] bg-gradient-to-br from-[#FFB8D1] via-[#FFD39A] to-[#A2E9AF] shadow-2xl shadow-pink-200/40 border-4 border-white/50"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="relative overflow-hidden p-6 rounded-[2rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-xl shadow-pink-100/50"
     >
-      {/* Background Decor */}
-      <PawPrint className="absolute -right-6 -top-6 w-40 h-40 text-white/25 rotate-12" />
-      
+      {/* Watermark Paw Prints */}
+      <PawPrint className="absolute -right-4 -top-4 w-32 h-32 text-white/20 rotate-12" />
+      <PawPrint className="absolute -left-8 -bottom-8 w-24 h-24 text-white/10 -rotate-12" />
+
       <div className="relative z-10">
-        <div className="flex justify-between items-start mb-10">
+        <div className="flex justify-between items-start mb-8">
           <div>
-            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">ระดับสมาชิก</h2>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="bg-amber-500 px-4 py-1.5 rounded-full text-sm font-black text-white flex items-center gap-2 shadow-sm">
-                <Crown size={16} fill="white" />
+            <h2 className="text-sm font-medium text-slate-600">สมาชิกระดับ</h2>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-amber-600 flex items-center gap-1">
+                <Crown size={12} fill="currentColor" />
                 GOLD MEMBER
               </span>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-[10px] font-bold text-slate-600 bg-white/40 px-2 py-0.5 rounded-md inline-block">ID: PET-8899</p>
-            <p className="text-xl font-black text-slate-900 mt-1">คุณซาร่า เจน</p>
+            <p className="text-xs text-slate-500">ID: PET-8899</p>
+            <p className="font-bold text-slate-800">คุณซาร่า เจน</p>
           </div>
         </div>
 
-        <div className="mb-6">
-          <p className="text-sm font-bold text-slate-700 mb-1">คะแนนสะสมปัจจุบัน</p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-6xl font-black text-slate-900 drop-shadow-sm">1,250</span>
-            <span className="text-lg font-bold text-slate-700">แต้ม</span>
+        <div className="mb-4">
+          <p className="text-xs text-slate-600 mb-1">คะแนนสะสมของคุณ</p>
+          <div className="flex items-baseline gap-1">
+            <span className="text-4xl font-bold text-slate-800">1,250</span>
+            <span className="text-sm text-slate-600">Points</span>
           </div>
         </div>
 
-        <div className="space-y-3">
-          <div className="w-full bg-black/10 h-5 rounded-full overflow-hidden border-2 border-white/30">
+        <div className="space-y-2">
+          <div className="w-full bg-white/40 h-3 rounded-full overflow-hidden">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: '80%' }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-              className="bg-white h-full rounded-full shadow-[0_0_15px_rgba(255,255,255,0.8)]"
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="bg-white h-full rounded-full"
             />
           </div>
-          <div className="flex justify-between items-center px-1">
-            <p className="text-xs text-slate-800 font-bold">
-              อีก <span className="text-pink-600 text-sm font-black underline decoration-2 underline-offset-2">250 แต้ม</span> เพื่อเลื่อนระดับ
-            </p>
-            <span className="text-xs font-black text-slate-700">PLATINUM</span>
-          </div>
+          <p className="text-[10px] text-slate-600 text-center font-medium">
+            อีก 250 คะแนน เพื่อเลื่อนเป็น <span className="text-slate-800 font-bold">Platinum Member</span>
+          </p>
         </div>
       </div>
     </motion.div>
