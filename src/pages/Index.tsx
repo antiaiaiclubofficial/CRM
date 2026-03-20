@@ -5,6 +5,7 @@ import MembershipCard from '@/components/MembershipCard';
 import PetList from '@/components/PetList';
 import PetManagement from '@/components/PetManagement';
 import ServiceHistory from '@/components/ServiceHistory';
+import Promotions from '@/components/Promotions';
 import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -161,7 +162,18 @@ const Index = () => {
             </motion.div>
           )}
 
-          {(activeTab !== 'home' && activeTab !== 'pets' && activeTab !== 'history') && (
+          {activeTab === 'promo' && (
+            <motion.div
+              key="promo-tab"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <Promotions />
+            </motion.div>
+          )}
+
+          {(activeTab !== 'home' && activeTab !== 'pets' && activeTab !== 'history' && activeTab !== 'promo') && (
             <motion.div
               key="other"
               initial={{ opacity: 0, scale: 0.95 }}
