@@ -1,19 +1,161 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+"use client";
 
-import { MadeWithDyad } from "@/components/made-with-elmony";
+import React, { useState } from 'react';
+import MembershipCard from '@/components/MembershipCard';
+import PetList from '@/components/PetList';
+import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState('home');
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">
-          Start building your amazing project here!
-        </p>
-      </div>
-      <MadeWithDyad />
+    <div className="max-w-[390px] min-h-[844px] mx-auto bg-[#FFF9F0] relative shadow-2xl overflow-hidden flex flex-col font-['Prompt']">
+      
+      {/* Header Section */}
+      <header className="px-6 pt-10 pb-6 flex justify-between items-center">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-slate-800">สวัสดี, คุณซาร่า!</h1>
+            <motion.div
+              animate={{ rotate: [0, 20, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+            >
+              <PawPrint className="text-pink-400" size={24} fill="currentColor" />
+            </motion.div>
+          </div>
+          <p className="text-slate-500 text-sm">วันนี้พาน้องๆ ไปสปากันเถอะ ✨</p>
+        </div>
+        <div className="relative">
+          <div className="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden bg-pink-100">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sara" alt="Profile" />
+          </div>
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
+            <span className="text-[8px] text-white font-bold">2</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="px-6 flex-1 overflow-y-auto no-scrollbar pb-32">
+        
+        <AnimatePresence mode="wait">
+          {activeTab === 'home' && (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              {/* Membership Card */}
+              <MembershipCard />
+
+              {/* Quick Actions Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <button className="bg-white p-4 rounded-3xl shadow-sm border border-slate-50 flex flex-col items-center gap-2 group active:scale-95 transition-all">
+                  <div className="w-12 h-12 bg-mint-100 bg-[#B2F2BB]/30 rounded-2xl flex items-center justify-center text-mint-600">
+                    <Calendar className="text-emerald-500" />
+                  </div>
+                  <span className="font-bold text-sm text-slate-700">จองคิวอาบน้ำ</span>
+                </button>
+                <button className="bg-white p-4 rounded-3xl shadow-sm border border-slate-50 flex flex-col items-center gap-2 group active:scale-95 transition-all">
+                  <div className="w-12 h-12 bg-pink-100 bg-[#FFD8E4]/30 rounded-2xl flex items-center justify-center text-pink-600">
+                    <Gift className="text-pink-500" />
+                  </div>
+                  <span className="font-bold text-sm text-slate-700">แลกของรางวัล</span>
+                </button>
+              </div>
+
+              {/* My Pets Section */}
+              <PetList />
+
+              {/* Latest Promotion Banner */}
+              <div className="bg-[#FFE3BC]/40 p-5 rounded-[2rem] border border-[#FFE3BC] flex items-center gap-4">
+                <div className="p-3 bg-white rounded-2xl shadow-sm">
+                  <Megaphone className="text-amber-500" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm text-slate-800">โปรโมชั่นประจำเดือน!</h4>
+                  <p className="text-xs text-slate-600">ลด 20% สำหรับบริการสปาหินร้อน</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab !== 'home' && (
+            <motion.div
+              key="other"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center justify-center h-[400px] text-center"
+            >
+              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-400">
+                <Bell size={40} />
+              </div>
+              <h3 className="font-bold text-slate-800">กำลังเตรียมข้อมูล...</h3>
+              <p className="text-sm text-slate-500">ส่วนของ "{activeTab}" กำลังจะมาเร็วๆ นี้</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      {/* Bottom Navigation Bar */}
+      <nav className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-100 px-6 py-4 flex justify-between items-center rounded-t-[2.5rem] shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.05)]">
+        <NavButton 
+          active={activeTab === 'home'} 
+          icon={<Home size={22} />} 
+          label="หน้าแรก" 
+          onClick={() => setActiveTab('home')} 
+        />
+        <NavButton 
+          active={activeTab === 'level'} 
+          icon={<Award size={22} />} 
+          label="ระดับสมาชิก" 
+          onClick={() => setActiveTab('level')} 
+        />
+        <NavButton 
+          active={activeTab === 'pets'} 
+          icon={<PawPrint size={22} />} 
+          label="สัตว์เลี้ยง" 
+          onClick={() => setActiveTab('pets')} 
+        />
+        <NavButton 
+          active={activeTab === 'promo'} 
+          icon={<Megaphone size={22} />} 
+          label="โปรโมชั่น" 
+          onClick={() => setActiveTab('promo')} 
+        />
+      </nav>
     </div>
   );
 };
+
+interface NavButtonProps {
+  active: boolean;
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}
+
+const NavButton = ({ active, icon, label, onClick }: NavButtonProps) => (
+  <button 
+    onClick={onClick}
+    className={`flex flex-col items-center gap-1 transition-all duration-300 ${active ? 'text-pink-500 scale-110' : 'text-slate-400'}`}
+  >
+    <div className={active ? 'drop-shadow-sm' : ''}>
+      {icon}
+    </div>
+    <span className={`text-[10px] font-medium ${active ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>
+      {label}
+    </span>
+    {active && (
+      <motion.div 
+        layoutId="activeTab" 
+        className="w-1 h-1 bg-pink-500 rounded-full mt-0.5" 
+      />
+    )}
+  </button>
+);
 
 export default Index;
