@@ -6,12 +6,26 @@ import PetList from '@/components/PetList';
 import PetManagement from '@/components/PetManagement';
 import ServiceHistory from '@/components/ServiceHistory';
 import Promotions from '@/components/Promotions';
+import UpcomingAppointments from '@/components/UpcomingAppointments';
+import UserProfileEdit from '@/components/UserProfileEdit';
 import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedPetName, setSelectedPetName] = useState<string | null>(null);
+  const [isProfileEditing, setIsProfileEditing] = useState(false);
+  
+  const [ownerProfile, setOwnerProfile] = useState({
+    firstName: 'ซาร่า',
+    lastName: 'เจน',
+    gender: 'หญิง',
+    age: '28',
+    phone: '081-234-5678',
+    address: '123/45 หมู่บ้านแสนสุข ถ.สุขุมวิท กรุงเทพฯ 10110',
+    email: 'sara.jane@example.com'
+  });
+
   const [pets, setPets] = useState([
     { 
       id: 1, 
@@ -66,7 +80,7 @@ const Index = () => {
       <header className="px-6 pt-10 pb-6 flex justify-between items-center">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-slate-800">สวัสดี, คุณซาร่า!</h1>
+            <h1 className="text-2xl font-bold text-slate-800">สวัสดี, คุณ{ownerProfile.firstName}!</h1>
             <motion.div
               animate={{ rotate: [0, 20, 0] }}
               transition={{ repeat: Infinity, duration: 1.5 }}
@@ -77,9 +91,13 @@ const Index = () => {
           <p className="text-slate-500 text-sm">วันนี้พาน้องๆ ไปสปากันเถอะ ✨</p>
         </div>
         <div className="relative">
-          <div className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100">
+          <motion.div 
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsProfileEditing(true)}
+            className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100 cursor-pointer"
+          >
             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sara" alt="Profile" className="w-full h-full object-cover" />
-          </div>
+          </motion.div>
           <div className="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
             <span className="text-[10px] text-white font-bold">2</span>
           </div>
@@ -100,6 +118,8 @@ const Index = () => {
             >
               <MembershipCard />
 
+              <UpcomingAppointments />
+
               <div className="grid grid-cols-2 gap-4">
                 <button className="bg-white p-4 rounded-3xl shadow-sm border border-slate-50 flex flex-col items-center gap-2 group active:scale-95 transition-all">
                   <div className="w-12 h-12 bg-[#B2F2BB]/30 rounded-2xl flex items-center justify-center">
@@ -107,11 +127,14 @@ const Index = () => {
                   </div>
                   <span className="font-bold text-sm text-slate-700">จองคิวอาบน้ำ</span>
                 </button>
-                <button className="bg-white p-4 rounded-3xl shadow-sm border border-slate-50 flex flex-col items-center gap-2 group active:scale-95 transition-all">
+                <button 
+                  onClick={() => setActiveTab('promo')}
+                  className="bg-white p-4 rounded-3xl shadow-sm border border-slate-50 flex flex-col items-center gap-2 group active:scale-95 transition-all"
+                >
                   <div className="w-12 h-12 bg-[#FFD8E4]/30 rounded-2xl flex items-center justify-center">
-                    <Gift className="text-pink-500" />
+                    <Megaphone className="text-pink-500" />
                   </div>
-                  <span className="font-bold text-sm text-slate-700">แลกของรางวัล</span>
+                  <span className="font-bold text-sm text-slate-700">โปรโมชั่น</span>
                 </button>
               </div>
 
@@ -190,8 +213,16 @@ const Index = () => {
         </AnimatePresence>
       </main>
 
+      {/* Profile Edit Drawer */}
+      <UserProfileEdit 
+        isOpen={isProfileEditing} 
+        onClose={() => setIsProfileEditing(false)} 
+        profile={ownerProfile}
+        onSave={(updated) => setOwnerProfile(updated)}
+      />
+
       {/* Bottom Navigation Bar */}
-      <nav className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-100 px-6 py-4 flex justify-between items-center rounded-t-[2.5rem] shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.05)]">
+      <nav className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-100 px-6 py-4 flex justify-between items-center rounded-t-[2.5rem] shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.05)] z-50">
         <NavButton 
           active={activeTab === 'home'} 
           icon={<Home size={22} />} 
