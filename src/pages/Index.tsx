@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import MembershipCard from '@/components/MembershipCard';
 import PetList from '@/components/PetList';
 import PetManagement from '@/components/PetManagement';
-import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell } from 'lucide-react';
+import ServiceHistory from '@/components/ServiceHistory';
+import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Index = () => {
@@ -137,7 +138,18 @@ const Index = () => {
             </motion.div>
           )}
 
-          {(activeTab !== 'home' && activeTab !== 'pets') && (
+          {activeTab === 'history' && (
+            <motion.div
+              key="history-tab"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <ServiceHistory />
+            </motion.div>
+          )}
+
+          {(activeTab !== 'home' && activeTab !== 'pets' && activeTab !== 'history') && (
             <motion.div
               key="other"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -173,6 +185,12 @@ const Index = () => {
           icon={<PawPrint size={22} />} 
           label="สัตว์เลี้ยง" 
           onClick={() => setActiveTab('pets')} 
+        />
+        <NavButton 
+          active={activeTab === 'history'} 
+          icon={<History size={22} />} 
+          label="ประวัติ" 
+          onClick={() => setActiveTab('history')} 
         />
         <NavButton 
           active={activeTab === 'promo'} 
