@@ -10,10 +10,32 @@ import { motion, AnimatePresence } from 'framer-motion';
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [pets, setPets] = useState([
-    { id: 1, name: 'น้องปุย', breed: 'Pomeranian', color: 'bg-orange-100', icon: '🐶' },
-    { id: 2, name: 'น้องกะทิ', breed: 'Persian Cat', color: 'bg-blue-100', icon: '🐱' },
-    { id: 3, name: 'น้องถุงทอง', breed: 'Golden', color: 'bg-yellow-100', icon: '🐕' },
-    { id: 4, name: 'น้องมี่', breed: 'Scottish Fold', color: 'bg-pink-100', icon: '🐈' },
+    { 
+      id: 1, 
+      name: 'น้องปุย', 
+      type: 'สุนัข',
+      breed: 'Pomeranian', 
+      age: '3',
+      gender: 'เมีย',
+      weight: '3.5',
+      medicalCondition: 'ภูมิแพ้ผิวหนัง',
+      precautions: 'ห้ามใช้แชมพูสูตรเย็น',
+      color: 'bg-orange-100', 
+      icon: '🐶' 
+    },
+    { 
+      id: 2, 
+      name: 'น้องกะทิ', 
+      type: 'แมว',
+      breed: 'Persian Cat', 
+      age: '2',
+      gender: 'ผู้',
+      weight: '4.2',
+      medicalCondition: '-',
+      precautions: 'ขี้ตื่นง่าย ระวังตอนตัดเล็บ',
+      color: 'bg-blue-100', 
+      icon: '🐱' 
+    },
   ]);
 
   const handleAddPet = (newPet: any) => {
@@ -85,7 +107,6 @@ const Index = () => {
                 </button>
               </div>
 
-              {/* My Pets Section (Using shared state) */}
               <PetList pets={pets} />
 
               <div className="bg-[#FFE3BC]/40 p-5 rounded-[2rem] border border-[#FFE3BC] flex items-center gap-4">
