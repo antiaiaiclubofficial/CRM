@@ -8,6 +8,7 @@ import ServiceHistory from '@/components/ServiceHistory';
 import Promotions from '@/components/Promotions';
 import UpcomingAppointments from '@/components/UpcomingAppointments';
 import UserProfileEdit from '@/components/UserProfileEdit';
+import MembershipLevels from '@/components/MembershipLevels'; // Import the new component
 import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -155,6 +156,17 @@ const Index = () => {
             </motion.div>
           )}
 
+          {activeTab === 'level' && ( // New tab for MembershipLevels
+            <motion.div
+              key="level-tab"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <MembershipLevels />
+            </motion.div>
+          )}
+
           {activeTab === 'pets' && (
             <motion.div
               key="pets-tab"
@@ -196,7 +208,7 @@ const Index = () => {
             </motion.div>
           )}
 
-          {(activeTab !== 'home' && activeTab !== 'pets' && activeTab !== 'history' && activeTab !== 'promo') && (
+          {(activeTab !== 'home' && activeTab !== 'pets' && activeTab !== 'history' && activeTab !== 'promo' && activeTab !== 'level') && (
             <motion.div
               key="other"
               initial={{ opacity: 0, scale: 0.95 }}
