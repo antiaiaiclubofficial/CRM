@@ -127,6 +127,14 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
   }
   progressPercentage = Math.min(100, Math.max(0, progressPercentage)); // Ensure it's between 0 and 100
 
+  // Reorder tiers for display: current level first, then others in their original sorted order
+  const tiersForDisplay = [currentLevel];
+  sortedTiers.forEach(tier => {
+    if (tier.id !== currentLevel.id) {
+      tiersForDisplay.push(tier);
+    }
+  });
+
   // Sub-component for the current membership status card
   const CurrentMembershipStatusCard = () => (
     <motion.div
@@ -184,7 +192,7 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
       <CurrentMembershipStatusCard />
 
       <div className="space-y-4">
-        {membershipTiers.map((tier, index) => {
+        {tiersForDisplay.map((tier, index) => { // Use tiersForDisplay here
           const isCurrentTier = currentLevel.id === tier.id;
           const isTierReached = totalAccumulatedPoints >= tier.minPoints; // Use totalAccumulatedPoints for benefits check
           
