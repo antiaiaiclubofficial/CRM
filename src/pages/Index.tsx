@@ -27,6 +27,8 @@ const Index = () => {
     email: 'sara.jane@example.com'
   });
 
+  const [userPoints, setUserPoints] = useState(1250); // State for user points
+
   const [pets, setPets] = useState([
     { 
       id: 1, 
@@ -204,7 +206,7 @@ const Index = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Promotions />
+              <Promotions userPoints={userPoints} /> {/* Pass userPoints here */}
             </motion.div>
           )}
 
