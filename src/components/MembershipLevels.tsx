@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Crown, Star, Gem, Diamond, HeartHandshake, Percent, CalendarCheck, Gift, ShieldCheck, Sparkles, PawPrint, BellRing, Plane, Check } from 'lucide-react';
+import { Crown, Star, Gem, Diamond, PawPrint, Check } from 'lucide-react';
 
 interface MembershipTier {
   id: string;
@@ -11,6 +11,7 @@ interface MembershipTier {
   colorClass: string;
   description: string;
   benefits: string[];
+  minPoints: number; // Added minPoints to define tier requirements
 }
 
 const membershipTiers: MembershipTier[] = [
@@ -25,6 +26,7 @@ const membershipTiers: MembershipTier[] = [
       'สะสมคะแนนทุกการใช้จ่าย',
       'รับข่าวสารโปรโมชั่นก่อนใคร',
     ],
+    minPoints: 0,
   },
   {
     id: 'silver',
@@ -38,6 +40,7 @@ const membershipTiers: MembershipTier[] = [
       'จองคิวล่วงหน้าได้ 3 วัน',
       'ของขวัญวันเกิดสำหรับสัตว์เลี้ยง',
     ],
+    minPoints: 300,
   },
   {
     id: 'gold',
@@ -52,6 +55,7 @@ const membershipTiers: MembershipTier[] = [
       'บริการสปาโอโซนฟรี 1 ครั้ง/ปี',
       'ที่ปรึกษาด้านการดูแลสัตว์เลี้ยงส่วนตัว',
     ],
+    minPoints: 700,
   },
   {
     id: 'platinum',
@@ -67,6 +71,7 @@ const membershipTiers: MembershipTier[] = [
       'เข้าร่วมกิจกรรมพิเศษสำหรับสมาชิก Platinum',
       'ของขวัญพิเศษประจำปี',
     ],
+    minPoints: 1000,
   },
   {
     id: 'vip',
@@ -83,14 +88,93 @@ const membershipTiers: MembershipTier[] = [
       'ของขวัญสุดหรูและบริการพิเศษเฉพาะบุคคล',
       'เชิญเข้าร่วมงานเลี้ยง VIP ประจำปี',
     ],
+    minPoints: 2000,
   },
 ];
 
-const MembershipLevels = () => {
+interface MembershipLevelsProps {
+  userPoints: number;
+}
+
+const MembershipLevels = ({ userPoints }: MembershipLevelsProps) => {
+  // Sort tiers by minPoints to ensure correct level determination
+  const sortedTiers = [...membershipTiers].sort((a, b) => a.minPoints - b.minPoints);
+
+  let currentLevel: MembershipTier = sortedTiers[0]; // Default to Bronze
+  let nextLevel: MembershipTier | null = null;
+
+  for (let i = 0; i < sortedTiers.length; i++) {
+    if (userPoints >= sortedTiers[i].minPoints) {
+      currentLevel = sortedTiers[i];
+    } else {
+      nextLevel = sortedTiers[i];
+      break;
+    }
+  }
+
+  const pointsToNextLevel = nextLevel ? nextLevel.minPoints - userPoints : 0;
+  const currentLevelMinPoints = currentLevel.minPoints;
+  const nextLevelMinPoints = nextLevel ? nextLevel.minPoints : currentLevel.minPoints + 1; // Prevent division by zero if max level
+  
+  let progressPercentage = 0;
+  if (nextLevel) {
+    const pointsRange = nextLevelMinPoints - currentLevelMinPoints;
+    const pointsEarnedInCurrentTier = userPoints - currentLevelMinPoints;
+    progressPercentage = (pointsEarnedInCurrentTier / pointsRange) * 100;
+  } else {
+    progressPercentage = 100; // Max level reached
+  }
+  progressPercentage = Math.min(100, Math.max(0, progressPercentage)); // Ensure it's between 0 and 100
+
+  // Sub-component for the current membership status card
+  const CurrentMembershipStatusCard = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="relative overflow-hidden p-6 rounded-[2rem] bg-gradient-to-br from-amber-500 to-amber-700 shadow-xl shadow-amber-200/50 text-white"
+    >
+      {/* Watermark Crown */}
+      <Crown className="absolute -right-4 -top-4 w-32 h-32 text-white/20 rotate-12" />
+      <Crown className="absolute -left-8 -bottom-8 w-24 h-24 text-white/10 -rotate-12" />
+
+      <div className="relative z-10 text-center space-y-3">
+        <Crown size={40} className="mx-auto text-white/90 mb-2" />
+        <p className="text-sm font-medium text-white/80">ระดับปัจจุบันของคุณ</p>
+        <h3 className="text-3xl font-bold mb-4">{currentLevel.name}</h3>
+
+        <div className="flex items-baseline justify-center gap-1 mb-4">
+          <span className="text-4xl font-bold">{userPoints}</span>
+          <span className="text-lg text-white/80"> / {nextLevel ? nextLevel.minPoints : 'MAX'} คะแนน</span>
+        </div>
+
+        <div className="w-full bg-white/30 h-3 rounded-full overflow-hidden mb-2">
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: `${progressPercentage}%` }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="bg-white h-full rounded-full"
+          />
+        </div>
+        {nextLevel ? (
+          <p className="text-xs text-white/80 font-medium">
+            อีก <span className="font-bold">{pointsToNextLevel}</span> คะแนน เพื่อเลื่อนเป็น <span className="font-bold">{nextLevel.name}</span>
+          </p>
+        ) : (
+          <p className="text-xs text-white/80 font-medium">
+            คุณอยู่ในระดับสูงสุดแล้ว!
+          </p>
+        )}
+      </div>
+    </motion.div>
+  );
+
   return (
     <div className="space-y-6 pb-20">
       <h2 className="text-xl font-bold text-slate-800 px-1">ระดับสมาชิกและสิทธิประโยชน์</h2>
       <p className="text-sm text-slate-500 px-1">เลือกแผนที่ใช่ เพื่อการดูแลที่ดีที่สุดสำหรับเพื่อนซี้สี่ขาของคุณ</p>
+
+      {/* Current Membership Status Card */}
+      <CurrentMembershipStatusCard />
 
       <div className="space-y-4">
         {membershipTiers.map((tier, index) => (

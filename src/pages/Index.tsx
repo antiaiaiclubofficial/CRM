@@ -235,7 +235,7 @@ const Index = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <MembershipLevels />
+              <MembershipLevels userPoints={userPoints} />
             </motion.div>
           )}
 
@@ -254,7 +254,7 @@ const Index = () => {
                   onDeletePet={handleDeletePet}
                 />
               ) : (
-                <PetManagement // Corrected component from PetList to PetManagement
+                <PetManagement 
                   pets={pets} 
                   onAddPet={handleOpenAddPetForm}
                   onViewDetails={handleViewPetDetails}
