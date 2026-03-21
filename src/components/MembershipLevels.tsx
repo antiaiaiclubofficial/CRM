@@ -93,7 +93,7 @@ const membershipTiers: MembershipTier[] = [
 ];
 
 interface MembershipLevelsProps {
-  userPoints: number;
+  userPoints: number; // This will now be totalAccumulatedPoints
 }
 
 const MembershipLevels = ({ userPoints }: MembershipLevelsProps) => {
@@ -185,9 +185,8 @@ const MembershipLevels = ({ userPoints }: MembershipLevelsProps) => {
       <div className="space-y-4">
         {membershipTiers.map((tier, index) => {
           const isTierReached = userPoints >= tier.minPoints;
-          const cardClasses = isTierReached 
-            ? "bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col"
-            : "bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col opacity-50 grayscale"; // Grey out if not reached
+          // Removed opacity-50 grayscale from cardClasses, now all cards are vibrant
+          const cardClasses = "bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col";
 
           return (
             <motion.div
@@ -209,8 +208,8 @@ const MembershipLevels = ({ userPoints }: MembershipLevelsProps) => {
               <div className="border-t border-slate-50 pt-4">
                 <ul className="space-y-2">
                   {tier.benefits.map((benefit, bIndex) => (
-                    <li key={bIndex} className={`flex items-start gap-2 text-sm ${isTierReached ? 'text-slate-700' : 'text-slate-400'}`}>
-                      <Check size={16} className={`${isTierReached ? 'text-pink-500' : 'text-slate-400'} flex-shrink-0 mt-0.5`} />
+                    <li key={bIndex} className={`flex items-start gap-2 text-sm ${isTierReached ? 'text-slate-700' : 'text-slate-400 opacity-50 grayscale'}`}>
+                      <Check size={16} className={`${isTierReached ? 'text-pink-500' : 'text-slate-400 opacity-50'} flex-shrink-0 mt-0.5`} />
                       <span>{benefit}</span>
                     </li>
                   ))}

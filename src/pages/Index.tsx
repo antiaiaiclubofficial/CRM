@@ -63,9 +63,11 @@ const Index = () => {
     email: 'sara.jane@example.com'
   });
 
-  const [userPoints, setUserPoints] = useState(1250);
+  const [totalAccumulatedPoints, setTotalAccumulatedPoints] = useState(1250); // For membership tiers
+  const [redeemablePoints, setRedeemablePoints] = useState(1250); // For coupon redemption
   const [collectedCoupons, setCollectedCoupons] = useState<Coupon[]>([]);
   const [usedOrExpiredCoupons, setUsedOrExpiredCoupons] = useState<UsedCoupon[]>([]);
+  const [usedSpecialPromotions, setUsedSpecialPromotions] = useState<number[]>([]); // Track used special promotions
 
   const [pets, setPets] = useState<Pet[]>([
     { 
@@ -123,8 +125,8 @@ const Index = () => {
 
   // Updated to handle points deduction
   const handleRedeemCoupon = (coupon: Coupon, pointsCost: number) => {
-    if (userPoints >= pointsCost) {
-      setUserPoints(prev => prev - pointsCost);
+    if (redeemablePoints >= pointsCost) {
+      setRedeemablePoints(prev => prev - pointsCost); // Only redeemablePoints decrease
       setCollectedCoupons((prev) => [...prev, coupon]);
       toast.success(`แลกคูปอง "${coupon.title}" สำเร็จ! ใช้ไป ${pointsCost} คะแนน`);
     } else {
@@ -139,6 +141,14 @@ const Index = () => {
       setCollectedCoupons(prev => prev.filter(c => c.id !== couponId));
       setUsedOrExpiredCoupons(prev => [...prev, { ...couponToUse, usedDate: new Date().toLocaleDateString('th-TH') }]);
       toast.success(`ใช้คูปอง "${couponToUse.title}" สำเร็จแล้วค่ะ!`);
+    }
+  };
+
+  // New function to handle using a special promotion
+  const handleUseSpecialPromotion = (promoId: number) => {
+    if (!usedSpecialPromotions.includes(promoId)) {
+      setUsedSpecialPromotions(prev => [...prev, promoId]);
+      toast.success('ใช้โปรโมชั่นพิเศษสำเร็จแล้วค่ะ!');
     }
   };
 
@@ -210,7 +220,10 @@ const Index = () => {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-6"
             >
-              <MembershipCard />
+              <MembershipCard 
+                totalAccumulatedPoints={totalAccumulatedPoints} 
+                redeemablePoints={redeemablePoints} 
+              />
 
               <UpcomingAppointments />
 
@@ -256,7 +269,7 @@ const Index = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <MembershipLevels userPoints={userPoints} />
+              <MembershipLevels userPoints={totalAccumulatedPoints} />
             </motion.div>
           )}
 
@@ -306,11 +319,13 @@ const Index = () => {
               exit={{ opacity: 0, x: -20 }}
             >
               <Promotions 
-                userPoints={userPoints} 
+                userPoints={redeemablePoints} // Pass redeemablePoints for coupon redemption
                 collectedCoupons={collectedCoupons}
                 usedOrExpiredCoupons={usedOrExpiredCoupons}
                 onRedeemCoupon={handleRedeemCoupon}
                 onUseCoupon={handleUseCoupon}
+                usedSpecialPromotions={usedSpecialPromotions}
+                onUseSpecialPromotion={handleUseSpecialPromotion}
               />
             </motion.div>
           )}

@@ -56,6 +56,8 @@ interface PromotionsProps {
   usedOrExpiredCoupons: UsedCoupon[]; // Used or expired coupons
   onRedeemCoupon: (coupon: Coupon, pointsCost: number) => void; // New prop for redeeming
   onUseCoupon: (couponId: number) => void; // New prop for using collected coupons
+  usedSpecialPromotions: number[]; // New prop to track used special promotions
+  onUseSpecialPromotion: (promoId: number) => void; // New prop for using special promotions
 }
 
 // Map icon names to LucideIcon components
@@ -77,7 +79,7 @@ const getIconComponent = (iconName: string, size: number, className?: string) =>
   return IconComponent ? <IconComponent size={size} className={className} /> : null;
 };
 
-const Promotions = ({ userPoints, collectedCoupons, usedOrExpiredCoupons, onRedeemCoupon, onUseCoupon }: PromotionsProps) => {
+const Promotions = ({ userPoints, collectedCoupons, usedOrExpiredCoupons, onRedeemCoupon, onUseCoupon, usedSpecialPromotions, onUseSpecialPromotion }: PromotionsProps) => {
   // Mock data for Special Promotions
   const specialPromotionsData: SpecialPromotionItem[] = [
     {
@@ -205,35 +207,46 @@ const Promotions = ({ userPoints, collectedCoupons, usedOrExpiredCoupons, onRede
           <h2 className="text-xl font-bold text-slate-800">โปรโมชั่นพิเศษ</h2>
         </div>
         <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 px-1">
-          {specialPromotionsData.map((promo) => (
-            <motion.div
-              key={promo.id}
-              whileTap={{ scale: 0.98 }}
-              className={`relative flex-shrink-0 w-[280px] h-36 ${promo.bgColor} rounded-[2rem] p-5 overflow-hidden shadow-sm border border-slate-50`}
-            >
-              {/* Paw print watermark */}
-              <PawPrint className={`absolute -right-4 -bottom-4 w-24 h-24 ${promo.pawPrintColor} opacity-50 rotate-12`} />
-              <PawPrint className={`absolute -left-8 -top-8 w-16 h-16 ${promo.pawPrintColor} opacity-30 -rotate-12`} />
+          {specialPromotionsData.map((promo) => {
+            const isUsed = usedSpecialPromotions.includes(promo.id);
+            return (
+              <motion.div
+                key={promo.id}
+                whileTap={{ scale: isUsed ? 1 : 0.98 }}
+                className={`relative flex-shrink-0 w-[280px] h-36 ${promo.bgColor} rounded-[2rem] p-5 overflow-hidden shadow-sm border border-slate-50 ${isUsed ? 'opacity-60 grayscale' : ''}`}
+              >
+                {/* Paw print watermark */}
+                <PawPrint className={`absolute -right-4 -bottom-4 w-24 h-24 ${promo.pawPrintColor} opacity-50 rotate-12`} />
+                <PawPrint className={`absolute -left-8 -top-8 w-16 h-16 ${promo.pawPrintColor} opacity-30 -rotate-12`} />
 
-              <div className="relative z-10 flex flex-col justify-between h-full">
-                <div>
-                  <span className={`text-[10px] font-bold ${promo.textColor} bg-white/60 backdrop-blur-sm px-2 py-0.5 rounded-full mb-2 inline-block`}>
-                    {promo.tag}
-                  </span>
-                  <h3 className={`text-lg font-bold ${promo.textColor} flex items-center gap-1`}>
-                    {promo.title} {promo.iconName && getIconComponent(promo.iconName, 18, promo.textColor)}
-                  </h3>
-                  <p className={`text-xs ${promo.textColor} opacity-80`}>{promo.description}</p>
+                <div className="relative z-10 flex flex-col justify-between h-full">
+                  <div>
+                    <span className={`text-[10px] font-bold ${promo.textColor} bg-white/60 backdrop-blur-sm px-2 py-0.5 rounded-full mb-2 inline-block`}>
+                      {promo.tag}
+                    </span>
+                    <h3 className={`text-lg font-bold ${promo.textColor} flex items-center gap-1`}>
+                      {promo.title} {promo.iconName && getIconComponent(promo.iconName, 18, promo.textColor)}
+                    </h3>
+                    <p className={`text-xs ${promo.textColor} opacity-80`}>{promo.description}</p>
+                  </div>
+                  <div className="flex justify-between items-end">
+                    <span className={`text-[10px] ${promo.textColor} opacity-70`}>{promo.expiry}</span>
+                    <button 
+                      onClick={() => onUseSpecialPromotion(promo.id)}
+                      disabled={isUsed}
+                      className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all ${
+                        isUsed
+                          ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
+                          : `${promo.buttonColor} ${promo.buttonTextColor} active:scale-95`
+                      }`}
+                    >
+                      {isUsed ? 'ใช้แล้ว' : 'ใช้เลย'}
+                    </button>
+                  </div>
                 </div>
-                <div className="flex justify-between items-end">
-                  <span className={`text-[10px] ${promo.textColor} opacity-70`}>{promo.expiry}</span>
-                  <button className={`text-xs font-bold ${promo.buttonTextColor} ${promo.buttonColor} px-3 py-1.5 rounded-full active:scale-95 transition-all`}>
-                    ใช้เลย
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       </div>
 

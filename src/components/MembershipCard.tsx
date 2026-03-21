@@ -4,7 +4,50 @@ import React from 'react';
 import { Crown, PawPrint } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const MembershipCard = () => {
+interface MembershipCardProps {
+  totalAccumulatedPoints: number;
+  redeemablePoints: number;
+}
+
+// Define membership tiers here for consistency, or import from a shared source if available
+const membershipTiers = [
+  { id: 'bronze', name: 'Bronze Member', minPoints: 0 },
+  { id: 'silver', name: 'Silver Member', minPoints: 300 },
+  { id: 'gold', name: 'Gold Member', minPoints: 700 },
+  { id: 'platinum', name: 'Platinum Member', minPoints: 1000 },
+  { id: 'vip', name: 'VIP Member', minPoints: 2000 },
+];
+
+const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints }: MembershipCardProps) => {
+  // Determine current and next level based on totalAccumulatedPoints
+  const sortedTiers = [...membershipTiers].sort((a, b) => a.minPoints - b.minPoints);
+
+  let currentLevel = sortedTiers[0];
+  let nextLevel: typeof membershipTiers[0] | null = null;
+
+  for (let i = 0; i < sortedTiers.length; i++) {
+    if (totalAccumulatedPoints >= sortedTiers[i].minPoints) {
+      currentLevel = sortedTiers[i];
+    } else {
+      nextLevel = sortedTiers[i];
+      break;
+    }
+  }
+
+  const pointsToNextLevel = nextLevel ? nextLevel.minPoints - totalAccumulatedPoints : 0;
+  const currentLevelMinPoints = currentLevel.minPoints;
+  const nextLevelMinPoints = nextLevel ? nextLevel.minPoints : currentLevel.minPoints + 1;
+  
+  let progressPercentage = 0;
+  if (nextLevel) {
+    const pointsRange = nextLevelMinPoints - currentLevelMinPoints;
+    const pointsEarnedInCurrentTier = totalAccumulatedPoints - currentLevelMinPoints;
+    progressPercentage = (pointsEarnedInCurrentTier / pointsRange) * 100;
+  } else {
+    progressPercentage = 100; // Max level reached
+  }
+  progressPercentage = Math.min(100, Math.max(0, progressPercentage));
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -22,7 +65,7 @@ const MembershipCard = () => {
             <div className="flex items-center gap-2 mt-1">
               <span className="bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-amber-600 flex items-center gap-1">
                 <Crown size={12} fill="currentColor" />
-                GOLD MEMBER
+                {currentLevel.name.toUpperCase()}
               </span>
             </div>
           </div>
@@ -35,7 +78,7 @@ const MembershipCard = () => {
         <div className="mb-4">
           <p className="text-xs text-slate-600 mb-1">คะแนนสะสมของคุณ</p>
           <div className="flex items-baseline gap-1">
-            <span className="text-4xl font-bold text-slate-800">1,250</span>
+            <span className="text-4xl font-bold text-slate-800">{redeemablePoints.toLocaleString()}</span>
             <span className="text-sm text-slate-600">Points</span>
           </div>
         </div>
@@ -44,13 +87,17 @@ const MembershipCard = () => {
           <div className="w-full bg-white/40 h-3 rounded-full overflow-hidden">
             <motion.div 
               initial={{ width: 0 }}
-              animate={{ width: '80%' }}
+              animate={{ width: `${progressPercentage}%` }}
               transition={{ duration: 1, ease: "easeOut" }}
               className="bg-white h-full rounded-full"
             />
           </div>
           <p className="text-[10px] text-slate-600 text-center font-medium">
-            อีก 250 คะแนน เพื่อเลื่อนเป็น <span className="text-slate-800 font-bold">Platinum Member</span>
+            {nextLevel ? (
+              <>อีก {pointsToNextLevel} คะแนน เพื่อเลื่อนเป็น <span className="text-slate-800 font-bold">{nextLevel.name}</span></>
+            ) : (
+              <>คุณอยู่ในระดับสูงสุดแล้ว!</>
+            )}
           </p>
         </div>
       </div>
