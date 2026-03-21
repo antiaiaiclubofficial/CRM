@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Edit2, Trash2, Calendar, Scale, PawPrint, HeartPulse, Info, Scissors, Bath, Sparkles, ChevronRight } from 'lucide-react';
+import PetIDCard from './PetIDCard'; // Import the new PetIDCard component
 
 interface Pet {
   id: number;
@@ -80,61 +81,8 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet }: PetDetailViewP
         </div>
       </div>
 
-      {/* Pet Card Section */}
-      <div className="relative overflow-hidden p-6 rounded-[2rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-xl shadow-pink-100/50 text-center">
-        <PawPrint className="absolute -right-4 -top-4 w-32 h-32 text-white/20 rotate-12" />
-        <PawPrint className="absolute -left-8 -bottom-8 w-24 h-24 text-white/10 -rotate-12" />
-        <div className="relative z-10">
-          <div className={`w-24 h-24 ${pet.color} rounded-full flex items-center justify-center text-5xl mx-auto mb-4 shadow-inner border-2 border-white`}>
-            {pet.icon}
-          </div>
-          <h2 className="text-3xl font-bold text-slate-800 mb-1">{pet.name}</h2>
-          <p className="text-sm text-slate-600">{pet.breed}</p>
-        </div>
-      </div>
-
-      {/* Metrics Section */}
-      <div className="grid grid-cols-3 gap-4 bg-white p-5 rounded-[2rem] shadow-sm border border-slate-50">
-        <div className="text-center">
-          <Calendar size={20} className="text-pink-500 mx-auto mb-1" />
-          <p className="text-[10px] text-slate-400 uppercase font-bold">อายุ</p>
-          <p className="text-sm font-medium text-slate-700">{pet.age || '-'} ปี</p>
-        </div>
-        <div className="text-center border-x border-slate-50">
-          <Scale size={20} className="text-blue-500 mx-auto mb-1" />
-          <p className="text-[10px] text-slate-400 uppercase font-bold">น้ำหนัก</p>
-          <p className="text-sm font-medium text-slate-700">{pet.weight || '-'} kg</p>
-        </div>
-        <div className="text-center">
-          <PawPrint size={20} className="text-amber-500 mx-auto mb-1" />
-          <p className="text-[10px] text-slate-400 uppercase font-bold">ประเภท</p>
-          <p className="text-sm font-medium text-slate-700">{pet.type}</p>
-        </div>
-      </div>
-
-      {/* Medical & Precautions */}
-      {(pet.medicalCondition || pet.precautions) && (
-        <div className="bg-white rounded-[2rem] p-5 space-y-3 shadow-sm border border-slate-50">
-          {pet.medicalCondition && (
-            <div className="flex gap-3 items-start">
-              <HeartPulse size={18} className="text-red-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs text-slate-500 font-bold">โรคประจำตัว</p>
-                <p className="text-sm text-slate-700">{pet.medicalCondition}</p>
-              </div>
-            </div>
-          )}
-          {pet.precautions && (
-            <div className="flex gap-3 items-start">
-              <Info size={18} className="text-amber-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs text-slate-500 font-bold">ข้อควรระวัง / แพ้อาหาร</p>
-                <p className="text-sm text-slate-700">{pet.precautions}</p>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Pet ID Card Section */}
+      <PetIDCard pet={pet} />
 
       {/* Service Summary */}
       <div className="grid grid-cols-2 gap-4">
