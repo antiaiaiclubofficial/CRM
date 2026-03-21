@@ -93,10 +93,11 @@ const membershipTiers: MembershipTier[] = [
 ];
 
 interface MembershipLevelsProps {
-  userPoints: number; // This will now be totalAccumulatedPoints
+  totalAccumulatedPoints: number; // For tier calculation
+  redeemablePoints: number; // For display
 }
 
-const MembershipLevels = ({ userPoints }: MembershipLevelsProps) => {
+const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: MembershipLevelsProps) => {
   // Sort tiers by minPoints to ensure correct level determination
   const sortedTiers = [...membershipTiers].sort((a, b) => a.minPoints - b.minPoints);
 
@@ -104,7 +105,7 @@ const MembershipLevels = ({ userPoints }: MembershipLevelsProps) => {
   let nextLevel: MembershipTier | null = null;
 
   for (let i = 0; i < sortedTiers.length; i++) {
-    if (userPoints >= sortedTiers[i].minPoints) {
+    if (totalAccumulatedPoints >= sortedTiers[i].minPoints) {
       currentLevel = sortedTiers[i];
     } else {
       nextLevel = sortedTiers[i];
@@ -112,14 +113,14 @@ const MembershipLevels = ({ userPoints }: MembershipLevelsProps) => {
     }
   }
 
-  const pointsToNextLevel = nextLevel ? nextLevel.minPoints - userPoints : 0;
+  const pointsToNextLevel = nextLevel ? nextLevel.minPoints - totalAccumulatedPoints : 0;
   const currentLevelMinPoints = currentLevel.minPoints;
   const nextLevelMinPoints = nextLevel ? nextLevel.minPoints : currentLevel.minPoints + 1; // Prevent division by zero if max level
   
   let progressPercentage = 0;
   if (nextLevel) {
     const pointsRange = nextLevelMinPoints - currentLevelMinPoints;
-    const pointsEarnedInCurrentTier = userPoints - currentLevelMinPoints;
+    const pointsEarnedInCurrentTier = totalAccumulatedPoints - currentLevelMinPoints;
     progressPercentage = (pointsEarnedInCurrentTier / pointsRange) * 100;
   } else {
     progressPercentage = 100; // Max level reached
@@ -149,7 +150,7 @@ const MembershipLevels = ({ userPoints }: MembershipLevelsProps) => {
         <h3 className="text-2xl font-bold mb-2">{currentLevel.name}</h3>
 
         <div className="flex items-baseline justify-center gap-1 mb-3">
-          <span className="text-3xl font-bold">{userPoints}</span>
+          <span className="text-3xl font-bold">{redeemablePoints}</span> {/* Display redeemablePoints here */}
           <span className="text-sm text-white/80"> / {nextLevel ? nextLevel.minPoints : 'MAX'} คะแนน</span>
         </div>
 
@@ -184,9 +185,12 @@ const MembershipLevels = ({ userPoints }: MembershipLevelsProps) => {
 
       <div className="space-y-4">
         {membershipTiers.map((tier, index) => {
-          const isTierReached = userPoints >= tier.minPoints;
-          // Removed opacity-50 grayscale from cardClasses, now all cards are vibrant
-          const cardClasses = "bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col";
+          const isCurrentTier = currentLevel.id === tier.id;
+          const isTierReached = totalAccumulatedPoints >= tier.minPoints; // Use totalAccumulatedPoints for benefits check
+          
+          const cardClasses = `bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col ${
+            isCurrentTier ? '' : 'opacity-60 grayscale' // Gray out if not the current tier
+          }`;
 
           return (
             <motion.div
@@ -208,7 +212,7 @@ const MembershipLevels = ({ userPoints }: MembershipLevelsProps) => {
               <div className="border-t border-slate-50 pt-4">
                 <ul className="space-y-2">
                   {tier.benefits.map((benefit, bIndex) => (
-                    <li key={bIndex} className={`flex items-start gap-2 text-sm ${isTierReached ? 'text-slate-700' : 'text-slate-400 opacity-50 grayscale'}`}>
+                    <li key={bIndex} className={`flex items-start gap-2 text-sm ${isTierReached ? 'text-slate-700' : 'text-slate-400 opacity-50'}`}>
                       <Check size={16} className={`${isTierReached ? 'text-pink-500' : 'text-slate-400 opacity-50'} flex-shrink-0 mt-0.5`} />
                       <span>{benefit}</span>
                     </li>

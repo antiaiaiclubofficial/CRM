@@ -269,7 +269,10 @@ const Index = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <MembershipLevels userPoints={totalAccumulatedPoints} />
+              <MembershipLevels 
+                totalAccumulatedPoints={totalAccumulatedPoints} 
+                redeemablePoints={redeemablePoints} 
+              />
             </motion.div>
           )}
 
