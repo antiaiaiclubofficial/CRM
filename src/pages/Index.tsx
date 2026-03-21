@@ -13,6 +13,7 @@ import MembershipLevels from '@/components/MembershipLevels';
 import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PetManagement from '@/components/PetManagement'; // Import PetManagement
+import { toast } from 'sonner'; // Import toast for notifications
 
 // Define the Pet interface here for consistency across components
 interface Pet {
@@ -43,6 +44,10 @@ interface Coupon {
   pointsRequired: number;
 }
 
+interface UsedCoupon extends Coupon {
+  usedDate?: string;
+}
+
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedPetName, setSelectedPetName] = useState<string | null>(null);
@@ -60,6 +65,7 @@ const Index = () => {
 
   const [userPoints, setUserPoints] = useState(1250);
   const [collectedCoupons, setCollectedCoupons] = useState<Coupon[]>([]);
+  const [usedOrExpiredCoupons, setUsedOrExpiredCoupons] = useState<UsedCoupon[]>([]);
 
   const [pets, setPets] = useState<Pet[]>([
     { 
@@ -115,9 +121,24 @@ const Index = () => {
     setActiveTab('history');
   };
 
-  const handleCollectCoupon = (coupon: Coupon) => {
-    if (!collectedCoupons.some(c => c.id === coupon.id)) {
+  // Updated to handle points deduction
+  const handleRedeemCoupon = (coupon: Coupon, pointsCost: number) => {
+    if (userPoints >= pointsCost) {
+      setUserPoints(prev => prev - pointsCost);
       setCollectedCoupons((prev) => [...prev, coupon]);
+      toast.success(`แลกคูปอง "${coupon.title}" สำเร็จ! ใช้ไป ${pointsCost} คะแนน`);
+    } else {
+      toast.error('คะแนนไม่พอสำหรับแลกคูปองนี้ค่ะ');
+    }
+  };
+
+  // New function to handle using a collected coupon
+  const handleUseCoupon = (couponId: number) => {
+    const couponToUse = collectedCoupons.find(c => c.id === couponId);
+    if (couponToUse) {
+      setCollectedCoupons(prev => prev.filter(c => c.id !== couponId));
+      setUsedOrExpiredCoupons(prev => [...prev, { ...couponToUse, usedDate: new Date().toLocaleDateString('th-TH') }]);
+      toast.success(`ใช้คูปอง "${couponToUse.title}" สำเร็จแล้วค่ะ!`);
     }
   };
 
@@ -287,7 +308,9 @@ const Index = () => {
               <Promotions 
                 userPoints={userPoints} 
                 collectedCoupons={collectedCoupons}
-                onCollectCoupon={handleCollectCoupon}
+                usedOrExpiredCoupons={usedOrExpiredCoupons}
+                onRedeemCoupon={handleRedeemCoupon}
+                onUseCoupon={handleUseCoupon}
               />
             </motion.div>
           )}

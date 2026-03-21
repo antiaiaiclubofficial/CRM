@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Ticket, Gift, Sparkles, Scissors, Clock, ChevronRight, LucideIcon, ShowerHead, Leaf, Hand, Tag, Heart, PawPrint, Crown } from 'lucide-react';
+import { Ticket, Gift, Sparkles, Scissors, Clock, ChevronRight, LucideIcon, ShowerHead, Leaf, Hand, Tag, Heart, PawPrint, Crown, History } from 'lucide-react';
 
 // Define the Coupon interface (reused for collected coupons)
 interface Coupon {
@@ -46,10 +46,16 @@ interface MemberDealItem {
   iconColor: string; // Tailwind class for icon color
 }
 
+interface UsedCoupon extends Coupon {
+  usedDate?: string; // To mark when it was used
+}
+
 interface PromotionsProps {
   userPoints: number;
-  collectedCoupons: Coupon[];
-  onCollectCoupon: (coupon: Coupon) => void;
+  collectedCoupons: Coupon[]; // Active, unused coupons
+  usedOrExpiredCoupons: UsedCoupon[]; // Used or expired coupons
+  onRedeemCoupon: (coupon: Coupon, pointsCost: number) => void; // New prop for redeeming
+  onUseCoupon: (couponId: number) => void; // New prop for using collected coupons
 }
 
 // Map icon names to LucideIcon components
@@ -71,7 +77,7 @@ const getIconComponent = (iconName: string, size: number, className?: string) =>
   return IconComponent ? <IconComponent size={size} className={className} /> : null;
 };
 
-const Promotions = ({ userPoints, collectedCoupons, onCollectCoupon }: PromotionsProps) => {
+const Promotions = ({ userPoints, collectedCoupons, usedOrExpiredCoupons, onRedeemCoupon, onUseCoupon }: PromotionsProps) => {
   // Mock data for Special Promotions
   const specialPromotionsData: SpecialPromotionItem[] = [
     {
@@ -150,57 +156,44 @@ const Promotions = ({ userPoints, collectedCoupons, onCollectCoupon }: Promotion
     },
   ];
 
-  // The allCoupons array is kept for the 'onCollectCoupon' logic,
-  // even if it's not directly displayed in a 'collectable' section in this new UI.
-  const allCoupons: Coupon[] = [
+  // Redeemable coupons data (repurposed from allCoupons)
+  const redeemableCouponsData: Coupon[] = [
     {
-      id: 1,
-      title: 'ส่วนลดอาบน้ำ-ตัดขน',
-      description: 'ลดทันทีเมื่อใช้บริการ Full Service',
+      id: 101, // Changed IDs to avoid conflict with existing collectedCoupons if any
+      title: 'ส่วนลด 100.-',
+      description: 'สำหรับบริการใดก็ได้',
       value: '100.-',
       type: 'DISCOUNT',
-      expiry: 'หมดเขต 30 มิ.ย. 67',
-      iconName: 'Scissors',
+      expiry: '31 ธ.ค. 67',
+      iconName: 'Tag',
       color: 'from-pink-400 to-rose-500',
       bg: 'bg-rose-50',
       pointsRequired: 500,
     },
     {
-      id: 2,
-      title: 'สปาโอโซน Buy 1 Get 1',
-      description: 'ซื้อ 1 ครั้ง แถมฟรีอีก 1 ครั้งทันที',
-      value: 'B1G1',
-      type: 'FREE',
-      expiry: 'หมดเขต 15 มิ.ย. 67',
-      iconName: 'Sparkles',
-      color: 'from-amber-400 to-orange-500',
-      bg: 'bg-amber-50',
+      id: 102,
+      title: 'ฟรี! แชมพูพรีเมียม',
+      description: 'เมื่อใช้บริการอาบน้ำ',
+      value: 'FREE',
+      type: 'GIFT',
+      expiry: '31 ธ.ค. 67',
+      iconName: 'ShowerHead',
+      color: 'from-emerald-400 to-teal-500',
+      bg: 'bg-emerald-50',
       pointsRequired: 800,
     },
     {
-      id: 3,
-      title: 'Welcome New Pet',
-      description: 'ส่วนลด 20% สำหรับสมาชิกใหม่',
+      id: 103,
+      title: 'ส่วนลด 20% สปา',
+      description: 'สำหรับบริการสปาทุกประเภท',
       value: '20%',
       type: 'PERCENT',
-      expiry: 'ไม่มีวันหมดอายุ',
-      iconName: 'Gift',
-      color: 'from-emerald-400 to-teal-500',
-      bg: 'bg-emerald-50',
-      pointsRequired: 0,
+      expiry: '31 ธ.ค. 67',
+      iconName: 'Sparkles',
+      color: 'from-amber-400 to-orange-500',
+      bg: 'bg-amber-50',
+      pointsRequired: 1200,
     },
-    {
-      id: 4,
-      title: 'ฟรี! ขนมขบเคี้ยว',
-      description: 'รับขนมฟรี 1 ซองเมื่อมียอดครบ 500.-',
-      value: 'FREE',
-      type: 'GIFT',
-      expiry: 'เฉพาะวันศุกร์เท่านั้น',
-      iconName: 'Ticket',
-      color: 'from-blue-400 to-indigo-500',
-      bg: 'bg-blue-50',
-      pointsRequired: 300,
-    }
   ];
 
   return (
@@ -268,12 +261,68 @@ const Promotions = ({ userPoints, collectedCoupons, onCollectCoupon }: Promotion
                   <h4 className="font-bold text-slate-800 text-sm">{coupon.title}</h4>
                   <p className="text-xs text-slate-500">{coupon.description}</p>
                 </div>
-                <span className="text-[10px] text-slate-400 font-medium">{coupon.expiry}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-slate-400 font-medium">{coupon.expiry}</span>
+                  <button
+                    onClick={() => onUseCoupon(coupon.id)}
+                    className="bg-pink-100 text-pink-700 text-xs font-bold px-3 py-1.5 rounded-full active:scale-95 transition-all"
+                  >
+                    ใช้เลย
+                  </button>
+                </div>
               </motion.div>
             ))
           ) : (
             <div className="text-center py-6 text-slate-400">คุณยังไม่มีคูปองที่เก็บไว้ค่ะ</div>
           )}
+        </div>
+      </div>
+
+      {/* Redeem Points for Discounts Section (NEW) */}
+      <div>
+        <div className="flex items-center gap-2 mb-4 px-1">
+          <Crown size={18} className="text-amber-500" /> {/* Using Crown for points redemption */}
+          <h2 className="text-xl font-bold text-slate-800">แลกคะแนนเป็นส่วนลด</h2>
+        </div>
+        <div className="space-y-3">
+          {redeemableCouponsData.map((coupon, index) => {
+            const canRedeem = userPoints >= coupon.pointsRequired;
+            const isAlreadyCollected = collectedCoupons.some(c => c.id === coupon.id); // Check if already in collected
+            const isDisabled = !canRedeem || isAlreadyCollected;
+
+            return (
+              <motion.div
+                key={coupon.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                whileTap={{ scale: isDisabled ? 1 : 0.98 }}
+                className={`bg-white p-4 rounded-2xl shadow-sm border border-slate-50 flex items-center gap-4 group ${isDisabled ? 'opacity-50 grayscale' : ''}`}
+              >
+                <div className={`w-10 h-10 ${coupon.bg} rounded-lg flex items-center justify-center text-xl shadow-inner`}>
+                  {getIconComponent(coupon.iconName, 20)}
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-slate-800 text-sm">{coupon.title}</h4>
+                  <p className="text-xs text-slate-500">{coupon.description}</p>
+                  <p className="text-[10px] text-slate-400 font-medium mt-1">
+                    ใช้ {coupon.pointsRequired} คะแนน
+                  </p>
+                </div>
+                <button
+                  onClick={() => onRedeemCoupon(coupon, coupon.pointsRequired)}
+                  disabled={isDisabled}
+                  className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all ${
+                    isDisabled
+                      ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
+                      : 'bg-pink-100 text-pink-700 active:scale-95'
+                  }`}
+                >
+                  {isAlreadyCollected ? 'แลกแล้ว' : 'แลกเลย'}
+                </button>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
 
@@ -313,8 +362,39 @@ const Promotions = ({ userPoints, collectedCoupons, onCollectCoupon }: Promotion
         </div>
       </div>
 
-      {/* The allCoupons and onCollectCoupon logic is preserved, but not directly exposed in this UI.
-          If you need a section for users to 'collect' coupons for points, please let me know! */}
+      {/* Used/Expired Coupons Section (NEW) */}
+      <div>
+        <div className="flex items-center gap-2 mb-4 px-1">
+          <History size={18} className="text-slate-500" /> {/* Using History icon */}
+          <h2 className="text-xl font-bold text-slate-800">คูปองที่ใช้แล้ว/หมดอายุ</h2>
+        </div>
+        <div className="space-y-3">
+          {usedOrExpiredCoupons.length > 0 ? (
+            usedOrExpiredCoupons.map((coupon, index) => (
+              <motion.div
+                key={coupon.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-50 flex items-center gap-4 opacity-60 grayscale"
+              >
+                <div className={`w-10 h-10 ${coupon.bg} rounded-lg flex items-center justify-center text-xl shadow-inner`}>
+                  {getIconComponent(coupon.iconName, 20)}
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-slate-800 text-sm line-through">{coupon.title}</h4>
+                  <p className="text-xs text-slate-500">{coupon.description}</p>
+                </div>
+                <span className="text-[10px] text-slate-400 font-medium">
+                  {coupon.usedDate ? `ใช้เมื่อ: ${coupon.usedDate}` : `หมดอายุ: ${coupon.expiry}`}
+                </span>
+              </motion.div>
+            ))
+          ) : (
+            <div className="text-center py-6 text-slate-400">ไม่มีคูปองที่ใช้แล้วหรือหมดอายุค่ะ</div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
