@@ -12,6 +12,20 @@ import MembershipLevels from '@/components/MembershipLevels'; // Import the new 
 import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Define the Coupon interface here as well, or import it if it were in a shared file
+interface Coupon {
+  id: number;
+  title: string;
+  description: string;
+  value: string;
+  type: string;
+  expiry: string;
+  iconName: string;
+  color: string;
+  bg: string;
+  pointsRequired: number;
+}
+
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedPetName, setSelectedPetName] = useState<string | null>(null);
@@ -28,6 +42,7 @@ const Index = () => {
   });
 
   const [userPoints, setUserPoints] = useState(1250); // State for user points
+  const [collectedCoupons, setCollectedCoupons] = useState<Coupon[]>([]); // New state for collected coupons
 
   const [pets, setPets] = useState([
     { 
@@ -74,6 +89,16 @@ const Index = () => {
   const handlePetSelection = (name: string) => {
     setSelectedPetName(name);
     setActiveTab('history');
+  };
+
+  // Function to handle collecting a coupon
+  const handleCollectCoupon = (coupon: Coupon) => {
+    // Check if the coupon is already collected to prevent duplicates
+    if (!collectedCoupons.some(c => c.id === coupon.id)) {
+      setCollectedCoupons((prev) => [...prev, coupon]);
+      // Optionally, deduct points here if that's part of the logic
+      // setUserPoints(prevPoints => prevPoints - coupon.pointsRequired);
+    }
   };
 
   return (
@@ -206,7 +231,11 @@ const Index = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Promotions userPoints={userPoints} /> {/* Pass userPoints here */}
+              <Promotions 
+                userPoints={userPoints} 
+                collectedCoupons={collectedCoupons} // Pass collected coupons
+                onCollectCoupon={handleCollectCoupon} // Pass the collection handler
+              />
             </motion.div>
           )}
 
