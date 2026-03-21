@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useState } from 'react';
-import MembershipCard from '@/components/MembershipCard';
-import PetList from '@/components/PetList'; // Renamed from PetManagement for clarity in this context
-import PetDetailView from '@/components/PetDetailView'; // New component
-import PetForm from '@/components/PetForm'; // New component for add/edit form
+import PetList from '@/components/PetList';
+import PetDetailView from '@/components/PetDetailView';
+import PetForm from '@/components/PetForm';
 import ServiceHistory from '@/components/ServiceHistory';
 import Promotions from '@/components/Promotions';
-import UpcomingAppointments from '@/components/UpcomingAppointments';
+import UpcomingAppointments from '@/components/UpcomingAppointments'; // Keep import for data structure, but not direct usage in home tab
 import UserProfileEdit from '@/components/UserProfileEdit';
 import MembershipLevels from '@/components/MembershipLevels';
-import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History } from 'lucide-react';
+import DashboardOverviewCard from '@/components/DashboardOverviewCard'; // New import
+import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History, Scissors, Bath } from 'lucide-react'; // Added Scissors, Bath for appointment icons
 import { motion, AnimatePresence } from 'framer-motion';
-import PetManagement from '@/components/PetManagement'; // Import PetManagement
+import PetManagement from '@/components/PetManagement';
 
 // Define the Pet interface here for consistency across components
 interface Pet {
@@ -41,6 +41,17 @@ interface Coupon {
   color: string;
   bg: string;
   pointsRequired: number;
+}
+
+// Define Appointment interface for consistency
+interface Appointment {
+  id: number;
+  petName: string;
+  service: string;
+  date: string;
+  time: string;
+  icon: React.ReactNode;
+  bg: string;
 }
 
 const Index = () => {
@@ -90,10 +101,32 @@ const Index = () => {
     },
   ]);
 
+  // Moved appointments data from UpcomingAppointments.tsx
+  const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([
+    {
+      id: 1,
+      petName: 'น้องปุย',
+      service: 'อาบน้ำตัดขน',
+      date: 'พรุ่งนี้, 14 มิ.ย.',
+      time: '13:00 น.',
+      icon: <Scissors size={16} className="text-pink-500" />,
+      bg: 'bg-pink-50'
+    },
+    {
+      id: 2,
+      petName: 'น้องกะทิ',
+      service: 'อาบน้ำแปรงขน',
+      date: '18 มิ.ย. 67',
+      time: '10:30 น.',
+      icon: <Bath size={16} className="text-blue-500" />,
+      bg: 'bg-blue-50'
+    }
+  ]);
+
   // State for PetForm modal
   const [isPetFormOpen, setIsPetFormOpen] = useState(false);
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
-  const [selectedPetForDetail, setSelectedPetForDetail] = useState<Pet | null>(null); // New state for pet detail view
+  const [selectedPetForDetail, setSelectedPetForDetail] = useState<Pet | null>(null);
 
   const handleAddPet = (newPetData: Omit<Pet, 'id'>) => {
     const id = pets.length > 0 ? Math.max(...pets.map(p => p.id)) + 1 : 1;
@@ -146,6 +179,17 @@ const Index = () => {
     setSelectedPetForDetail(null);
   };
 
+  // Handlers for DashboardOverviewCard actions
+  const handleViewAllPets = () => {
+    setActiveTab('pets');
+    setSelectedPetForDetail(null); // Ensure it goes to the list, not a specific detail
+  };
+
+  const handleViewAllAppointments = () => {
+    setActiveTab('history'); // Assuming appointments are part of history
+    setSelectedPetName(null); // Clear any pet filter in history
+  };
+
   return (
     <div className="max-w-[390px] min-h-[844px] mx-auto bg-[#FFF9F0] relative shadow-2xl overflow-hidden flex flex-col font-['Prompt']">
       
@@ -189,9 +233,14 @@ const Index = () => {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-6"
             >
-              <MembershipCard />
-
-              <UpcomingAppointments />
+              <DashboardOverviewCard
+                ownerProfile={ownerProfile}
+                userPoints={userPoints}
+                pets={pets}
+                upcomingAppointments={upcomingAppointments}
+                onViewAllPets={handleViewAllPets}
+                onViewAllAppointments={handleViewAllAppointments}
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <button className="bg-white p-4 rounded-3xl shadow-sm border border-slate-50 flex flex-col items-center gap-2 group active:scale-95 transition-all">
@@ -211,10 +260,8 @@ const Index = () => {
                 </button>
               </div>
 
-              <PetList 
-                pets={pets} 
-                onPetClick={handlePetSelection}
-              />
+              {/* Removed PetList from home tab as its summary is in DashboardOverviewCard */}
+              {/* Removed UpcomingAppointments from home tab as its summary is in DashboardOverviewCard */}
 
               <div className="bg-[#FFE3BC]/40 p-5 rounded-[2rem] border border-[#FFE3BC] flex items-center gap-4">
                 <div className="p-3 bg-white rounded-2xl shadow-sm">
@@ -254,7 +301,7 @@ const Index = () => {
                   onDeletePet={handleDeletePet}
                 />
               ) : (
-                <PetManagement // Corrected component from PetList to PetManagement
+                <PetManagement
                   pets={pets} 
                   onAddPet={handleOpenAddPetForm}
                   onViewDetails={handleViewPetDetails}
