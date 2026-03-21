@@ -2,15 +2,32 @@
 
 import React, { useState } from 'react';
 import MembershipCard from '@/components/MembershipCard';
-import PetList from '@/components/PetList';
-import PetManagement from '@/components/PetManagement';
+import PetList from '@/components/PetList'; // Renamed from PetManagement for clarity in this context
+import PetDetailView from '@/components/PetDetailView'; // New component
+import PetForm from '@/components/PetForm'; // New component for add/edit form
 import ServiceHistory from '@/components/ServiceHistory';
 import Promotions from '@/components/Promotions';
 import UpcomingAppointments from '@/components/UpcomingAppointments';
 import UserProfileEdit from '@/components/UserProfileEdit';
-import MembershipLevels from '@/components/MembershipLevels'; // Import the new component
+import MembershipLevels from '@/components/MembershipLevels';
 import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import PetManagement from '@/components/PetManagement'; // Import PetManagement
+
+// Define the Pet interface here for consistency across components
+interface Pet {
+  id: number;
+  name: string;
+  type: string;
+  breed: string;
+  age: string;
+  gender: string;
+  weight: string;
+  medicalCondition: string;
+  precautions: string;
+  color: string;
+  icon: string;
+}
 
 // Define the Coupon interface here as well, or import it if it were in a shared file
 interface Coupon {
@@ -41,10 +58,10 @@ const Index = () => {
     email: 'sara.jane@example.com'
   });
 
-  const [userPoints, setUserPoints] = useState(1250); // State for user points
-  const [collectedCoupons, setCollectedCoupons] = useState<Coupon[]>([]); // New state for collected coupons
+  const [userPoints, setUserPoints] = useState(1250);
+  const [collectedCoupons, setCollectedCoupons] = useState<Coupon[]>([]);
 
-  const [pets, setPets] = useState([
+  const [pets, setPets] = useState<Pet[]>([
     { 
       id: 1, 
       name: 'น้องปุย', 
@@ -73,17 +90,24 @@ const Index = () => {
     },
   ]);
 
-  const handleAddPet = (newPet: any) => {
+  // State for PetForm modal
+  const [isPetFormOpen, setIsPetFormOpen] = useState(false);
+  const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
+  const [selectedPetForDetail, setSelectedPetForDetail] = useState<Pet | null>(null); // New state for pet detail view
+
+  const handleAddPet = (newPetData: Omit<Pet, 'id'>) => {
     const id = pets.length > 0 ? Math.max(...pets.map(p => p.id)) + 1 : 1;
-    setPets([...pets, { ...newPet, id }]);
+    setPets([...pets, { ...newPetData, id }]);
   };
 
-  const handleEditPet = (id: number, updatedData: any) => {
-    setPets(pets.map(p => p.id === id ? { ...p, ...updatedData } : p));
+  const handleEditPet = (updatedPet: Pet) => {
+    setPets(pets.map(p => p.id === updatedPet.id ? updatedPet : p));
+    setSelectedPetForDetail(updatedPet); // Update detail view if currently open
   };
 
   const handleDeletePet = (id: number) => {
     setPets(pets.filter(p => p.id !== id));
+    setSelectedPetForDetail(null); // Close detail view if deleted
   };
 
   const handlePetSelection = (name: string) => {
@@ -91,14 +115,35 @@ const Index = () => {
     setActiveTab('history');
   };
 
-  // Function to handle collecting a coupon
   const handleCollectCoupon = (coupon: Coupon) => {
-    // Check if the coupon is already collected to prevent duplicates
     if (!collectedCoupons.some(c => c.id === coupon.id)) {
       setCollectedCoupons((prev) => [...prev, coupon]);
-      // Optionally, deduct points here if that's part of the logic
-      // setUserPoints(prevPoints => prevPoints - coupon.pointsRequired);
     }
+  };
+
+  // Handlers for PetForm
+  const handleOpenAddPetForm = () => {
+    setPetToEdit(null);
+    setIsPetFormOpen(true);
+  };
+
+  const handleOpenEditPetForm = (pet: Pet) => {
+    setPetToEdit(pet);
+    setIsPetFormOpen(true);
+  };
+
+  const handleClosePetForm = () => {
+    setIsPetFormOpen(false);
+    setPetToEdit(null);
+  };
+
+  // Handlers for PetDetailView
+  const handleViewPetDetails = (pet: Pet) => {
+    setSelectedPetForDetail(pet);
+  };
+
+  const handleBackFromPetDetail = () => {
+    setSelectedPetForDetail(null);
   };
 
   return (
@@ -183,7 +228,7 @@ const Index = () => {
             </motion.div>
           )}
 
-          {activeTab === 'level' && ( // New tab for MembershipLevels
+          {activeTab === 'level' && (
             <motion.div
               key="level-tab"
               initial={{ opacity: 0, x: 20 }}
@@ -201,12 +246,20 @@ const Index = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <PetManagement 
-                pets={pets} 
-                onAdd={handleAddPet} 
-                onEdit={handleEditPet} 
-                onDelete={handleDeletePet} 
-              />
+              {selectedPetForDetail ? (
+                <PetDetailView 
+                  pet={selectedPetForDetail}
+                  onBack={handleBackFromPetDetail}
+                  onStartEdit={handleOpenEditPetForm}
+                  onDeletePet={handleDeletePet}
+                />
+              ) : (
+                <PetManagement // Corrected component from PetList to PetManagement
+                  pets={pets} 
+                  onAddPet={handleOpenAddPetForm}
+                  onViewDetails={handleViewPetDetails}
+                />
+              )}
             </motion.div>
           )}
 
@@ -233,8 +286,8 @@ const Index = () => {
             >
               <Promotions 
                 userPoints={userPoints} 
-                collectedCoupons={collectedCoupons} // Pass collected coupons
-                onCollectCoupon={handleCollectCoupon} // Pass the collection handler
+                collectedCoupons={collectedCoupons}
+                onCollectCoupon={handleCollectCoupon}
               />
             </motion.div>
           )}
@@ -250,7 +303,7 @@ const Index = () => {
                 <Bell size={40} />
               </div>
               <h3 className="font-bold text-slate-800">กำลังเตรียมข้อมูล...</h3>
-              <p className="text-sm text-slate-500">ส่วนของ "{activeTab}" กำลังจะมาเร็วๆ นี้</p>
+              <p className="text-sm text-slate-500">ส่วนของ "{activeTab}" กำงจะมาเร็วๆ นี้</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -264,37 +317,51 @@ const Index = () => {
         onSave={(updated) => setOwnerProfile(updated)}
       />
 
+      {/* Pet Add/Edit Form Modal */}
+      <PetForm
+        isOpen={isPetFormOpen}
+        onClose={handleClosePetForm}
+        onSave={(data) => {
+          if ('id' in data) {
+            handleEditPet(data as Pet);
+          } else {
+            handleAddPet(data);
+          }
+        }}
+        initialData={petToEdit}
+      />
+
       {/* Bottom Navigation Bar */}
       <nav className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-100 px-6 py-4 flex justify-between items-center rounded-t-[2.5rem] shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.05)] z-50">
         <NavButton 
           active={activeTab === 'home'} 
           icon={<Home size={22} />} 
           label="หน้าแรก" 
-          onClick={() => { setActiveTab('home'); setSelectedPetName(null); }} 
+          onClick={() => { setActiveTab('home'); setSelectedPetName(null); setSelectedPetForDetail(null); }} 
         />
         <NavButton 
           active={activeTab === 'level'} 
           icon={<Award size={22} />} 
           label="ระดับสมาชิก" 
-          onClick={() => setActiveTab('level')} 
+          onClick={() => { setActiveTab('level'); setSelectedPetForDetail(null); }} 
         />
         <NavButton 
           active={activeTab === 'pets'} 
           icon={<PawPrint size={22} />} 
           label="สัตว์เลี้ยง" 
-          onClick={() => setActiveTab('pets')} 
+          onClick={() => { setActiveTab('pets'); setSelectedPetForDetail(null); }} 
         />
         <NavButton 
           active={activeTab === 'history'} 
           icon={<History size={22} />} 
           label="ประวัติ" 
-          onClick={() => setActiveTab('history')} 
+          onClick={() => { setActiveTab('history'); setSelectedPetForDetail(null); }} 
         />
         <NavButton 
           active={activeTab === 'promo'} 
           icon={<Megaphone size={22} />} 
           label="โปรโมชั่น" 
-          onClick={() => setActiveTab('promo')} 
+          onClick={() => { setActiveTab('promo'); setSelectedPetForDetail(null); }} 
         />
       </nav>
     </div>
