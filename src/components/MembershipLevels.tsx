@@ -131,23 +131,29 @@ const MembershipLevels = ({ userPoints }: MembershipLevelsProps) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden p-6 rounded-[2rem] bg-gradient-to-br from-amber-500 to-amber-700 shadow-xl shadow-amber-200/50 text-white"
+      className={`relative overflow-hidden p-4 rounded-[2rem] ${currentLevel.colorClass} shadow-xl shadow-slate-200/50 text-white`}
     >
-      {/* Watermark Crown */}
-      <Crown className="absolute -right-4 -top-4 w-32 h-32 text-white/20 rotate-12" />
-      <Crown className="absolute -left-8 -bottom-8 w-24 h-24 text-white/10 -rotate-12" />
+      {/* Watermark Icon */}
+      <div className="absolute -right-4 -top-4 w-24 h-24 text-white/20 rotate-12 flex items-center justify-center">
+        {React.cloneElement(currentLevel.icon as React.ReactElement, { size: 64 })}
+      </div>
+      <div className="absolute -left-8 -bottom-8 w-16 h-16 text-white/10 -rotate-12 flex items-center justify-center">
+        {React.cloneElement(currentLevel.icon as React.ReactElement, { size: 40 })}
+      </div>
 
-      <div className="relative z-10 text-center space-y-3">
-        <Crown size={40} className="mx-auto text-white/90 mb-2" />
-        <p className="text-sm font-medium text-white/80">ระดับปัจจุบันของคุณ</p>
-        <h3 className="text-3xl font-bold mb-4">{currentLevel.name}</h3>
+      <div className="relative z-10 text-center space-y-2">
+        <div className="mx-auto text-white/90 mb-1">
+          {React.cloneElement(currentLevel.icon as React.ReactElement, { size: 32 })}
+        </div>
+        <p className="text-xs font-medium text-white/80">ระดับปัจจุบันของคุณ</p>
+        <h3 className="text-2xl font-bold mb-2">{currentLevel.name}</h3>
 
-        <div className="flex items-baseline justify-center gap-1 mb-4">
-          <span className="text-4xl font-bold">{userPoints}</span>
-          <span className="text-lg text-white/80"> / {nextLevel ? nextLevel.minPoints : 'MAX'} คะแนน</span>
+        <div className="flex items-baseline justify-center gap-1 mb-3">
+          <span className="text-3xl font-bold">{userPoints}</span>
+          <span className="text-sm text-white/80"> / {nextLevel ? nextLevel.minPoints : 'MAX'} คะแนน</span>
         </div>
 
-        <div className="w-full bg-white/30 h-3 rounded-full overflow-hidden mb-2">
+        <div className="w-full bg-white/30 h-2 rounded-full overflow-hidden mb-2">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${progressPercentage}%` }}
@@ -171,48 +177,56 @@ const MembershipLevels = ({ userPoints }: MembershipLevelsProps) => {
   return (
     <div className="space-y-6 pb-20">
       <h2 className="text-xl font-bold text-slate-800 px-1">ระดับสมาชิกและสิทธิประโยชน์</h2>
-      <p className="text-sm text-slate-500 px-1">เลือกแผนที่ใช่ เพื่อการดูแลที่ดีที่สุดสำหรับเพื่อนซี้สี่ขาของคุณ</p>
+      {/* Removed: <p className="text-sm text-slate-500 px-1">เลือกแผนที่ใช่ เพื่อการดูแลที่ดีที่สุดสำหรับเพื่อนซี้สี่ขาของคุณ</p> */}
 
       {/* Current Membership Status Card */}
       <CurrentMembershipStatusCard />
 
       <div className="space-y-4">
-        {membershipTiers.map((tier, index) => (
-          <motion.div
-            key={tier.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col"
-          >
-            <div className="flex items-center gap-4 mb-4">
-              <div className={`w-14 h-14 ${tier.colorClass} rounded-2xl flex items-center justify-center text-white text-2xl shadow-inner`}>
-                {tier.icon}
+        {membershipTiers.map((tier, index) => {
+          const isTierReached = userPoints >= tier.minPoints;
+          const cardClasses = isTierReached 
+            ? "bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col"
+            : "bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col opacity-50 grayscale"; // Grey out if not reached
+
+          return (
+            <motion.div
+              key={tier.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className={cardClasses}
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className={`w-14 h-14 ${tier.colorClass} rounded-2xl flex items-center justify-center text-white text-2xl shadow-inner`}>
+                  {tier.icon}
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-800 text-lg">{tier.name}</h3>
+                  <p className="text-xs text-slate-500">{tier.description}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-slate-800 text-lg">{tier.name}</h3>
-                <p className="text-xs text-slate-500">{tier.description}</p>
+              <div className="border-t border-slate-50 pt-4">
+                <ul className="space-y-2">
+                  {tier.benefits.map((benefit, bIndex) => (
+                    <li key={bIndex} className={`flex items-start gap-2 text-sm ${isTierReached ? 'text-slate-700' : 'text-slate-400'}`}>
+                      <Check size={16} className={`${isTierReached ? 'text-pink-500' : 'text-slate-400'} flex-shrink-0 mt-0.5`} />
+                      <span>{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
-            <div className="border-t border-slate-50 pt-4">
-              <ul className="space-y-2">
-                {tier.benefits.map((benefit, bIndex) => (
-                  <li key={bIndex} className="flex items-start gap-2 text-sm text-slate-700">
-                    <Check size={16} className="text-pink-500 flex-shrink-0 mt-0.5" />
-                    <span>{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          );
+        })}
       </div>
 
-      <div className="bg-white/40 p-6 rounded-[2.5rem] text-center border-2 border-dashed border-slate-200">
+      {/* Removed: Upgrade contact message */}
+      {/* <div className="bg-white/40 p-6 rounded-[2.5rem] text-center border-2 border-dashed border-slate-200">
         <p className="text-xs text-slate-400">
           ต้องการอัปเกรดระดับสมาชิก? <span className="text-pink-500 font-bold">ติดต่อเรา</span> เพื่อสอบถามข้อมูลเพิ่มเติม
         </p>
-      </div>
+      </div> */}
     </div>
   );
 };
