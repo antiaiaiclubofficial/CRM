@@ -71,20 +71,24 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints }: Membership
           </div>
           <div className="text-right">
             <p className="text-xs text-slate-500">ID: PET-8899</p>
-            {/* Moved total accumulated points here */}
-            <p className="text-xs font-bold text-slate-800">
-              {totalAccumulatedPoints.toLocaleString()} / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'} Points
-            </p>
             <p className="font-bold text-slate-800">คุณซาร่า เจน</p>
           </div>
         </div>
 
-        {/* Display current redeemable points */}
-        <div className="mb-4">
-          <p className="text-xs text-slate-600 mb-1">คะแนนปัจจุบันของคุณ</p>
-          <div className="flex items-baseline gap-1">
-            <span className="text-4xl font-bold text-slate-800">{redeemablePoints.toLocaleString()}</span>
-            <span className="text-sm text-slate-600">Points</span>
+        {/* Display current redeemable points and total accumulated points on the same line */}
+        <div className="flex justify-between items-end mb-4">
+          <div>
+            <p className="text-xs text-slate-600 mb-1">คะแนนปัจจุบันของคุณ</p>
+            <div className="flex items-baseline gap-1">
+              <span className="text-4xl font-bold text-slate-800">{redeemablePoints.toLocaleString()}</span>
+              <span className="text-sm text-slate-600">Points</span>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] text-slate-500 mb-0.5">คะแนนสะสมทั้งหมด</p>
+            <p className="text-sm font-bold text-slate-800">
+              {totalAccumulatedPoints.toLocaleString()} / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'} Points
+            </p>
           </div>
         </div>
 
