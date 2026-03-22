@@ -127,6 +127,10 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
   }
   progressPercentage = Math.min(100, Math.max(0, progressPercentage)); // Ensure it's between 0 and 100
 
+  // Create a new array for display order: currentLevel first, then others sorted
+  const otherTiers = sortedTiers.filter(tier => tier.id !== currentLevel.id);
+  const displayTiers = [currentLevel, ...otherTiers];
+
   // Sub-component for the current membership status card
   const CurrentMembershipStatusCard = () => (
     <motion.div
@@ -183,11 +187,12 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
       <CurrentMembershipStatusCard />
 
       <div className="space-y-4">
-        {sortedTiers.map((tier, index) => { 
+        {displayTiers.map((tier, index) => { 
           const isTierReached = totalAccumulatedPoints >= tier.minPoints;
           
+          // Apply opacity-30 and grayscale if the tier is NOT the current level AND NOT reached
           const cardClasses = `bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col ${
-            isTierReached ? '' : 'opacity-30 grayscale' // Apply fading if tier is NOT reached
+            (tier.id !== currentLevel.id && !isTierReached) ? 'opacity-30 grayscale' : ''
           }`;
 
           return (
@@ -210,8 +215,8 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
               <div className="border-t border-slate-50 pt-4">
                 <ul className="space-y-2">
                   {tier.benefits.map((benefit, bIndex) => (
-                    <li key={bIndex} className="flex items-start gap-2 text-sm text-slate-700"> {/* Let parent opacity handle fading */}
-                      <Check size={16} className="text-pink-500 flex-shrink-0 mt-0.5" /> {/* Let parent opacity handle fading */}
+                    <li key={bIndex} className="flex items-start gap-2 text-sm text-slate-700">
+                      <Check size={16} className="text-pink-500 flex-shrink-0 mt-0.5" />
                       <span>{benefit}</span>
                     </li>
                   ))}
