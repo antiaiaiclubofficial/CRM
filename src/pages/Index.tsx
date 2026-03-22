@@ -60,6 +60,9 @@ interface ServiceHistoryItem {
   bg: string;
   description: string;
   notes?: string;
+  shampooUsed?: string; // New field
+  spaTreatment?: string; // New field
+  groomerNotes?: string; // New field
   beforeAfterImages?: { before: string; after: string; }[];
 }
 

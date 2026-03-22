@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Calendar, Clock, DollarSign, FileText, Image, Info, PawPrint } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, DollarSign, FileText, Image, Info, PawPrint, Droplet, Sparkles, UserCog } from 'lucide-react'; // Added Droplet, Sparkles, UserCog
 
 interface ServiceDetail {
   id: number;
@@ -14,6 +14,9 @@ interface ServiceDetail {
   bg: string;
   description: string;
   notes?: string;
+  shampooUsed?: string; // New field
+  spaTreatment?: string; // New field
+  groomerNotes?: string; // New field
   beforeAfterImages?: { before: string; after: string; }[];
 }
 
@@ -71,14 +74,50 @@ const ServiceHistoryDetail = ({ service, onBack }: ServiceHistoryDetailProps) =>
         </div>
       </div>
 
+      {/* Shampoo Used (if any) */}
+      {service.shampooUsed && (
+        <div className="space-y-3">
+          <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <Droplet size={20} className="text-blue-500" /> แชมพูที่ใช้
+          </h3>
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
+            <p className="text-sm text-slate-700">{service.shampooUsed}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Spa Treatment (if any) */}
+      {service.spaTreatment && (
+        <div className="space-y-3">
+          <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <Sparkles size={20} className="text-amber-500" /> ทรีทเมนต์สปา
+          </h3>
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
+            <p className="text-sm text-slate-700">{service.spaTreatment}</p>
+          </div>
+        </div>
+      )}
+
       {/* Notes (if any) */}
       {service.notes && (
         <div className="space-y-3">
           <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <Info size={20} className="text-amber-500" /> หมายเหตุ
+            <Info size={20} className="text-purple-500" /> หมายเหตุจากเจ้าของ
           </h3>
           <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
             <p className="text-sm text-slate-700">{service.notes}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Groomer Notes (if any) */}
+      {service.groomerNotes && (
+        <div className="space-y-3">
+          <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <UserCog size={20} className="text-emerald-500" /> ข้อสังเกตจากช่าง
+          </h3>
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
+            <p className="text-sm text-slate-700">{service.groomerNotes}</p>
           </div>
         </div>
       )}
@@ -87,7 +126,7 @@ const ServiceHistoryDetail = ({ service, onBack }: ServiceHistoryDetailProps) =>
       {service.beforeAfterImages && service.beforeAfterImages.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <Image size={20} className="text-emerald-500" /> รูปภาพ Before-After
+            <Image size={20} className="text-pink-500" /> รูปภาพ Before-After
           </h3>
           <div className="grid grid-cols-2 gap-4">
             {service.beforeAfterImages.map((images, index) => (

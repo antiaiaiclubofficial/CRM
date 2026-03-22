@@ -14,6 +14,9 @@ interface ServiceHistoryItem {
   bg: string;
   description: string;
   notes?: string;
+  shampooUsed?: string; // New field
+  spaTreatment?: string; // New field
+  groomerNotes?: string; // New field
   beforeAfterImages?: { before: string; after: string; }[];
 }
 
@@ -35,6 +38,9 @@ const ServiceHistory = ({ filterPetName, onClearFilter, onServiceClick }: Servic
       bg: 'bg-pink-50',
       description: 'บริการอาบน้ำและตัดขนครบวงจรสำหรับน้องปุย รวมถึงการแปรงขน กำจัดขนที่หลุดร่วง และตัดแต่งทรงขนตามต้องการ',
       notes: 'น้องปุยมีผิวแพ้ง่าย ใช้แชมพูสูตรอ่อนโยนพิเศษ',
+      shampooUsed: 'แชมพูสูตรอ่อนโยนสำหรับผิวแพ้ง่าย (Hypoallergenic Shampoo)',
+      spaTreatment: 'ไม่มี',
+      groomerNotes: 'น้องปุยให้ความร่วมมือดีมาก ขนสะอาดและนุ่มสลวย',
       beforeAfterImages: [
         { before: 'https://via.placeholder.com/150/FFD8E4/000000?text=Before+Pui', after: 'https://via.placeholder.com/150/B2F2BB/000000?text=After+Pui' }
       ]
@@ -49,6 +55,9 @@ const ServiceHistory = ({ filterPetName, onClearFilter, onServiceClick }: Servic
       bg: 'bg-amber-50',
       description: 'สปาโอโซนช่วยบำรุงผิวหนังและเส้นขนของน้องกะทิให้แข็งแรง พร้อมนวดผ่อนคลายลดความเครียด',
       notes: 'น้องกะทิขี้ตื่นง่าย ควรทำในห้องที่เงียบสงบ',
+      shampooUsed: 'แชมพูบำรุงขนสำหรับแมวขนยาว (Long Hair Cat Shampoo)',
+      spaTreatment: 'สปาโอโซนบำรุงผิวและขน',
+      groomerNotes: 'น้องกะทิผ่อนคลายดีหลังจากการนวด ขนเงางามขึ้น',
       beforeAfterImages: [
         { before: 'https://via.placeholder.com/150/FFE3BC/000000?text=Before+Kati', after: 'https://via.placeholder.com/150/FFD8E4/000000?text=After+Kati' }
       ]
@@ -63,6 +72,9 @@ const ServiceHistory = ({ filterPetName, onClearFilter, onServiceClick }: Servic
       bg: 'bg-blue-50',
       description: 'บริการอาบน้ำด้วยแชมพูกำจัดเห็บหมัดประสิทธิภาพสูง เพื่อสุขอนามัยที่ดีของน้องปุย',
       notes: 'ตรวจสอบให้แน่ใจว่าไม่มีเห็บหมัดหลงเหลืออยู่',
+      shampooUsed: 'แชมพูกำจัดเห็บหมัด (Flea & Tick Shampoo)',
+      spaTreatment: 'ไม่มี',
+      groomerNotes: 'พบเห็บหมัดเล็กน้อยบริเวณคอ ได้ทำการกำจัดออกทั้งหมดแล้ว',
       beforeAfterImages: [
         { before: 'https://via.placeholder.com/150/FFD8E4/000000?text=Before+Pui', after: 'https://via.placeholder.com/150/B2F2BB/000000?text=After+Pui' }
       ]
