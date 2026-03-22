@@ -190,9 +190,9 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
 
       <div className="space-y-4">
         {displayTiers.map((tier, index) => { 
-          // Apply opacity-5 and grayscale if the tier is NOT the current level
-          const cardClasses = `bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col ${
-            tier.id !== currentLevel.id ? 'opacity-5 grayscale' : ''
+          const isCurrentLevel = tier.id === currentLevel.id;
+          const cardClasses = `bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col relative overflow-hidden ${
+            !isCurrentLevel ? 'grayscale' : '' // Apply grayscale to the card
           }`;
 
           return (
@@ -203,25 +203,32 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
               transition={{ delay: index * 0.1 }}
               className={cardClasses}
             >
-              <div className="flex items-center gap-4 mb-4">
-                <div className={`w-14 h-14 ${tier.colorClass} rounded-2xl flex items-center justify-center text-white text-2xl shadow-inner`}>
-                  {tier.icon}
+              {/* Content of the card */}
+              <div className="relative z-10"> {/* Content is below the overlay */}
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`w-14 h-14 ${tier.colorClass} rounded-2xl flex items-center justify-center text-white text-2xl shadow-inner`}>
+                    {tier.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-800 text-lg">{tier.name}</h3>
+                    <p className="text-xs text-slate-500">{tier.description}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-bold text-slate-800 text-lg">{tier.name}</h3>
-                  <p className="text-xs text-slate-500">{tier.description}</p>
+                <div className="border-t border-slate-50 pt-4">
+                  <ul className="space-y-2">
+                    {tier.benefits.map((benefit, bIndex) => (
+                      <li key={bIndex} className="flex items-start gap-2 text-sm text-slate-700">
+                        <Check size={16} className="text-pink-500 flex-shrink-0 mt-0.5" />
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
-              <div className="border-t border-slate-50 pt-4">
-                <ul className="space-y-2">
-                  {tier.benefits.map((benefit, bIndex) => (
-                    <li key={bIndex} className="flex items-start gap-2 text-sm text-slate-700">
-                      <Check size={16} className="text-pink-500 flex-shrink-0 mt-0.5" />
-                      <span>{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {!isCurrentLevel && (
+                // Overlay for the "fog" effect, on top of content
+                <div className="absolute inset-0 bg-white/80 z-20 rounded-[2.5rem]" /> 
+              )}
             </motion.div>
           );
         })}
