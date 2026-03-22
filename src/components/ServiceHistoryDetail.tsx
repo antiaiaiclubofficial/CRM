@@ -74,27 +74,30 @@ const ServiceHistoryDetail = ({ service, onBack }: ServiceHistoryDetailProps) =>
         </div>
       </div>
 
-      {/* Shampoo Used (if any) */}
-      {service.shampooUsed && (
-        <div className="space-y-3">
-          <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <Droplet size={20} className="text-blue-500" /> แชมพูที่ใช้
-          </h3>
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
-            <p className="text-sm text-slate-700">{service.shampooUsed}</p>
-          </div>
-        </div>
-      )}
+      {/* Shampoo Used & Spa Treatment in 2 columns */}
+      {(service.shampooUsed || service.spaTreatment) && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {service.shampooUsed && (
+            <div className="space-y-3">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <Droplet size={20} className="text-blue-500" /> แชมพูที่ใช้
+              </h3>
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
+                <p className="text-sm text-slate-700">{service.shampooUsed}</p>
+              </div>
+            </div>
+          )}
 
-      {/* Spa Treatment (if any) */}
-      {service.spaTreatment && (
-        <div className="space-y-3">
-          <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <Sparkles size={20} className="text-amber-500" /> ทรีทเมนต์สปา
-          </h3>
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
-            <p className="text-sm text-slate-700">{service.spaTreatment}</p>
-          </div>
+          {service.spaTreatment && (
+            <div className="space-y-3">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <Sparkles size={20} className="text-amber-500" /> ทรีทเมนต์สปา
+              </h3>
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
+                <p className="text-sm text-slate-700">{service.spaTreatment}</p>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
