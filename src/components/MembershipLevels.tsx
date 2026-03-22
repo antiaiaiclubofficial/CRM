@@ -114,14 +114,11 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
   }
 
   const pointsToNextLevel = nextLevel ? nextLevel.minPoints - totalAccumulatedPoints : 0;
-  const currentLevelMinPoints = currentLevel.minPoints;
-  const nextLevelMinPoints = nextLevel ? nextLevel.minPoints : currentLevel.minPoints + 1; // Prevent division by zero if max level
   
   let progressPercentage = 0;
   if (nextLevel) {
-    const pointsRange = nextLevelMinPoints - currentLevelMinPoints;
-    const pointsEarnedInCurrentTier = totalAccumulatedPoints - currentLevelMinPoints;
-    progressPercentage = (pointsEarnedInCurrentTier / pointsRange) * 100;
+    // Corrected calculation: progress from 0 towards the next level's minimum points
+    progressPercentage = (totalAccumulatedPoints / nextLevel.minPoints) * 100;
   } else {
     progressPercentage = 100; // Max level reached
   }

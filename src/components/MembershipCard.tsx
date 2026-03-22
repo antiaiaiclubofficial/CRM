@@ -35,14 +35,11 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints }: Membership
   }
 
   const pointsToNextLevel = nextLevel ? nextLevel.minPoints - totalAccumulatedPoints : 0;
-  const currentLevelMinPoints = currentLevel.minPoints;
-  const nextLevelMinPoints = nextLevel ? nextLevel.minPoints : currentLevel.minPoints + 1;
   
   let progressPercentage = 0;
   if (nextLevel) {
-    const pointsRange = nextLevelMinPoints - currentLevelMinPoints;
-    const pointsEarnedInCurrentTier = totalAccumulatedPoints - currentLevelMinPoints;
-    progressPercentage = (pointsEarnedInCurrentTier / pointsRange) * 100;
+    // Corrected calculation: progress from 0 towards the next level's minimum points
+    progressPercentage = (totalAccumulatedPoints / nextLevel.minPoints) * 100;
   } else {
     progressPercentage = 100; // Max level reached
   }
@@ -78,15 +75,15 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints }: Membership
         {/* Display current redeemable points and total accumulated points on the same line */}
         <div className="flex justify-between items-end mb-4">
           <div>
-            <p className="text-sm text-slate-600 mb-1">คะแนนปัจจุบันของคุณ</p>
+            <p className="text-xs text-slate-600 mb-1">คะแนนปัจจุบันของคุณ</p>
             <div className="flex items-baseline gap-1">
               <span className="text-4xl font-bold text-slate-800">{redeemablePoints.toLocaleString()}</span>
               <span className="text-sm text-slate-600">Points</span>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-[10px] text-slate-500 mb-1">คะแนนสะสมทั้งหมด</p>
-            <p className="text-xs font-bold text-slate-800 mb-1">
+            <p className="text-[10px] text-slate-500 mb-0.5">คะแนนสะสมทั้งหมด</p>
+            <p className="text-sm font-bold text-slate-800">
               {totalAccumulatedPoints.toLocaleString()} / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'} Points
             </p>
           </div>
