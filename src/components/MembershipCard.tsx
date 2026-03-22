@@ -86,7 +86,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints }: Membership
           </div>
           <div className="text-right">
             <p className="text-[10px] text-slate-500 mb-0.5">คะแนนสะสมทั้งหมด</p>
-            <p className="text-s font-bold text-slate-800">
+            <p className="text-xs font-bold text-slate-800">
               {totalAccumulatedPoints.toLocaleString()} / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'} Points
             </p>
           </div>
