@@ -10,6 +10,7 @@ import Promotions from '@/components/Promotions';
 import UpcomingAppointments from '@/components/UpcomingAppointments';
 import UserProfileEdit from '@/components/UserProfileEdit';
 import MembershipLevels from '@/components/MembershipLevels';
+import ServiceHistoryDetail from '@/components/ServiceHistoryDetail'; // Import new component
 import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PetManagement from '@/components/PetManagement'; // Import PetManagement
@@ -46,6 +47,20 @@ interface Coupon {
 
 interface UsedCoupon extends Coupon {
   usedDate?: string;
+}
+
+// Define ServiceHistoryItem interface for consistency
+interface ServiceHistoryItem {
+  id: number;
+  date: string;
+  petName: string;
+  service: string;
+  price: string;
+  icon: React.ReactNode;
+  bg: string;
+  description: string;
+  notes?: string;
+  beforeAfterImages?: { before: string; after: string; }[];
 }
 
 const Index = () => {
@@ -102,6 +117,7 @@ const Index = () => {
   const [isPetFormOpen, setIsPetFormOpen] = useState(false);
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
   const [selectedPetForDetail, setSelectedPetForDetail] = useState<Pet | null>(null); // New state for pet detail view
+  const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<ServiceHistoryItem | null>(null); // New state for service history detail
 
   const handleAddPet = (newPetData: Omit<Pet, 'id'>) => {
     const id = pets.length > 0 ? Math.max(...pets.map(p => p.id)) + 1 : 1;
@@ -120,6 +136,7 @@ const Index = () => {
 
   const handlePetSelection = (name: string) => {
     setSelectedPetName(name);
+    setSelectedServiceForDetail(null); // Clear service detail when filtering pets
     setActiveTab('history');
   };
 
@@ -175,6 +192,15 @@ const Index = () => {
 
   const handleBackFromPetDetail = () => {
     setSelectedPetForDetail(null);
+  };
+
+  // Handlers for ServiceHistoryDetail
+  const handleViewServiceDetail = (service: ServiceHistoryItem) => {
+    setSelectedServiceForDetail(service);
+  };
+
+  const handleBackFromServiceDetail = () => {
+    setSelectedServiceForDetail(null);
   };
 
   return (
@@ -307,10 +333,18 @@ const Index = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <ServiceHistory 
-                filterPetName={selectedPetName} 
-                onClearFilter={() => setSelectedPetName(null)}
-              />
+              {selectedServiceForDetail ? (
+                <ServiceHistoryDetail 
+                  service={selectedServiceForDetail} 
+                  onBack={handleBackFromServiceDetail} 
+                />
+              ) : (
+                <ServiceHistory 
+                  filterPetName={selectedPetName} 
+                  onClearFilter={() => setSelectedPetName(null)}
+                  onServiceClick={handleViewServiceDetail} // Pass the new handler
+                />
+              )}
             </motion.div>
           )}
 
@@ -378,31 +412,31 @@ const Index = () => {
           active={activeTab === 'home'} 
           icon={<Home size={22} />} 
           label="หน้าแรก" 
-          onClick={() => { setActiveTab('home'); setSelectedPetName(null); setSelectedPetForDetail(null); }} 
+          onClick={() => { setActiveTab('home'); setSelectedPetName(null); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
         />
         <NavButton 
           active={activeTab === 'level'} 
           icon={<Award size={22} />} 
           label="ระดับสมาชิก" 
-          onClick={() => { setActiveTab('level'); setSelectedPetForDetail(null); }} 
+          onClick={() => { setActiveTab('level'); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
         />
         <NavButton 
           active={activeTab === 'pets'} 
           icon={<PawPrint size={22} />} 
           label="สัตว์เลี้ยง" 
-          onClick={() => { setActiveTab('pets'); setSelectedPetForDetail(null); }} 
+          onClick={() => { setActiveTab('pets'); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
         />
         <NavButton 
-          active={activeTab === 'history'} 
-          icon={<History size={22} />} 
-          label="ประวัติ" 
-          onClick={() => { setActiveTab('history'); setSelectedPetForDetail(null); }} 
-        />
-        <NavButton 
-          active={activeTab === 'promo'} 
+          active={activeTab === 'promo'} // Swapped position
           icon={<Megaphone size={22} />} 
           label="โปรโมชั่น" 
-          onClick={() => { setActiveTab('promo'); setSelectedPetForDetail(null); }} 
+          onClick={() => { setActiveTab('promo'); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
+        />
+        <NavButton 
+          active={activeTab === 'history'} // Swapped position
+          icon={<History size={22} />} 
+          label="ประวัติ" 
+          onClick={() => { setActiveTab('history'); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
         />
       </nav>
     </div>
