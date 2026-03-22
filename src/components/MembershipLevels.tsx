@@ -153,13 +153,10 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
         <p className="text-xs font-medium text-white/80">ระดับปัจจุบันของคุณ</p>
         <h3 className="text-2xl font-bold mb-2">{currentLevel.name}</h3>
 
-        {/* New: Display total accumulated points */}
-        <p className="text-xs text-white/70">คะแนนสะสมทั้งหมด: <span className="font-bold">{totalAccumulatedPoints.toLocaleString()}</span></p>
-
-        {/* Modified: Display current redeemable points */}
+        {/* Display total accumulated points with next tier target */}
         <div className="flex items-baseline justify-center gap-1 mb-3">
-          <span className="text-3xl font-bold">{redeemablePoints.toLocaleString()}</span>
-          <span className="text-sm text-white/80">คะแนนปัจจุบัน</span>
+          <span className="text-3xl font-bold">{totalAccumulatedPoints.toLocaleString()}</span>
+          <span className="text-sm text-white/80"> / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'} คะแนน</span>
         </div>
 
         <div className="w-full bg-white/30 h-2 rounded-full overflow-hidden mb-2">

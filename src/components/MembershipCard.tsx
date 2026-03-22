@@ -71,14 +71,12 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints }: Membership
           </div>
           <div className="text-right">
             <p className="text-xs text-slate-500">ID: PET-8899</p>
+            {/* Moved total accumulated points here */}
+            <p className="text-xs font-bold text-slate-800">
+              {totalAccumulatedPoints.toLocaleString()} / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'} Points
+            </p>
             <p className="font-bold text-slate-800">คุณซาร่า เจน</p>
           </div>
-        </div>
-
-        {/* Display total accumulated points */}
-        <div className="mb-2">
-          <p className="text-[10px] text-slate-500 mb-0.5">คะแนนสะสมทั้งหมด</p>
-          <p className="text-lg font-bold text-slate-800">{totalAccumulatedPoints.toLocaleString()} Points</p>
         </div>
 
         {/* Display current redeemable points */}
