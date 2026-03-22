@@ -102,18 +102,16 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
   const sortedTiers = [...membershipTiers].sort((a, b) => a.minPoints - b.minPoints);
 
   let currentLevel: MembershipTier = sortedTiers[0]; // Default to Bronze
+  let nextLevel: MembershipTier | null = null;
 
   for (let i = 0; i < sortedTiers.length; i++) {
     if (totalAccumulatedPoints >= sortedTiers[i].minPoints) {
       currentLevel = sortedTiers[i];
     } else {
-      break; // Found the first tier not yet reached, so currentLevel is the one before it
+      nextLevel = sortedTiers[i];
+      break;
     }
   }
-
-  // Determine next level for progress bar
-  const currentLevelIndex = sortedTiers.findIndex(tier => tier.id === currentLevel.id);
-  const nextLevel = sortedTiers[currentLevelIndex + 1] || null;
 
   const pointsToNextLevel = nextLevel ? nextLevel.minPoints - totalAccumulatedPoints : 0;
   const currentLevelMinPoints = currentLevel.minPoints;
@@ -155,9 +153,13 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
         <p className="text-xs font-medium text-white/80">ระดับปัจจุบันของคุณ</p>
         <h3 className="text-2xl font-bold mb-2">{currentLevel.name}</h3>
 
+        {/* New: Display total accumulated points */}
+        <p className="text-xs text-white/70">คะแนนสะสมทั้งหมด: <span className="font-bold">{totalAccumulatedPoints.toLocaleString()}</span></p>
+
+        {/* Modified: Display current redeemable points */}
         <div className="flex items-baseline justify-center gap-1 mb-3">
-          <span className="text-3xl font-bold">{redeemablePoints}</span> {/* Display redeemablePoints here */}
-          <span className="text-sm text-white/80"> / {nextLevel ? nextLevel.minPoints : 'MAX'} คะแนน</span>
+          <span className="text-3xl font-bold">{redeemablePoints.toLocaleString()}</span>
+          <span className="text-sm text-white/80">คะแนนปัจจุบัน</span>
         </div>
 
         <div className="w-full bg-white/30 h-2 rounded-full overflow-hidden mb-2">
