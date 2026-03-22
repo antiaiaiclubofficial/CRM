@@ -127,14 +127,6 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
   }
   progressPercentage = Math.min(100, Math.max(0, progressPercentage)); // Ensure it's between 0 and 100
 
-  // Reorder tiers for display: current level first, then others in their original sorted order
-  const tiersForDisplay = [currentLevel];
-  sortedTiers.forEach(tier => {
-    if (tier.id !== currentLevel.id) {
-      tiersForDisplay.push(tier);
-    }
-  });
-
   // Sub-component for the current membership status card
   const CurrentMembershipStatusCard = () => (
     <motion.div
@@ -186,18 +178,16 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
   return (
     <div className="space-y-6 pb-20">
       <h2 className="text-xl font-bold text-slate-800 px-1">ระดับสมาชิกและสิทธิประโยชน์</h2>
-      {/* Removed: <p className="text-sm text-slate-500 px-1">เลือกแผนที่ใช่ เพื่อการดูแลที่ดีที่สุดสำหรับเพื่อนซี้สี่ขาของคุณ</p> */}
-
+      
       {/* Current Membership Status Card */}
       <CurrentMembershipStatusCard />
 
       <div className="space-y-4">
-        {tiersForDisplay.map((tier, index) => { // Use tiersForDisplay here
-          const isCurrentTier = currentLevel.id === tier.id;
-          const isTierReached = totalAccumulatedPoints >= tier.minPoints; // Use totalAccumulatedPoints for benefits check
+        {sortedTiers.map((tier, index) => { 
+          const isTierReached = totalAccumulatedPoints >= tier.minPoints;
           
           const cardClasses = `bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col ${
-            isCurrentTier ? '' : 'opacity-60 grayscale' // Gray out if not the current tier
+            isTierReached ? '' : 'opacity-30 grayscale' // Apply fading if tier is NOT reached
           }`;
 
           return (
@@ -220,8 +210,8 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
               <div className="border-t border-slate-50 pt-4">
                 <ul className="space-y-2">
                   {tier.benefits.map((benefit, bIndex) => (
-                    <li key={bIndex} className={`flex items-start gap-2 text-sm ${isTierReached ? 'text-slate-700' : 'text-slate-400 opacity-50'}`}>
-                      <Check size={16} className={`${isTierReached ? 'text-pink-500' : 'text-slate-400 opacity-50'} flex-shrink-0 mt-0.5`} />
+                    <li key={bIndex} className="flex items-start gap-2 text-sm text-slate-700"> {/* Let parent opacity handle fading */}
+                      <Check size={16} className="text-pink-500 flex-shrink-0 mt-0.5" /> {/* Let parent opacity handle fading */}
                       <span>{benefit}</span>
                     </li>
                   ))}
@@ -231,13 +221,6 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
           );
         })}
       </div>
-
-      {/* Removed: Upgrade contact message */}
-      {/* <div className="bg-white/40 p-6 rounded-[2.5rem] text-center border-2 border-dashed border-slate-200">
-        <p className="text-xs text-slate-400">
-          ต้องการอัปเกรดระดับสมาชิก? <span className="text-pink-500 font-bold">ติดต่อเรา</span> เพื่อสอบถามข้อมูลเพิ่มเติม
-        </p>
-      </div> */}
     </div>
   );
 };
