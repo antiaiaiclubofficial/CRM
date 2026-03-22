@@ -78,7 +78,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints }: Membership
         {/* Display current redeemable points and total accumulated points on the same line */}
         <div className="flex justify-between items-end mb-4">
           <div>
-            <p className="text-xs text-slate-600 mb-1">คะแนนปัจจุบันของคุณ</p>
+            <p className="text-s text-slate-600 mb-1">คะแนนปัจจุบันของคุณ</p>
             <div className="flex items-baseline gap-1">
               <span className="text-4xl font-bold text-slate-800">{redeemablePoints.toLocaleString()}</span>
               <span className="text-sm text-slate-600">Points</span>
