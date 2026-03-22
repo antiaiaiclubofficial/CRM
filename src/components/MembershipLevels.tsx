@@ -190,9 +190,9 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
         {displayTiers.map((tier, index) => { 
           const isTierReached = totalAccumulatedPoints >= tier.minPoints;
           
-          // Apply opacity-30 and grayscale if the tier is NOT the current level AND NOT reached
+          // Apply opacity-10 and grayscale if the tier is NOT the current level AND NOT reached
           const cardClasses = `bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col ${
-            (tier.id !== currentLevel.id && !isTierReached) ? 'opacity-30 grayscale' : ''
+            (tier.id !== currentLevel.id && !isTierReached) ? 'opacity-10 grayscale' : ''
           }`;
 
           return (
