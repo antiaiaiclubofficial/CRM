@@ -102,16 +102,18 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
   const sortedTiers = [...membershipTiers].sort((a, b) => a.minPoints - b.minPoints);
 
   let currentLevel: MembershipTier = sortedTiers[0]; // Default to Bronze
-  let nextLevel: MembershipTier | null = null;
 
   for (let i = 0; i < sortedTiers.length; i++) {
     if (totalAccumulatedPoints >= sortedTiers[i].minPoints) {
       currentLevel = sortedTiers[i];
     } else {
-      nextLevel = sortedTiers[i];
-      break;
+      break; // Found the first tier not yet reached, so currentLevel is the one before it
     }
   }
+
+  // Determine next level for progress bar
+  const currentLevelIndex = sortedTiers.findIndex(tier => tier.id === currentLevel.id);
+  const nextLevel = sortedTiers[currentLevelIndex + 1] || null;
 
   const pointsToNextLevel = nextLevel ? nextLevel.minPoints - totalAccumulatedPoints : 0;
   const currentLevelMinPoints = currentLevel.minPoints;
@@ -188,11 +190,9 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
 
       <div className="space-y-4">
         {displayTiers.map((tier, index) => { 
-          const isTierReached = totalAccumulatedPoints >= tier.minPoints;
-          
-          // Apply opacity-10 and grayscale if the tier is NOT the current level AND NOT reached
+          // Apply opacity-5 and grayscale if the tier is NOT the current level
           const cardClasses = `bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col ${
-            (tier.id !== currentLevel.id && !isTierReached) ? 'opacity-10 grayscale' : ''
+            tier.id !== currentLevel.id ? 'opacity-5 grayscale' : ''
           }`;
 
           return (
