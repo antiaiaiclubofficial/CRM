@@ -4,9 +4,20 @@ import React from 'react';
 import { Crown, PawPrint } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+interface OwnerProfile {
+  firstName: string;
+  lastName: string;
+  gender: string;
+  age: string;
+  phone: string;
+  address: string;
+  email: string;
+}
+
 interface MembershipCardProps {
   totalAccumulatedPoints: number;
   redeemablePoints: number;
+  ownerProfile: OwnerProfile; // Added ownerProfile prop
 }
 
 // Define membership tiers here for consistency, or import from a shared source if available
@@ -18,7 +29,7 @@ const membershipTiers = [
   { id: 'vip', name: 'VIP Member', minPoints: 2000 },
 ];
 
-const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints }: MembershipCardProps) => {
+const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile }: MembershipCardProps) => {
   // Determine current and next level based on totalAccumulatedPoints
   const sortedTiers = [...membershipTiers].sort((a, b) => a.minPoints - b.minPoints);
 
@@ -67,8 +78,8 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints }: Membership
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xs text-slate-500">ID: PET-8899</p>
-            <p className="font-bold text-slate-800">คุณซาร่า เจน</p>
+            <p className="text-xs text-slate-500">ID: {ownerProfile.phone}</p> {/* Changed to ownerProfile.phone */}
+            <p className="font-bold text-slate-800">คุณ{ownerProfile.firstName} {ownerProfile.lastName}</p> {/* Display full name */}
           </div>
         </div>
 

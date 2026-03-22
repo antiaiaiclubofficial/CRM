@@ -252,6 +252,7 @@ const Index = () => {
               <MembershipCard 
                 totalAccumulatedPoints={totalAccumulatedPoints} 
                 redeemablePoints={redeemablePoints} 
+                ownerProfile={ownerProfile} // Pass ownerProfile here
               />
 
               <UpcomingAppointments />
