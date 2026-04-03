@@ -2,19 +2,19 @@
 
 import React, { useState } from 'react';
 import MembershipCard from '@/components/MembershipCard';
-import PetList from '@/components/PetList'; // Renamed from PetManagement for clarity in this context
-import PetDetailView from '@/components/PetDetailView'; // New component
-import PetForm from '@/components/PetForm'; // New component for add/edit form
+import PetList from '@/components/PetList';
+import PetDetailView from '@/components/PetDetailView';
+import PetForm from '@/components/PetForm';
 import ServiceHistory from '@/components/ServiceHistory';
 import Promotions from '@/components/Promotions';
 import UpcomingAppointments from '@/components/UpcomingAppointments';
 import UserProfileEdit from '@/components/UserProfileEdit';
 import MembershipLevels from '@/components/MembershipLevels';
-import ServiceHistoryDetail from '@/components/ServiceHistoryDetail'; // Import new component
-import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History } from 'lucide-react';
+import ServiceHistoryDetail from '@/components/ServiceHistoryDetail';
+import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History, Scissors, Sparkles, Bath } from 'lucide-react'; // Added Scissors, Sparkles, Bath for serviceHistory icons
 import { motion, AnimatePresence } from 'framer-motion';
-import PetManagement from '@/components/PetManagement'; // Import PetManagement
-import { toast } from 'sonner'; // Import toast for notifications
+import PetManagement from '@/components/PetManagement';
+import { toast } from 'sonner';
 
 // Define the Pet interface here for consistency across components
 interface Pet {
@@ -29,6 +29,8 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
+  shampooPreference?: string; // New field
+  spaPreference?: string;     // New field
 }
 
 // Define the Coupon interface here as well, or import it if it were in a shared file
@@ -60,9 +62,9 @@ interface ServiceHistoryItem {
   bg: string;
   description: string;
   notes?: string;
-  shampooUsed?: string; // New field
-  spaTreatment?: string; // New field
-  groomerNotes?: string; // New field
+  shampooUsed?: string;
+  spaTreatment?: string;
+  groomerNotes?: string;
   beforeAfterImages?: { before: string; after: string; }[];
 }
 
@@ -97,9 +99,11 @@ const Index = () => {
       gender: 'เมีย',
       weight: '3.5',
       medicalCondition: 'ภูมิแพ้ผิวหนัง',
-      precautions: 'ห้ามใช้แชมพูสูตรเย็น',
+      precautions: 'ห้ามใช้แชมพูสูตรอ่อนโยนพิเศษ',
       color: 'bg-orange-100', 
-      icon: '🐶' 
+      icon: '🐶',
+      shampooPreference: 'กลิ่นลาเวนเดอร์', // New
+      spaPreference: 'สปาโคลนเดดซี' // New
     },
     { 
       id: 2, 
@@ -112,8 +116,65 @@ const Index = () => {
       medicalCondition: '-',
       precautions: 'ขี้ตื่นง่าย ระวังตอนตัดเล็บ',
       color: 'bg-blue-100', 
-      icon: '🐱' 
+      icon: '🐱',
+      shampooPreference: 'กลิ่นมะลิ', // New
+      spaPreference: 'สปาน้ำนมข้าว' // New
     },
+  ]);
+
+  // Moved historyData here
+  const [serviceHistory, setServiceHistory] = useState<ServiceHistoryItem[]>([
+    {
+      id: 1,
+      date: '15 พ.ค. 2567',
+      petName: 'น้องปุย',
+      service: 'อาบน้ำตัดขน Full Service',
+      price: '550',
+      icon: <Scissors className="text-pink-500" />,
+      bg: 'bg-pink-50',
+      description: 'บริการอาบน้ำและตัดขนครบวงจรสำหรับน้องปุย รวมถึงการแปรงขน กำจัดขนที่หลุดร่วง และตัดแต่งทรงขนตามต้องการ',
+      notes: 'น้องปุยมีผิวแพ้ง่าย ใช้แชมพูสูตรอ่อนโยนพิเศษ',
+      shampooUsed: 'แชมพูสูตรอ่อนโยนสำหรับผิวแพ้ง่าย (Hypoallergenic Shampoo)',
+      spaTreatment: 'ไม่มี',
+      groomerNotes: 'น้องปุยให้ความร่วมมือดีมาก ขนสะอาดและนุ่มสลวย',
+      beforeAfterImages: [
+        { before: 'https://via.placeholder.com/150/FFD8E4/000000?text=Before+Pui', after: 'https://via.placeholder.com/150/B2F2BB/000000?text=After+Pui' }
+      ]
+    },
+    {
+      id: 2,
+      date: '02 พ.ค. 2567',
+      petName: 'น้องกะทิ',
+      service: 'สปาโอโซนและนวดผ่อนคลาย',
+      price: '890',
+      icon: <Sparkles className="text-amber-500" />,
+      bg: 'bg-amber-50',
+      description: 'สปาโอโซนช่วยบำรุงผิวหนังและเส้นขนของน้องกะทิให้แข็งแรง พร้อมนวดผ่อนคลายลดความเครียด',
+      notes: 'น้องกะทิขี้ตื่นง่าย ควรทำในห้องที่เงียบสงบ',
+      shampooUsed: 'แชมพูบำรุงขนสำหรับแมวขนยาว (Long Hair Cat Shampoo)',
+      spaTreatment: 'สปาโอโซนบำรุงผิวและขน',
+      groomerNotes: 'น้องกะทิผ่อนคลายดีหลังจากการนวด ขนเงางามขึ้น',
+      beforeAfterImages: [
+        { before: 'https://via.placeholder.com/150/FFE3BC/000000?text=Before+Kati', after: 'https://via.placeholder.com/150/FFD8E4/000000?text=After+Kati' }
+      ]
+    },
+    {
+      id: 3,
+      date: '20 เม.ย. 2567',
+      petName: 'น้องปุย',
+      service: 'อาบน้ำกำจัดเห็บหมัด',
+      price: '350',
+      icon: <Bath className="text-blue-500" />,
+      bg: 'bg-blue-50',
+      description: 'บริการอาบน้ำด้วยแชมพูกำจัดเห็บหมัดประสิทธิภาพสูง เพื่อสุขอนามัยที่ดีของน้องปุย',
+      notes: 'ตรวจสอบให้แน่ใจว่าไม่มีเห็บหมัดหลงเหลืออยู่',
+      shampooUsed: 'แชมพูกำจัดเห็บหมัด (Flea & Tick Shampoo)',
+      spaTreatment: 'ไม่มี',
+      groomerNotes: 'พบเห็บหมัดเล็กน้อยบริเวณคอ ได้ทำการกำจัดออกทั้งหมดแล้ว',
+      beforeAfterImages: [
+        { before: 'https://via.placeholder.com/150/FFD8E4/000000?text=Before+Pui', after: 'https://via.placeholder.com/150/B2F2BB/000000?text=After+Pui' }
+      ]
+    }
   ]);
 
   // State for PetForm modal
@@ -206,6 +267,20 @@ const Index = () => {
     setSelectedServiceForDetail(null);
   };
 
+  // New: Calculate total service cost for a specific pet
+  const calculateTotalServiceCost = (petName: string): number => {
+    return serviceHistory
+      .filter(item => item.petName === petName)
+      .reduce((sum, item) => sum + parseFloat(item.price), 0);
+  };
+
+  // New: Handle viewing service history for a specific pet
+  const handleViewPetServiceHistory = (petName: string) => {
+    setSelectedPetName(petName);
+    setSelectedServiceForDetail(null); // Clear service detail when navigating
+    setActiveTab('history');
+  };
+
   return (
     <div className="max-w-[390px] min-h-[844px] mx-auto bg-[#FFF9F0] relative shadow-2xl overflow-hidden flex flex-col font-['Prompt']">
       
@@ -252,7 +327,7 @@ const Index = () => {
               <MembershipCard 
                 totalAccumulatedPoints={totalAccumulatedPoints} 
                 redeemablePoints={redeemablePoints} 
-                ownerProfile={ownerProfile} // Pass ownerProfile here
+                ownerProfile={ownerProfile}
               />
 
               <UpcomingAppointments />
@@ -319,6 +394,8 @@ const Index = () => {
                   onBack={handleBackFromPetDetail}
                   onStartEdit={handleOpenEditPetForm}
                   onDeletePet={handleDeletePet}
+                  totalServiceCost={calculateTotalServiceCost(selectedPetForDetail.name)} // New prop
+                  onViewServiceHistoryForPet={handleViewPetServiceHistory} // New prop
                 />
               ) : (
                 <PetManagement 
@@ -344,9 +421,10 @@ const Index = () => {
                 />
               ) : (
                 <ServiceHistory 
+                  historyData={serviceHistory} // Pass historyData
                   filterPetName={selectedPetName} 
                   onClearFilter={() => setSelectedPetName(null)}
-                  onServiceClick={handleViewServiceDetail} // Pass the new handler
+                  onServiceClick={handleViewServiceDetail}
                 />
               )}
             </motion.div>
@@ -360,7 +438,7 @@ const Index = () => {
               exit={{ opacity: 0, x: -20 }}
             >
               <Promotions 
-                userPoints={redeemablePoints} // Pass redeemablePoints for coupon redemption
+                userPoints={redeemablePoints}
                 collectedCoupons={collectedCoupons}
                 usedOrExpiredCoupons={usedOrExpiredCoupons}
                 onRedeemCoupon={handleRedeemCoupon}
@@ -431,13 +509,13 @@ const Index = () => {
           onClick={() => { setActiveTab('pets'); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
         />
         <NavButton 
-          active={activeTab === 'promo'} // Swapped position
+          active={activeTab === 'promo'}
           icon={<Megaphone size={22} />} 
           label="โปรโมชั่น" 
           onClick={() => { setActiveTab('promo'); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
         />
         <NavButton 
-          active={activeTab === 'history'} // Swapped position
+          active={activeTab === 'history'}
           icon={<History size={22} />} 
           label="ประวัติ" 
           onClick={() => { setActiveTab('history'); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 

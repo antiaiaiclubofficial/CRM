@@ -6,7 +6,7 @@ import {
   ArrowLeft, Edit2, Share2, Scale, 
   Ruler, Activity, Heart, CheckCircle2, 
   Info, ChevronRight, MoreHorizontal,
-  Droplet, Dog, Cat
+  Droplet, Dog, Cat, DollarSign, Sparkles // Added DollarSign and Sparkles
 } from 'lucide-react';
 
 interface Pet {
@@ -21,6 +21,8 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
+  shampooPreference?: string; // New field
+  spaPreference?: string;     // New field
 }
 
 interface PetDetailViewProps {
@@ -28,18 +30,32 @@ interface PetDetailViewProps {
   onBack: () => void;
   onStartEdit: (pet: Pet) => void;
   onDeletePet: (id: number) => void;
+  totalServiceCost: number; // New prop
+  onViewServiceHistoryForPet: (petName: string) => void; // New prop
 }
 
-const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet }: PetDetailViewProps) => {
+const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost, onViewServiceHistoryForPet }: PetDetailViewProps) => {
   // Mock data for the new sections
-  const streak = 320;
   const adventures = 323;
   
-  const micropets = [
-    { id: 1, name: 'Cow', icon: '🐮', color: 'bg-[#F3E5AB]', number: '#23' },
-    { id: 2, name: 'Puppy', icon: '🐶', color: 'bg-[#E9967A]', number: '#53' },
-    { id: 3, name: 'Drop', icon: '💧', color: 'bg-[#6495ED]', number: '#14' },
-  ];
+  // Determine emoji and color based on totalServiceCost
+  let costEmoji = '✨';
+  let costColor = 'text-slate-500';
+  let bgColor = 'bg-slate-100';
+
+  if (totalServiceCost > 2000) {
+    costEmoji = '💎';
+    costColor = 'text-blue-600';
+    bgColor = 'bg-blue-50';
+  } else if (totalServiceCost > 1000) {
+    costEmoji = '🌟';
+    costColor = 'text-amber-600';
+    bgColor = 'bg-amber-50';
+  } else if (totalServiceCost > 500) {
+    costEmoji = '💖';
+    costColor = 'text-pink-600';
+    bgColor = 'bg-pink-50';
+  }
 
   return (
     <motion.div
@@ -127,27 +143,25 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet }: PetDetailViewP
         <button className="flex-1 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Personality</button>
       </div>
 
-      {/* Streak Card */}
+      {/* Total Service Cost Card (formerly Streak Card) */}
       <motion.div 
         whileTap={{ scale: 0.98 }}
-        className="bg-white rounded-[2rem] p-5 flex items-center gap-4 shadow-sm"
+        onClick={() => onViewServiceHistoryForPet(pet.name)} // New onClick
+        className={`bg-white rounded-[2rem] p-5 flex items-center gap-4 shadow-sm cursor-pointer ${bgColor}`} // Added bgColor
       >
-        <div className="w-14 h-14 bg-[#FFD700]/20 rounded-2xl flex items-center justify-center text-[#DAA520]">
-          <div className="relative">
-            <CheckCircle2 size={32} />
-            <div className="absolute inset-0 blur-sm opacity-50"><CheckCircle2 size={32} /></div>
-          </div>
+        <div className={`w-14 h-14 ${bgColor} rounded-2xl flex items-center justify-center text-2xl ${costColor}`}>
+          {costEmoji}
         </div>
         <div className="flex-1">
-          <h3 className="text-xl font-black text-slate-800">{streak} วันต่อเนื่อง!</h3>
-          <p className="text-xs text-slate-400 font-medium">สถิติการดูแลตัวเองที่ยาวนานที่สุด!</p>
+          <h3 className="text-xl font-black text-slate-800">รวมค่าบริการทั้งหมด</h3>
+          <p className="text-xs text-slate-400 font-medium">฿{totalServiceCost.toLocaleString()} จาก {pet.name}</p>
         </div>
         <ChevronRight className="text-slate-300" size={20} />
       </motion.div>
 
-      {/* Collection Section */}
+      {/* Collection Section (now Pet Preferences) */}
       <div className="pt-4">
-        <h3 className="text-lg font-black text-slate-800 mb-4 px-2">{pet.name}'s collection</h3>
+        <h3 className="text-lg font-black text-slate-800 mb-4 px-2">สิ่งที่ต้องใช้กับน้อง{pet.name}</h3>
         
         <div className="bg-[#FAF7F0] rounded-[2.5rem] border-t-8 border-[#D2B48C] relative">
           {/* Decorative tabs at the top */}
@@ -157,21 +171,40 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet }: PetDetailViewP
 
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h4 className="text-lg font-black text-[#8B4513]">Micropets</h4>
+              <h4 className="text-lg font-black text-[#8B4513]">ความชอบส่วนตัว</h4>
               <button className="p-1.5 bg-slate-200/50 rounded-full text-slate-400">
                 <Info size={16} />
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
-              {micropets.map((mp) => (
-                <div key={mp.id} className="space-y-1">
-                  <div className={`${mp.color} aspect-square rounded-2xl flex items-center justify-center text-3xl shadow-sm border-2 border-white relative`}>
-                    <span className="absolute top-1 right-2 text-[8px] font-black text-black/20">{mp.number}</span>
-                    {mp.icon}
+            <div className="space-y-4">
+              {pet.shampooPreference && (
+                <div className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
+                  <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-500 text-xl shadow-inner">
+                    <Droplet size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium">แชมพูที่ชอบ</p>
+                    <p className="font-bold text-slate-800 text-sm">{pet.shampooPreference}</p>
                   </div>
                 </div>
-              ))}
+              )}
+              {pet.spaPreference && (
+                <div className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
+                  <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center text-purple-500 text-xl shadow-inner">
+                    <Sparkles size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium">สปาที่ชอบ</p>
+                    <p className="font-bold text-slate-800 text-sm">{pet.spaPreference}</p>
+                  </div>
+                </div>
+              )}
+              {(!pet.shampooPreference && !pet.spaPreference) && (
+                <div className="text-center py-4 text-slate-400 text-sm">
+                  ยังไม่มีข้อมูลความชอบส่วนตัว
+                </div>
+              )}
             </div>
           </div>
         </div>

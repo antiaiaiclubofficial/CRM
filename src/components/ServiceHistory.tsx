@@ -21,65 +21,14 @@ interface ServiceHistoryItem {
 }
 
 interface ServiceHistoryProps {
+  historyData: ServiceHistoryItem[]; // New prop
   filterPetName?: string | null;
   onClearFilter?: () => void;
   onServiceClick: (service: ServiceHistoryItem) => void; // New prop
 }
 
-const ServiceHistory = ({ filterPetName, onClearFilter, onServiceClick }: ServiceHistoryProps) => {
-  const historyData: ServiceHistoryItem[] = [
-    {
-      id: 1,
-      date: '15 พ.ค. 2567',
-      petName: 'น้องปุย',
-      service: 'อาบน้ำตัดขน Full Service',
-      price: '550',
-      icon: <Scissors className="text-pink-500" />,
-      bg: 'bg-pink-50',
-      description: 'บริการอาบน้ำและตัดขนครบวงจรสำหรับน้องปุย รวมถึงการแปรงขน กำจัดขนที่หลุดร่วง และตัดแต่งทรงขนตามต้องการ',
-      notes: 'น้องปุยมีผิวแพ้ง่าย ใช้แชมพูสูตรอ่อนโยนพิเศษ',
-      shampooUsed: 'แชมพูสูตรอ่อนโยนสำหรับผิวแพ้ง่าย (Hypoallergenic Shampoo)',
-      spaTreatment: 'ไม่มี',
-      groomerNotes: 'น้องปุยให้ความร่วมมือดีมาก ขนสะอาดและนุ่มสลวย',
-      beforeAfterImages: [
-        { before: 'https://via.placeholder.com/150/FFD8E4/000000?text=Before+Pui', after: 'https://via.placeholder.com/150/B2F2BB/000000?text=After+Pui' }
-      ]
-    },
-    {
-      id: 2,
-      date: '02 พ.ค. 2567',
-      petName: 'น้องกะทิ',
-      service: 'สปาโอโซนและนวดผ่อนคลาย',
-      price: '890',
-      icon: <Sparkles className="text-amber-500" />,
-      bg: 'bg-amber-50',
-      description: 'สปาโอโซนช่วยบำรุงผิวหนังและเส้นขนของน้องกะทิให้แข็งแรง พร้อมนวดผ่อนคลายลดความเครียด',
-      notes: 'น้องกะทิขี้ตื่นง่าย ควรทำในห้องที่เงียบสงบ',
-      shampooUsed: 'แชมพูบำรุงขนสำหรับแมวขนยาว (Long Hair Cat Shampoo)',
-      spaTreatment: 'สปาโอโซนบำรุงผิวและขน',
-      groomerNotes: 'น้องกะทิผ่อนคลายดีหลังจากการนวด ขนเงางามขึ้น',
-      beforeAfterImages: [
-        { before: 'https://via.placeholder.com/150/FFE3BC/000000?text=Before+Kati', after: 'https://via.placeholder.com/150/FFD8E4/000000?text=After+Kati' }
-      ]
-    },
-    {
-      id: 3,
-      date: '20 เม.ย. 2567',
-      petName: 'น้องปุย',
-      service: 'อาบน้ำกำจัดเห็บหมัด',
-      price: '350',
-      icon: <Bath className="text-blue-500" />,
-      bg: 'bg-blue-50',
-      description: 'บริการอาบน้ำด้วยแชมพูกำจัดเห็บหมัดประสิทธิภาพสูง เพื่อสุขอนามัยที่ดีของน้องปุย',
-      notes: 'ตรวจสอบให้แน่ใจว่าไม่มีเห็บหมัดหลงเหลืออยู่',
-      shampooUsed: 'แชมพูกำจัดเห็บหมัด (Flea & Tick Shampoo)',
-      spaTreatment: 'ไม่มี',
-      groomerNotes: 'พบเห็บหมัดเล็กน้อยบริเวณคอ ได้ทำการกำจัดออกทั้งหมดแล้ว',
-      beforeAfterImages: [
-        { before: 'https://via.placeholder.com/150/FFD8E4/000000?text=Before+Pui', after: 'https://via.placeholder.com/150/B2F2BB/000000?text=After+Pui' }
-      ]
-    }
-  ];
+const ServiceHistory = ({ historyData, filterPetName, onClearFilter, onServiceClick }: ServiceHistoryProps) => {
+  // Removed internal historyData definition
 
   const filteredData = filterPetName 
     ? historyData.filter(item => item.petName === filterPetName)
@@ -114,7 +63,7 @@ const ServiceHistory = ({ filterPetName, onClearFilter, onServiceClick }: Servic
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              onClick={() => onServiceClick(item)} // Call onServiceClick here
+              onClick={() => onServiceClick(item)}
               className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-50 group active:scale-[0.98] transition-all cursor-pointer"
             >
               <div className="flex items-center gap-4">

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, HeartPulse, Scale, Calendar, Info, Check } from 'lucide-react';
+import { X, User, HeartPulse, Scale, Calendar, Info, Check, Droplet, Sparkles } from 'lucide-react'; // Added Droplet, Sparkles
 
 interface Pet {
   id: number;
@@ -16,6 +16,8 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
+  shampooPreference?: string; // New field
+  spaPreference?: string;     // New field
 }
 
 interface PetFormProps {
@@ -38,7 +40,9 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     weight: '',
     medicalCondition: '',
     precautions: '',
-    icon: '🐶'
+    icon: '🐶',
+    shampooPreference: '', // Initialize new fields
+    spaPreference: ''      // Initialize new fields
   });
 
   useEffect(() => {
@@ -52,7 +56,9 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         weight: initialData.weight,
         medicalCondition: initialData.medicalCondition,
         precautions: initialData.precautions,
-        icon: initialData.icon
+        icon: initialData.icon,
+        shampooPreference: initialData.shampooPreference || '', // Set from initialData
+        spaPreference: initialData.spaPreference || ''          // Set from initialData
       });
     } else {
       setFormData({
@@ -64,7 +70,9 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         weight: '',
         medicalCondition: '',
         precautions: '',
-        icon: '🐶'
+        icon: '🐶',
+        shampooPreference: '',
+        spaPreference: ''
       });
     }
   }, [initialData, isOpen]);
@@ -197,6 +205,30 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                     onChange={(e) => setFormData({...formData, precautions: e.target.value})}
                     placeholder="ระบุสิ่งที่ร้านควรระวัง"
                     className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-amber-100 outline-none text-sm h-20 resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* New: Preferences */}
+              <div className="space-y-4 pt-2">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-blue-500"><Droplet size={12}/> แชมพูที่ชอบ</label>
+                  <input 
+                    type="text" 
+                    value={formData.shampooPreference}
+                    onChange={(e) => setFormData({...formData, shampooPreference: e.target.value})}
+                    placeholder="เช่น กลิ่นลาเวนเดอร์"
+                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-100 outline-none text-sm"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-purple-500"><Sparkles size={12}/> สปาที่ชอบ</label>
+                  <input 
+                    type="text" 
+                    value={formData.spaPreference}
+                    onChange={(e) => setFormData({...formData, spaPreference: e.target.value})}
+                    placeholder="เช่น สปาโคลนเดดซี"
+                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-purple-100 outline-none text-sm"
                   />
                 </div>
               </div>
