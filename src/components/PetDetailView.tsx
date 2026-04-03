@@ -4,9 +4,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Edit2, Share2, Scale, 
-  Ruler, Activity, Heart, CheckCircle2, 
-  Info, ChevronRight, MoreHorizontal,
-  Droplet, Dog, Cat, DollarSign, Sparkles // Added DollarSign and Sparkles
+  Ruler, Activity, Heart, Info, ChevronRight,
+  Droplet, DollarSign, Sparkles, Settings // Added Settings icon for preferences
 } from 'lucide-react';
 
 interface Pet {
@@ -21,8 +20,8 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
-  shampooPreference?: string; // New field
-  spaPreference?: string;     // New field
+  shampooPreference?: string;
+  spaPreference?: string;
 }
 
 interface PetDetailViewProps {
@@ -30,12 +29,12 @@ interface PetDetailViewProps {
   onBack: () => void;
   onStartEdit: (pet: Pet) => void;
   onDeletePet: (id: number) => void;
-  totalServiceCost: number; // New prop
-  onViewServiceHistoryForPet: (petName: string) => void; // New prop
+  totalServiceCost: number;
+  onViewServiceHistoryForPet: (petName: string) => void;
+  onEditPreferences: () => void; // New prop for editing preferences
 }
 
-const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost, onViewServiceHistoryForPet }: PetDetailViewProps) => {
-  // Mock data for the new sections
+const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost, onViewServiceHistoryForPet, onEditPreferences }: PetDetailViewProps) => {
   const adventures = 323;
   
   // Determine emoji and color based on totalServiceCost
@@ -62,7 +61,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="space-y-4 pb-32 bg-[#F5F1E3] -mx-6 -mt-6 p-6 min-h-screen"
+      className="space-y-4 pb-32 bg-[#FFF9F0] -mx-6 -mt-6 p-6 min-h-screen" // Changed background color
     >
       {/* Top Navigation */}
       <div className="flex justify-between items-center mb-2">
@@ -146,20 +145,20 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
       {/* Total Service Cost Card (formerly Streak Card) */}
       <motion.div 
         whileTap={{ scale: 0.98 }}
-        onClick={() => onViewServiceHistoryForPet(pet.name)} // New onClick
-        className={`bg-white rounded-[2rem] p-5 flex items-center gap-4 shadow-sm cursor-pointer ${bgColor}`} // Added bgColor
+        onClick={() => onViewServiceHistoryForPet(pet.name)}
+        className={`bg-white rounded-[2rem] p-5 flex items-center gap-4 shadow-sm cursor-pointer ${bgColor}`}
       >
         <div className={`w-14 h-14 ${bgColor} rounded-2xl flex items-center justify-center text-2xl ${costColor}`}>
           {costEmoji}
         </div>
         <div className="flex-1">
-          <h3 className="text-xl font-black text-slate-800">รวมค่าบริการทั้งหมด</h3>
+          <h3 className="text-xl font-black text-slate-800">ยอดการใช้บริการสะสม</h3> {/* Changed text */}
           <p className="text-xs text-slate-400 font-medium">฿{totalServiceCost.toLocaleString()} จาก {pet.name}</p>
         </div>
         <ChevronRight className="text-slate-300" size={20} />
       </motion.div>
 
-      {/* Collection Section (now Pet Preferences) */}
+      {/* Collection Section (Pet Preferences) */}
       <div className="pt-4">
         <h3 className="text-lg font-black text-slate-800 mb-4 px-2">{pet.name}'s collection</h3>
         
@@ -172,8 +171,11 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h4 className="text-lg font-black text-[#8B4513]">ความชอบส่วนตัว</h4>
-              <button className="p-1.5 bg-slate-200/50 rounded-full text-slate-400">
-                <Info size={16} />
+              <button 
+                onClick={onEditPreferences} // New button to edit preferences
+                className="p-1.5 bg-slate-200/50 rounded-full text-slate-400 hover:bg-slate-200 transition-colors"
+              >
+                <Settings size={16} />
               </button>
             </div>
 

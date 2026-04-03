@@ -11,7 +11,8 @@ import UpcomingAppointments from '@/components/UpcomingAppointments';
 import UserProfileEdit from '@/components/UserProfileEdit';
 import MembershipLevels from '@/components/MembershipLevels';
 import ServiceHistoryDetail from '@/components/ServiceHistoryDetail';
-import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History, Scissors, Sparkles, Bath } from 'lucide-react'; // Added Scissors, Sparkles, Bath for serviceHistory icons
+import PetPreferenceForm from '@/components/PetPreferenceForm'; // Import new component
+import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History, Scissors, Sparkles, Bath } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PetManagement from '@/components/PetManagement';
 import { toast } from 'sonner';
@@ -29,8 +30,8 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
-  shampooPreference?: string; // New field
-  spaPreference?: string;     // New field
+  shampooPreference?: string;
+  spaPreference?: string;
 }
 
 // Define the Coupon interface here as well, or import it if it were in a shared file
@@ -83,11 +84,11 @@ const Index = () => {
     email: 'sara.jane@example.com'
   });
 
-  const [totalAccumulatedPoints, setTotalAccumulatedPoints] = useState(1250); // For membership tiers
-  const [redeemablePoints, setRedeemablePoints] = useState(1250); // For coupon redemption
+  const [totalAccumulatedPoints, setTotalAccumulatedPoints] = useState(1250);
+  const [redeemablePoints, setRedeemablePoints] = useState(1250);
   const [collectedCoupons, setCollectedCoupons] = useState<Coupon[]>([]);
   const [usedOrExpiredCoupons, setUsedOrExpiredCoupons] = useState<UsedCoupon[]>([]);
-  const [usedSpecialPromotions, setUsedSpecialPromotions] = useState<number[]>([]); // Track used special promotions
+  const [usedSpecialPromotions, setUsedSpecialPromotions] = useState<number[]>([]);
 
   const [pets, setPets] = useState<Pet[]>([
     { 
@@ -102,8 +103,8 @@ const Index = () => {
       precautions: 'ห้ามใช้แชมพูสูตรอ่อนโยนพิเศษ',
       color: 'bg-orange-100', 
       icon: '🐶',
-      shampooPreference: 'กลิ่นลาเวนเดอร์', // New
-      spaPreference: 'สปาโคลนเดดซี' // New
+      shampooPreference: 'กลิ่นลาเวนเดอร์',
+      spaPreference: 'สปาโคลนเดดซี'
     },
     { 
       id: 2, 
@@ -117,12 +118,11 @@ const Index = () => {
       precautions: 'ขี้ตื่นง่าย ระวังตอนตัดเล็บ',
       color: 'bg-blue-100', 
       icon: '🐱',
-      shampooPreference: 'กลิ่นมะลิ', // New
-      spaPreference: 'สปาน้ำนมข้าว' // New
+      shampooPreference: 'กลิ่นมะลิ',
+      spaPreference: 'สปาน้ำนมข้าว'
     },
   ]);
 
-  // Moved historyData here
   const [serviceHistory, setServiceHistory] = useState<ServiceHistoryItem[]>([
     {
       id: 1,
@@ -180,8 +180,11 @@ const Index = () => {
   // State for PetForm modal
   const [isPetFormOpen, setIsPetFormOpen] = useState(false);
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
-  const [selectedPetForDetail, setSelectedPetForDetail] = useState<Pet | null>(null); // New state for pet detail view
-  const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<ServiceHistoryItem | null>(null); // New state for service history detail
+  const [selectedPetForDetail, setSelectedPetForDetail] = useState<Pet | null>(null);
+  const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<ServiceHistoryItem | null>(null);
+
+  // New state for PetPreferenceForm modal
+  const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
 
   const handleAddPet = (newPetData: Omit<Pet, 'id'>) => {
     const id = pets.length > 0 ? Math.max(...pets.map(p => p.id)) + 1 : 1;
@@ -200,14 +203,13 @@ const Index = () => {
 
   const handlePetSelection = (name: string) => {
     setSelectedPetName(name);
-    setSelectedServiceForDetail(null); // Clear service detail when filtering pets
+    setSelectedServiceForDetail(null);
     setActiveTab('history');
   };
 
-  // Updated to handle points deduction
   const handleRedeemCoupon = (coupon: Coupon, pointsCost: number) => {
     if (redeemablePoints >= pointsCost) {
-      setRedeemablePoints(prev => prev - pointsCost); // Only redeemablePoints decrease
+      setRedeemablePoints(prev => prev - pointsCost);
       setCollectedCoupons((prev) => [...prev, coupon]);
       toast.success(`แลกคูปอง "${coupon.title}" สำเร็จ! ใช้ไป ${pointsCost} คะแนน`);
     } else {
@@ -215,7 +217,6 @@ const Index = () => {
     }
   };
 
-  // New function to handle using a collected coupon
   const handleUseCoupon = (couponId: number) => {
     const couponToUse = collectedCoupons.find(c => c.id === couponId);
     if (couponToUse) {
@@ -225,7 +226,6 @@ const Index = () => {
     }
   };
 
-  // New function to handle using a special promotion
   const handleUseSpecialPromotion = (promoId: number) => {
     if (!usedSpecialPromotions.includes(promoId)) {
       setUsedSpecialPromotions(prev => [...prev, promoId]);
@@ -267,18 +267,35 @@ const Index = () => {
     setSelectedServiceForDetail(null);
   };
 
-  // New: Calculate total service cost for a specific pet
+  // Calculate total service cost for a specific pet
   const calculateTotalServiceCost = (petName: string): number => {
     return serviceHistory
       .filter(item => item.petName === petName)
       .reduce((sum, item) => sum + parseFloat(item.price), 0);
   };
 
-  // New: Handle viewing service history for a specific pet
+  // Handle viewing service history for a specific pet
   const handleViewPetServiceHistory = (petName: string) => {
     setSelectedPetName(petName);
-    setSelectedServiceForDetail(null); // Clear service detail when navigating
+    setSelectedServiceForDetail(null);
     setActiveTab('history');
+  };
+
+  // Handlers for PetPreferenceForm
+  const handleOpenPreferenceForm = () => {
+    setIsPreferenceFormOpen(true);
+  };
+
+  const handleClosePreferenceForm = () => {
+    setIsPreferenceFormOpen(false);
+  };
+
+  const handleSavePetPreferences = (updatedPreferences: { shampooPreference?: string; spaPreference?: string }) => {
+    if (selectedPetForDetail) {
+      const updatedPet = { ...selectedPetForDetail, ...updatedPreferences };
+      handleEditPet(updatedPet); // Use existing handleEditPet to update the pet in state
+      toast.success('บันทึกความชอบส่วนตัวสำเร็จ!');
+    }
   };
 
   return (
@@ -394,8 +411,9 @@ const Index = () => {
                   onBack={handleBackFromPetDetail}
                   onStartEdit={handleOpenEditPetForm}
                   onDeletePet={handleDeletePet}
-                  totalServiceCost={calculateTotalServiceCost(selectedPetForDetail.name)} // New prop
-                  onViewServiceHistoryForPet={handleViewPetServiceHistory} // New prop
+                  totalServiceCost={calculateTotalServiceCost(selectedPetForDetail.name)}
+                  onViewServiceHistoryForPet={handleViewPetServiceHistory}
+                  onEditPreferences={handleOpenPreferenceForm} // New prop
                 />
               ) : (
                 <PetManagement 
@@ -421,7 +439,7 @@ const Index = () => {
                 />
               ) : (
                 <ServiceHistory 
-                  historyData={serviceHistory} // Pass historyData
+                  historyData={serviceHistory}
                   filterPetName={selectedPetName} 
                   onClearFilter={() => setSelectedPetName(null)}
                   onServiceClick={handleViewServiceDetail}
@@ -487,6 +505,20 @@ const Index = () => {
         }}
         initialData={petToEdit}
       />
+
+      {/* Pet Preference Form Modal */}
+      {selectedPetForDetail && (
+        <PetPreferenceForm
+          isOpen={isPreferenceFormOpen}
+          onClose={handleClosePreferenceForm}
+          onSave={handleSavePetPreferences}
+          initialData={{
+            shampooPreference: selectedPetForDetail.shampooPreference,
+            spaPreference: selectedPetForDetail.spaPreference,
+          }}
+          petName={selectedPetForDetail.name}
+        />
+      )}
 
       {/* Bottom Navigation Bar */}
       <nav className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-100 px-6 py-4 flex justify-between items-center rounded-t-[2.5rem] shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.05)] z-50">
