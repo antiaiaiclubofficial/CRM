@@ -10,8 +10,8 @@ interface PetCategoryCardProps {
     name: string; // Pet's name or breed name
     breed: string; // Pet's breed
     imageUrl: string;
-    locationLabel: string; // e.g., "California"
-    statusLabel: string; // e.g., "Adoption", "Matings"
+    weight: string; // Changed from locationLabel
+    gender: string; // Changed from statusLabel
     cardBgColor: string; // Specific hex color for the inner background
     hasHeartIcon?: boolean; // Optional heart icon
   };
@@ -53,9 +53,9 @@ const PetCategoryCard = ({ pet, onClick }: PetCategoryCardProps) => {
         {/* Content Area */}
         <div className="p-4 relative z-10">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs text-gray-600 font-medium">{pet.locationLabel}</span>
+            <span className="text-xs text-gray-600 font-medium">{pet.weight} kg</span> {/* Changed to weight */}
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-black bg-white text-black">
-              {pet.statusLabel}
+              {pet.gender} {/* Changed to gender */}
             </span>
           </div>
           <h3 className="text-lg font-bold text-black">{pet.name}</h3>

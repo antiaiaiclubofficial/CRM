@@ -10,18 +10,16 @@ interface Pet {
   type: string;
   breed: string;
   age: string;
-  gender: string;
-  weight: string;
+  gender: string; // Changed from statusLabel
+  weight: string; // Changed from locationLabel
   medicalCondition: string;
   precautions: string;
   color: string;
   icon: string;
   furLength?: string; // New field for fur length
   customPreferences?: { id: string; label: string; value: string; }[];
-  imageUrl?: string; // Make optional
-  locationLabel?: string; // Make optional
-  statusLabel?: string; // Make optional
-  cardBgColor?: string; // Make optional
+  imageUrl: string; // Make required, consistent with Index.tsx
+  cardBgColor: string; // Make required, consistent with Index.tsx
   hasHeartIcon?: boolean; // Make optional
 }
 
@@ -35,8 +33,11 @@ interface PetFormProps {
 const petIcons: Record<string, string> = { 'สุนัข': '🐶', 'แมว': '🐱', 'กระต่าย': '🐰', 'หนูแฮมสเตอร์': '🐹', 'นก': '🦜' };
 const colors = ['bg-orange-100', 'bg-blue-100', 'bg-yellow-100', 'bg-pink-100', 'bg-purple-100', 'bg-green-100'];
 
+// Define a type for the editable fields in formData
+type EditablePetFields = Omit<Pet, 'id' | 'color' | 'icon' | 'customPreferences' | 'imageUrl' | 'cardBgColor' | 'hasHeartIcon'>;
+
 const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
-  const [formData, setFormData] = useState<Omit<Pet, 'id' | 'color' | 'customPreferences' | 'imageUrl' | 'locationLabel' | 'statusLabel' | 'cardBgColor' | 'hasHeartIcon'>>({ // Exclude new fields from formData as they are generated/defaulted
+  const [formData, setFormData] = useState<EditablePetFields>({
     name: '',
     type: 'สุนัข',
     breed: '',
@@ -45,8 +46,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     weight: '',
     medicalCondition: '',
     precautions: '',
-    icon: '🐶',
-    furLength: '', // Initialize new field
+    furLength: '',
   });
 
   useEffect(() => {
@@ -60,8 +60,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         weight: initialData.weight,
         medicalCondition: initialData.medicalCondition,
         precautions: initialData.precautions,
-        icon: initialData.icon,
-        furLength: initialData.furLength || '', // Set from initialData
+        furLength: initialData.furLength || '',
       });
     } else {
       setFormData({
@@ -73,7 +72,6 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         weight: '',
         medicalCondition: '',
         precautions: '',
-        icon: '🐶',
         furLength: '',
       });
     }
@@ -81,21 +79,28 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
 
   const handleSave = () => {
     if (initialData) {
-      // Editing existing pet, preserve existing customPreferences and new fields
-      onSave({ ...initialData, ...formData, icon: petIcons[formData.type] || '🐾' });
+      // Editing existing pet
+      const updatedPet: Pet = {
+        ...initialData, // Keep existing id, color, icon, imageUrl, cardBgColor, hasHeartIcon, customPreferences
+        ...formData, // Override editable fields
+        icon: petIcons[formData.type] || '🐾', // Update icon based on type
+      };
+      onSave(updatedPet);
     } else {
-      // Adding new pet, initialize customPreferences as empty and provide defaults for new fields
-      onSave({ 
-        ...formData, 
-        color: colors[Math.floor(Math.random() * colors.length)],
-        icon: petIcons[formData.type] || '🐾',
+      // Adding new pet
+      const defaultCardBgColors = ['#FFF9C4', '#FFCDD2', '#BBDEFB', '#C8E6C9', '#DCEDC8', '#E1BEE7'];
+      const randomColor = defaultCardBgColors[Math.floor(Math.random() * defaultCardBgColors.length)];
+      
+      const newPet: Omit<Pet, 'id'> = {
+        ...formData,
+        color: colors[Math.floor(Math.random() * colors.length)], // Assign a random color
+        icon: petIcons[formData.type] || '🐾', // Assign icon based on type
         customPreferences: [], // Initialize as empty array for new pets
         imageUrl: 'https://via.placeholder.com/150/CCCCCC/000000?text=New+Pet', // Default image
-        locationLabel: 'Unknown',
-        statusLabel: 'New',
-        cardBgColor: '#CCCCCC', // Default card background color
-        hasHeartIcon: false,
-      });
+        cardBgColor: randomColor, // Default card background color
+        hasHeartIcon: false, // Default
+      };
+      onSave(newPet);
     }
     onClose();
   };

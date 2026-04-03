@@ -11,8 +11,8 @@ interface Pet {
   type: string;
   breed: string;
   age: string;
-  gender: string;
-  weight: string;
+  gender: string; // Changed from statusLabel
+  weight: string; // Changed from locationLabel
   medicalCondition: string;
   precautions: string;
   color: string; // Existing: for old icon background
@@ -20,8 +20,6 @@ interface Pet {
   furLength?: string;
   customPreferences?: { id: string; label: string; value: string; }[];
   imageUrl: string; // New: URL for the pet's image
-  locationLabel: string; // New: e.g., "California"
-  statusLabel: string; // New: e.g., "Adoption", "Matings"
   cardBgColor: string; // New: Specific hex color for the inner background
   hasHeartIcon?: boolean; // New: for the heart icon on Persian cat
 }
@@ -51,6 +49,9 @@ const PetManagement = ({ pets, onBack, onViewDetails }: PetManagementProps) => {
         <h2 className="text-xl font-bold text-slate-800 flex-1 text-center -ml-10">สัตว์เลี้ยงของฉัน</h2> {/* Adjusted margin for centering */}
         <div className="w-10"></div> {/* Spacer to balance the X button */}
       </div>
+
+      {/* Subtitle */}
+      <p className="text-center text-slate-500 text-sm mb-6">All pet categories cat near you</p>
 
       {/* Pet Grid */}
       <div className="grid grid-cols-2 gap-4">

@@ -24,18 +24,16 @@ interface Pet {
   type: string;
   breed: string;
   age: string;
-  gender: string;
-  weight: string;
+  gender: string; // Changed from statusLabel
+  weight: string; // Changed from locationLabel
   medicalCondition: string;
   precautions: string;
   color: string; // Existing: for old icon background
   icon: string; // Existing: Emoji icon
   furLength?: string;
   customPreferences?: { id: string; label: string; value: string; }[];
-  imageUrl: string; // Make required
-  locationLabel: string; // Make required
-  statusLabel: string; // Make required
-  cardBgColor: string; // Make required
+  imageUrl: string;
+  cardBgColor: string;
   hasHeartIcon?: boolean; // Make optional
 }
 
@@ -102,8 +100,8 @@ const Index = () => {
       type: 'แมว', // Assuming all are cats for this view
       breed: 'Abyssinian', 
       age: '3',
-      gender: 'เมีย',
-      weight: '3.5',
+      gender: 'เมีย', // Mapped from original gender
+      weight: '3.5', // Mapped from original weight
       medicalCondition: 'ภูมิแพ้ผิวหนัง',
       precautions: 'ห้ามใช้แชมพูสูตรอ่อนโยนพิเศษ',
       color: 'bg-orange-100', 
@@ -116,8 +114,6 @@ const Index = () => {
         { id: 'pref4', label: 'สไตล์การตัดขน', value: 'ตัดขนสั้นแบบเท็ดดี้แบร์' }
       ],
       imageUrl: 'https://via.placeholder.com/150/FFF9C4/000000?text=Abyssinian', // Placeholder image
-      locationLabel: 'California',
-      statusLabel: 'Adoption',
       cardBgColor: '#FFF9C4', // Light Yellow
     },
     { 
@@ -126,8 +122,8 @@ const Index = () => {
       type: 'แมว',
       breed: 'Persian Cat', 
       age: '2',
-      gender: 'ผู้',
-      weight: '4.2',
+      gender: 'ผู้', // Mapped from original gender
+      weight: '4.2', // Mapped from original weight
       medicalCondition: '-',
       precautions: 'ขี้ตื่นง่าย ระวังตอนตัดเล็บ',
       color: 'bg-blue-100', 
@@ -135,8 +131,6 @@ const Index = () => {
       furLength: 'ขนยาว',
       customPreferences: [],
       imageUrl: 'https://via.placeholder.com/150/FFCDD2/000000?text=Persian', // Placeholder image
-      locationLabel: 'East Mids',
-      statusLabel: 'Adoptions',
       cardBgColor: '#FFCDD2', // Light Pink
       hasHeartIcon: true,
     },
@@ -146,8 +140,8 @@ const Index = () => {
       type: 'แมว',
       breed: 'Tabby',
       age: '1',
-      gender: 'เมีย',
-      weight: '3.0',
+      gender: 'เมีย', // Mapped from original gender
+      weight: '3.0', // Mapped from original weight
       medicalCondition: '-',
       precautions: '-',
       color: 'bg-gray-100',
@@ -155,8 +149,6 @@ const Index = () => {
       furLength: 'ขนสั้น',
       customPreferences: [],
       imageUrl: 'https://via.placeholder.com/150/BBDEFB/000000?text=Gray+Tabby', // Placeholder image
-      locationLabel: 'Frislatu',
-      statusLabel: 'Adoption',
       cardBgColor: '#BBDEFB', // Light Blue
     },
     {
@@ -165,8 +157,8 @@ const Index = () => {
       type: 'แมว',
       breed: 'Scottish Fold',
       age: '4',
-      gender: 'ผู้',
-      weight: '5.0',
+      gender: 'ผู้', // Mapped from original gender
+      weight: '5.0', // Mapped from original weight
       medicalCondition: '-',
       precautions: 'ชอบเล่นน้ำ',
       color: 'bg-green-100',
@@ -174,8 +166,6 @@ const Index = () => {
       furLength: 'ขนสั้น',
       customPreferences: [],
       imageUrl: 'https://via.placeholder.com/150/C8E6C9/000000?text=Scottish+Fold', // Placeholder image
-      locationLabel: 'New York',
-      statusLabel: 'Matings',
       cardBgColor: '#C8E6C9', // Light Green
     },
     {
@@ -184,8 +174,8 @@ const Index = () => {
       type: 'แมว',
       breed: 'Japanese Bobtail',
       age: '2',
-      gender: 'เมีย',
-      weight: '3.8',
+      gender: 'เมีย', // Mapped from original gender
+      weight: '3.8', // Mapped from original weight
       medicalCondition: '-',
       precautions: '-',
       color: 'bg-yellow-100',
@@ -193,8 +183,6 @@ const Index = () => {
       furLength: 'ขนสั้น',
       customPreferences: [],
       imageUrl: 'https://via.placeholder.com/150/DCEDC8/000000?text=Japanese+Bobtail', // Placeholder image
-      locationLabel: 'Wristlen',
-      statusLabel: 'Matings',
       cardBgColor: '#DCEDC8', // Lighter Green
     },
     {
@@ -203,8 +191,8 @@ const Index = () => {
       type: 'แมว',
       breed: 'Norwegian Forest Cat',
       age: '5',
-      gender: 'ผู้',
-      weight: '6.5',
+      gender: 'ผู้', // Mapped from original gender
+      weight: '6.5', // Mapped from original weight
       medicalCondition: '-',
       precautions: 'ขนยาว ต้องการการแปรงขนบ่อย',
       color: 'bg-purple-100',
@@ -212,8 +200,6 @@ const Index = () => {
       furLength: 'ขนยาว',
       customPreferences: [],
       imageUrl: 'https://via.placeholder.com/150/E1BEE7/000000?text=Norwegian+Forest', // Placeholder image
-      locationLabel: 'Utah',
-      statusLabel: 'Matings',
       cardBgColor: '#E1BEE7', // Light Purple
     },
   ]);
@@ -290,8 +276,8 @@ const Index = () => {
       ...newPetData, 
       id, 
       imageUrl: newPetData.imageUrl || 'https://via.placeholder.com/150/CCCCCC/000000?text=New+Pet', // Default image
-      locationLabel: newPetData.locationLabel || 'Unknown',
-      statusLabel: newPetData.statusLabel || 'New',
+      weight: newPetData.weight || '0', // Default weight
+      gender: newPetData.gender || 'ไม่ระบุ', // Default gender
       cardBgColor: newPetData.cardBgColor || randomColor,
       hasHeartIcon: newPetData.hasHeartIcon || false,
     }]);
