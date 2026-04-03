@@ -34,7 +34,7 @@ interface PetDetailViewProps {
 }
 
 const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost, onViewServiceHistoryForPet, onEditPreferences }: PetDetailViewProps) => {
-  const adventures = 323;
+  // Removed adventures variable as it's no longer used
   
   // Determine emoji and color based on totalServiceCost
   let costEmoji = '✨';
@@ -77,6 +77,10 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
       <div className="bg-white rounded-[2.5rem] p-6 shadow-sm relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute top-4 right-10 opacity-10">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="1" />
+            <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1" />
+          </svg>
         </div>
 
         <div className="flex justify-between items-start mb-6">
@@ -86,16 +90,18 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
             </div>
             <div className="pt-2">
               <h2 className="text-2xl font-black text-slate-800">{pet.name}</h2>
-              <p className="text-slate-400 text-sm font-medium">{pet.gender === 'ผู้' ? 'He/Him' : 'She/Her'} • {adventures} ผจญภัย</p>
+              <p className="text-slate-400 text-sm font-medium">
+                {pet.gender === 'ผู้' ? 'เพศผู้' : 'เพศเมีย'} {/* Changed gender display */}
+              </p>
             </div>
           </div>
-          <div className="flex gap-2 w-full max-w-[120px]"> {/* Adjusted width for the button */}
+          <div className="flex gap-2">
             {/* Removed Share2 button */}
             <button 
               onClick={() => onStartEdit(pet)} 
-              className="flex-1 py-2 px-4 bg-pink-100 text-pink-700 rounded-full font-bold flex items-center justify-center gap-2 active:scale-85 transition-all"
+              className="p-2.5 bg-pink-100 text-pink-700 rounded-full active:scale-95 transition-all" // Reduced size to icon-only
             >
-              <Edit2 size={14} /> แก้ไข
+              <Edit2 size={20} />
             </button>
           </div>
         </div>
