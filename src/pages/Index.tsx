@@ -11,10 +11,10 @@ import UpcomingAppointments from '@/components/UpcomingAppointments';
 import UserProfileEdit from '@/components/UserProfileEdit';
 import MembershipLevels from '@/components/MembershipLevels';
 import ServiceHistoryDetail from '@/components/ServiceHistoryDetail';
-import PetPreferenceForm from '@/components/PetPreferenceForm'; // Import new component
-import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History, Scissors, Sparkles, Bath } from 'lucide-react';
+import PetPreferenceForm from '@/components/PetPreferenceForm';
+import PetManagement from '@/components/PetManagement'; // Import the updated PetManagement
+import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History, Scissors, Sparkles, Bath, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import PetManagement from '@/components/PetManagement';
 import { toast } from 'sonner';
 
 // Define the Pet interface here for consistency across components
@@ -28,10 +28,15 @@ interface Pet {
   weight: string;
   medicalCondition: string;
   precautions: string;
-  color: string;
-  icon: string;
-  furLength?: string; // New field for fur length
+  color: string; // Existing: for old icon background
+  icon: string; // Existing: Emoji icon
+  furLength?: string;
   customPreferences?: { id: string; label: string; value: string; }[];
+  imageUrl: string; // Make required
+  locationLabel: string; // Make required
+  statusLabel: string; // Make required
+  cardBgColor: string; // Make required
+  hasHeartIcon?: boolean; // Make optional
 }
 
 // Define the Coupon interface here as well, or import it if it were in a shared file
@@ -93,9 +98,9 @@ const Index = () => {
   const [pets, setPets] = useState<Pet[]>([
     { 
       id: 1, 
-      name: 'น้องปุย', 
-      type: 'สุนัข',
-      breed: 'Pomeranian', 
+      name: 'Abyssinian Cats', // Changed to match image
+      type: 'แมว', // Assuming all are cats for this view
+      breed: 'Abyssinian', 
       age: '3',
       gender: 'เมีย',
       weight: '3.5',
@@ -103,17 +108,21 @@ const Index = () => {
       precautions: 'ห้ามใช้แชมพูสูตรอ่อนโยนพิเศษ',
       color: 'bg-orange-100', 
       icon: '🐶',
-      furLength: 'ขนสั้น', // Example fur length
+      furLength: 'ขนสั้น',
       customPreferences: [
         { id: 'pref1', label: 'แชมพูที่ชอบ', value: 'กลิ่นลาเวนเดอร์' },
         { id: 'pref2', label: 'สปาที่ชอบ', value: 'สปาโคลนเดดซี' },
         { id: 'pref3', label: 'อาหารที่ชอบ', value: 'อาหารเม็ดสูตรลดน้ำหนัก' },
         { id: 'pref4', label: 'สไตล์การตัดขน', value: 'ตัดขนสั้นแบบเท็ดดี้แบร์' }
-      ]
+      ],
+      imageUrl: 'https://via.placeholder.com/150/FFF9C4/000000?text=Abyssinian', // Placeholder image
+      locationLabel: 'California',
+      statusLabel: 'Adoption',
+      cardBgColor: '#FFF9C4', // Light Yellow
     },
     { 
       id: 2, 
-      name: 'น้องกะทิ', 
+      name: 'Persian', 
       type: 'แมว',
       breed: 'Persian Cat', 
       age: '2',
@@ -123,8 +132,89 @@ const Index = () => {
       precautions: 'ขี้ตื่นง่าย ระวังตอนตัดเล็บ',
       color: 'bg-blue-100', 
       icon: '🐱',
-      furLength: 'ขนยาว', // Example fur length
-      customPreferences: [] // Empty for adding
+      furLength: 'ขนยาว',
+      customPreferences: [],
+      imageUrl: 'https://via.placeholder.com/150/FFCDD2/000000?text=Persian', // Placeholder image
+      locationLabel: 'East Mids',
+      statusLabel: 'Adoptions',
+      cardBgColor: '#FFCDD2', // Light Pink
+      hasHeartIcon: true,
+    },
+    {
+      id: 3,
+      name: 'Gray Tabby',
+      type: 'แมว',
+      breed: 'Tabby',
+      age: '1',
+      gender: 'เมีย',
+      weight: '3.0',
+      medicalCondition: '-',
+      precautions: '-',
+      color: 'bg-gray-100',
+      icon: '🐱',
+      furLength: 'ขนสั้น',
+      customPreferences: [],
+      imageUrl: 'https://via.placeholder.com/150/BBDEFB/000000?text=Gray+Tabby', // Placeholder image
+      locationLabel: 'Frislatu',
+      statusLabel: 'Adoption',
+      cardBgColor: '#BBDEFB', // Light Blue
+    },
+    {
+      id: 4,
+      name: 'Scottish Fold',
+      type: 'แมว',
+      breed: 'Scottish Fold',
+      age: '4',
+      gender: 'ผู้',
+      weight: '5.0',
+      medicalCondition: '-',
+      precautions: 'ชอบเล่นน้ำ',
+      color: 'bg-green-100',
+      icon: '🐱',
+      furLength: 'ขนสั้น',
+      customPreferences: [],
+      imageUrl: 'https://via.placeholder.com/150/C8E6C9/000000?text=Scottish+Fold', // Placeholder image
+      locationLabel: 'New York',
+      statusLabel: 'Matings',
+      cardBgColor: '#C8E6C9', // Light Green
+    },
+    {
+      id: 5,
+      name: 'Japanese Bobtail',
+      type: 'แมว',
+      breed: 'Japanese Bobtail',
+      age: '2',
+      gender: 'เมีย',
+      weight: '3.8',
+      medicalCondition: '-',
+      precautions: '-',
+      color: 'bg-yellow-100',
+      icon: '🐱',
+      furLength: 'ขนสั้น',
+      customPreferences: [],
+      imageUrl: 'https://via.placeholder.com/150/DCEDC8/000000?text=Japanese+Bobtail', // Placeholder image
+      locationLabel: 'Wristlen',
+      statusLabel: 'Matings',
+      cardBgColor: '#DCEDC8', // Lighter Green
+    },
+    {
+      id: 6,
+      name: 'Norwegian Forest',
+      type: 'แมว',
+      breed: 'Norwegian Forest Cat',
+      age: '5',
+      gender: 'ผู้',
+      weight: '6.5',
+      medicalCondition: '-',
+      precautions: 'ขนยาว ต้องการการแปรงขนบ่อย',
+      color: 'bg-purple-100',
+      icon: '🐱',
+      furLength: 'ขนยาว',
+      customPreferences: [],
+      imageUrl: 'https://via.placeholder.com/150/E1BEE7/000000?text=Norwegian+Forest', // Placeholder image
+      locationLabel: 'Utah',
+      statusLabel: 'Matings',
+      cardBgColor: '#E1BEE7', // Light Purple
     },
   ]);
 
@@ -132,7 +222,7 @@ const Index = () => {
     {
       id: 1,
       date: '15 พ.ค. 2567',
-      petName: 'น้องปุย',
+      petName: 'Abyssinian Cats', // Updated pet name
       service: 'อาบน้ำตัดขน Full Service',
       price: '550',
       icon: <Scissors className="text-pink-500" />,
@@ -149,7 +239,7 @@ const Index = () => {
     {
       id: 2,
       date: '02 พ.ค. 2567',
-      petName: 'น้องกะทิ',
+      petName: 'Persian', // Updated pet name
       service: 'สปาโอโซนและนวดผ่อนคลาย',
       price: '890',
       icon: <Sparkles className="text-amber-500" />,
@@ -166,7 +256,7 @@ const Index = () => {
     {
       id: 3,
       date: '20 เม.ย. 2567',
-      petName: 'น้องปุย',
+      petName: 'Abyssinian Cats', // Updated pet name
       service: 'อาบน้ำกำจัดเห็บหมัด',
       price: '350',
       icon: <Bath className="text-blue-500" />,
@@ -193,7 +283,18 @@ const Index = () => {
 
   const handleAddPet = (newPetData: Omit<Pet, 'id'>) => {
     const id = pets.length > 0 ? Math.max(...pets.map(p => p.id)) + 1 : 1;
-    setPets([...pets, { ...newPetData, id, customPreferences: [] }]); // Initialize customPreferences for new pets
+    // Assign a default cardBgColor and other new fields for new pets
+    const defaultCardBgColors = ['#FFF9C4', '#FFCDD2', '#BBDEFB', '#C8E6C9', '#DCEDC8', '#E1BEE7'];
+    const randomColor = defaultCardBgColors[Math.floor(Math.random() * defaultCardBgColors.length)];
+    setPets([...pets, { 
+      ...newPetData, 
+      id, 
+      imageUrl: newPetData.imageUrl || 'https://via.placeholder.com/150/CCCCCC/000000?text=New+Pet', // Default image
+      locationLabel: newPetData.locationLabel || 'Unknown',
+      statusLabel: newPetData.statusLabel || 'New',
+      cardBgColor: newPetData.cardBgColor || randomColor,
+      hasHeartIcon: newPetData.hasHeartIcon || false,
+    }]);
   };
 
   const handleEditPet = (updatedPet: Pet) => {
@@ -206,11 +307,11 @@ const Index = () => {
     setSelectedPetForDetail(null); // Close detail view if deleted
   };
 
-  const handlePetSelection = (pet: Pet) => { // Changed to accept full pet object
-    setSelectedPetForDetail(pet); // Set the selected pet for detail view
-    setActiveTab('pets'); // Change to the 'pets' tab
-    setSelectedPetName(null); // Clear any history filter
-    setSelectedServiceForDetail(null); // Clear any service detail
+  const handlePetSelection = (pet: Pet) => {
+    setSelectedPetForDetail(pet);
+    setActiveTab('pets');
+    setSelectedPetName(null);
+    setSelectedServiceForDetail(null);
   };
 
   const handleRedeemCoupon = (coupon: Coupon, pointsCost: number) => {
@@ -299,7 +400,7 @@ const Index = () => {
   const handleSavePetPreferences = (updatedPreferences: { id: string; label: string; value: string; }[]) => {
     if (selectedPetForDetail) {
       const updatedPet = { ...selectedPetForDetail, customPreferences: updatedPreferences };
-      handleEditPet(updatedPet); // Use existing handleEditPet to update the pet in state
+      handleEditPet(updatedPet);
       toast.success('บันทึกความชอบส่วนตัวสำเร็จ!');
     }
   };
@@ -375,7 +476,7 @@ const Index = () => {
 
               <PetList 
                 pets={pets} 
-                onPetClick={handlePetSelection} // Updated to use handlePetSelection
+                onPetClick={handlePetSelection}
               />
 
               <div className="bg-[#FFE3BC]/40 p-5 rounded-[2rem] border border-[#FFE3BC] flex items-center gap-4">
@@ -419,12 +520,12 @@ const Index = () => {
                   onDeletePet={handleDeletePet}
                   totalServiceCost={calculateTotalServiceCost(selectedPetForDetail.name)}
                   onViewServiceHistoryForPet={handleViewPetServiceHistory}
-                  onEditPreferences={handleOpenPreferenceForm} // New prop
+                  onEditPreferences={handleOpenPreferenceForm}
                 />
               ) : (
                 <PetManagement 
                   pets={pets} 
-                  onAddPet={handleOpenAddPetForm}
+                  onBack={() => setActiveTab('home')} // Back to home tab
                   onViewDetails={handleViewPetDetails}
                 />
               )}
@@ -518,7 +619,7 @@ const Index = () => {
           isOpen={isPreferenceFormOpen}
           onClose={handleClosePreferenceForm}
           onSave={handleSavePetPreferences}
-          initialData={selectedPetForDetail.customPreferences || []} // Pass customPreferences array
+          initialData={selectedPetForDetail.customPreferences || []}
           petName={selectedPetForDetail.name}
         />
       )}

@@ -1,8 +1,9 @@
 "use client";
 
 import React from 'react';
-import { Plus, ChevronRight } from 'lucide-react';
+import { X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import PetCategoryCard from './PetCategoryCard'; // Import the new card component
 
 interface Pet {
   id: number;
@@ -14,66 +15,57 @@ interface Pet {
   weight: string;
   medicalCondition: string;
   precautions: string;
-  color: string;
-  icon: string;
+  color: string; // Existing: for old icon background
+  icon: string; // Existing: Emoji icon
   furLength?: string;
   customPreferences?: { id: string; label: string; value: string; }[];
+  imageUrl: string; // New: URL for the pet's image
+  locationLabel: string; // New: e.g., "California"
+  statusLabel: string; // New: e.g., "Adoption", "Matings"
+  cardBgColor: string; // New: Specific hex color for the inner background
+  hasHeartIcon?: boolean; // New: for the heart icon on Persian cat
 }
 
 interface PetManagementProps {
   pets: Pet[];
-  onAddPet: () => void;
-  onViewDetails: (pet: Pet) => void;
+  onBack: () => void; // New prop for back button
+  onViewDetails: (pet: Pet) => void; // Keep this for clicking on a card
 }
 
-const PetManagement = ({ pets, onAddPet, onViewDetails }: PetManagementProps) => {
+const PetManagement = ({ pets, onBack, onViewDetails }: PetManagementProps) => {
   return (
-    <div className="space-y-6 pb-20">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-slate-800">จัดการสัตว์เลี้ยง</h2>
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className="space-y-6 pb-20"
+    >
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
         <button 
-          onClick={onAddPet}
-          className="bg-pink-500 text-white p-2 rounded-2xl shadow-lg shadow-pink-200 active:scale-90 transition-transform"
+          onClick={onBack}
+          className="p-2 bg-emerald-100 text-emerald-600 rounded-xl active:scale-90 transition-transform"
         >
-          <Plus size={20} />
+          <X size={20} />
         </button>
+        <h2 className="text-xl font-bold text-slate-800 flex-1 text-center -ml-10">สัตว์เลี้ยงของฉัน</h2> {/* Adjusted margin for centering */}
+        <div className="w-10"></div> {/* Spacer to balance the X button */}
       </div>
 
-      <div className="space-y-4">
+      {/* Subtitle */}
+      <p className="text-center text-slate-500 text-sm mb-6">All pet categories cat near you</p>
+
+      {/* Pet Grid */}
+      <div className="grid grid-cols-2 gap-4">
         {pets.map((pet) => (
-          <motion.div 
-            layout
+          <PetCategoryCard
             key={pet.id}
-            whileTap={{ scale: 0.98 }}
+            pet={pet}
             onClick={() => onViewDetails(pet)}
-            className="relative bg-white p-6 pt-10 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col items-center text-center cursor-pointer active:bg-slate-50 transition-colors overflow-hidden"
-          >
-            {/* Top accent/border */}
-            <div className={`absolute top-0 left-0 right-0 h-2.5 ${pet.color} rounded-t-[2.5rem]`} />
-            
-            {/* Decorative tabs at the top */}
-            <div className="absolute -top-3 left-0 right-0 flex justify-around px-8">
-              {[1,2,3,4,5].map(i => <div key={i} className={`w-3 h-5 ${pet.color} rounded-full`} />)}
-            </div>
-
-            {/* Pet Icon */}
-            <div className={`w-20 h-20 ${pet.color} rounded-full flex items-center justify-center text-4xl shadow-inner border-4 border-white relative z-10 -mt-8 mb-4`}>
-              {pet.icon}
-            </div>
-
-            {/* Pet Name and Breed */}
-            <h4 className="font-bold text-slate-800 text-lg mb-1">{pet.name}</h4>
-            <p className="text-xs text-slate-500 mb-4">{pet.breed}</p>
-
-            {/* View Details Button */}
-            <div className="flex items-center gap-1 text-pink-500 text-sm font-medium">
-              <span>ดูรายละเอียด</span>
-              <ChevronRight size={16} />
-            </div>
-          </motion.div>
+          />
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

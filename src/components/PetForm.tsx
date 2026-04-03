@@ -18,6 +18,11 @@ interface Pet {
   icon: string;
   furLength?: string; // New field for fur length
   customPreferences?: { id: string; label: string; value: string; }[];
+  imageUrl?: string; // Make optional
+  locationLabel?: string; // Make optional
+  statusLabel?: string; // Make optional
+  cardBgColor?: string; // Make optional
+  hasHeartIcon?: boolean; // Make optional
 }
 
 interface PetFormProps {
@@ -31,7 +36,7 @@ const petIcons: Record<string, string> = { 'สุนัข': '🐶', 'แมว
 const colors = ['bg-orange-100', 'bg-blue-100', 'bg-yellow-100', 'bg-pink-100', 'bg-purple-100', 'bg-green-100'];
 
 const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
-  const [formData, setFormData] = useState<Omit<Pet, 'id' | 'color' | 'customPreferences'>>({ // Exclude customPreferences from formData
+  const [formData, setFormData] = useState<Omit<Pet, 'id' | 'color' | 'customPreferences' | 'imageUrl' | 'locationLabel' | 'statusLabel' | 'cardBgColor' | 'hasHeartIcon'>>({ // Exclude new fields from formData as they are generated/defaulted
     name: '',
     type: 'สุนัข',
     breed: '',
@@ -76,15 +81,20 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
 
   const handleSave = () => {
     if (initialData) {
-      // Editing existing pet, preserve existing customPreferences
+      // Editing existing pet, preserve existing customPreferences and new fields
       onSave({ ...initialData, ...formData, icon: petIcons[formData.type] || '🐾' });
     } else {
-      // Adding new pet, initialize customPreferences as empty
+      // Adding new pet, initialize customPreferences as empty and provide defaults for new fields
       onSave({ 
         ...formData, 
         color: colors[Math.floor(Math.random() * colors.length)],
         icon: petIcons[formData.type] || '🐾',
-        customPreferences: [] // Initialize as empty array for new pets
+        customPreferences: [], // Initialize as empty array for new pets
+        imageUrl: 'https://via.placeholder.com/150/CCCCCC/000000?text=New+Pet', // Default image
+        locationLabel: 'Unknown',
+        statusLabel: 'New',
+        cardBgColor: '#CCCCCC', // Default card background color
+        hasHeartIcon: false,
       });
     }
     onClose();
