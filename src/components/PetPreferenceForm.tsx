@@ -82,14 +82,14 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
             exit={{ y: "100%" }}
             className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] py-8 max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
           >
-            <div className="flex justify-between items-center mb-6 sticky top-0 bg-white px-6 py-2 z-10"> {/* Added px-6 here */}
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-white px-6 py-2 z-10">
               <h3 className="font-bold text-xl text-slate-800 flex-1 min-w-0 text-wrap">ความชอบส่วนตัวของน้อง{petName}</h3>
               <button onClick={onClose} className="p-2 bg-slate-100 rounded-full text-slate-400">
                 <X size={20} />
               </button>
             </div>
 
-            <div className="space-y-5 pb-8 px-6"> {/* Added px-6 here */}
+            <div className="space-y-5 pb-8 px-6">
               {preferences.length > 0 && (
                 <div className="space-y-4">
                   <h4 className="text-sm font-bold text-slate-600 px-2">รายการความชอบที่มีอยู่</h4>
@@ -100,18 +100,19 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
                         value={pref.label}
                         onChange={(e) => handlePreferenceChange(pref.id, 'label', e.target.value)}
                         placeholder="หัวข้อ (เช่น แชมพูที่ชอบ)"
-                        className="flex-1 p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
+                        className="flex-1 min-w-[80px] p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
                       />
                       <input 
                         type="text" 
                         value={pref.value}
                         onChange={(e) => handlePreferenceChange(pref.id, 'value', e.target.value)}
                         placeholder="รายละเอียด"
-                        className="flex-1 p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
+                        className="flex-1 min-w-[100px] p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
                       />
                       <button 
                         onClick={() => handleRemovePreference(pref.id)}
-                        className="p-2 bg-red-100 rounded-full text-red-500 hover:bg-red-200 transition-colors"
+                        // Added flex-shrink-0
+                        className="p-2 bg-red-100 rounded-full text-red-500 hover:bg-red-200 transition-colors flex-shrink-0"
                       >
                         <Trash2 size={16} />
                       </button>
