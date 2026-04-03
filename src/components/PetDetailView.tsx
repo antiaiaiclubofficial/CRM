@@ -161,7 +161,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
 
       {/* Collection Section (now Pet Preferences) */}
       <div className="pt-4">
-        <h3 className="text-lg font-black text-slate-800 mb-4 px-2">สิ่งที่ต้องใช้กับน้อง{pet.name}</h3>
+        <h3 className="text-lg font-black text-slate-800 mb-4 px-2">{pet.name}'s collection</h3>
         
         <div className="bg-[#FAF7F0] rounded-[2.5rem] border-t-8 border-[#D2B48C] relative">
           {/* Decorative tabs at the top */}
