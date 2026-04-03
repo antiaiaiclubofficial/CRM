@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Plus, ChevronRight } from 'lucide-react'; // Changed HeartPulse and Info to ChevronRight
+import { Plus, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Pet {
@@ -16,7 +16,7 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
-  furLength?: string; // New field for fur length
+  furLength?: string;
   customPreferences?: { id: string; label: string; value: string; }[];
 }
 
@@ -46,19 +46,30 @@ const PetManagement = ({ pets, onAddPet, onViewDetails }: PetManagementProps) =>
             key={pet.id}
             whileTap={{ scale: 0.98 }}
             onClick={() => onViewDetails(pet)}
-            className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-50 flex items-center justify-between cursor-pointer active:bg-slate-50 transition-colors"
+            className="relative bg-white p-6 pt-10 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col items-center text-center cursor-pointer active:bg-slate-50 transition-colors overflow-hidden"
           >
-            <div className="flex items-center gap-4">
-              <div className={`w-14 h-14 ${pet.color} rounded-2xl flex items-center justify-center text-2xl shadow-inner`}>
-                {pet.icon}
-              </div>
-              <div>
-                <h4 className="font-bold text-slate-800 text-lg">{pet.name}</h4>
-                <p className="text-xs text-slate-500">{pet.type} • {pet.breed}</p>
-              </div>
-            </div>
+            {/* Top accent/border */}
+            <div className={`absolute top-0 left-0 right-0 h-2.5 ${pet.color} rounded-t-[2.5rem]`} />
             
-            <ChevronRight size={20} className="text-slate-300 group-hover:text-pink-400 transition-colors" />
+            {/* Decorative tabs at the top */}
+            <div className="absolute -top-3 left-0 right-0 flex justify-around px-8">
+              {[1,2,3,4,5].map(i => <div key={i} className={`w-3 h-5 ${pet.color} rounded-full`} />)}
+            </div>
+
+            {/* Pet Icon */}
+            <div className={`w-20 h-20 ${pet.color} rounded-full flex items-center justify-center text-4xl shadow-inner border-4 border-white relative z-10 -mt-8 mb-4`}>
+              {pet.icon}
+            </div>
+
+            {/* Pet Name and Breed */}
+            <h4 className="font-bold text-slate-800 text-lg mb-1">{pet.name}</h4>
+            <p className="text-xs text-slate-500 mb-4">{pet.breed}</p>
+
+            {/* View Details Button */}
+            <div className="flex items-center gap-1 text-pink-500 text-sm font-medium">
+              <span>ดูรายละเอียด</span>
+              <ChevronRight size={16} />
+            </div>
           </motion.div>
         ))}
       </div>
