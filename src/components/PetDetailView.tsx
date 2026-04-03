@@ -152,8 +152,11 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
           {costEmoji}
         </div>
         <div className="flex-1">
-          <h3 className="text-xl font-black text-slate-800">ยอดการใช้บริการสะสม</h3> {/* Changed text */}
-          <p className="text-xs text-slate-400 font-medium">฿{totalServiceCost.toLocaleString()} จาก {pet.name}</p>
+          <p className="text-xs font-medium text-slate-500 mb-1">ยอดการใช้บริการสะสม</p>
+          <div className="flex items-baseline gap-1">
+            <span className="text-3xl font-bold text-slate-800">฿{totalServiceCost.toLocaleString()}</span>
+            <span className="text-sm text-slate-600">จาก {pet.name}</span>
+          </div>
         </div>
         <ChevronRight className="text-slate-300" size={20} />
       </motion.div>
