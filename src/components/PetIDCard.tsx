@@ -16,10 +16,7 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
-  shampooPreference?: string; // New field
-  spaPreference?: string;     // New field
-  foodPreference?: string;    // New field
-  groomingStyle?: string;     // New field
+  customPreferences?: { id: string; label: string; value: string; }[]; // Changed to include id
 }
 
 interface PetIDCardProps {

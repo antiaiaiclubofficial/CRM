@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, HeartPulse, Scale, Calendar, Info, Check, Droplet, Sparkles, Utensils, Scissors } from 'lucide-react'; // Added Utensils, Scissors
+import { X, User, HeartPulse, Scale, Calendar, Info, Check } from 'lucide-react'; // Removed Droplet, Sparkles, Utensils, Scissors
 
 interface Pet {
   id: number;
@@ -16,10 +16,7 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
-  shampooPreference?: string; // New field
-  spaPreference?: string;     // New field
-  foodPreference?: string;    // New field
-  groomingStyle?: string;     // New field
+  customPreferences?: { id: string; label: string; value: string; }[]; // Changed to include id
 }
 
 interface PetFormProps {
@@ -33,7 +30,7 @@ const petIcons: Record<string, string> = { 'สุนัข': '🐶', 'แมว
 const colors = ['bg-orange-100', 'bg-blue-100', 'bg-yellow-100', 'bg-pink-100', 'bg-purple-100', 'bg-green-100'];
 
 const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
-  const [formData, setFormData] = useState<Omit<Pet, 'id' | 'color'>>({
+  const [formData, setFormData] = useState<Omit<Pet, 'id' | 'color' | 'customPreferences'>>({ // Exclude customPreferences from formData
     name: '',
     type: 'สุนัข',
     breed: '',
@@ -43,10 +40,6 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     medicalCondition: '',
     precautions: '',
     icon: '🐶',
-    shampooPreference: '', 
-    spaPreference: '',
-    foodPreference: '', // Initialize new fields
-    groomingStyle: ''      // Initialize new fields
   });
 
   useEffect(() => {
@@ -61,10 +54,6 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         medicalCondition: initialData.medicalCondition,
         precautions: initialData.precautions,
         icon: initialData.icon,
-        shampooPreference: initialData.shampooPreference || '', 
-        spaPreference: initialData.spaPreference || '',
-        foodPreference: initialData.foodPreference || '', // Set from initialData
-        groomingStyle: initialData.groomingStyle || ''          // Set from initialData
       });
     } else {
       setFormData({
@@ -77,24 +66,21 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         medicalCondition: '',
         precautions: '',
         icon: '🐶',
-        shampooPreference: '',
-        spaPreference: '',
-        foodPreference: '',
-        groomingStyle: ''
       });
     }
   }, [initialData, isOpen]);
 
   const handleSave = () => {
     if (initialData) {
-      // Editing existing pet
+      // Editing existing pet, preserve existing customPreferences
       onSave({ ...initialData, ...formData, icon: petIcons[formData.type] || '🐾' });
     } else {
-      // Adding new pet
+      // Adding new pet, initialize customPreferences as empty
       onSave({ 
         ...formData, 
         color: colors[Math.floor(Math.random() * colors.length)],
-        icon: petIcons[formData.type] || '🐾'
+        icon: petIcons[formData.type] || '🐾',
+        customPreferences: [] // Initialize as empty array for new pets
       });
     }
     onClose();
@@ -213,50 +199,6 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                     onChange={(e) => setFormData({...formData, precautions: e.target.value})}
                     placeholder="ระบุสิ่งที่ร้านควรระวัง"
                     className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-amber-100 outline-none text-sm h-20 resize-none"
-                  />
-                </div>
-              </div>
-
-              {/* New: Preferences */}
-              <div className="space-y-4 pt-2">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-blue-500"><Droplet size={12}/> แชมพูที่ชอบ</label>
-                  <input 
-                    type="text" 
-                    value={formData.shampooPreference}
-                    onChange={(e) => setFormData({...formData, shampooPreference: e.target.value})}
-                    placeholder="เช่น กลิ่นลาเวนเดอร์"
-                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-100 outline-none text-sm"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-purple-500"><Sparkles size={12}/> สปาที่ชอบ</label>
-                  <input 
-                    type="text" 
-                    value={formData.spaPreference}
-                    onChange={(e) => setFormData({...formData, spaPreference: e.target.value})}
-                    placeholder="เช่น สปาโคลนเดดซี"
-                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-purple-100 outline-none text-sm"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-green-500"><Utensils size={12}/> อาหารที่ชอบ</label>
-                  <input 
-                    type="text" 
-                    value={formData.foodPreference}
-                    onChange={(e) => setFormData({...formData, foodPreference: e.target.value})}
-                    placeholder="เช่น อาหารเม็ดสูตรปลาแซลมอน"
-                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-green-100 outline-none text-sm"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-orange-500"><Scissors size={12}/> สไตล์การตัดขน</label>
-                  <input 
-                    type="text" 
-                    value={formData.groomingStyle}
-                    onChange={(e) => setFormData({...formData, groomingStyle: e.target.value})}
-                    placeholder="เช่น ตัดขนสั้นแบบหมีเท็ดดี้"
-                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-100 outline-none text-sm"
                   />
                 </div>
               </div>

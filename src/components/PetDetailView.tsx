@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Edit2, Share2, Scale, 
   Ruler, Activity, Heart, Info, ChevronRight,
-  Droplet, DollarSign, Sparkles, Settings, Plus, Utensils, Scissors // Added Utensils, Scissors icons
+  Settings, Plus, Tag // Added Tag icon for generic preference
 } from 'lucide-react';
 
 interface Pet {
@@ -20,10 +20,7 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
-  shampooPreference?: string;
-  spaPreference?: string;
-  foodPreference?: string; // New field
-  groomingStyle?: string; // New field
+  customPreferences?: { id: string; label: string; value: string; }[]; // Changed to include id
 }
 
 interface PetDetailViewProps {
@@ -58,7 +55,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
     bgColor = 'bg-pink-50';
   }
 
-  const hasPreferences = pet.shampooPreference || pet.spaPreference || pet.foodPreference || pet.groomingStyle;
+  const hasPreferences = pet.customPreferences && pet.customPreferences.length > 0;
 
   return (
     <motion.div
@@ -187,51 +184,19 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
             </div>
 
             <div className="space-y-4">
-              {pet.shampooPreference && (
-                <div className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
-                  <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-500 text-xl shadow-inner">
-                    <Droplet size={20} />
+              {hasPreferences ? (
+                pet.customPreferences?.map((pref, index) => (
+                  <div key={index} className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
+                    <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-500 text-xl shadow-inner">
+                      <Tag size={20} /> {/* Generic icon for custom preferences */}
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 font-medium">{pref.label}</p>
+                      <p className="font-bold text-slate-800 text-sm">{pref.value}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs text-slate-500 font-medium">แชมพูที่ชอบ</p>
-                    <p className="font-bold text-slate-800 text-sm">{pet.shampooPreference}</p>
-                  </div>
-                </div>
-              )}
-              {pet.spaPreference && (
-                <div className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
-                  <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center text-purple-500 text-xl shadow-inner">
-                    <Sparkles size={20} />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 font-medium">สปาที่ชอบ</p>
-                    <p className="font-bold text-slate-800 text-sm">{pet.spaPreference}</p>
-                  </div>
-                </div>
-              )}
-              {pet.foodPreference && (
-                <div className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
-                  <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center text-green-500 text-xl shadow-inner">
-                    <Utensils size={20} />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 font-medium">อาหารที่ชอบ</p>
-                    <p className="font-bold text-slate-800 text-sm">{pet.foodPreference}</p>
-                  </div>
-                </div>
-              )}
-              {pet.groomingStyle && (
-                <div className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
-                  <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center text-orange-500 text-xl shadow-inner">
-                    <Scissors size={20} />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 font-medium">สไตล์การตัดขน</p>
-                    <p className="font-bold text-slate-800 text-sm">{pet.groomingStyle}</p>
-                  </div>
-                </div>
-              )}
-              {!hasPreferences && (
+                ))
+              ) : (
                 <button 
                   onClick={onEditPreferences} 
                   className="w-full py-4 text-center text-slate-500 text-sm bg-slate-50 rounded-2xl border border-slate-100 hover:bg-slate-100 transition-colors flex items-center justify-center gap-2"

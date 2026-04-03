@@ -2,51 +2,66 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Droplet, Sparkles, Utensils, Scissors } from 'lucide-react'; // Added Utensils, Scissors
+import { X, Check, Plus, Trash2, Tag } from 'lucide-react'; // Added Trash2 for delete
 
-interface PetPreferences {
-  shampooPreference?: string;
-  spaPreference?: string;
-  foodPreference?: string; // New field
-  groomingStyle?: string; // New field
+interface CustomPreference {
+  id: string; // Unique ID for managing list items
+  label: string;
+  value: string;
 }
 
 interface PetPreferenceFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (preferences: PetPreferences) => void;
-  initialData?: PetPreferences;
+  onSave: (preferences: CustomPreference[]) => void;
+  initialData?: CustomPreference[];
   petName: string; // To display in the title
 }
 
+const generateUniqueId = () => Math.random().toString(36).substring(2, 9);
+
 const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: PetPreferenceFormProps) => {
-  const [formData, setFormData] = useState<PetPreferences>({
-    shampooPreference: '',
-    spaPreference: '',
-    foodPreference: '', // Initialize new fields
-    groomingStyle: '', // Initialize new fields
-  });
+  const [preferences, setPreferences] = useState<CustomPreference[]>([]);
+  const [newPreferenceLabel, setNewPreferenceLabel] = useState('');
+  const [newPreferenceValue, setNewPreferenceValue] = useState('');
 
   useEffect(() => {
-    if (initialData) {
-      setFormData({
-        shampooPreference: initialData.shampooPreference || '',
-        spaPreference: initialData.spaPreference || '',
-        foodPreference: initialData.foodPreference || '', // Set from initialData
-        groomingStyle: initialData.groomingStyle || '', // Set from initialData
-      });
-    } else {
-      setFormData({
-        shampooPreference: '',
-        spaPreference: '',
-        foodPreference: '',
-        groomingStyle: '',
-      });
+    if (isOpen) {
+      // Assign unique IDs if not present, useful for initial data
+      const dataWithIds = initialData?.map(pref => ({ ...pref, id: pref.id || generateUniqueId() })) || [];
+      setPreferences(dataWithIds);
+      setNewPreferenceLabel('');
+      setNewPreferenceValue('');
     }
   }, [initialData, isOpen]);
 
+  const handlePreferenceChange = (id: string, field: 'label' | 'value', newValue: string) => {
+    setPreferences(prev =>
+      prev.map(pref =>
+        pref.id === id ? { ...pref, [field]: newValue } : pref
+      )
+    );
+  };
+
+  const handleAddPreference = () => {
+    if (newPreferenceLabel.trim() && newPreferenceValue.trim()) {
+      setPreferences(prev => [
+        ...prev,
+        { id: generateUniqueId(), label: newPreferenceLabel.trim(), value: newPreferenceValue.trim() }
+      ]);
+      setNewPreferenceLabel('');
+      setNewPreferenceValue('');
+    }
+  };
+
+  const handleRemovePreference = (id: string) => {
+    setPreferences(prev => prev.filter(pref => pref.id !== id));
+  };
+
   const handleSave = () => {
-    onSave(formData);
+    // Filter out empty preferences before saving
+    const filteredPreferences = preferences.filter(p => p.label.trim() && p.value.trim());
+    onSave(filteredPreferences);
     onClose();
   };
 
@@ -75,45 +90,61 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
             </div>
 
             <div className="space-y-5 pb-8">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-blue-500"><Droplet size={12}/> แชมพูที่ชอบ</label>
-                <input 
-                  type="text" 
-                  value={formData.shampooPreference}
-                  onChange={(e) => setFormData({...formData, shampooPreference: e.target.value})}
-                  placeholder="เช่น กลิ่นลาเวนเดอร์"
-                  className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-100 outline-none text-sm"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-purple-500"><Sparkles size={12}/> สปาที่ชอบ</label>
-                <input 
-                  type="text" 
-                  value={formData.spaPreference}
-                  onChange={(e) => setFormData({...formData, spaPreference: e.target.value})}
-                  placeholder="เช่น สปาโคลนเดดซี"
-                  className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-purple-100 outline-none text-sm"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-green-500"><Utensils size={12}/> อาหารที่ชอบ</label>
-                <input 
-                  type="text" 
-                  value={formData.foodPreference}
-                  onChange={(e) => setFormData({...formData, foodPreference: e.target.value})}
-                  placeholder="เช่น อาหารเม็ดสูตรปลาแซลมอน"
-                  className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-green-100 outline-none text-sm"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-orange-500"><Scissors size={12}/> สไตล์การตัดขน</label>
-                <input 
-                  type="text" 
-                  value={formData.groomingStyle}
-                  onChange={(e) => setFormData({...formData, groomingStyle: e.target.value})}
-                  placeholder="เช่น ตัดขนสั้นแบบหมีเท็ดดี้"
-                  className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-100 outline-none text-sm"
-                />
+              {preferences.length > 0 && (
+                <div className="space-y-4">
+                  <h4 className="text-sm font-bold text-slate-600 px-2">รายการความชอบที่มีอยู่</h4>
+                  {preferences.map((pref) => (
+                    <div key={pref.id} className="flex items-center gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                      <input 
+                        type="text" 
+                        value={pref.label}
+                        onChange={(e) => handlePreferenceChange(pref.id, 'label', e.target.value)}
+                        placeholder="หัวข้อ (เช่น แชมพูที่ชอบ)"
+                        className="flex-1 p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
+                      />
+                      <input 
+                        type="text" 
+                        value={pref.value}
+                        onChange={(e) => handlePreferenceChange(pref.id, 'value', e.target.value)}
+                        placeholder="รายละเอียด"
+                        className="flex-1 p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
+                      />
+                      <button 
+                        onClick={() => handleRemovePreference(pref.id)}
+                        className="p-2 bg-red-100 rounded-full text-red-500 hover:bg-red-200 transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="space-y-4 pt-4 border-t border-slate-100">
+                <h4 className="text-sm font-bold text-slate-600 px-2">เพิ่มความชอบใหม่</h4>
+                <div className="space-y-2">
+                  <input 
+                    type="text" 
+                    value={newPreferenceLabel}
+                    onChange={(e) => setNewPreferenceLabel(e.target.value)}
+                    placeholder="หัวข้อ (เช่น ของเล่นที่ชอบ)"
+                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                  />
+                  <input 
+                    type="text" 
+                    value={newPreferenceValue}
+                    onChange={(e) => setNewPreferenceValue(e.target.value)}
+                    placeholder="รายละเอียด (เช่น ลูกบอลยางสีแดง)"
+                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                  />
+                </div>
+                <button 
+                  onClick={handleAddPreference}
+                  disabled={!newPreferenceLabel.trim() || !newPreferenceValue.trim()}
+                  className="w-full py-3 bg-pink-100 text-pink-700 rounded-2xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Plus size={18} /> เพิ่มรายการ
+                </button>
               </div>
 
               <button 

@@ -30,10 +30,7 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
-  shampooPreference?: string;
-  spaPreference?: string;
-  foodPreference?: string; // New field
-  groomingStyle?: string; // New field
+  customPreferences?: { id: string; label: string; value: string; }[]; // Changed to include id
 }
 
 // Define the Coupon interface here as well, or import it if it were in a shared file
@@ -105,10 +102,12 @@ const Index = () => {
       precautions: 'ห้ามใช้แชมพูสูตรอ่อนโยนพิเศษ',
       color: 'bg-orange-100', 
       icon: '🐶',
-      shampooPreference: 'กลิ่นลาเวนเดอร์',
-      spaPreference: 'สปาโคลนเดดซี',
-      foodPreference: 'อาหารเม็ดสูตรลดน้ำหนัก', // Example preference
-      groomingStyle: 'ตัดขนสั้นแบบเท็ดดี้แบร์' // Example preference
+      customPreferences: [
+        { id: 'pref1', label: 'แชมพูที่ชอบ', value: 'กลิ่นลาเวนเดอร์' },
+        { id: 'pref2', label: 'สปาที่ชอบ', value: 'สปาโคลนเดดซี' },
+        { id: 'pref3', label: 'อาหารที่ชอบ', value: 'อาหารเม็ดสูตรลดน้ำหนัก' },
+        { id: 'pref4', label: 'สไตล์การตัดขน', value: 'ตัดขนสั้นแบบเท็ดดี้แบร์' }
+      ]
     },
     { 
       id: 2, 
@@ -122,10 +121,7 @@ const Index = () => {
       precautions: 'ขี้ตื่นง่าย ระวังตอนตัดเล็บ',
       color: 'bg-blue-100', 
       icon: '🐱',
-      shampooPreference: '', 
-      spaPreference: '',
-      foodPreference: '', // Empty for adding
-      groomingStyle: '' // Empty for adding
+      customPreferences: [] // Empty for adding
     },
   ]);
 
@@ -194,7 +190,7 @@ const Index = () => {
 
   const handleAddPet = (newPetData: Omit<Pet, 'id'>) => {
     const id = pets.length > 0 ? Math.max(...pets.map(p => p.id)) + 1 : 1;
-    setPets([...pets, { ...newPetData, id }]);
+    setPets([...pets, { ...newPetData, id, customPreferences: [] }]); // Initialize customPreferences for new pets
   };
 
   const handleEditPet = (updatedPet: Pet) => {
@@ -296,14 +292,9 @@ const Index = () => {
     setIsPreferenceFormOpen(false);
   };
 
-  const handleSavePetPreferences = (updatedPreferences: { 
-    shampooPreference?: string; 
-    spaPreference?: string;
-    foodPreference?: string; // New field
-    groomingStyle?: string; // New field
-  }) => {
+  const handleSavePetPreferences = (updatedPreferences: { id: string; label: string; value: string; }[]) => {
     if (selectedPetForDetail) {
-      const updatedPet = { ...selectedPetForDetail, ...updatedPreferences };
+      const updatedPet = { ...selectedPetForDetail, customPreferences: updatedPreferences };
       handleEditPet(updatedPet); // Use existing handleEditPet to update the pet in state
       toast.success('บันทึกความชอบส่วนตัวสำเร็จ!');
     }
@@ -523,12 +514,7 @@ const Index = () => {
           isOpen={isPreferenceFormOpen}
           onClose={handleClosePreferenceForm}
           onSave={handleSavePetPreferences}
-          initialData={{
-            shampooPreference: selectedPetForDetail.shampooPreference,
-            spaPreference: selectedPetForDetail.spaPreference,
-            foodPreference: selectedPetForDetail.foodPreference, // Pass new field
-            groomingStyle: selectedPetForDetail.groomingStyle, // Pass new field
-          }}
+          initialData={selectedPetForDetail.customPreferences || []} // Pass customPreferences array
           petName={selectedPetForDetail.name}
         />
       )}
