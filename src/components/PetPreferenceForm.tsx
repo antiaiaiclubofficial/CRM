@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Plus, Trash2, Tag } from 'lucide-react'; // Added Trash2 for delete
+import { X, Check, Plus, Trash2, Tag } from 'lucide-react';
 
 interface CustomPreference {
-  id: string; // Unique ID for managing list items
+  id: string;
   label: string;
   value: string;
 }
@@ -15,7 +15,7 @@ interface PetPreferenceFormProps {
   onClose: () => void;
   onSave: (preferences: CustomPreference[]) => void;
   initialData?: CustomPreference[];
-  petName: string; // To display in the title
+  petName: string;
 }
 
 const generateUniqueId = () => Math.random().toString(36).substring(2, 9);
@@ -27,7 +27,6 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
 
   useEffect(() => {
     if (isOpen) {
-      // Assign unique IDs if not present, useful for initial data
       const dataWithIds = initialData?.map(pref => ({ ...pref, id: pref.id || generateUniqueId() })) || [];
       setPreferences(dataWithIds);
       setNewPreferenceLabel('');
@@ -59,7 +58,6 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
   };
 
   const handleSave = () => {
-    // Filter out empty preferences before saving
     const filteredPreferences = preferences.filter(p => p.label.trim() && p.value.trim());
     onSave(filteredPreferences);
     onClose();
@@ -83,8 +81,8 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
             className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] py-8 max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
           >
             <div className="flex justify-between items-center mb-6 sticky top-0 bg-white px-6 py-2 z-10">
-              <h3 className="font-bold text-xl text-slate-800 flex-1 min-w-0 text-wrap">ความชอบส่วนตัวของน้อง{petName}</h3>
-              <button onClick={onClose} className="p-2 bg-slate-100 rounded-full text-slate-400">
+              <h3 className="font-bold text-xl text-slate-800 flex-1 min-w-0 break-words pr-2">ความชอบส่วนตัวของน้อง{petName}</h3>
+              <button onClick={onClose} className="p-2 bg-slate-100 rounded-full text-slate-400 flex-shrink-0">
                 <X size={20} />
               </button>
             </div>
@@ -92,26 +90,27 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
             <div className="space-y-5 pb-8 px-6">
               {preferences.length > 0 && (
                 <div className="space-y-4">
-                  <h4 className="text-sm font-bold text-slate-600 px-2">รายการความชอบที่มีอยู่</h4>
+                  <h4 className="text-sm font-bold text-slate-600">รายการความชอบที่มีอยู่</h4>
                   {preferences.map((pref) => (
                     <div key={pref.id} className="flex items-center gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                      {/* Changed to w-0 flex-grow */}
                       <input 
                         type="text" 
                         value={pref.label}
                         onChange={(e) => handlePreferenceChange(pref.id, 'label', e.target.value)}
                         placeholder="หัวข้อ (เช่น แชมพูที่ชอบ)"
-                        className="flex-1 min-w-[80px] p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
+                        className="w-0 flex-grow p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
                       />
+                      {/* Changed to w-0 flex-grow */}
                       <input 
                         type="text" 
                         value={pref.value}
                         onChange={(e) => handlePreferenceChange(pref.id, 'value', e.target.value)}
                         placeholder="รายละเอียด"
-                        className="flex-1 min-w-[100px] p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
+                        className="w-0 flex-grow p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
                       />
                       <button 
                         onClick={() => handleRemovePreference(pref.id)}
-                        // Added flex-shrink-0
                         className="p-2 bg-red-100 rounded-full text-red-500 hover:bg-red-200 transition-colors flex-shrink-0"
                       >
                         <Trash2 size={16} />
@@ -122,7 +121,7 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
               )}
 
               <div className="space-y-4 pt-4 border-t border-slate-100">
-                <h4 className="text-sm font-bold text-slate-600 px-2">เพิ่มความชอบใหม่</h4>
+                <h4 className="text-sm font-bold text-slate-600">เพิ่มความชอบใหม่</h4>
                 <div className="space-y-2">
                   <input 
                     type="text" 
