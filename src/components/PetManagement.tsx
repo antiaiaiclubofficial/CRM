@@ -11,8 +11,8 @@ interface Pet {
   type: string;
   breed: string;
   age: string;
-  gender: string; // Changed from statusLabel
-  weight: string; // Changed from locationLabel
+  gender: string;
+  weight: string;
   medicalCondition: string;
   precautions: string;
   color: string; // Existing: for old icon background
@@ -39,19 +39,12 @@ const PetManagement = ({ pets, onBack, onViewDetails }: PetManagementProps) => {
       className="space-y-6 pb-20"
     >
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <button 
-          onClick={onBack}
-          className="p-2 bg-emerald-100 text-emerald-600 rounded-xl active:scale-90 transition-transform"
-        >
-          <X size={20} />
-        </button>
-        <h2 className="text-xl font-bold text-slate-800 flex-1 text-center -ml-10">สัตว์เลี้ยงของฉัน</h2> {/* Adjusted margin for centering */}
-        <div className="w-10"></div> {/* Spacer to balance the X button */}
+      <div className="flex justify-center items-center mb-6"> {/* Changed to justify-center */}
+        <h2 className="text-xl font-bold text-slate-800">สัตว์เลี้ยงของฉัน</h2> {/* Removed -ml-10 */}
       </div>
 
-      {/* Subtitle */}
-      <p className="text-center text-slate-500 text-sm mb-6">All pet categories cat near you</p>
+      {/* Removed Subtitle */}
+      {/* <p className="text-center text-slate-500 text-sm mb-6">All pet categories cat near you</p> */}
 
       {/* Pet Grid */}
       <div className="grid grid-cols-2 gap-4">

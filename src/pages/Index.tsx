@@ -24,8 +24,8 @@ interface Pet {
   type: string;
   breed: string;
   age: string;
-  gender: string; // Changed from statusLabel
-  weight: string; // Changed from locationLabel
+  gender: string;
+  weight: string;
   medicalCondition: string;
   precautions: string;
   color: string; // Existing: for old icon background
@@ -113,7 +113,7 @@ const Index = () => {
         { id: 'pref3', label: 'อาหารที่ชอบ', value: 'อาหารเม็ดสูตรลดน้ำหนัก' },
         { id: 'pref4', label: 'สไตล์การตัดขน', value: 'ตัดขนสั้นแบบเท็ดดี้แบร์' }
       ],
-      imageUrl: 'https://via.placeholder.com/150/FFF9C4/000000?text=Abyssinian', // Placeholder image
+      imageUrl: 'https://images.unsplash.com/photo-1574144702728-1ab0e5759688?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Abyssinian Cat
       cardBgColor: '#FFF9C4', // Light Yellow
     },
     { 
@@ -130,7 +130,7 @@ const Index = () => {
       icon: '🐱',
       furLength: 'ขนยาว',
       customPreferences: [],
-      imageUrl: 'https://via.placeholder.com/150/FFCDD2/000000?text=Persian', // Placeholder image
+      imageUrl: 'https://images.unsplash.com/photo-1596854307913-a029b7371c95?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Persian Cat
       cardBgColor: '#FFCDD2', // Light Pink
       hasHeartIcon: true,
     },
@@ -148,7 +148,7 @@ const Index = () => {
       icon: '🐱',
       furLength: 'ขนสั้น',
       customPreferences: [],
-      imageUrl: 'https://via.placeholder.com/150/BBDEFB/000000?text=Gray+Tabby', // Placeholder image
+      imageUrl: 'https://images.unsplash.com/photo-1514813482567-bf37b7610a88?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Gray Tabby
       cardBgColor: '#BBDEFB', // Light Blue
     },
     {
@@ -165,7 +165,7 @@ const Index = () => {
       icon: '🐱',
       furLength: 'ขนสั้น',
       customPreferences: [],
-      imageUrl: 'https://via.placeholder.com/150/C8E6C9/000000?text=Scottish+Fold', // Placeholder image
+      imageUrl: 'https://images.unsplash.com/photo-1577023311546-cdc07a8454d9?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Scottish Fold
       cardBgColor: '#C8E6C9', // Light Green
     },
     {
@@ -182,7 +182,7 @@ const Index = () => {
       icon: '🐱',
       furLength: 'ขนสั้น',
       customPreferences: [],
-      imageUrl: 'https://via.placeholder.com/150/DCEDC8/000000?text=Japanese+Bobtail', // Placeholder image
+      imageUrl: 'https://images.unsplash.com/photo-1548247771-f0016775d077?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Japanese Bobtail
       cardBgColor: '#DCEDC8', // Lighter Green
     },
     {
@@ -199,7 +199,7 @@ const Index = () => {
       icon: '🐱',
       furLength: 'ขนยาว',
       customPreferences: [],
-      imageUrl: 'https://via.placeholder.com/150/E1BEE7/000000?text=Norwegian+Forest', // Placeholder image
+      imageUrl: 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Norwegian Forest
       cardBgColor: '#E1BEE7', // Light Purple
     },
   ]);
@@ -275,7 +275,7 @@ const Index = () => {
     setPets([...pets, { 
       ...newPetData, 
       id, 
-      imageUrl: newPetData.imageUrl || 'https://via.placeholder.com/150/CCCCCC/000000?text=New+Pet', // Default image
+      imageUrl: newPetData.imageUrl || 'https://images.unsplash.com/photo-1514813482567-bf37b7610a88?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Default image
       weight: newPetData.weight || '0', // Default weight
       gender: newPetData.gender || 'ไม่ระบุ', // Default gender
       cardBgColor: newPetData.cardBgColor || randomColor,

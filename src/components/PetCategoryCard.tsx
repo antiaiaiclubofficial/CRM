@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart } from 'lucide-react';
+import { Heart, Scale } from 'lucide-react'; // Import Scale icon
 
 interface PetCategoryCardProps {
   pet: {
@@ -53,9 +53,12 @@ const PetCategoryCard = ({ pet, onClick }: PetCategoryCardProps) => {
         {/* Content Area */}
         <div className="p-4 relative z-10">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs text-gray-600 font-medium">{pet.weight} kg</span> {/* Changed to weight */}
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-black bg-white text-black">
-              {pet.gender} {/* Changed to gender */}
+            <span className="text-xs text-gray-600 font-medium flex items-center gap-1">
+              <Scale size={12} className="text-gray-500" /> {/* Scale icon added */}
+              {pet.weight} kg
+            </span>
+            <span className="text-xs font-bold px-3 py-1 rounded-full border border-black bg-white text-black"> {/* Increased padding for larger tag */}
+              {pet.gender}
             </span>
           </div>
           <h3 className="text-lg font-bold text-black">{pet.name}</h3>
