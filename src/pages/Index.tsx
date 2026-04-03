@@ -118,8 +118,8 @@ const Index = () => {
       precautions: 'ขี้ตื่นง่าย ระวังตอนตัดเล็บ',
       color: 'bg-blue-100', 
       icon: '🐱',
-      shampooPreference: 'กลิ่นมะลิ',
-      spaPreference: 'สปาน้ำนมข้าว'
+      shampooPreference: '', // Changed to empty string
+      spaPreference: ''      // Changed to empty string
     },
   ]);
 
