@@ -93,9 +93,9 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
             {/* Removed Share2 button */}
             <button 
               onClick={() => onStartEdit(pet)} 
-              className="flex-1 py-2 px-4 bg-pink-100 text-pink-700 rounded-full font-bold flex items-center justify-center gap-2 active:scale-95 transition-all"
+              className="flex-1 py-2 px-4 bg-pink-100 text-pink-700 rounded-full font-bold flex items-center justify-center gap-2 active:scale-85 transition-all"
             >
-              <Edit2 size={16} /> แก้ไข
+              <Edit2 size={14} /> แก้ไข
             </button>
           </div>
         </div>
