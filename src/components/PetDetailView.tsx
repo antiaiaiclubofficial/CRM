@@ -156,18 +156,18 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
       <div className="pt-4">
         <h3 className="text-lg font-black text-slate-800 mb-4 px-2">{pet.name}'s collection</h3>
         
-        <div className="bg-[#FAF7F0] rounded-[2.5rem] border-t-8 border-[#D2B48C] relative">
+        <div className="bg-emerald-900 rounded-[2.5rem] border-t-8 border-emerald-700 relative">
           {/* Decorative tabs at the top */}
           <div className="absolute -top-3 left-0 right-0 flex justify-around px-8">
-            {[1,2,3,4,5].map(i => <div key={i} className="w-3 h-5 bg-[#D2B48C] rounded-full" />)}
+            {[1,2,3,4,5].map(i => <div key={i} className="w-3 h-5 bg-emerald-700 rounded-full" />)}
           </div>
 
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h4 className="text-lg font-black text-[#8B4513]">ความชอบส่วนตัว</h4>
+              <h4 className="text-lg font-black text-emerald-100">ความชอบส่วนตัว</h4>
               <button 
                 onClick={onEditPreferences} // This button is always for editing/adding
-                className="p-1.5 bg-slate-200/50 rounded-full text-slate-400 hover:bg-slate-200 transition-colors"
+                className="p-1.5 bg-emerald-700/50 rounded-full text-emerald-100 hover:bg-emerald-700 transition-colors"
               >
                 <Settings size={16} />
               </button>
@@ -189,7 +189,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
               ) : (
                 <button 
                   onClick={onEditPreferences} 
-                  className="w-full py-4 text-center text-slate-500 text-sm bg-slate-50 rounded-2xl border border-slate-100 hover:bg-slate-100 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-4 text-center text-emerald-100 text-sm bg-emerald-700 rounded-2xl border border-emerald-600 hover:bg-emerald-800 transition-colors flex items-center justify-center gap-2"
                 >
                   <Plus size={16} /> เพิ่มความชอบส่วนตัว
                 </button>
