@@ -43,10 +43,6 @@ const PetCategoryCard = ({ pet, onClick }: PetCategoryCardProps) => {
         {/* Pet Image container */}
         <div className="relative w-[calc(100%-16px)] h-32 bg-white rounded-[1.5rem] overflow-hidden border-2 border-black mx-2 mt-2 z-10">
           <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
-          {pet.hasHeartIcon && (
-            <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-sm">
-              <Heart size={16} className="text-red-500 fill-red-500" />
-            </div>
           )}
         </div>
 
