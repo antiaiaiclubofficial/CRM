@@ -52,9 +52,6 @@ const PetManagement = ({ pets, onBack, onViewDetails }: PetManagementProps) => {
         <div className="w-10"></div> {/* Spacer to balance the X button */}
       </div>
 
-      {/* Subtitle */}
-      <p className="text-center text-slate-500 text-sm mb-6">All pet categories cat near you</p>
-
       {/* Pet Grid */}
       <div className="grid grid-cols-2 gap-4">
         {pets.map((pet) => (
