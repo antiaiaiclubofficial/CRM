@@ -39,7 +39,7 @@ const PetManagement = ({ pets, onBack, onViewDetails }: PetManagementProps) => {
       className="space-y-6 pb-20"
     >
       {/* Header */}
-      <div className="flex justify-center items-center mb-6"> {/* Changed to justify-center */}
+      <div className="flex"> {/* Changed to justify-center */}
         <h2 className="text-xl font-bold text-slate-800">สัตว์เลี้ยงของฉัน</h2> {/* Removed -ml-10 */}
       </div>
 
