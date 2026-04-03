@@ -156,18 +156,18 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
       <div className="pt-4">
         <h3 className="text-lg font-black text-slate-800 mb-4 px-2">{pet.name}'s collection</h3>
         
-        <div className="bg-lime-50 rounded-[2.5rem] border-t-8 border-stone-800 relative">
+        <div className="bg-[#E6F7D9] rounded-[2.5rem] border-t-8 border-[#8B4513] relative"> {/* Light banana leaf green and saddle brown */}
           {/* Decorative tabs at the top */}
           <div className="absolute -top-3 left-0 right-0 flex justify-around px-8">
-            {[1,2,3,4,5].map(i => <div key={i} className="w-3 h-5 bg-stone-800 rounded-full" />)}
+            {[1,2,3,4,5].map(i => <div key={i} className="w-3 h-5 bg-[#8B4513] rounded-full" />)} {/* Saddle brown tabs */}
           </div>
 
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h4 className="text-lg font-black text-stone-900">ความชอบส่วนตัว</h4>
+              <h4 className="text-lg font-black text-[#4A2C0F]">ความชอบส่วนตัว</h4> {/* Darker brown text for contrast */}
               <button 
                 onClick={onEditPreferences} // This button is always for editing/adding
-                className="p-1.5 bg-stone-200 rounded-full text-stone-700 hover:bg-stone-300 transition-colors"
+                className="p-1.5 bg-[#C8E6B2] rounded-full text-[#4A2C0F] hover:bg-[#B2D99C] transition-colors" // Lighter green button with dark brown text
               >
                 <Settings size={16} />
               </button>
@@ -189,7 +189,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
               ) : (
                 <button 
                   onClick={onEditPreferences} 
-                  className="w-full py-4 text-center text-stone-700 text-sm bg-stone-100 rounded-2xl border border-stone-200 hover:bg-stone-200 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-4 text-center text-[#4A2C0F] text-sm bg-[#D9F0C4] rounded-2xl border border-[#B2D99C] hover:bg-[#C8E6B2] transition-colors flex items-center justify-center gap-2" // Light green button with dark brown text
                 >
                   <Plus size={16} /> เพิ่มความชอบส่วนตัว
                 </button>
