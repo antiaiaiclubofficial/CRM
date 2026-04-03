@@ -80,10 +80,10 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] p-8 max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
+            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] px-6 py-8 max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
           >
             <div className="flex justify-between items-center mb-6 sticky top-0 bg-white py-2 z-10">
-              <h3 className="font-bold text-xl text-slate-800">ความชอบส่วนตัวของน้อง{petName}</h3>
+              <h3 className="font-bold text-xl text-slate-800 flex-1 min-w-0 text-wrap">ความชอบส่วนตัวของน้อง{petName}</h3>
               <button onClick={onClose} className="p-2 bg-slate-100 rounded-full text-slate-400">
                 <X size={20} />
               </button>
