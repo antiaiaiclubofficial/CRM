@@ -69,7 +69,6 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
         <button onClick={onBack} className="p-2 text-slate-400 hover:bg-white/50 rounded-full transition-colors">
           <ArrowLeft size={24} />
         </button>
-        <div className="w-10 h-1.5 bg-[#A68966] rounded-full opacity-60"></div>
         <div className="w-10"></div> {/* Spacer */}
       </div>
 
