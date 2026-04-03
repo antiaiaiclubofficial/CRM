@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Edit2, Share2, Scale, 
   Ruler, Activity, Heart, Info, ChevronRight,
-  Droplet, DollarSign, Sparkles, Settings // Added Settings icon for preferences
+  Droplet, DollarSign, Sparkles, Settings, Plus // Added Plus icon
 } from 'lucide-react';
 
 interface Pet {
@@ -55,6 +55,8 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
     costColor = 'text-pink-600';
     bgColor = 'bg-pink-50';
   }
+
+  const hasPreferences = pet.shampooPreference || pet.spaPreference;
 
   return (
     <motion.div
@@ -175,7 +177,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
             <div className="flex justify-between items-center mb-6">
               <h4 className="text-lg font-black text-[#8B4513]">ความชอบส่วนตัว</h4>
               <button 
-                onClick={onEditPreferences} // New button to edit preferences
+                onClick={onEditPreferences} // This button is always for editing/adding
                 className="p-1.5 bg-slate-200/50 rounded-full text-slate-400 hover:bg-slate-200 transition-colors"
               >
                 <Settings size={16} />
@@ -205,10 +207,13 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
                   </div>
                 </div>
               )}
-              {(!pet.shampooPreference && !pet.spaPreference) && (
-                <div className="text-center py-4 text-slate-400 text-sm">
-                  ยังไม่มีข้อมูลความชอบส่วนตัว
-                </div>
+              {!hasPreferences && (
+                <button 
+                  onClick={onEditPreferences} 
+                  className="w-full py-4 text-center text-slate-500 text-sm bg-slate-50 rounded-2xl border border-slate-100 hover:bg-slate-100 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Plus size={16} /> เพิ่มความชอบส่วนตัว
+                </button>
               )}
             </div>
           </div>
