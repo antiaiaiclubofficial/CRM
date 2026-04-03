@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Edit2, Share2, Scale, 
   Ruler, Activity, Heart, Info, ChevronRight,
-  Droplet, DollarSign, Sparkles, Settings, Plus // Added Plus icon
+  Droplet, DollarSign, Sparkles, Settings, Plus, Utensils, Scissors // Added Utensils, Scissors icons
 } from 'lucide-react';
 
 interface Pet {
@@ -22,6 +22,8 @@ interface Pet {
   icon: string;
   shampooPreference?: string;
   spaPreference?: string;
+  foodPreference?: string; // New field
+  groomingStyle?: string; // New field
 }
 
 interface PetDetailViewProps {
@@ -56,7 +58,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
     bgColor = 'bg-pink-50';
   }
 
-  const hasPreferences = pet.shampooPreference || pet.spaPreference;
+  const hasPreferences = pet.shampooPreference || pet.spaPreference || pet.foodPreference || pet.groomingStyle;
 
   return (
     <motion.div
@@ -204,6 +206,28 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
                   <div>
                     <p className="text-xs text-slate-500 font-medium">สปาที่ชอบ</p>
                     <p className="font-bold text-slate-800 text-sm">{pet.spaPreference}</p>
+                  </div>
+                </div>
+              )}
+              {pet.foodPreference && (
+                <div className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
+                  <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center text-green-500 text-xl shadow-inner">
+                    <Utensils size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium">อาหารที่ชอบ</p>
+                    <p className="font-bold text-slate-800 text-sm">{pet.foodPreference}</p>
+                  </div>
+                </div>
+              )}
+              {pet.groomingStyle && (
+                <div className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
+                  <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center text-orange-500 text-xl shadow-inner">
+                    <Scissors size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium">สไตล์การตัดขน</p>
+                    <p className="font-bold text-slate-800 text-sm">{pet.groomingStyle}</p>
                   </div>
                 </div>
               )}

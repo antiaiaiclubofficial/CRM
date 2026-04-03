@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, HeartPulse, Scale, Calendar, Info, Check, Droplet, Sparkles } from 'lucide-react'; // Added Droplet, Sparkles
+import { X, User, HeartPulse, Scale, Calendar, Info, Check, Droplet, Sparkles, Utensils, Scissors } from 'lucide-react'; // Added Utensils, Scissors
 
 interface Pet {
   id: number;
@@ -18,6 +18,8 @@ interface Pet {
   icon: string;
   shampooPreference?: string; // New field
   spaPreference?: string;     // New field
+  foodPreference?: string;    // New field
+  groomingStyle?: string;     // New field
 }
 
 interface PetFormProps {
@@ -41,8 +43,10 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     medicalCondition: '',
     precautions: '',
     icon: '🐶',
-    shampooPreference: '', // Initialize new fields
-    spaPreference: ''      // Initialize new fields
+    shampooPreference: '', 
+    spaPreference: '',
+    foodPreference: '', // Initialize new fields
+    groomingStyle: ''      // Initialize new fields
   });
 
   useEffect(() => {
@@ -57,8 +61,10 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         medicalCondition: initialData.medicalCondition,
         precautions: initialData.precautions,
         icon: initialData.icon,
-        shampooPreference: initialData.shampooPreference || '', // Set from initialData
-        spaPreference: initialData.spaPreference || ''          // Set from initialData
+        shampooPreference: initialData.shampooPreference || '', 
+        spaPreference: initialData.spaPreference || '',
+        foodPreference: initialData.foodPreference || '', // Set from initialData
+        groomingStyle: initialData.groomingStyle || ''          // Set from initialData
       });
     } else {
       setFormData({
@@ -72,7 +78,9 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         precautions: '',
         icon: '🐶',
         shampooPreference: '',
-        spaPreference: ''
+        spaPreference: '',
+        foodPreference: '',
+        groomingStyle: ''
       });
     }
   }, [initialData, isOpen]);
@@ -229,6 +237,26 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                     onChange={(e) => setFormData({...formData, spaPreference: e.target.value})}
                     placeholder="เช่น สปาโคลนเดดซี"
                     className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-purple-100 outline-none text-sm"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-green-500"><Utensils size={12}/> อาหารที่ชอบ</label>
+                  <input 
+                    type="text" 
+                    value={formData.foodPreference}
+                    onChange={(e) => setFormData({...formData, foodPreference: e.target.value})}
+                    placeholder="เช่น อาหารเม็ดสูตรปลาแซลมอน"
+                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-green-100 outline-none text-sm"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-orange-500"><Scissors size={12}/> สไตล์การตัดขน</label>
+                  <input 
+                    type="text" 
+                    value={formData.groomingStyle}
+                    onChange={(e) => setFormData({...formData, groomingStyle: e.target.value})}
+                    placeholder="เช่น ตัดขนสั้นแบบหมีเท็ดดี้"
+                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-100 outline-none text-sm"
                   />
                 </div>
               </div>

@@ -32,6 +32,8 @@ interface Pet {
   icon: string;
   shampooPreference?: string;
   spaPreference?: string;
+  foodPreference?: string; // New field
+  groomingStyle?: string; // New field
 }
 
 // Define the Coupon interface here as well, or import it if it were in a shared file
@@ -104,7 +106,9 @@ const Index = () => {
       color: 'bg-orange-100', 
       icon: '🐶',
       shampooPreference: 'กลิ่นลาเวนเดอร์',
-      spaPreference: 'สปาโคลนเดดซี'
+      spaPreference: 'สปาโคลนเดดซี',
+      foodPreference: 'อาหารเม็ดสูตรลดน้ำหนัก', // Example preference
+      groomingStyle: 'ตัดขนสั้นแบบเท็ดดี้แบร์' // Example preference
     },
     { 
       id: 2, 
@@ -118,8 +122,10 @@ const Index = () => {
       precautions: 'ขี้ตื่นง่าย ระวังตอนตัดเล็บ',
       color: 'bg-blue-100', 
       icon: '🐱',
-      shampooPreference: '', // Changed to empty string
-      spaPreference: ''      // Changed to empty string
+      shampooPreference: '', 
+      spaPreference: '',
+      foodPreference: '', // Empty for adding
+      groomingStyle: '' // Empty for adding
     },
   ]);
 
@@ -290,7 +296,12 @@ const Index = () => {
     setIsPreferenceFormOpen(false);
   };
 
-  const handleSavePetPreferences = (updatedPreferences: { shampooPreference?: string; spaPreference?: string }) => {
+  const handleSavePetPreferences = (updatedPreferences: { 
+    shampooPreference?: string; 
+    spaPreference?: string;
+    foodPreference?: string; // New field
+    groomingStyle?: string; // New field
+  }) => {
     if (selectedPetForDetail) {
       const updatedPet = { ...selectedPetForDetail, ...updatedPreferences };
       handleEditPet(updatedPet); // Use existing handleEditPet to update the pet in state
@@ -515,6 +526,8 @@ const Index = () => {
           initialData={{
             shampooPreference: selectedPetForDetail.shampooPreference,
             spaPreference: selectedPetForDetail.spaPreference,
+            foodPreference: selectedPetForDetail.foodPreference, // Pass new field
+            groomingStyle: selectedPetForDetail.groomingStyle, // Pass new field
           }}
           petName={selectedPetForDetail.name}
         />
