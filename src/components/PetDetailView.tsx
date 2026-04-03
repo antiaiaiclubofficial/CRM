@@ -77,10 +77,6 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
       <div className="bg-white rounded-[2.5rem] p-6 shadow-sm relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute top-4 right-10 opacity-10">
-          <svg width="100" height="100" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="1" />
-            <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1" />
-          </svg>
         </div>
 
         <div className="flex justify-between items-start mb-6">
