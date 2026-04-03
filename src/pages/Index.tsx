@@ -206,10 +206,11 @@ const Index = () => {
     setSelectedPetForDetail(null); // Close detail view if deleted
   };
 
-  const handlePetSelection = (name: string) => {
-    setSelectedPetName(name);
-    setSelectedServiceForDetail(null);
-    setActiveTab('history');
+  const handlePetSelection = (pet: Pet) => { // Changed to accept full pet object
+    setSelectedPetForDetail(pet); // Set the selected pet for detail view
+    setActiveTab('pets'); // Change to the 'pets' tab
+    setSelectedPetName(null); // Clear any history filter
+    setSelectedServiceForDetail(null); // Clear any service detail
   };
 
   const handleRedeemCoupon = (coupon: Coupon, pointsCost: number) => {
@@ -374,7 +375,7 @@ const Index = () => {
 
               <PetList 
                 pets={pets} 
-                onPetClick={handlePetSelection}
+                onPetClick={handlePetSelection} // Updated to use handlePetSelection
               />
 
               <div className="bg-[#FFE3BC]/40 p-5 rounded-[2rem] border border-[#FFE3BC] flex items-center gap-4">

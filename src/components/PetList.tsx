@@ -15,7 +15,7 @@ interface Pet {
 
 interface PetListProps {
   pets: Pet[];
-  onPetClick?: (petName: string) => void;
+  onPetClick?: (pet: Pet) => void; // Changed to pass the full pet object
 }
 
 const PetList = ({ pets, onPetClick }: PetListProps) => {
@@ -32,7 +32,7 @@ const PetList = ({ pets, onPetClick }: PetListProps) => {
             key={pet.id}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => onPetClick?.(pet.name)}
+            onClick={() => onPetClick?.(pet)} // Pass the full pet object
             className="flex-shrink-0 w-32 bg-white p-4 rounded-3xl shadow-sm border border-slate-50 text-center cursor-pointer active:bg-slate-50 transition-colors"
           >
             <div className={`w-16 h-16 ${pet.color} rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner`}>
