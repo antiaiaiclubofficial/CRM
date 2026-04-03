@@ -6,7 +6,7 @@ import {
   ArrowLeft, Edit2, Share2, Scale, 
   Ruler, Activity, Heart, CheckCircle2, 
   Info, ChevronRight, MoreHorizontal,
-  Droplet, Dog, Cat
+  Droplet, Dog, Cat, Menu, Feather, Sun, Check
 } from 'lucide-react';
 
 interface Pet {
@@ -14,9 +14,9 @@ interface Pet {
   name: string;
   type: string;
   breed: string;
-  age: string;
+  age: string; // Assuming this is in years, will display as months if < 1 year
   gender: string;
-  weight: string;
+  weight: string; // Assuming this is in kg
   medicalCondition: string;
   precautions: string;
   color: string;
@@ -31,10 +31,19 @@ interface PetDetailViewProps {
 }
 
 const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet }: PetDetailViewProps) => {
-  // Mock data for the new sections
-  const streak = 320;
+  // Mock data for the new sections, as these fields are not in the Pet interface
   const adventures = 323;
-  
+  const friendshipStatus = 'Uber Soulmates';
+  const humanName = 'El';
+  const friendCode = '••••••••••'; // Placeholder for friend code
+  const petHeight = '9.0cm'; // Placeholder for height
+  const petWingspan = '23.0cm'; // Placeholder for wingspan
+
+  // Convert age to months if less than a year, otherwise display in years
+  const displayAge = pet.age && parseFloat(pet.age) < 1 
+    ? `${Math.round(parseFloat(pet.age) * 12)} months` 
+    : `${pet.age} ปี`;
+
   const micropets = [
     { id: 1, name: 'Cow', icon: '🐮', color: 'bg-[#F3E5AB]', number: '#23' },
     { id: 2, name: 'Puppy', icon: '🐶', color: 'bg-[#E9967A]', number: '#53' },
@@ -51,10 +60,17 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet }: PetDetailViewP
       {/* Top Navigation */}
       <div className="flex justify-between items-center mb-2">
         <button onClick={onBack} className="p-2 text-slate-400 hover:bg-white/50 rounded-full transition-colors">
-          <ArrowLeft size={24} />
+          <Menu size={24} /> {/* Changed to Menu icon */}
         </button>
         <div className="w-10 h-1.5 bg-[#A68966] rounded-full opacity-60"></div>
-        <div className="w-10"></div> {/* Spacer */}
+        <div className="flex gap-2">
+          <button className="p-2.5 bg-[#F9F6ED] rounded-full text-[#A68966]">
+            <Share2 size={20} />
+          </button>
+          <button onClick={() => onStartEdit(pet)} className="p-2.5 bg-[#F9F6ED] rounded-full text-[#A68966]">
+            <Edit2 size={20} />
+          </button>
+        </div>
       </div>
 
       {/* Main Profile Card */}
@@ -77,30 +93,28 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet }: PetDetailViewP
               <p className="text-slate-400 text-sm font-medium">{pet.gender === 'ผู้' ? 'He/Him' : 'She/Her'} • {adventures} ผจญภัย</p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <button className="p-2.5 bg-[#F9F6ED] rounded-full text-[#A68966]">
-              <Share2 size={20} />
-            </button>
-            <button onClick={() => onStartEdit(pet)} className="p-2.5 bg-[#F9F6ED] rounded-full text-[#A68966]">
-              <Edit2 size={20} />
-            </button>
-          </div>
         </div>
 
         <div className="space-y-3 mb-6">
           <div className="flex items-center">
             <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">AGE</span>
-            <span className="text-sm font-bold text-slate-700">{pet.age} ปี</span>
+            <span className="text-sm font-bold text-slate-700">{displayAge}</span>
           </div>
           <div className="flex items-center">
-            <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">BREED</span>
+            <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">FRIENDSHIP</span>
             <span className="text-sm font-bold text-slate-700 flex items-center gap-1">
-              {pet.breed} <Heart size={14} className="text-red-400 fill-red-400" />
+              {friendshipStatus} <Heart size={14} className="text-red-400 fill-red-400" />
             </span>
           </div>
           <div className="flex items-center">
-            <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">TYPE</span>
-            <span className="text-sm font-bold text-slate-700">{pet.type}</span>
+            <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">HUMAN</span>
+            <span className="text-sm font-bold text-slate-700">{humanName}</span>
+          </div>
+          <div className="flex items-center">
+            <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">FRIEND CODE</span>
+            <span className="text-sm font-bold text-slate-700 flex items-center gap-1">
+              {friendCode} <Info size={14} className="text-slate-300" />
+            </span>
           </div>
         </div>
 
@@ -112,11 +126,11 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet }: PetDetailViewP
           </div>
           <div className="flex items-center gap-1.5 text-slate-400">
             <Ruler size={16} />
-            <span className="text-xs font-bold">45.0cm</span>
+            <span className="text-xs font-bold">{petHeight}</span>
           </div>
           <div className="flex items-center gap-1.5 text-slate-400">
-            <Activity size={16} />
-            <span className="text-xs font-bold">ปกติ</span>
+            <Feather size={16} /> {/* Changed to Feather icon for wingspan */}
+            <span className="text-xs font-bold">{petWingspan}</span>
           </div>
         </div>
       </div>
@@ -134,13 +148,13 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet }: PetDetailViewP
       >
         <div className="w-14 h-14 bg-[#FFD700]/20 rounded-2xl flex items-center justify-center text-[#DAA520]">
           <div className="relative">
-            <CheckCircle2 size={32} />
-            <div className="absolute inset-0 blur-sm opacity-50"><CheckCircle2 size={32} /></div>
+            <Sun size={32} /> {/* Changed to Sun icon */}
+            <Check size={16} className="absolute bottom-0 right-0 text-white bg-[#DAA520] rounded-full p-0.5" /> {/* Added Check icon */}
           </div>
         </div>
         <div className="flex-1">
-          <h3 className="text-xl font-black text-slate-800">{streak} วันต่อเนื่อง!</h3>
-          <p className="text-xs text-slate-400 font-medium">สถิติการดูแลตัวเองที่ยาวนานที่สุด!</p>
+          <h3 className="text-xl font-black text-slate-800">320 day streak</h3> {/* Updated text */}
+          <p className="text-xs text-slate-400 font-medium">Longest self-care streak ever!</p> {/* Updated text */}
         </div>
         <ChevronRight className="text-slate-300" size={20} />
       </motion.div>
@@ -152,7 +166,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet }: PetDetailViewP
         <div className="bg-[#FAF7F0] rounded-[2.5rem] border-t-8 border-[#D2B48C] relative">
           {/* Decorative tabs at the top */}
           <div className="absolute -top-3 left-0 right-0 flex justify-around px-8">
-            {[1,2,3,4,5].map(i => <div key={i} className="w-3 h-5 bg-[#D2B48C] rounded-full" />)}
+            {[1,2,3,4,5].map(i => <div key={i} className="w-10 h-2 bg-[#A68966] rounded-full" />)} {/* Updated tab styling */}
           </div>
 
           <div className="p-6">
