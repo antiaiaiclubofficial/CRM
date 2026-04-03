@@ -156,7 +156,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
       <div className="pt-4">
         <h3 className="text-lg font-black text-slate-800 mb-4 px-2">{pet.name}'s collection</h3>
         
-        <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative">
+        <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative shadow-lg">
           {/* Decorative tabs at the top */}
           <div className="absolute -top-3 left-0 right-0 flex justify-around px-8">
             {[1,2,3,4,5].map(i => <div key={i} className="w-3 h-5 bg-[#c28856] rounded-full" />)}
