@@ -138,11 +138,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
         </div>
       </div>
 
-      {/* Tabs Placeholder */}
-      <div className="flex gap-2 p-1 bg-white/50 rounded-2xl">
-        <button className="flex-1 py-3 bg-white rounded-xl text-xs font-black text-slate-600 shadow-sm uppercase tracking-widest">About</button>
-        <button className="flex-1 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Personality</button>
-      </div>
+      {/* Removed Tabs Placeholder */}
 
       {/* Total Service Cost Card (formerly Streak Card) */}
       <motion.div 
