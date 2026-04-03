@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Plus, HeartPulse, Info } from 'lucide-react'; // Added HeartPulse and Info
+import { Plus, ChevronRight } from 'lucide-react'; // Changed HeartPulse and Info to ChevronRight
 import { motion } from 'framer-motion';
 
 interface Pet {
@@ -46,52 +46,19 @@ const PetManagement = ({ pets, onAddPet, onViewDetails }: PetManagementProps) =>
             key={pet.id}
             whileTap={{ scale: 0.98 }}
             onClick={() => onViewDetails(pet)}
-            className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col gap-4 cursor-pointer active:bg-slate-50 transition-colors"
+            className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-50 flex items-center justify-between cursor-pointer active:bg-slate-50 transition-colors"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 ${pet.color} rounded-2xl flex items-center justify-center text-2xl shadow-inner`}>
-                  {pet.icon}
-                </div>
-                <div>
-                  <h4 className="font-bold text-slate-800 text-lg">{pet.name}</h4>
-                  <p className="text-xs text-slate-500">{pet.type} • {pet.breed}</p>
-                </div>
+            <div className="flex items-center gap-4">
+              <div className={`w-14 h-14 ${pet.color} rounded-2xl flex items-center justify-center text-2xl shadow-inner`}>
+                {pet.icon}
               </div>
-              {/* Removed Edit/Delete buttons from list view */}
+              <div>
+                <h4 className="font-bold text-slate-800 text-lg">{pet.name}</h4>
+                <p className="text-xs text-slate-500">{pet.type} • {pet.breed}</p>
+              </div>
             </div>
             
-            <div className="grid grid-cols-3 gap-2 py-2 border-t border-slate-50">
-              <div className="text-center">
-                <p className="text-[10px] text-slate-400 uppercase font-bold">อายุ</p>
-                <p className="text-sm font-medium text-slate-700">{pet.age || '-'} ปี</p>
-              </div>
-              <div className="text-center border-x border-slate-50">
-                <p className="text-[10px] text-slate-400 uppercase font-bold">เพศ</p>
-                <p className="text-sm font-medium text-slate-700">{pet.gender}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-[10px] text-slate-400 uppercase font-bold">น้ำหนัก</p>
-                <p className="text-sm font-medium text-slate-700">{pet.weight || '-'} kg</p>
-              </div>
-            </div>
-
-            {(pet.medicalCondition || pet.precautions) && (
-              <div className="bg-slate-50 rounded-2xl p-3 space-y-2">
-                {pet.medicalCondition && (
-                  <div className="flex gap-2 items-start">
-                    <HeartPulse size={14} className="text-red-400 mt-0.5" />
-                    <p className="text-[11px] text-slate-600"><span className="font-bold">โรค:</span> {pet.medicalCondition}</p>
-                  </div>
-                )}
-                {pet.precautions && (
-                  <div className="flex gap-2 items-start">
-                    <Info size={14} className="text-amber-400 mt-0.5" />
-                    <p className="text-[11px] text-slate-600"><span className="font-bold">ควรระวัง:</span> {pet.precautions}</p>
-                  </div>
-                )}
-              </div>
-            )}
+            <ChevronRight size={20} className="text-slate-300 group-hover:text-pink-400 transition-colors" />
           </motion.div>
         ))}
       </div>
