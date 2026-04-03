@@ -16,7 +16,8 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
-  customPreferences?: { id: string; label: string; value: string; }[]; // Changed to include id
+  furLength?: string; // New field for fur length
+  customPreferences?: { id: string; label: string; value: string; }[];
 }
 
 interface PetManagementProps {

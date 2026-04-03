@@ -3,9 +3,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  ArrowLeft, Edit2, Share2, Scale, 
-  Ruler, Activity, Heart, Info, ChevronRight,
-  Settings, Plus, Tag // Added Tag icon for generic preference
+  ArrowLeft, Edit2, Feather, Scale, 
+  Info, ChevronRight, Settings, Plus, Tag // Added Feather icon
 } from 'lucide-react';
 
 interface Pet {
@@ -20,7 +19,8 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
-  customPreferences?: { id: string; label: string; value: string; }[]; // Changed to include id
+  furLength?: string; // New field for fur length
+  customPreferences?: { id: string; label: string; value: string; }[];
 }
 
 interface PetDetailViewProps {
@@ -93,12 +93,13 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
               <p className="text-slate-400 text-sm font-medium">{pet.gender === 'ผู้' ? 'He/Him' : 'She/Her'} • {adventures} ผจญภัย</p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <button className="p-2.5 bg-[#F9F6ED] rounded-full text-[#A68966]">
-              <Share2 size={20} />
-            </button>
-            <button onClick={() => onStartEdit(pet)} className="p-2.5 bg-[#F9F6ED] rounded-full text-[#A68966]">
-              <Edit2 size={20} />
+          <div className="flex gap-2 w-full max-w-[120px]"> {/* Adjusted width for the button */}
+            {/* Removed Share2 button */}
+            <button 
+              onClick={() => onStartEdit(pet)} 
+              className="flex-1 py-2 px-4 bg-pink-100 text-pink-700 rounded-full font-bold flex items-center justify-center gap-2 active:scale-95 transition-all"
+            >
+              <Edit2 size={16} /> แก้ไข
             </button>
           </div>
         </div>
@@ -110,9 +111,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
           </div>
           <div className="flex items-center">
             <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">BREED</span>
-            <span className="text-sm font-bold text-slate-700 flex items-center gap-1">
-              {pet.breed} <Heart size={14} className="text-red-400 fill-red-400" />
-            </span>
+            <span className="text-sm font-bold text-slate-700">{pet.breed}</span>
           </div>
           <div className="flex items-center">
             <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">TYPE</span>
@@ -120,19 +119,19 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
           </div>
         </div>
 
-        {/* Physical Stats */}
-        <div className="flex gap-6 pt-4 border-t border-slate-50">
+        {/* Physical Stats & Precautions */}
+        <div className="grid grid-cols-2 gap-6 pt-4 border-t border-slate-50">
           <div className="flex items-center gap-1.5 text-slate-400">
             <Scale size={16} />
             <span className="text-xs font-bold">{pet.weight}kg</span>
           </div>
           <div className="flex items-center gap-1.5 text-slate-400">
-            <Ruler size={16} />
-            <span className="text-xs font-bold">45.0cm</span>
+            <Feather size={16} /> {/* Changed icon to Feather */}
+            <span className="text-xs font-bold">{pet.furLength || '-'}</span> {/* Display furLength */}
           </div>
-          <div className="flex items-center gap-1.5 text-slate-400">
-            <Activity size={16} />
-            <span className="text-xs font-bold">ปกติ</span>
+          <div className="flex items-center gap-1.5 text-slate-400 col-span-2"> {/* Made precautions span 2 columns */}
+            <Info size={16} /> {/* Changed icon to Info */}
+            <span className="text-xs font-bold">ข้อควรระวัง: {pet.precautions || '-'}</span> {/* Display precautions */}
           </div>
         </div>
       </div>

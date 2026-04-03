@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, HeartPulse, Scale, Calendar, Info, Check } from 'lucide-react'; // Removed Droplet, Sparkles, Utensils, Scissors
+import { X, User, HeartPulse, Scale, Calendar, Info, Check, Feather } from 'lucide-react'; // Added Feather
 
 interface Pet {
   id: number;
@@ -16,7 +16,8 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
-  customPreferences?: { id: string; label: string; value: string; }[]; // Changed to include id
+  furLength?: string; // New field for fur length
+  customPreferences?: { id: string; label: string; value: string; }[];
 }
 
 interface PetFormProps {
@@ -40,6 +41,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     medicalCondition: '',
     precautions: '',
     icon: '🐶',
+    furLength: '', // Initialize new field
   });
 
   useEffect(() => {
@@ -54,6 +56,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         medicalCondition: initialData.medicalCondition,
         precautions: initialData.precautions,
         icon: initialData.icon,
+        furLength: initialData.furLength || '', // Set from initialData
       });
     } else {
       setFormData({
@@ -66,6 +69,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         medicalCondition: '',
         precautions: '',
         icon: '🐶',
+        furLength: '',
       });
     }
   }, [initialData, isOpen]);
@@ -179,6 +183,20 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                     className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm text-center"
                   />
                 </div>
+              </div>
+
+              {/* Fur Length */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 text-purple-500"><Feather size={12}/> ความยาวขน</label>
+                <select 
+                  value={formData.furLength}
+                  onChange={(e) => setFormData({...formData, furLength: e.target.value})}
+                  className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-purple-100 outline-none text-sm appearance-none"
+                >
+                  <option value="">เลือก</option>
+                  <option value="ขนสั้น">ขนสั้น</option>
+                  <option value="ขนยาว">ขนยาว</option>
+                </select>
               </div>
 
               {/* Medical & Special Care */}

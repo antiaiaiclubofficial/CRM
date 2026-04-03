@@ -30,7 +30,8 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
-  customPreferences?: { id: string; label: string; value: string; }[]; // Changed to include id
+  furLength?: string; // New field for fur length
+  customPreferences?: { id: string; label: string; value: string; }[];
 }
 
 // Define the Coupon interface here as well, or import it if it were in a shared file
@@ -102,6 +103,7 @@ const Index = () => {
       precautions: 'ห้ามใช้แชมพูสูตรอ่อนโยนพิเศษ',
       color: 'bg-orange-100', 
       icon: '🐶',
+      furLength: 'ขนสั้น', // Example fur length
       customPreferences: [
         { id: 'pref1', label: 'แชมพูที่ชอบ', value: 'กลิ่นลาเวนเดอร์' },
         { id: 'pref2', label: 'สปาที่ชอบ', value: 'สปาโคลนเดดซี' },
@@ -121,6 +123,7 @@ const Index = () => {
       precautions: 'ขี้ตื่นง่าย ระวังตอนตัดเล็บ',
       color: 'bg-blue-100', 
       icon: '🐱',
+      furLength: 'ขนยาว', // Example fur length
       customPreferences: [] // Empty for adding
     },
   ]);
