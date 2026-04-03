@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Edit2, Feather, Scale, 
-  Info, ChevronRight, Settings, Plus, Tag, HeartPulse // Added HeartPulse icon
+  Info, ChevronRight, Settings, Plus, Tag, HeartPulse // HeartPulse is still imported but not used for display here
 } from 'lucide-react';
 
 interface Pet {
@@ -113,11 +113,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
             <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">TYPE</span>
             <span className="text-sm font-bold text-slate-700">{pet.type}</span>
           </div>
-          {/* New: Medical Condition */}
-          <div className="flex items-center">
-            <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">โรคประจำตัว</span>
-            <span className="text-sm font-bold text-slate-700">{pet.medicalCondition || '-'}</span>
-          </div>
+          {/* Removed: Medical Condition */}
         </div>
 
         {/* Physical Stats & Precautions */}
