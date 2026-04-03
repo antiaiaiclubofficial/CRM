@@ -513,6 +513,7 @@ const Index = () => {
                   pets={pets} 
                   onBack={() => setActiveTab('home')} // Back to home tab
                   onViewDetails={handleViewPetDetails}
+                  onAddPet={handleOpenAddPetForm} // Pass the handler for adding a pet
                 />
               )}
             </motion.div>

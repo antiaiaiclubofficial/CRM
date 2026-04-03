@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { X } from 'lucide-react';
+import { Plus } from 'lucide-react'; // Import Plus icon
 import { motion } from 'framer-motion';
 import PetCategoryCard from './PetCategoryCard'; // Import the new card component
 
@@ -28,9 +28,10 @@ interface PetManagementProps {
   pets: Pet[];
   onBack: () => void; // New prop for back button
   onViewDetails: (pet: Pet) => void; // Keep this for clicking on a card
+  onAddPet: () => void; // New prop for adding a new pet
 }
 
-const PetManagement = ({ pets, onBack, onViewDetails }: PetManagementProps) => {
+const PetManagement = ({ pets, onBack, onViewDetails, onAddPet }: PetManagementProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -39,12 +40,15 @@ const PetManagement = ({ pets, onBack, onViewDetails }: PetManagementProps) => {
       className="space-y-6 pb-20"
     >
       {/* Header */}
-      <div className="flex"> {/* Changed to justify-center */}
-        <h2 className="text-xl font-bold text-slate-800">สัตว์เลี้ยงของฉัน</h2> {/* Removed -ml-10 */}
+      <div className="flex justify-between items-center mb-4"> {/* Changed to justify-between and items-center */}
+        <h2 className="text-xl font-bold text-slate-800">สัตว์เลี้ยงของฉัน</h2>
+        <button 
+          onClick={onAddPet}
+          className="p-2 bg-pink-100 text-pink-700 rounded-full active:scale-95 transition-all"
+        >
+          <Plus size={20} />
+        </button>
       </div>
-
-      {/* Removed Subtitle */}
-      {/* <p className="text-center text-slate-500 text-sm mb-6">All pet categories cat near you</p> */}
 
       {/* Pet Grid */}
       <div className="grid grid-cols-2 gap-4">
