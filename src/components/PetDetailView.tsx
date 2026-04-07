@@ -51,7 +51,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
       className="relative min-h-screen bg-[#FFF9F0] pb-20" // Changed background color
     >
       {/* Top Navigation */}
-      <div className="absolute top-0 left-0 z-30"> {/* Adjusted top-4 to top-10 */}
+      <div className="absolute top-10 left-6 z-30"> {/* Adjusted top-4 to top-10 */}
         <button onClick={onBack} className="p-2 bg-emerald-400 text-white rounded-xl shadow-md">
           <ArrowLeft size={24} />
         </button>
@@ -107,7 +107,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
       </div>
 
       {/* Collection Section (Pet Preferences) - Kept as requested */}
-      <div className="pt-4 px-6">
+      <div className="pt-8 px-6"> {/* Changed pt-4 to pt-8 to move it down */}
         <h3 className="text-lg font-black text-slate-800 mb-4">{pet.name}'s collection</h3>
         
         <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative shadow-lg border-2 border-[#c28856] shadow-soft"> {/* Changed border-black to border-[#c28856] */}
