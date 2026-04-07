@@ -51,7 +51,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
       className="relative min-h-screen bg-[#FFF9F0] pb-20" // Changed background color
     >
       {/* Top Navigation */}
-      <div className="absolute top-10 left-6 z-30"> {/* Changed top-2 to top-10 */}
+      <div className="absolute top-4 left-6 z-30"> {/* Changed top-10 to top-4 */}
         <button onClick={onBack} className="p-2 bg-emerald-400 text-white rounded-xl shadow-md">
           <ArrowLeft size={24} />
         </button>
