@@ -91,7 +91,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       boxShadow: {
-        'soft': '4px 4px 0px 0px black', // Custom shadow to match the image
+        'soft': '4px 4px 0px 0px #c28856', // Custom shadow to match the image
       }
     },
   },
