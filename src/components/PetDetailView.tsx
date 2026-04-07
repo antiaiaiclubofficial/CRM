@@ -1,10 +1,9 @@
 "use client";
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'; // Import motion from framer-motion
 import { 
-  ArrowLeft, Edit2, Feather, Scale, 
-  Info, ChevronRight, Settings, Plus, Tag, HeartPulse // Added HeartPulse icon
+  ArrowLeft, Edit2, Heart, MapPin, Tag, Plus 
 } from 'lucide-react';
 
 interface Pet {
@@ -17,43 +16,30 @@ interface Pet {
   weight: string;
   medicalCondition: string;
   precautions: string;
-  color: string;
-  icon: string;
+  color: string; // Existing: for old icon background (not used for image border)
+  icon: string; // Existing: Emoji icon (not used for image)
   furLength?: string; // New field for fur length
   customPreferences?: { id: string; label: string; value: string; }[];
+  imageUrl: string; // Required for the new design
 }
 
 interface PetDetailViewProps {
   pet: Pet;
   onBack: () => void;
   onStartEdit: (pet: Pet) => void;
-  onDeletePet: (id: number) => void;
-  totalServiceCost: number;
-  onViewServiceHistoryForPet: (petName: string) => void;
-  onEditPreferences: () => void; // New prop for editing preferences
+  onDeletePet: (id: number) => void; // Keeping this prop for now, but functionality will be moved
+  totalServiceCost: number; // Not used in this design, but keeping prop for now
+  onViewServiceHistoryForPet: (petName: string) => void; // Not used in this design, but keeping prop for now
+  onEditPreferences: () => void;
 }
 
-const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost, onViewServiceHistoryForPet, onEditPreferences }: PetDetailViewProps) => {
-  // Removed adventures variable as it's no longer used
-  
-  // Determine emoji and color based on totalServiceCost
-  let costEmoji = '✨';
-  let costColor = 'text-slate-500';
-  let bgColor = 'bg-slate-100';
-
-  if (totalServiceCost > 2000) {
-    costEmoji = '💎';
-    costColor = 'text-blue-600';
-    bgColor = 'bg-blue-50';
-  } else if (totalServiceCost > 1000) {
-    costEmoji = '🌟';
-    costColor = 'text-amber-600';
-    bgColor = 'bg-amber-50';
-  } else if (totalServiceCost > 500) {
-    costEmoji = '💖';
-    costColor = 'text-pink-600';
-    bgColor = 'bg-pink-50';
-  }
+const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetailViewProps) => {
+  // Helper to map gender to a display string, or furLength if preferred for the 'color' tag slot
+  const getGenderDisplay = (gender: string) => {
+    if (gender === 'ผู้') return 'Male';
+    if (gender === 'เมีย') return 'Female';
+    return 'Unknown';
+  };
 
   const hasPreferences = pet.customPreferences && pet.customPreferences.length > 0;
 
@@ -62,102 +48,67 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="space-y-4 pb-32 bg-[#FFF9F0] -mx-6 -mt-6 p-6 min-h-screen" // Changed background color
+      className="relative min-h-screen bg-slate-50 pb-20" // Cleaner background
     >
       {/* Top Navigation */}
-      <div className="flex justify-between items-center mb-2">
-        <button onClick={onBack} className="p-2 text-slate-400 hover:bg-white/50 rounded-full transition-colors">
+      <div className="absolute top-8 left-6 z-20">
+        <button onClick={onBack} className="p-2 bg-emerald-400 text-white rounded-xl shadow-md">
           <ArrowLeft size={24} />
         </button>
-        <div className="w-10"></div> {/* Spacer */}
       </div>
 
-      {/* Main Profile Card */}
-      <div className="bg-white rounded-[2.5rem] p-6 shadow-sm relative overflow-hidden">
-        {/* Decorative elements */}
-        {/* Removed the SVG circles as requested */}
-
-        <div className="flex justify-between items-start mb-6">
-          <div className="flex gap-4">
-            <div className={`w-28 h-28 ${pet.color} rounded-3xl flex items-center justify-center text-5xl shadow-inner border-4 border-white`}>
-              {pet.icon}
-            </div>
-            <div className="pt-2">
-              <h2 className="text-2xl font-black text-slate-800">{pet.name}</h2>
-              <p className="text-slate-400 text-sm font-medium">
-                {pet.gender === 'ผู้' ? 'เพศผู้' : 'เพศเมีย'} {/* Changed gender display */}
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            {/* Removed Share2 button */}
-            <button 
-              onClick={() => onStartEdit(pet)} 
-              className="p-2.5 bg-pink-100 text-pink-700 rounded-full active:scale-95 transition-all" // Reduced size to icon-only
-            >
-              <Edit2 size={20} />
-            </button>
-          </div>
-        </div>
-
-        <div className="space-y-3 mb-6">
-          <div className="flex items-center">
-            <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">AGE</span>
-            <span className="text-sm font-bold text-slate-700">{pet.age} ปี</span>
-          </div>
-          <div className="flex items-center">
-            <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">BREED</span>
-            <span className="text-sm font-bold text-slate-700">{pet.breed}</span>
-          </div>
-          <div className="flex items-center">
-            <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">TYPE</span>
-            <span className="text-sm font-bold text-slate-700">{pet.type}</span>
-          </div>
-          {/* New: Medical Condition */}
-          <div className="flex items-center">
-            <span className="text-[10px] font-black text-slate-300 tracking-widest w-24">โรคประจำตัว</span>
-            <span className="text-sm font-bold text-slate-700">{pet.medicalCondition || '-'}</span>
-          </div>
-        </div>
-
-        {/* Physical Stats & Precautions */}
-        <div className="grid grid-cols-2 gap-6 pt-4 border-t border-slate-50">
-          <div className="flex items-center gap-1.5 text-slate-400">
-            <Scale size={16} />
-            <span className="text-xs font-bold">{pet.weight}kg</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-slate-400">
-            <Feather size={16} /> {/* Changed icon to Feather */}
-            <span className="text-xs font-bold">{pet.furLength || '-'}</span> {/* Display furLength */}
-          </div>
-          <div className="flex items-center gap-1.5 text-slate-400 col-span-2"> {/* Made precautions span 2 columns */}
-            <Info size={16} /> {/* Changed icon to Info */}
-            <span className="text-xs font-bold">ข้อควรระวัง: {pet.precautions || '-'}</span> {/* Display precautions */}
-          </div>
+      {/* Pet Image Section */}
+      <div className="relative w-full h-64 flex items-center justify-center pt-16 pb-8"> {/* Adjusted padding */}
+        <div className="relative w-48 h-48 rounded-full border-[6px] border-amber-400 flex items-center justify-center overflow-hidden shadow-lg">
+          <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
         </div>
       </div>
 
-      {/* Total Service Cost Card (formerly Streak Card) */}
-      <motion.div 
-        whileTap={{ scale: 0.98 }}
-        onClick={() => onViewServiceHistoryForPet(pet.name)}
-        className={`bg-white rounded-[2rem] p-5 flex items-center gap-4 shadow-sm cursor-pointer ${bgColor}`}
-      >
-        <div className={`w-14 h-14 ${bgColor} rounded-2xl flex items-center justify-center text-2xl ${costColor}`}>
-          {costEmoji}
+      {/* Main Info Card */}
+      <div className="relative bg-white rounded-[2rem] p-6 mx-6 -mt-16 shadow-xl z-10"> {/* Adjusted margin-top */}
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-800">{pet.name}</h2>
+            <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
+              <MapPin size={14} className="text-slate-400" />
+              {pet.breed} ({pet.type}) {/* Using breed and type for location feel */}
+            </p>
+          </div>
+          <button className="p-2 bg-pink-100 text-pink-500 rounded-full">
+            <Heart size={20} fill="currentColor" />
+          </button>
         </div>
-        <div className="flex-1">
-          <p className="text-xs font-medium text-slate-500 mb-1">ยอดการใช้บริการสะสมของ{pet.name}</p>
-          <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-bold text-slate-800">฿{totalServiceCost.toLocaleString()}</span>
+
+        {/* Info Tags (Age, Gender, Weight) */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="bg-slate-50 p-3 rounded-xl text-center">
+            <p className="text-lg font-bold text-slate-800">{pet.age} ปี</p>
+            <p className="text-xs text-slate-500">Age</p>
+          </div>
+          <div className="bg-slate-50 p-3 rounded-xl text-center">
+            <p className="text-lg font-bold text-slate-800">{getGenderDisplay(pet.gender)}</p>
+            <p className="text-xs text-slate-500">Gender</p>
+          </div>
+          <div className="bg-slate-50 p-3 rounded-xl text-center">
+            <p className="text-lg font-bold text-slate-800">{pet.weight} Kg</p>
+            <p className="text-xs text-slate-500">Weight</p>
           </div>
         </div>
-        <ChevronRight className="text-slate-300" size={20} />
-      </motion.div>
 
-      {/* Collection Section (Pet Preferences) */}
-      <div className="pt-4">
-        <h3 className="text-lg font-black text-slate-800 mb-4 px-2">{pet.name}'s collection</h3>
+        {/* Pet Story Section (Medical Condition / Precautions) */}
+        <div className="mb-6">
+          <h3 className="text-lg font-bold text-slate-800 mb-2">Pet Story</h3>
+          <p className="text-sm text-slate-700">
+            {pet.medicalCondition && `โรคประจำตัว: ${pet.medicalCondition}. `}
+            {pet.precautions && `ข้อควรระวัง: ${pet.precautions}.`}
+            {(!pet.medicalCondition && !pet.precautions) && "ไม่มีข้อมูล Pet Story เพิ่มเติม"}
+          </p>
+        </div>
+      </div>
+
+      {/* Collection Section (Pet Preferences) - Kept as requested */}
+      <div className="pt-4 px-6">
+        <h3 className="text-lg font-black text-slate-800 mb-4">{pet.name}'s collection</h3>
         
         <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative shadow-lg">
           {/* Decorative tabs at the top */}
@@ -169,10 +120,10 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
             <div className="flex justify-between items-center mb-6">
               <h4 className="text-lg font-black text-[#4A2C0F]">ความชอบส่วนตัว</h4>
               <button 
-                onClick={onEditPreferences} // This button is always for editing/adding
+                onClick={onEditPreferences} 
                 className="p-1.5 bg-[#D4B89A] rounded-full text-[#4A2C0F] hover:bg-[#E0C7A9] transition-colors"
               >
-                <Settings size={16} />
+                <Edit2 size={16} /> {/* Changed to Edit2 for consistency with editing */}
               </button>
             </div>
 
@@ -181,7 +132,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
                 pet.customPreferences?.map((pref, index) => (
                   <div key={index} className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
                     <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-500 text-xl shadow-inner">
-                      <Tag size={20} /> {/* Generic icon for custom preferences */}
+                      <Tag size={20} /> 
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 font-medium">{pref.label}</p>
@@ -200,16 +151,6 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, totalServiceCost
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Delete button (minimal) */}
-      <div className="pt-4 pb-10 text-center">
-        <button 
-          onClick={() => onDeletePet(pet.id)}
-          className="text-xs font-bold text-red-300 hover:text-red-500 transition-colors uppercase tracking-widest"
-        >
-          ลบข้อมูลสัตว์เลี้ยง
-        </button>
       </div>
     </motion.div>
   );
