@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { motion } from 'framer-motion'; // Import motion from framer-motion
+import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Edit2, Heart, MapPin, Tag, Plus 
 } from 'lucide-react';
@@ -48,7 +48,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="relative min-h-screen bg-slate-50 pb-20" // Cleaner background
+      className="relative min-h-screen bg-[#FFF9F0] pb-20" // Changed background color
     >
       {/* Top Navigation */}
       <div className="absolute top-8 left-6 z-20">
@@ -58,14 +58,14 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
       </div>
 
       {/* Pet Image Section */}
-      <div className="relative w-full h-64 flex items-center justify-center pt-16 pb-8"> {/* Adjusted padding */}
+      <div className="relative w-full h-64 flex items-center justify-center pt-16 pb-8 z-20"> {/* Increased z-index for image */}
         <div className="relative w-48 h-48 rounded-full border-[6px] border-amber-400 flex items-center justify-center overflow-hidden shadow-lg">
           <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
         </div>
       </div>
 
       {/* Main Info Card */}
-      <div className="relative bg-white rounded-[2rem] p-6 mx-6 -mt-16 shadow-xl z-10"> {/* Adjusted margin-top */}
+      <div className="relative bg-white rounded-[2rem] p-6 mx-6 -mt-8 shadow-xl z-10 border-2 border-black shadow-soft"> {/* Adjusted margin-top, added border and shadow */}
         <div className="flex justify-between items-start mb-4">
           <div>
             <h2 className="text-2xl font-bold text-slate-800">{pet.name}</h2>
@@ -97,12 +97,12 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
 
         {/* Pet Story Section (Medical Condition / Precautions) */}
         <div className="mb-6">
-          <h3 className="text-lg font-bold text-slate-800 mb-2">Pet Story</h3>
-          <p className="text-sm text-slate-700">
-            {pet.medicalCondition && `โรคประจำตัว: ${pet.medicalCondition}. `}
-            {pet.precautions && `ข้อควรระวัง: ${pet.precautions}.`}
-            {(!pet.medicalCondition && !pet.precautions) && "ไม่มีข้อมูล Pet Story เพิ่มเติม"}
-          </p>
+          <h3 className="text-lg font-bold text-slate-800 mb-2">Note :</h3> {/* Changed "Pet Story" to "Note :" */}
+          <div className="text-sm text-slate-700 space-y-1"> {/* Added space-y-1 for separation */}
+            {pet.medicalCondition && <p>โรคประจำตัว: <span className="font-medium">{pet.medicalCondition}</span></p>}
+            {pet.precautions && <p>ข้อควรระวัง: <span className="font-medium">{pet.precautions}</span></p>}
+            {(!pet.medicalCondition && !pet.precautions) && <p>ไม่มีข้อมูลเพิ่มเติม</p>}
+          </div>
         </div>
       </div>
 
@@ -110,7 +110,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
       <div className="pt-4 px-6">
         <h3 className="text-lg font-black text-slate-800 mb-4">{pet.name}'s collection</h3>
         
-        <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative shadow-lg">
+        <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative shadow-lg border-2 border-black shadow-soft"> {/* Added border and shadow */}
           {/* Decorative tabs at the top */}
           <div className="absolute -top-3 left-0 right-0 flex justify-around px-8">
             {[1,2,3,4,5].map(i => <div key={i} className="w-3 h-5 bg-[#c28856] rounded-full" />)}
