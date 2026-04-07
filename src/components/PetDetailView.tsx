@@ -112,7 +112,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
         
         <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative shadow-lg border-2 border-[#c28856] shadow-soft"> {/* Changed border-black to border-[#c28856] */}
           {/* Decorative tabs at the top */}
-          <div className="absolute -top-3 left-0 right-0 flex justify-around px-8">
+          <div className="absolute -top-10 left-0 right-0 flex justify-around px-8">
             {[1,2,3,4,5].map(i => <div key={i} className="w-3 h-5 bg-[#c28856] rounded-full" />)}
           </div>
 
