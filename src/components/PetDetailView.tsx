@@ -51,14 +51,14 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
       className="relative min-h-screen bg-[#FFF9F0] pb-20" // Changed background color
     >
       {/* Top Navigation */}
-      <div className="absolute top-4 left-6 z-30"> {/* Changed top-10 to top-4 */}
+      <div className="absolute top-10 left-6 z-30"> {/* Adjusted top-4 to top-10 */}
         <button onClick={onBack} className="p-2 bg-emerald-400 text-white rounded-xl shadow-md">
           <ArrowLeft size={24} />
         </button>
       </div>
 
       {/* Pet Image Section */}
-      <div className="relative w-full h-64 flex items-center justify-center pt-16 pb-8 z-20"> {/* Increased z-index for image */}
+      <div className="relative w-full h-64 flex items-center justify-center pt-20 pb-8 z-20"> {/* Adjusted pt-16 to pt-20 to make space for the button */}
         <div className="relative w-48 h-48 rounded-full border-[6px] border-amber-400 flex items-center justify-center overflow-hidden shadow-lg">
           <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
         </div>
