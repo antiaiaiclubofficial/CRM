@@ -14,7 +14,7 @@ import ServiceHistoryDetail from '@/components/ServiceHistoryDetail';
 import PetPreferenceForm from '@/components/PetPreferenceForm';
 import PetManagement from '@/components/PetManagement'; // Import the updated PetManagement
 import QRCodeModal from '@/components/QRCodeModal'; // Import the new QR modal
-import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History, Scissors, Sparkles, Bath, X } from 'lucide-react';
+import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History, Scissors, Sparkles, Bath, X, LayoutGrid } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -623,35 +623,31 @@ const Index = () => {
         />
       )}
 
-      <nav className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-100 px-6 py-4 flex justify-between items-center rounded-t-[2.5rem] shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.05)] z-50">
+      {/* Floating Liquid Glass Nav Bar */}
+      <nav className="absolute bottom-8 left-6 right-6 bg-slate-900/90 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-2xl z-50 border border-white/10">
         <NavButton 
           active={activeTab === 'home'} 
           icon={<Home size={22} />} 
-          label="หน้าแรก" 
           onClick={() => { setActiveTab('home'); setSelectedPetName(null); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
         />
         <NavButton 
           active={activeTab === 'level'} 
           icon={<Award size={22} />} 
-          label="ระดับสมาชิก" 
           onClick={() => { setActiveTab('level'); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
         />
         <NavButton 
           active={activeTab === 'pets'} 
-          icon={<PawPrint size={22} />} 
-          label="สัตว์เลี้ยง" 
+          icon={<LayoutGrid size={22} />} 
           onClick={() => { setActiveTab('pets'); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
         />
         <NavButton 
           active={activeTab === 'promo'}
           icon={<Megaphone size={22} />} 
-          label="โปรโมชั่น" 
           onClick={() => { setActiveTab('promo'); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
         />
         <NavButton 
           active={activeTab === 'history'}
           icon={<History size={22} />} 
-          label="ประวัติ" 
           onClick={() => { setActiveTab('history'); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
         />
       </nav>
@@ -662,27 +658,24 @@ const Index = () => {
 interface NavButtonProps {
   active: boolean;
   icon: React.ReactNode;
-  label: string;
   onClick: () => void;
 }
 
-const NavButton = ({ active, icon, label, onClick }: NavButtonProps) => (
+const NavButton = ({ active, icon, onClick }: NavButtonProps) => (
   <button 
     onClick={onClick}
-    className={`flex flex-col items-center gap-1 transition-all duration-300 ${active ? 'text-pink-500 scale-110' : 'text-slate-400'}`}
+    className="relative flex items-center justify-center w-12 h-12 transition-all duration-300 group"
   >
-    <div className={active ? 'drop-shadow-sm' : ''}>
-      {icon}
-    </div>
-    <span className={`text-[10px] font-medium ${active ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>
-      {label}
-    </span>
     {active && (
       <motion.div 
-        layoutId="activeTab" 
-        className="w-1 h-1 bg-pink-500 rounded-full mt-0.5" 
+        layoutId="activeNavBg"
+        className="absolute inset-0 bg-gradient-to-tr from-pink-500 to-amber-400 rounded-full shadow-lg shadow-pink-500/20"
+        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
       />
     )}
+    <div className={`relative z-10 transition-colors duration-300 ${active ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'}`}>
+      {icon}
+    </div>
   </button>
 );
 
