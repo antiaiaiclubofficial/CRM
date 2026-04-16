@@ -31,7 +31,7 @@ interface PetManagementProps {
   onAddPet: () => void; // New prop for adding a new pet
 }
 
-const PetManagement = ({ pets, onBack, onViewDetails, onAddPet }: PetManagementProps) => {
+const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -40,7 +40,7 @@ const PetManagement = ({ pets, onBack, onViewDetails, onAddPet }: PetManagementP
       className="space-y-6 pb-20"
     >
       {/* Header */}
-      <div className="flex justify-between items-center mb-4"> {/* Changed to justify-between and items-center */}
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-slate-800">สัตว์เลี้ยงของฉัน</h2>
         <button 
           onClick={onAddPet}
@@ -50,14 +50,15 @@ const PetManagement = ({ pets, onBack, onViewDetails, onAddPet }: PetManagementP
         </button>
       </div>
 
-      {/* Pet Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Pet Masonry Layout */}
+      <div className="columns-2 gap-4 space-y-4">
         {pets.map((pet) => (
-          <PetCategoryCard
-            key={pet.id}
-            pet={pet}
-            onClick={() => onViewDetails(pet)}
-          />
+          <div key={pet.id} className="break-inside-avoid mb-4">
+            <PetCategoryCard
+              pet={pet}
+              onClick={() => onViewDetails(pet)}
+            />
+          </div>
         ))}
       </div>
     </motion.div>
