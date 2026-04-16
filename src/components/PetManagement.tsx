@@ -50,10 +50,11 @@ const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) =>
         </button>
       </div>
 
-      {/* Grid Layout - Ensures Left-to-Right sorting */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Masonry Layout for tight packing (like previous version) */}
+      {/* Note: Columns fill top-to-bottom, so the visual 'Left-to-Right' flow is handled by the data order */}
+      <div className="columns-2 gap-4 space-y-4">
         {pets.map((pet) => (
-          <div key={pet.id}>
+          <div key={pet.id} className="break-inside-avoid mb-4">
             <PetCategoryCard
               pet={{
                 id: pet.id,
