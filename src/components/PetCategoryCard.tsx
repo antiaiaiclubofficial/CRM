@@ -27,10 +27,8 @@ const PetCategoryCard = ({ pet, onClick }: PetCategoryCardProps) => {
     >
       {/* Pin connection line (SVG) - positioned relative to the card */}
       <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-20">
-        <svg width="10" height="20" viewBox="0 0 10 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M5 0V10C5 15 0 15 0 20H10C10 15 5 15 5 10V0Z" fill="black"/>
-        </svg>
-        <svg className="absolute top-0 left-1/2 -translate-x-1/2" width="8" height="18" viewBox="0 0 8 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        
+        
           <path d="M4 0V9C4 13.5 0 13.5 0 18H8C8 13.5 4 13.5 4 9V0Z" fill="white"/>
         </svg>
       </div>
