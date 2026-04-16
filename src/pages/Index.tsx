@@ -365,6 +365,14 @@ const Index = () => {
     setIsPetFormOpen(true);
   };
 
+  const handleFreezableScroll = (isOpen: boolean) => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  };
+
   const handleClosePetForm = () => {
     setIsPetFormOpen(false);
     setPetToEdit(null);
@@ -623,8 +631,8 @@ const Index = () => {
         />
       )}
 
-      {/* Floating Light Frosted Liquid Glass Nav Bar */}
-      <nav className="absolute bottom-8 left-6 right-6 bg-white/30 backdrop-blur-2xl px-4 py-3 flex justify-between items-center rounded-full shadow-xl z-50 border border-white/40">
+      {/* Crystal-Clear Liquid Glass Nav Bar */}
+      <nav className="absolute bottom-8 left-6 right-6 bg-white/10 backdrop-blur-3xl px-4 py-3 flex justify-between items-center rounded-full shadow-2xl z-50 border border-white/60">
         <NavButton 
           active={activeTab === 'home'} 
           icon={<Home size={22} />} 
@@ -673,7 +681,7 @@ const NavButton = ({ active, icon, onClick }: NavButtonProps) => (
         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
       />
     )}
-    <div className={`relative z-10 transition-colors duration-300 ${active ? 'text-white' : 'text-slate-500 group-hover:text-slate-700'}`}>
+    <div className={`relative z-10 transition-colors duration-300 ${active ? 'text-white' : 'text-slate-600 group-hover:text-slate-800'}`}>
       {icon}
     </div>
   </button>
