@@ -21,7 +21,7 @@ interface Pet {
   customPreferences?: { id: string; label: string; value: string; }[];
   imageUrl: string; // New: URL for the pet's image
   cardBgColor: string; // New: Specific hex color for the inner background
-  hasHeartIcon?: boolean; // New: for the heart icon on Persian cat
+  isFavorite?: boolean; // New: for the heart icon on Persian cat
 }
 
 interface PetManagementProps {
@@ -50,12 +50,21 @@ const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) =>
         </button>
       </div>
 
-      {/* Pet Masonry Layout */}
-      <div className="columns-2 gap-4 space-y-4">
+      {/* Pet Grid Layout - Changed to grid-cols-2 for Left-to-Right sorting */}
+      <div className="grid grid-cols-2 gap-4">
         {pets.map((pet) => (
-          <div key={pet.id} className="break-inside-avoid mb-4">
+          <div key={pet.id}>
             <PetCategoryCard
-              pet={pet}
+              pet={{
+                id: pet.id,
+                name: pet.name,
+                breed: pet.breed,
+                imageUrl: pet.imageUrl,
+                weight: pet.weight,
+                gender: pet.gender,
+                cardBgColor: pet.cardBgColor,
+                isFavorite: pet.isFavorite
+              }}
               onClick={() => onViewDetails(pet)}
             />
           </div>
