@@ -50,10 +50,10 @@ const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) =>
         </button>
       </div>
 
-      {/* Masonry Layout - Using columns-2 for tight packing */}
-      <div className="columns-2 gap-4 space-y-4">
+      {/* Grid Layout - Ensures Left-to-Right sorting */}
+      <div className="grid grid-cols-2 gap-4">
         {pets.map((pet) => (
-          <div key={pet.id} className="break-inside-avoid mb-4">
+          <div key={pet.id}>
             <PetCategoryCard
               pet={{
                 id: pet.id,
