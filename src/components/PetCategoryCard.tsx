@@ -26,12 +26,7 @@ const PetCategoryCard = ({ pet, onClick }: PetCategoryCardProps) => {
       className="relative w-full cursor-pointer"
     >
       {/* Pin connection line (SVG) - positioned relative to the card */}
-      <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-20">
-        
-        
-          <path d="M4 0V9C4 13.5 0 13.5 0 18H8C8 13.5 4 13.5 4 9V0Z" fill="white"/>
-        </svg>
-      </div>
+      
 
       {/* Main Card Body with black border and soft shadow */}
       <div className="relative w-full rounded-[2rem] border-2 border-black shadow-soft overflow-hidden">
