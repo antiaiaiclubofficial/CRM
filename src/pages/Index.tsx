@@ -413,9 +413,9 @@ const Index = () => {
   };
 
   return (
-    <div className="max-w-[390px] min-h-[844px] mx-auto bg-[#FFF9F0] relative shadow-2xl overflow-hidden flex flex-col font-['Prompt']">
+    <div className="max-w-[390px] h-[844px] mx-auto bg-[#FFF9F0] relative shadow-2xl overflow-hidden flex flex-col font-['Prompt']">
       
-      <header className="px-6 pt-10 pb-6 flex justify-between items-center">
+      <header className="px-6 pt-10 pb-6 flex justify-between items-center shrink-0">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-slate-800">สวัสดี, คุณ{ownerProfile.firstName}!</h1>

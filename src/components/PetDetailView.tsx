@@ -49,7 +49,7 @@ const PetDetailView = ({ pet, onBack, onEditPreferences, onToggleFavorite }: Pet
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="relative min-h-screen bg-[#FFF9F0] pb-20"
+      className="relative bg-[#FFF9F0] pb-20"
     >
       {/* Back Button - Moved higher and increased Z-index */}
       <div className="absolute top-2 left-0 z-[60]">
