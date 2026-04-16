@@ -50,8 +50,8 @@ const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) =>
         </button>
       </div>
 
-      {/* Pet Grid Layout - Changed to gap-3 for closer cards */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* Pet Grid Layout - Changed to grid-cols-2 for Left-to-Right sorting */}
+      <div className="grid grid-cols-2 gap-4">
         {pets.map((pet) => (
           <div key={pet.id}>
             <PetCategoryCard
