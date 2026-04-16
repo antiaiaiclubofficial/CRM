@@ -32,6 +32,10 @@ interface PetManagementProps {
 }
 
 const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) => {
+  // Split pets into two columns manually to achieve Left-to-Right flow with Masonry look
+  const leftColumnPets = pets.filter((_, index) => index % 2 === 0);
+  const rightColumnPets = pets.filter((_, index) => index % 2 !== 0);
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -50,12 +54,13 @@ const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) =>
         </button>
       </div>
 
-      {/* Masonry Layout for tight packing (like previous version) */}
-      {/* Note: Columns fill top-to-bottom, so the visual 'Left-to-Right' flow is handled by the data order */}
-      <div className="columns-2 gap-4 space-y-4">
-        {pets.map((pet) => (
-          <div key={pet.id} className="break-inside-avoid mb-4">
+      {/* Manual 2-Column Layout for Masonry + Left-to-Right sorting */}
+      <div className="flex gap-4 items-start">
+        {/* Left Column */}
+        <div className="flex-1 space-y-4">
+          {leftColumnPets.map((pet) => (
             <PetCategoryCard
+              key={pet.id}
               pet={{
                 id: pet.id,
                 name: pet.name,
@@ -68,8 +73,28 @@ const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) =>
               }}
               onClick={() => onViewDetails(pet)}
             />
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {/* Right Column */}
+        <div className="flex-1 space-y-4">
+          {rightColumnPets.map((pet) => (
+            <PetCategoryCard
+              key={pet.id}
+              pet={{
+                id: pet.id,
+                name: pet.name,
+                breed: pet.breed,
+                imageUrl: pet.imageUrl,
+                weight: pet.weight,
+                gender: pet.gender,
+                cardBgColor: pet.cardBgColor,
+                isFavorite: pet.isFavorite
+              }}
+              onClick={() => onViewDetails(pet)}
+            />
+          ))}
+        </div>
       </div>
     </motion.div>
   );
