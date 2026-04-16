@@ -13,6 +13,7 @@ import MembershipLevels from '@/components/MembershipLevels';
 import ServiceHistoryDetail from '@/components/ServiceHistoryDetail';
 import PetPreferenceForm from '@/components/PetPreferenceForm';
 import PetManagement from '@/components/PetManagement'; // Import the updated PetManagement
+import QRCodeModal from '@/components/QRCodeModal'; // Import the new QR modal
 import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History, Scissors, Sparkles, Bath, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -76,6 +77,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedPetName, setSelectedPetName] = useState<string | null>(null);
   const [isProfileEditing, setIsProfileEditing] = useState(false);
+  const [isQRCodeOpen, setIsQRCodeOpen] = useState(false); // New state for QR Modal
   
   const [ownerProfile, setOwnerProfile] = useState({
     firstName: 'ซาร่า',
@@ -456,6 +458,7 @@ const Index = () => {
                 totalAccumulatedPoints={totalAccumulatedPoints} 
                 redeemablePoints={redeemablePoints} 
                 ownerProfile={ownerProfile}
+                onShowQR={() => setIsQRCodeOpen(true)} // Handle QR click
               />
 
               <UpcomingAppointments />
@@ -582,11 +585,19 @@ const Index = () => {
         </AnimatePresence>
       </main>
 
+      {/* Modals */}
       <UserProfileEdit 
         isOpen={isProfileEditing} 
         onClose={() => setIsProfileEditing(false)} 
         profile={ownerProfile}
         onSave={(updated) => setOwnerProfile(updated)}
+      />
+
+      <QRCodeModal 
+        isOpen={isQRCodeOpen}
+        onClose={() => setIsQRCodeOpen(false)}
+        ownerName={ownerProfile.firstName}
+        memberId={ownerProfile.phone}
       />
 
       <PetForm

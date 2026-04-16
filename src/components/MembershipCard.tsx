@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Crown, PawPrint } from 'lucide-react';
+import { Crown, PawPrint, QrCode } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface OwnerProfile {
@@ -17,10 +17,10 @@ interface OwnerProfile {
 interface MembershipCardProps {
   totalAccumulatedPoints: number;
   redeemablePoints: number;
-  ownerProfile: OwnerProfile; // Added ownerProfile prop
+  ownerProfile: OwnerProfile;
+  onShowQR: () => void; // New prop
 }
 
-// Define membership tiers here for consistency, or import from a shared source if available
 const membershipTiers = [
   { id: 'bronze', name: 'Bronze Member', minPoints: 0 },
   { id: 'silver', name: 'Silver Member', minPoints: 300 },
@@ -29,8 +29,7 @@ const membershipTiers = [
   { id: 'vip', name: 'VIP Member', minPoints: 2000 },
 ];
 
-const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile }: MembershipCardProps) => {
-  // Determine current and next level based on totalAccumulatedPoints
+const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile, onShowQR }: MembershipCardProps) => {
   const sortedTiers = [...membershipTiers].sort((a, b) => a.minPoints - b.minPoints);
 
   let currentLevel = sortedTiers[0];
@@ -49,10 +48,9 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
   
   let progressPercentage = 0;
   if (nextLevel) {
-    // Corrected calculation: progress from 0 towards the next level's minimum points
     progressPercentage = (totalAccumulatedPoints / nextLevel.minPoints) * 100;
   } else {
-    progressPercentage = 100; // Max level reached
+    progressPercentage = 100;
   }
   progressPercentage = Math.min(100, Math.max(0, progressPercentage));
 
@@ -62,7 +60,6 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
       animate={{ opacity: 1, y: 0 }}
       className="relative overflow-hidden p-6 rounded-[2rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-xl shadow-pink-100/50"
     >
-      {/* Watermark Paw Prints */}
       <PawPrint className="absolute -right-4 -top-4 w-32 h-32 text-white/20 rotate-12" />
       <PawPrint className="absolute -left-8 -bottom-8 w-24 h-24 text-white/10 -rotate-12" />
 
@@ -77,13 +74,19 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               </span>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-xs text-slate-500">ID: {ownerProfile.phone}</p> {/* Changed to ownerProfile.phone */}
-            <p className="font-bold text-slate-800">คุณ{ownerProfile.firstName} {ownerProfile.lastName}</p> {/* Display full name */}
+          <div className="flex flex-col items-end">
+            <motion.button 
+              whileTap={{ scale: 0.9 }}
+              onClick={onShowQR}
+              className="bg-white/90 p-2 rounded-2xl shadow-sm mb-2 text-pink-500 hover:text-pink-600 transition-colors"
+            >
+              <QrCode size={20} />
+            </motion.button>
+            <p className="text-[10px] text-slate-500">ID: {ownerProfile.phone}</p>
+            <p className="font-bold text-slate-800">คุณ{ownerProfile.firstName} {ownerProfile.lastName}</p>
           </div>
         </div>
 
-        {/* Display current redeemable points and total accumulated points on the same line */}
         <div className="flex justify-between items-end mb-4">
           <div>
             <p className="text-xs text-slate-600 mb-1">คะแนนปัจจุบันของคุณ</p>
