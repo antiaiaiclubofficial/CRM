@@ -130,7 +130,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
               </button>
             </div>
 
-            <div className="space-y-5 px-8 pb-10">
+            <div className="space-y-5 px-8 pb-24"> {/* Increased bottom padding */}
               {/* Basic Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">

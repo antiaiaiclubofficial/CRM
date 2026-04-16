@@ -88,7 +88,7 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
               </button>
             </div>
 
-            <div className="space-y-5 px-6 pb-10">
+            <div className="space-y-5 px-6 pb-24"> {/* Increased bottom padding */}
               {preferences.length > 0 && (
                 <div className="space-y-4">
                   <h4 className="text-sm font-bold text-slate-600">รายการความชอบที่มีอยู่</h4>

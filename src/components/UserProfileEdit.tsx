@@ -54,7 +54,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
               </button>
             </div>
 
-            <div className="space-y-5 px-8 pb-10">
+            <div className="space-y-5 px-8 pb-24"> {/* Increased bottom padding */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1"><User size={12}/> ชื่อ</label>
