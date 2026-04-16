@@ -40,7 +40,7 @@ const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) =>
       className="space-y-6 pb-20"
     >
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 px-1">
         <h2 className="text-xl font-bold text-slate-800">สัตว์เลี้ยงของฉัน</h2>
         <button 
           onClick={onAddPet}
@@ -50,10 +50,10 @@ const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) =>
         </button>
       </div>
 
-      {/* Pet Grid Layout - Changed to grid-cols-2 for Left-to-Right sorting */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Masonry Layout - Using columns-2 for tight packing */}
+      <div className="columns-2 gap-4 space-y-4">
         {pets.map((pet) => (
-          <div key={pet.id}>
+          <div key={pet.id} className="break-inside-avoid mb-4">
             <PetCategoryCard
               pet={{
                 id: pet.id,
