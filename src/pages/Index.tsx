@@ -637,7 +637,7 @@ const Index = () => {
         />
         <NavButton 
           active={activeTab === 'pets'} 
-          icon={<LayoutGrid size={22} />} 
+          icon={<PawPrint size={22} />} 
           onClick={() => { setActiveTab('pets'); setSelectedPetForDetail(null); setSelectedServiceForDetail(null); }} 
         />
         <NavButton 
