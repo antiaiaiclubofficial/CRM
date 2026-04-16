@@ -444,7 +444,8 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="px-6 flex-1 overflow-y-auto no-scrollbar pb-32">
+      {/* Reduced horizontal padding from px-6 to px-4 for tighter layout */}
+      <main className="px-4 flex-1 overflow-y-auto no-scrollbar pb-32">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div
