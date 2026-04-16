@@ -44,16 +44,17 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] p-8 max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
+            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
           >
-            <div className="flex justify-between items-center mb-6 sticky top-0 bg-white py-2 z-10">
+            {/* Improved Sticky Header */}
+            <div className="flex justify-between items-center sticky top-0 bg-white pt-8 pb-4 px-8 z-10 rounded-t-[3rem]">
               <h3 className="font-bold text-xl text-slate-800">ข้อมูลส่วนตัวเจ้าของ</h3>
               <button onClick={onClose} className="p-2 bg-slate-100 rounded-full text-slate-400">
                 <X size={20} />
               </button>
             </div>
 
-            <div className="space-y-5 pb-8">
+            <div className="space-y-5 px-8 pb-10">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1"><User size={12}/> ชื่อ</label>

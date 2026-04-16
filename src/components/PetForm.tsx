@@ -120,16 +120,17 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] p-8 max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
+            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
           >
-            <div className="flex justify-between items-center mb-6 sticky top-0 bg-white py-2 z-10">
+            {/* Improved Sticky Header */}
+            <div className="flex justify-between items-center sticky top-0 bg-white pt-8 pb-4 px-8 z-10 rounded-t-[3rem]">
               <h3 className="font-bold text-xl text-slate-800">{initialData ? 'แก้ไขข้อมูลสัตว์เลี้ยง' : 'เพิ่มสัตว์เลี้ยงใหม่'}</h3>
               <button onClick={onClose} className="p-2 bg-slate-100 rounded-full text-slate-400">
                 <X size={20} />
               </button>
             </div>
 
-            <div className="space-y-5 pb-8">
+            <div className="space-y-5 px-8 pb-10">
               {/* Basic Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">

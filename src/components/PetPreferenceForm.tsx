@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Plus, Trash2, Tag } from 'lucide-react';
+import { X, Check, Plus, Trash2 } from 'lucide-react';
 
 interface CustomPreference {
   id: string;
@@ -78,22 +78,22 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] py-8 max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
+            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
           >
-            <div className="flex justify-between items-center mb-6 sticky top-0 bg-white px-6 py-2 z-10">
+            {/* Improved Sticky Header */}
+            <div className="flex justify-between items-center sticky top-0 bg-white pt-8 pb-4 px-6 z-10 rounded-t-[3rem]">
               <h3 className="font-bold text-xl text-slate-800 flex-1 min-w-0 break-words pr-2">ความชอบส่วนตัวของน้อง{petName}</h3>
               <button onClick={onClose} className="p-2 bg-slate-100 rounded-full text-slate-400 flex-shrink-0">
                 <X size={20} />
               </button>
             </div>
 
-            <div className="space-y-5 pb-8 px-6">
+            <div className="space-y-5 px-6 pb-10">
               {preferences.length > 0 && (
                 <div className="space-y-4">
                   <h4 className="text-sm font-bold text-slate-600">รายการความชอบที่มีอยู่</h4>
                   {preferences.map((pref) => (
                     <div key={pref.id} className="flex items-center gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                      {/* Changed to w-0 flex-grow */}
                       <input 
                         type="text" 
                         value={pref.label}
@@ -101,7 +101,6 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
                         placeholder="หัวข้อ (เช่น แชมพูที่ชอบ)"
                         className="w-0 flex-grow p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
                       />
-                      {/* Changed to w-0 flex-grow */}
                       <input 
                         type="text" 
                         value={pref.value}
