@@ -32,7 +32,7 @@ interface PetDetailViewProps {
   totalServiceCost: number;
   onViewServiceHistoryForPet: (petName: string) => void;
   onEditPreferences: () => void;
-  onToggleFavorite: () => void; // New prop
+  onToggleFavorite: () => void;
 }
 
 const PetDetailView = ({ pet, onBack, onEditPreferences, onToggleFavorite }: PetDetailViewProps) => {
@@ -51,13 +51,20 @@ const PetDetailView = ({ pet, onBack, onEditPreferences, onToggleFavorite }: Pet
       exit={{ opacity: 0 }}
       className="relative min-h-screen bg-[#FFF9F0] pb-20"
     >
-      <div className="absolute top-10 left-1 z-10">
-        <button onClick={onBack} className="p-2 bg-emerald-400 text-white rounded-xl shadow-md">
+      {/* Back Button - Moved higher and increased Z-index */}
+      <div className="absolute top-2 left-0 z-[60]">
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            onBack();
+          }} 
+          className="p-2.5 bg-emerald-400 text-white rounded-xl shadow-lg active:scale-95 transition-transform"
+        >
           <ArrowLeft size={24} />
         </button>
       </div>
 
-      <div className="relative w-full h-64 flex items-center justify-center pt-20 pb-8 z-20">
+      <div className="relative w-full h-64 flex items-center justify-center pt-16 pb-8 z-20">
         <div className="relative w-48 h-48 rounded-full border-[6px] border-amber-400 flex items-center justify-center overflow-hidden shadow-lg">
           <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
         </div>
@@ -106,7 +113,7 @@ const PetDetailView = ({ pet, onBack, onEditPreferences, onToggleFavorite }: Pet
         </div>
       </div>
 
-      <div className="pt-8 px-6">
+      <div className="pt-4 px-6">
         <h3 className="text-lg font-black text-slate-800 mb-4">{pet.name}'s collection</h3>
         
         <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative shadow-lg border-2 border-[#c28856] shadow-soft">
