@@ -18,7 +18,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
 // Define the Pet interface here for consistency across components
-interface Pet {
+export interface Pet {
   id: number;
   name: string;
   type: string;
@@ -34,7 +34,7 @@ interface Pet {
   customPreferences?: { id: string; label: string; value: string; }[];
   imageUrl: string;
   cardBgColor: string;
-  hasHeartIcon?: boolean; // Make optional
+  isFavorite?: boolean; // New: isFavorite property
 }
 
 // Define the Coupon interface here as well, or import it if it were in a shared file
@@ -96,12 +96,12 @@ const Index = () => {
   const [pets, setPets] = useState<Pet[]>([
     { 
       id: 1, 
-      name: 'Abyssinian Cats', // Changed to match image
-      type: 'แมว', // Assuming all are cats for this view
+      name: 'Abyssinian Cats', 
+      type: 'แมว', 
       breed: 'Abyssinian', 
       age: '3',
-      gender: 'เมีย', // Mapped from original gender
-      weight: '3.5', // Mapped from original weight
+      gender: 'เมีย', 
+      weight: '3.5', 
       medicalCondition: 'ภูมิแพ้ผิวหนัง',
       precautions: 'ห้ามใช้แชมพูสูตรอ่อนโยนพิเศษ',
       color: 'bg-orange-100', 
@@ -113,8 +113,9 @@ const Index = () => {
         { id: 'pref3', label: 'อาหารที่ชอบ', value: 'อาหารเม็ดสูตรลดน้ำหนัก' },
         { id: 'pref4', label: 'สไตล์การตัดขน', value: 'ตัดขนสั้นแบบเท็ดดี้แบร์' }
       ],
-      imageUrl: 'https://images.unsplash.com/photo-1574144702728-1ab0e5759688?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Abyssinian Cat
-      cardBgColor: '#FFF9C4', // Light Yellow
+      imageUrl: 'https://images.unsplash.com/photo-1574144702728-1ab0e5759688?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      cardBgColor: '#FFF9C4',
+      isFavorite: false,
     },
     { 
       id: 2, 
@@ -122,17 +123,17 @@ const Index = () => {
       type: 'แมว',
       breed: 'Persian Cat', 
       age: '2',
-      gender: 'ผู้', // Mapped from original gender
-      weight: '4.2', // Mapped from original weight
+      gender: 'ผู้', 
+      weight: '4.2', 
       medicalCondition: '-',
       precautions: 'ขี้ตื่นง่าย ระวังตอนตัดเล็บ',
       color: 'bg-blue-100', 
       icon: '🐱',
       furLength: 'ขนยาว',
       customPreferences: [],
-      imageUrl: 'https://images.unsplash.com/photo-1596854307913-a029b7371c95?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Persian Cat
-      cardBgColor: '#FFCDD2', // Light Pink
-      hasHeartIcon: true,
+      imageUrl: 'https://images.unsplash.com/photo-1596854307913-a029b7371c95?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      cardBgColor: '#FFCDD2',
+      isFavorite: true,
     },
     {
       id: 3,
@@ -140,16 +141,17 @@ const Index = () => {
       type: 'แมว',
       breed: 'Tabby',
       age: '1',
-      gender: 'เมีย', // Mapped from original gender
-      weight: '3.0', // Mapped from original weight
+      gender: 'เมีย', 
+      weight: '3.0', 
       medicalCondition: '-',
       precautions: '-',
       color: 'bg-gray-100',
       icon: '🐱',
       furLength: 'ขนสั้น',
       customPreferences: [],
-      imageUrl: 'https://images.unsplash.com/photo-1514813482567-bf37b7610a88?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Gray Tabby
-      cardBgColor: '#BBDEFB', // Light Blue
+      imageUrl: 'https://images.unsplash.com/photo-1514813482567-bf37b7610a88?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      cardBgColor: '#BBDEFB',
+      isFavorite: false,
     },
     {
       id: 4,
@@ -157,16 +159,17 @@ const Index = () => {
       type: 'แมว',
       breed: 'Scottish Fold',
       age: '4',
-      gender: 'ผู้', // Mapped from original gender
-      weight: '5.0', // Mapped from original weight
+      gender: 'ผู้', 
+      weight: '5.0', 
       medicalCondition: '-',
       precautions: 'ชอบเล่นน้ำ',
       color: 'bg-green-100',
       icon: '🐱',
       furLength: 'ขนสั้น',
       customPreferences: [],
-      imageUrl: 'https://images.unsplash.com/photo-1577023311546-cdc07a8454d9?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Scottish Fold
-      cardBgColor: '#C8E6C9', // Light Green
+      imageUrl: 'https://images.unsplash.com/photo-1577023311546-cdc07a8454d9?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      cardBgColor: '#C8E6C9',
+      isFavorite: false,
     },
     {
       id: 5,
@@ -174,16 +177,17 @@ const Index = () => {
       type: 'แมว',
       breed: 'Japanese Bobtail',
       age: '2',
-      gender: 'เมีย', // Mapped from original gender
-      weight: '3.8', // Mapped from original weight
+      gender: 'เมีย', 
+      weight: '3.8', 
       medicalCondition: '-',
       precautions: '-',
       color: 'bg-yellow-100',
       icon: '🐱',
       furLength: 'ขนสั้น',
       customPreferences: [],
-      imageUrl: 'https://images.unsplash.com/photo-1548247771-f0016775d077?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Japanese Bobtail
-      cardBgColor: '#DCEDC8', // Lighter Green
+      imageUrl: 'https://images.unsplash.com/photo-1548247771-f0016775d077?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      cardBgColor: '#DCEDC8',
+      isFavorite: false,
     },
     {
       id: 6,
@@ -191,24 +195,32 @@ const Index = () => {
       type: 'แมว',
       breed: 'Norwegian Forest Cat',
       age: '5',
-      gender: 'ผู้', // Mapped from original gender
-      weight: '6.5', // Mapped from original weight
+      gender: 'ผู้', 
+      weight: '6.5', 
       medicalCondition: '-',
       precautions: 'ขนยาว ต้องการการแปรงขนบ่อย',
       color: 'bg-purple-100',
       icon: '🐱',
       furLength: 'ขนยาว',
       customPreferences: [],
-      imageUrl: 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Norwegian Forest
-      cardBgColor: '#E1BEE7', // Light Purple
+      imageUrl: 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      cardBgColor: '#E1BEE7',
+      isFavorite: false,
     },
   ]);
+
+  // Sorting logic for pets: Favorites first (alphabetical), then non-favorites (alphabetical)
+  const sortedPets = [...pets].sort((a, b) => {
+    if (a.isFavorite && !b.isFavorite) return -1;
+    if (!a.isFavorite && b.isFavorite) return 1;
+    return a.name.localeCompare(b.name);
+  });
 
   const [serviceHistory, setServiceHistory] = useState<ServiceHistoryItem[]>([
     {
       id: 1,
       date: '15 พ.ค. 2567',
-      petName: 'Abyssinian Cats', // Updated pet name
+      petName: 'Abyssinian Cats',
       service: 'อาบน้ำตัดขน Full Service',
       price: '550',
       icon: <Scissors className="text-pink-500" />,
@@ -225,7 +237,7 @@ const Index = () => {
     {
       id: 2,
       date: '02 พ.ค. 2567',
-      petName: 'Persian', // Updated pet name
+      petName: 'Persian',
       service: 'สปาโอโซนและนวดผ่อนคลาย',
       price: '890',
       icon: <Sparkles className="text-amber-500" />,
@@ -242,7 +254,7 @@ const Index = () => {
     {
       id: 3,
       date: '20 เม.ย. 2567',
-      petName: 'Abyssinian Cats', // Updated pet name
+      petName: 'Abyssinian Cats',
       service: 'อาบน้ำกำจัดเห็บหมัด',
       price: '350',
       icon: <Bath className="text-blue-500" />,
@@ -258,39 +270,54 @@ const Index = () => {
     }
   ]);
 
-  // State for PetForm modal
   const [isPetFormOpen, setIsPetFormOpen] = useState(false);
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
   const [selectedPetForDetail, setSelectedPetForDetail] = useState<Pet | null>(null);
   const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<ServiceHistoryItem | null>(null);
-
-  // New state for PetPreferenceForm modal
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
 
   const handleAddPet = (newPetData: Omit<Pet, 'id'>) => {
     const id = pets.length > 0 ? Math.max(...pets.map(p => p.id)) + 1 : 1;
-    // Assign a default cardBgColor and other new fields for new pets
     const defaultCardBgColors = ['#FFF9C4', '#FFCDD2', '#BBDEFB', '#C8E6C9', '#DCEDC8', '#E1BEE7'];
     const randomColor = defaultCardBgColors[Math.floor(Math.random() * defaultCardBgColors.length)];
     setPets([...pets, { 
       ...newPetData, 
       id, 
-      imageUrl: newPetData.imageUrl || 'https://images.unsplash.com/photo-1514813482567-bf37b7610a88?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Default image
-      weight: newPetData.weight || '0', // Default weight
-      gender: newPetData.gender || 'ไม่ระบุ', // Default gender
+      imageUrl: newPetData.imageUrl || 'https://images.unsplash.com/photo-1514813482567-bf37b7610a88?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      weight: newPetData.weight || '0',
+      gender: newPetData.gender || 'ไม่ระบุ',
       cardBgColor: newPetData.cardBgColor || randomColor,
-      hasHeartIcon: newPetData.hasHeartIcon || false,
+      isFavorite: false,
     }]);
   };
 
   const handleEditPet = (updatedPet: Pet) => {
     setPets(pets.map(p => p.id === updatedPet.id ? updatedPet : p));
-    setSelectedPetForDetail(updatedPet); // Update detail view if currently open
+    if (selectedPetForDetail?.id === updatedPet.id) {
+      setSelectedPetForDetail(updatedPet);
+    }
+  };
+
+  const handleToggleFavorite = (petId: number) => {
+    const updatedPets = pets.map(p => 
+      p.id === petId ? { ...p, isFavorite: !p.isFavorite } : p
+    );
+    setPets(updatedPets);
+    
+    // Update the detail view state if that pet is currently being viewed
+    if (selectedPetForDetail?.id === petId) {
+      setSelectedPetForDetail({ ...selectedPetForDetail, isFavorite: !selectedPetForDetail.isFavorite });
+    }
+    
+    const pet = updatedPets.find(p => p.id === petId);
+    if (pet?.isFavorite) {
+      toast.success(`เพิ่ม ${pet.name} เป็นตัวโปรดแล้ว!`);
+    }
   };
 
   const handleDeletePet = (id: number) => {
     setPets(pets.filter(p => p.id !== id));
-    setSelectedPetForDetail(null); // Close detail view if deleted
+    setSelectedPetForDetail(null);
   };
 
   const handlePetSelection = (pet: Pet) => {
@@ -326,7 +353,6 @@ const Index = () => {
     }
   };
 
-  // Handlers for PetForm
   const handleOpenAddPetForm = () => {
     setPetToEdit(null);
     setIsPetFormOpen(true);
@@ -342,7 +368,6 @@ const Index = () => {
     setPetToEdit(null);
   };
 
-  // Handlers for PetDetailView
   const handleViewPetDetails = (pet: Pet) => {
     setSelectedPetForDetail(pet);
   };
@@ -351,7 +376,6 @@ const Index = () => {
     setSelectedPetForDetail(null);
   };
 
-  // Handlers for ServiceHistoryDetail
   const handleViewServiceDetail = (service: ServiceHistoryItem) => {
     setSelectedServiceForDetail(service);
   };
@@ -360,21 +384,18 @@ const Index = () => {
     setSelectedServiceForDetail(null);
   };
 
-  // Calculate total service cost for a specific pet
   const calculateTotalServiceCost = (petName: string): number => {
     return serviceHistory
       .filter(item => item.petName === petName)
       .reduce((sum, item) => sum + parseFloat(item.price), 0);
   };
 
-  // Handle viewing service history for a specific pet
   const handleViewPetServiceHistory = (petName: string) => {
     setSelectedPetName(petName);
     setSelectedServiceForDetail(null);
     setActiveTab('history');
   };
 
-  // Handlers for PetPreferenceForm
   const handleOpenPreferenceForm = () => {
     setIsPreferenceFormOpen(true);
   };
@@ -394,7 +415,6 @@ const Index = () => {
   return (
     <div className="max-w-[390px] min-h-[844px] mx-auto bg-[#FFF9F0] relative shadow-2xl overflow-hidden flex flex-col font-['Prompt']">
       
-      {/* Header Section */}
       <header className="px-6 pt-10 pb-6 flex justify-between items-center">
         <div>
           <div className="flex items-center gap-2">
@@ -422,9 +442,7 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Main Content Area */}
       <main className="px-6 flex-1 overflow-y-auto no-scrollbar pb-32">
-        
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div
@@ -461,7 +479,7 @@ const Index = () => {
               </div>
 
               <PetList 
-                pets={pets} 
+                pets={sortedPets} 
                 onPetClick={handlePetSelection}
               />
 
@@ -507,13 +525,14 @@ const Index = () => {
                   totalServiceCost={calculateTotalServiceCost(selectedPetForDetail.name)}
                   onViewServiceHistoryForPet={handleViewPetServiceHistory}
                   onEditPreferences={handleOpenPreferenceForm}
+                  onToggleFavorite={() => handleToggleFavorite(selectedPetForDetail.id)}
                 />
               ) : (
                 <PetManagement 
-                  pets={pets} 
-                  onBack={() => setActiveTab('home')} // Back to home tab
+                  pets={sortedPets} 
+                  onBack={() => setActiveTab('home')}
                   onViewDetails={handleViewPetDetails}
-                  onAddPet={handleOpenAddPetForm} // Pass the handler for adding a pet
+                  onAddPet={handleOpenAddPetForm}
                 />
               )}
             </motion.div>
@@ -560,25 +579,9 @@ const Index = () => {
               />
             </motion.div>
           )}
-
-          {(activeTab !== 'home' && activeTab !== 'pets' && activeTab !== 'history' && activeTab !== 'promo' && activeTab !== 'level') && (
-            <motion.div
-              key="other"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center h-[400px] text-center"
-            >
-              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-400">
-                <Bell size={40} />
-              </div>
-              <h3 className="font-bold text-slate-800">กำลังเตรียมข้อมูล...</h3>
-              <p className="text-sm text-slate-500">ส่วนของ "{activeTab}" กำงจะมาเร็วๆ นี้</p>
-            </motion.div>
-          )}
         </AnimatePresence>
       </main>
 
-      {/* Profile Edit Drawer */}
       <UserProfileEdit 
         isOpen={isProfileEditing} 
         onClose={() => setIsProfileEditing(false)} 
@@ -586,7 +589,6 @@ const Index = () => {
         onSave={(updated) => setOwnerProfile(updated)}
       />
 
-      {/* Pet Add/Edit Form Modal */}
       <PetForm
         isOpen={isPetFormOpen}
         onClose={handleClosePetForm}
@@ -600,7 +602,6 @@ const Index = () => {
         initialData={petToEdit}
       />
 
-      {/* Pet Preference Form Modal */}
       {selectedPetForDetail && (
         <PetPreferenceForm
           isOpen={isPreferenceFormOpen}
@@ -611,7 +612,6 @@ const Index = () => {
         />
       )}
 
-      {/* Bottom Navigation Bar */}
       <nav className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-100 px-6 py-4 flex justify-between items-center rounded-t-[2.5rem] shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.05)] z-50">
         <NavButton 
           active={activeTab === 'home'} 

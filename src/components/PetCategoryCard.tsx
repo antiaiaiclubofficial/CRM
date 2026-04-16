@@ -2,18 +2,18 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Scale } from 'lucide-react'; // Import Scale icon
+import { Heart, Scale } from 'lucide-react';
 
 interface PetCategoryCardProps {
   pet: {
     id: number;
-    name: string; // Pet's name or breed name
-    breed: string; // Pet's breed
+    name: string;
+    breed: string;
     imageUrl: string;
-    weight: string; // Changed from locationLabel
-    gender: string; // Changed from statusLabel
-    cardBgColor: string; // Specific hex color for the inner background
-    hasHeartIcon?: boolean; // Optional heart icon
+    weight: string;
+    gender: string;
+    cardBgColor: string;
+    isFavorite?: boolean; // Changed from hasHeartIcon to isFavorite
   };
   onClick: (petId: number) => void;
 }
@@ -25,32 +25,25 @@ const PetCategoryCard = ({ pet, onClick }: PetCategoryCardProps) => {
       onClick={() => onClick(pet.id)}
       className="relative w-full cursor-pointer"
     >
-      {/* Pin connection line (SVG) - positioned relative to the card */}
-      
-
-      {/* Main Card Body with black border and soft shadow */}
       <div className="relative w-full rounded-[2rem] border-2 border-black shadow-soft overflow-hidden">
-        {/* Inner colored background */}
         <div className="absolute inset-0 rounded-[1.8rem]" style={{ backgroundColor: pet.cardBgColor }}></div>
 
-        {/* Pet Image container */}
         <div className="relative w-[calc(100%-16px)] h-32 bg-white rounded-[1.5rem] overflow-hidden border-2 border-black mx-2 mt-2 z-10">
           <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
-          {pet.hasHeartIcon && (
-            <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-sm">
+          {pet.isFavorite && (
+            <div className="absolute top-2 right-2 bg-white rounded-full p-1.5 shadow-sm border border-slate-100">
               <Heart size={16} className="text-red-500 fill-red-500" />
             </div>
           )}
         </div>
 
-        {/* Content Area */}
         <div className="p-4 relative z-10">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-600 font-medium flex items-center gap-1"> {/* Changed text-xs to text-sm */}
-              <Scale size={16} className="text-gray-500" /> {/* Changed size={12} to size={16} */}
+            <span className="text-sm text-gray-600 font-medium flex items-center gap-1">
+              <Scale size={16} className="text-gray-500" />
               {pet.weight} kg
             </span>
-            <span className="text-xs font-bold px-3 py-1 rounded-full border border-black bg-white text-black"> {/* Increased padding for larger tag */}
+            <span className="text-xs font-bold px-3 py-1 rounded-full border border-black bg-white text-black">
               {pet.gender}
             </span>
           </div>

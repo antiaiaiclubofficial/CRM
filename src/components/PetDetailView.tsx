@@ -16,25 +16,26 @@ interface Pet {
   weight: string;
   medicalCondition: string;
   precautions: string;
-  color: string; // Existing: for old icon background (not used for image border)
-  icon: string; // Existing: Emoji icon (not used for image)
-  furLength?: string; // New field for fur length
+  color: string;
+  icon: string;
+  furLength?: string;
   customPreferences?: { id: string; label: string; value: string; }[];
-  imageUrl: string; // Required for the new design
+  imageUrl: string;
+  isFavorite?: boolean;
 }
 
 interface PetDetailViewProps {
   pet: Pet;
   onBack: () => void;
   onStartEdit: (pet: Pet) => void;
-  onDeletePet: (id: number) => void; // Keeping this prop for now, but functionality will be moved
-  totalServiceCost: number; // Not used in this design, but keeping prop for now
-  onViewServiceHistoryForPet: (petName: string) => void; // Not used in this design, but keeping prop for now
+  onDeletePet: (id: number) => void;
+  totalServiceCost: number;
+  onViewServiceHistoryForPet: (petName: string) => void;
   onEditPreferences: () => void;
+  onToggleFavorite: () => void; // New prop
 }
 
-const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetailViewProps) => {
-  // Helper to map gender to a display string, or furLength if preferred for the 'color' tag slot
+const PetDetailView = ({ pet, onBack, onEditPreferences, onToggleFavorite }: PetDetailViewProps) => {
   const getGenderDisplay = (gender: string) => {
     if (gender === 'ผู้') return 'Male';
     if (gender === 'เมีย') return 'Female';
@@ -48,38 +49,38 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="relative min-h-screen bg-[#FFF9F0] pb-20" // Changed background color
+      className="relative min-h-screen bg-[#FFF9F0] pb-20"
     >
-      {/* Top Navigation */}
-      <div className="absolute top-1 left-1 z-10"> {/* Adjusted top-4 to top-10 */}
+      <div className="absolute top-10 left-1 z-10">
         <button onClick={onBack} className="p-2 bg-emerald-400 text-white rounded-xl shadow-md">
           <ArrowLeft size={24} />
         </button>
       </div>
 
-      {/* Pet Image Section */}
-      <div className="relative w-full h-64 flex items-center justify-center pt-20 pb-8 z-20"> {/* Adjusted pt-16 to pt-20 to make space for the button */}
+      <div className="relative w-full h-64 flex items-center justify-center pt-20 pb-8 z-20">
         <div className="relative w-48 h-48 rounded-full border-[6px] border-amber-400 flex items-center justify-center overflow-hidden shadow-lg">
           <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
         </div>
       </div>
 
-      {/* Main Info Card */}
-      <div className="relative bg-white rounded-[2rem] p-6 mx-6 -mt-8 shadow-xl z-10 border-2 border-black shadow-soft"> {/* Adjusted margin-top, added border and shadow */}
+      <div className="relative bg-white rounded-[2rem] p-6 mx-6 -mt-8 shadow-xl z-10 border-2 border-black shadow-soft">
         <div className="flex justify-between items-start mb-4">
           <div>
             <h2 className="text-2xl font-bold text-slate-800">{pet.name}</h2>
             <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
               <MapPin size={14} className="text-slate-400" />
-              {pet.breed} ({pet.type}) {/* Using breed and type for location feel */}
+              {pet.breed} ({pet.type})
             </p>
           </div>
-          <button className="p-2 bg-pink-100 text-pink-500 rounded-full">
-            <Heart size={20} fill="currentColor" />
-          </button>
+          <motion.button 
+            whileTap={{ scale: 0.9 }}
+            onClick={onToggleFavorite}
+            className={`p-2 rounded-full transition-colors ${pet.isFavorite ? 'bg-pink-100 text-pink-500' : 'bg-slate-100 text-slate-400'}`}
+          >
+            <Heart size={20} fill={pet.isFavorite ? "currentColor" : "none"} />
+          </motion.button>
         </div>
 
-        {/* Info Tags (Age, Gender, Weight) */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="bg-slate-50 p-3 rounded-xl text-center">
             <p className="text-lg font-bold text-slate-800">{pet.age} ปี</p>
@@ -95,10 +96,9 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
           </div>
         </div>
 
-        {/* Pet Story Section (Medical Condition / Precautions) */}
         <div className="mb-6">
-          <h3 className="text-lg font-bold text-slate-800 mb-2">Note :</h3> {/* Changed "Pet Story" to "Note :" */}
-          <div className="text-sm text-slate-700 space-y-1"> {/* Added space-y-1 for separation */}
+          <h3 className="text-lg font-bold text-slate-800 mb-2">Note :</h3>
+          <div className="text-sm text-slate-700 space-y-1">
             {pet.medicalCondition && <p>โรคประจำตัว: <span className="font-medium">{pet.medicalCondition}</span></p>}
             {pet.precautions && <p>ข้อควรระวัง: <span className="font-medium">{pet.precautions}</span></p>}
             {(!pet.medicalCondition && !pet.precautions) && <p>ไม่มีข้อมูลเพิ่มเติม</p>}
@@ -106,12 +106,10 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
         </div>
       </div>
 
-      {/* Collection Section (Pet Preferences) - Kept as requested */}
-      <div className="pt-8 px-6"> {/* Changed pt-4 to pt-8 to move it down */}
+      <div className="pt-8 px-6">
         <h3 className="text-lg font-black text-slate-800 mb-4">{pet.name}'s collection</h3>
         
-        <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative shadow-lg border-2 border-[#c28856] shadow-soft"> {/* Changed border-black to border-[#c28856] */}
-          {/* Decorative tabs at the top */}
+        <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative shadow-lg border-2 border-[#c28856] shadow-soft">
           <div className="absolute -top-3 left-0 right-0 flex justify-around px-8">
             {[1,2,3,4,5].map(i => <div key={i} className="w-3 h-5 bg-[#c28856] rounded-full" />)}
           </div>
@@ -123,7 +121,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences }: PetDetai
                 onClick={onEditPreferences} 
                 className="p-1.5 bg-[#D4B89A] rounded-full text-[#4A2C0F] hover:bg-[#E0C7A9] transition-colors"
               >
-                <Edit2 size={16} /> {/* Changed to Edit2 for consistency with editing */}
+                <Edit2 size={16} />
               </button>
             </div>
 
