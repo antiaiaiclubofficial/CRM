@@ -58,55 +58,54 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden p-6 rounded-[2rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-xl shadow-pink-100/50"
+      className="relative overflow-hidden p-5 rounded-[2rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-xl shadow-pink-100/50"
     >
       <PawPrint className="absolute -right-4 -top-4 w-32 h-32 text-white/20 rotate-12" />
       <PawPrint className="absolute -left-8 -bottom-8 w-24 h-24 text-white/10 -rotate-12" />
 
       <div className="relative z-10">
-        <div className="flex justify-between items-start mb-8">
+        <div className="flex justify-between items-start mb-2"> {/* Reduced from mb-5 to mb-2 */}
           <div>
-            <h2 className="text-sm font-medium text-slate-600">สมาชิกระดับ</h2>
+            <h2 className="text-[10px] font-medium text-slate-600 uppercase tracking-wider">สมาชิกระดับ</h2>
             <div className="flex items-center gap-2 mt-1">
-              <span className="bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-amber-600 flex items-center gap-1">
-                <Crown size={12} fill="currentColor" />
+              <span className="bg-white/90 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-amber-600 flex items-center gap-1 shadow-sm">
+                <Crown size={10} fill="currentColor" />
                 {currentLevel.name.toUpperCase()}
               </span>
             </div>
           </div>
           <div className="flex flex-col items-end">
-            <p className="text-[10px] text-slate-500">ID: {ownerProfile.phone}</p>
-            <p className="font-bold text-slate-800">คุณ{ownerProfile.firstName} {ownerProfile.lastName}</p>
-            {/* Moved QR button to be under the name */}
+            <p className="text-[9px] text-slate-500">ID: {ownerProfile.phone}</p>
+            <p className="text-sm font-bold text-slate-800">คุณ{ownerProfile.firstName} {ownerProfile.lastName}</p>
             <motion.button 
               whileTap={{ scale: 0.9 }}
               onClick={onShowQR}
-              className="mt-2 bg-white/90 p-2 rounded-2xl shadow-sm text-pink-500 hover:text-pink-600 transition-colors flex items-center gap-2 px-3"
+              className="mt-1.5 bg-white/90 p-1.5 rounded-xl shadow-sm text-pink-500 hover:text-pink-600 transition-colors flex items-center gap-1.5 px-2.5"
             >
-              <QrCode size={18} />
-              <span className="text-[10px] font-bold">QR สมาชิก</span>
+              <QrCode size={14} />
+              <span className="text-[9px] font-bold">QR สมาชิก</span>
             </motion.button>
           </div>
         </div>
 
-        <div className="flex justify-between items-end mb-4">
+        <div className="flex justify-between items-end mb-3">
           <div>
-            <p className="text-xs text-slate-600 mb-1">คะแนนปัจจุบันของคุณ</p>
+            <p className="text-[10px] text-slate-600 mb-0.5">คะแนนปัจจุบันของคุณ</p>
             <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold text-slate-800">{redeemablePoints.toLocaleString()}</span>
-              <span className="text-sm text-slate-600">Points</span>
+              <span className="text-3xl font-bold text-slate-800">{redeemablePoints.toLocaleString()}</span>
+              <span className="text-[10px] text-slate-600 font-medium">Points</span>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-[10px] text-slate-500 mb-0.5">คะแนนสะสมทั้งหมด</p>
-            <p className="text-sm font-bold text-slate-800">
-              {totalAccumulatedPoints.toLocaleString()} / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'} Points
+            <p className="text-[9px] text-slate-500 mb-0.5">คะแนนสะสมทั้งหมด</p>
+            <p className="text-[11px] font-bold text-slate-800">
+              {totalAccumulatedPoints.toLocaleString()} / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'}
             </p>
           </div>
         </div>
 
-        <div className="space-y-2">
-          <div className="w-full bg-white/40 h-3 rounded-full overflow-hidden">
+        <div className="space-y-1.5">
+          <div className="w-full bg-white/40 h-2.5 rounded-full overflow-hidden">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
@@ -114,7 +113,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               className="bg-white h-full rounded-full"
             />
           </div>
-          <p className="text-[10px] text-slate-600 text-center font-medium">
+          <p className="text-[9px] text-slate-600 text-center font-medium">
             {nextLevel ? (
               <>อีก {pointsToNextLevel} คะแนน เพื่อเลื่อนเป็น <span className="text-slate-800 font-bold">{nextLevel.name}</span></>
             ) : (
