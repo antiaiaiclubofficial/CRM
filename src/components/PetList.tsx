@@ -6,12 +6,20 @@ import { motion } from 'framer-motion';
 interface Pet {
   id: number;
   name: string;
+  type: string;
   breed: string;
+  age: string;
+  gender: string;
+  weight: string;
+  medicalCondition: string;
+  precautions: string;
   color: string;
   icon: string;
-  imageUrl: string; // Added imageUrl
+  imageUrl: string;
+  cardBgColor: string;
   furLength?: string;
   customPreferences?: { id: string; label: string; value: string; }[];
+  isFavorite?: boolean;
 }
 
 interface PetListProps {
@@ -36,7 +44,6 @@ const PetList = ({ pets, onPetClick }: PetListProps) => {
             onClick={() => onPetClick?.(pet)}
             className="flex-shrink-0 w-32 bg-white p-4 rounded-3xl shadow-sm border border-slate-50 text-center cursor-pointer active:bg-slate-50 transition-colors"
           >
-            {/* Displaying actual pet image instead of emoji icon */}
             <div className="w-16 h-16 rounded-full overflow-hidden mx-auto mb-3 border-2 border-white shadow-md bg-slate-100">
               <img 
                 src={pet.imageUrl} 

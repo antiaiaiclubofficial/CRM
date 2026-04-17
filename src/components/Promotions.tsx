@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Ticket, Gift, Sparkles, Scissors, Clock, ChevronRight, LucideIcon, ShowerHead, Leaf, Hand, Tag, Heart, PawPrint, Crown, History } from 'lucide-react';
+import { Ticket, Gift, Scissors, Sparkles, ShowerHead, Leaf, Hand, Tag, Heart, PawPrint, Crown, History, LucideIcon } from 'lucide-react';
 
-// Define the Coupon interface (reused for collected coupons)
+// Define the Coupon interface
 interface Coupon {
   id: number;
   title: string;
@@ -18,59 +18,38 @@ interface Coupon {
   pointsRequired: number;
 }
 
-// New interface for Special Promotions
+// Interface for Special Promotions
 interface SpecialPromotionItem {
   id: number;
   tag: 'HOT' | 'EXCLUSIVE';
   title: string;
   description: string;
   expiry: string;
-  bgColor: string; // Tailwind class for background
-  textColor: string; // Tailwind class for text
-  buttonColor: string; // Tailwind class for button background
-  buttonTextColor: string; // Tailwind class for button text
-  pawPrintColor: string; // Tailwind class for paw print watermark
-  iconName?: string; // Optional icon for the title
-}
-
-// New interface for Member Deals
-interface MemberDealItem {
-  id: number;
-  discountPercentage: number;
-  iconName: string; // Lucide icon name
-  serviceName: string;
-  currentPrice: string;
-  originalPrice: string;
-  membershipLevelRequired: string; // e.g., "ทุกระดับ", "Gold ขึ้นไป"
-  bgColor: string; // Tailwind class for background
-  iconColor: string; // Tailwind class for icon color
+  bgColor: string;
+  textColor: string;
+  buttonColor: string;
+  buttonTextColor: string;
+  pawPrintColor: string;
+  iconName?: string;
 }
 
 interface UsedCoupon extends Coupon {
-  usedDate?: string; // To mark when it was used
+  usedDate?: string;
 }
 
 interface PromotionsProps {
   userPoints: number;
-  collectedCoupons: Coupon[]; // Active, unused coupons
-  usedOrExpiredCoupons: UsedCoupon[]; // Used or expired coupons
-  onRedeemCoupon: (coupon: Coupon, pointsCost: number) => void; // New prop for redeeming
-  onUseCoupon: (couponId: number) => void; // New prop for using collected coupons
-  usedSpecialPromotions: number[]; // New prop to track used special promotions
-  onUseSpecialPromotion: (promoId: number) => void; // New prop for using special promotions
+  collectedCoupons: Coupon[];
+  usedOrExpiredCoupons: UsedCoupon[];
+  onRedeemCoupon: (coupon: Coupon, pointsCost: number) => void;
+  onUseCoupon: (couponId: number) => void;
+  collectedSpecialPromos: number[]; // Changed from usedSpecialPromotions
+  onCollectSpecialPromotion: (promo: Coupon) => void; // Changed logic to pass coupon object
 }
 
 // Map icon names to LucideIcon components
 const iconMap: Record<string, LucideIcon> = {
-  Scissors: Scissors,
-  Sparkles: Sparkles,
-  Gift: Gift,
-  Ticket: Ticket,
-  ShowerHead: ShowerHead,
-  Leaf: Leaf,
-  Hand: Hand,
-  Tag: Tag,
-  Heart: Heart,
+  Scissors, Sparkles, Gift, Ticket, ShowerHead, Leaf, Hand, Tag, Heart, History, Crown, PawPrint
 };
 
 // Helper function to get the icon component
@@ -79,16 +58,25 @@ const getIconComponent = (iconName: string, size: number, className?: string) =>
   return IconComponent ? <IconComponent size={size} className={className} /> : null;
 };
 
-const Promotions = ({ userPoints, collectedCoupons, usedOrExpiredCoupons, onRedeemCoupon, onUseCoupon, usedSpecialPromotions, onUseSpecialPromotion }: PromotionsProps) => {
-  // Mock data for Special Promotions
+const Promotions = ({ 
+  userPoints, 
+  collectedCoupons, 
+  usedOrExpiredCoupons, 
+  onRedeemCoupon, 
+  onUseCoupon, 
+  collectedSpecialPromos, 
+  onCollectSpecialPromotion 
+}: PromotionsProps) => {
+  
+  // Data for Special Promotions - defined here to map easily to Coupons
   const specialPromotionsData: SpecialPromotionItem[] = [
     {
-      id: 1,
+      id: 201, // Use unique IDs that won't clash with redeemable ones
       tag: 'HOT',
       title: 'สปาคู่รัก',
       description: 'พาน้องมา 2 ตัว ลด 30%',
-      expiry: 'ถึง 31 มี.ค. 69',
-      bgColor: 'bg-[#FFD8E4]', // Light Pink
+      expiry: '31 มี.ค. 69',
+      bgColor: 'bg-[#FFD8E4]',
       textColor: 'text-pink-800',
       buttonColor: 'bg-pink-200',
       buttonTextColor: 'text-pink-700',
@@ -96,106 +84,42 @@ const Promotions = ({ userPoints, collectedCoupons, usedOrExpiredCoupons, onRede
       iconName: 'Heart',
     },
     {
-      id: 2,
+      id: 202,
       tag: 'EXCLUSIVE',
       title: 'สมาชิก Gold',
       description: 'ฟรี! สปาผิวพรรณ',
-      expiry: 'ถึง 15 เม.ย. 69',
-      bgColor: 'bg-[#FFE3BC]', // Light Amber
+      expiry: '15 เม.ย. 69',
+      bgColor: 'bg-[#FFE3BC]',
       textColor: 'text-amber-800',
       buttonColor: 'bg-amber-200',
       buttonTextColor: 'text-amber-700',
       pawPrintColor: 'text-amber-200',
-    },
-    // Add more special promotions here
-  ];
-
-  // Mock data for Member Deals (these are direct offers, not collectable coupons)
-  const memberDealsData: MemberDealItem[] = [
-    {
-      id: 1,
-      discountPercentage: 24,
-      iconName: 'ShowerHead',
-      serviceName: 'อาบน้ำ + ตัดขน',
-      currentPrice: '฿990',
-      originalPrice: '฿1,300',
-      membershipLevelRequired: 'ทุกระดับ',
-      bgColor: 'bg-emerald-50',
-      iconColor: 'text-emerald-500',
-    },
-    {
-      id: 2,
-      discountPercentage: 28,
-      iconName: 'Leaf',
-      serviceName: 'แพ็คเกจสปาพรีเมียม',
-      currentPrice: '฿1,799',
-      originalPrice: '฿2,500',
-      membershipLevelRequired: 'Gold ขึ้นไป',
-      bgColor: 'bg-purple-50',
-      iconColor: 'text-purple-500',
-    },
-    {
-      id: 3,
-      discountPercentage: 36,
-      iconName: 'Hand',
-      serviceName: 'ทำเล็บ + สปาเท้า',
-      currentPrice: '฿450',
-      originalPrice: '฿700',
-      membershipLevelRequired: 'ทุกระดับ',
-      bgColor: 'bg-orange-50',
-      iconColor: 'text-orange-500',
-    },
-    {
-      id: 4,
-      discountPercentage: 33,
       iconName: 'Sparkles',
-      serviceName: 'แต่งตัว + ถ่ายรูป',
-      currentPrice: '฿999',
-      originalPrice: '฿1,500',
-      membershipLevelRequired: 'Platinum',
-      bgColor: 'bg-pink-50',
-      iconColor: 'text-pink-500',
     },
   ];
 
-  // Redeemable coupons data (repurposed from allCoupons)
+  // Helper to convert SpecialPromo to Coupon format
+  const convertToCoupon = (promo: SpecialPromotionItem): Coupon => ({
+    id: promo.id,
+    title: promo.title,
+    description: promo.description,
+    value: promo.tag === 'HOT' ? '30%' : 'FREE',
+    type: promo.tag === 'HOT' ? 'PERCENT' : 'GIFT',
+    expiry: promo.expiry,
+    iconName: promo.iconName || 'Ticket',
+    color: promo.tag === 'HOT' ? 'from-pink-400 to-rose-500' : 'from-amber-400 to-orange-500',
+    bg: promo.bgColor,
+    pointsRequired: 0,
+  });
+
+  const memberDealsData = [
+    { id: 1, discountPercentage: 24, iconName: 'ShowerHead', serviceName: 'อาบน้ำ + ตัดขน', currentPrice: '฿990', originalPrice: '฿1,300', membershipLevelRequired: 'ทุกระดับ', bgColor: 'bg-emerald-50', iconColor: 'text-emerald-500' },
+    { id: 2, discountPercentage: 28, iconName: 'Leaf', serviceName: 'แพ็คเกจสปาพรีเมียม', currentPrice: '฿1,799', originalPrice: '฿2,500', membershipLevelRequired: 'Gold ขึ้นไป', bgColor: 'bg-purple-50', iconColor: 'text-purple-500' },
+  ];
+
   const redeemableCouponsData: Coupon[] = [
-    {
-      id: 101, // Changed IDs to avoid conflict with existing collectedCoupons if any
-      title: 'ส่วนลด 100.-',
-      description: 'สำหรับบริการใดก็ได้',
-      value: '100.-',
-      type: 'DISCOUNT',
-      expiry: '31 ธ.ค. 67',
-      iconName: 'Tag',
-      color: 'from-pink-400 to-rose-500',
-      bg: 'bg-rose-50',
-      pointsRequired: 500,
-    },
-    {
-      id: 102,
-      title: 'ฟรี! แชมพูพรีเมียม',
-      description: 'เมื่อใช้บริการอาบน้ำ',
-      value: 'FREE',
-      type: 'GIFT',
-      expiry: '31 ธ.ค. 67',
-      iconName: 'ShowerHead',
-      color: 'from-emerald-400 to-teal-500',
-      bg: 'bg-emerald-50',
-      pointsRequired: 800,
-    },
-    {
-      id: 103,
-      title: 'ส่วนลด 20% สปา',
-      description: 'สำหรับบริการสปาทุกประเภท',
-      value: '20%',
-      type: 'PERCENT',
-      expiry: '31 ธ.ค. 67',
-      iconName: 'Sparkles',
-      color: 'from-amber-400 to-orange-500',
-      bg: 'bg-amber-50',
-      pointsRequired: 1200,
-    },
+    { id: 101, title: 'ส่วนลด 100.-', description: 'สำหรับบริการใดก็ได้', value: '100.-', type: 'DISCOUNT', expiry: '31 ธ.ค. 67', iconName: 'Tag', color: 'from-pink-400 to-rose-500', bg: 'bg-rose-50', pointsRequired: 500 },
+    { id: 102, title: 'ฟรี! แชมพูพรีเมียม', description: 'เมื่อใช้บริการอาบน้ำ', value: 'FREE', type: 'GIFT', expiry: '31 ธ.ค. 67', iconName: 'ShowerHead', color: 'from-emerald-400 to-teal-500', bg: 'bg-emerald-50', pointsRequired: 800 },
   ];
 
   return (
@@ -208,14 +132,13 @@ const Promotions = ({ userPoints, collectedCoupons, usedOrExpiredCoupons, onRede
         </div>
         <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 px-1">
           {specialPromotionsData.map((promo) => {
-            const isUsed = usedSpecialPromotions.includes(promo.id);
+            const isCollected = collectedSpecialPromos.includes(promo.id);
             return (
               <motion.div
                 key={promo.id}
-                whileTap={{ scale: isUsed ? 1 : 0.98 }}
-                className={`relative flex-shrink-0 w-[280px] h-36 ${promo.bgColor} rounded-[2rem] p-5 overflow-hidden shadow-sm border border-slate-50 ${isUsed ? 'opacity-60 grayscale' : ''}`}
+                whileTap={{ scale: isCollected ? 1 : 0.98 }}
+                className={`relative flex-shrink-0 w-[280px] h-36 ${promo.bgColor} rounded-[2rem] p-5 overflow-hidden shadow-sm border border-slate-50 ${isCollected ? 'opacity-60 grayscale' : ''}`}
               >
-                {/* Paw print watermark */}
                 <PawPrint className={`absolute -right-4 -bottom-4 w-24 h-24 ${promo.pawPrintColor} opacity-50 rotate-12`} />
                 <PawPrint className={`absolute -left-8 -top-8 w-16 h-16 ${promo.pawPrintColor} opacity-30 -rotate-12`} />
 
@@ -232,15 +155,15 @@ const Promotions = ({ userPoints, collectedCoupons, usedOrExpiredCoupons, onRede
                   <div className="flex justify-between items-end">
                     <span className={`text-[10px] ${promo.textColor} opacity-70`}>{promo.expiry}</span>
                     <button 
-                      onClick={() => onUseSpecialPromotion(promo.id)}
-                      disabled={isUsed}
-                      className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all ${
-                        isUsed
+                      onClick={() => onCollectSpecialPromotion(convertToCoupon(promo))}
+                      disabled={isCollected}
+                      className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all ${
+                        isCollected
                           ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
-                          : `${promo.buttonColor} ${promo.buttonTextColor} active:scale-95`
+                          : `${promo.buttonColor} ${promo.buttonTextColor} active:scale-95 shadow-sm`
                       }`}
                     >
-                      {isUsed ? 'ใช้แล้ว' : 'ใช้เลย'}
+                      {isCollected ? 'เก็บแล้ว' : 'เก็บ'}
                     </button>
                   </div>
                 </div>
@@ -291,16 +214,16 @@ const Promotions = ({ userPoints, collectedCoupons, usedOrExpiredCoupons, onRede
         </div>
       </div>
 
-      {/* Redeem Points for Discounts Section (NEW) */}
+      {/* Redeem Points Section */}
       <div>
         <div className="flex items-center gap-2 mb-4 px-1">
-          <Crown size={18} className="text-amber-500" /> {/* Using Crown for points redemption */}
+          <Crown size={18} className="text-amber-500" />
           <h2 className="text-xl font-bold text-slate-800">แลกคะแนนเป็นส่วนลด</h2>
         </div>
         <div className="space-y-3">
           {redeemableCouponsData.map((coupon, index) => {
             const canRedeem = userPoints >= coupon.pointsRequired;
-            const isAlreadyCollected = collectedCoupons.some(c => c.id === coupon.id); // Check if already in collected
+            const isAlreadyCollected = collectedCoupons.some(c => c.id === coupon.id);
             const isDisabled = !canRedeem || isAlreadyCollected;
 
             return (
@@ -339,46 +262,10 @@ const Promotions = ({ userPoints, collectedCoupons, usedOrExpiredCoupons, onRede
         </div>
       </div>
 
-      {/* Deals for Members Section */}
+      {/* Used/Expired Section */}
       <div>
         <div className="flex items-center gap-2 mb-4 px-1">
-          <Gift size={18} className="text-pink-500" />
-          <h2 className="text-xl font-bold text-slate-800">ดีลสำหรับสมาชิก</h2>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          {memberDealsData.map((deal, index) => (
-            <motion.div
-              key={deal.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              whileTap={{ scale: 0.98 }}
-              className="relative bg-white p-4 rounded-3xl shadow-sm border border-slate-50 flex flex-col items-center text-center"
-            >
-              <span className="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                -{deal.discountPercentage}%
-              </span>
-              <div className={`w-16 h-16 ${deal.bgColor} rounded-full flex items-center justify-center text-2xl ${deal.iconColor} mb-3 shadow-inner`}>
-                {getIconComponent(deal.iconName, 28)}
-              </div>
-              <h4 className="font-bold text-slate-800 text-sm mb-1">{deal.serviceName}</h4>
-              <div className="flex items-baseline gap-1 mb-2">
-                <span className="text-lg font-bold text-pink-500">{deal.currentPrice}</span>
-                <span className="text-xs text-slate-400 line-through">{deal.originalPrice}</span>
-              </div>
-              <div className="flex items-center gap-1 text-[10px] text-slate-500 font-medium">
-                <Crown size={10} className="text-amber-500" />
-                {deal.membershipLevelRequired}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* Used/Expired Coupons Section (NEW) */}
-      <div>
-        <div className="flex items-center gap-2 mb-4 px-1">
-          <History size={18} className="text-slate-500" /> {/* Using History icon */}
+          <History size={18} className="text-slate-500" />
           <h2 className="text-xl font-bold text-slate-800">คูปองที่ใช้แล้ว/หมดอายุ</h2>
         </div>
         <div className="space-y-3">
