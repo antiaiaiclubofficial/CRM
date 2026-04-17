@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Ticket, Gift, Scissors, Sparkles, ShowerHead, Leaf, Hand, Tag, Heart, PawPrint, Crown, History, LucideIcon } from 'lucide-react';
+import { Ticket, Gift, Scissors, Sparkles, ShowerHead, Leaf, Hand, Tag, Heart, PawPrint, Crown, History, Award, LucideIcon } from 'lucide-react';
 
 // Define the Coupon interface
 interface Coupon {
@@ -43,13 +43,13 @@ interface PromotionsProps {
   usedOrExpiredCoupons: UsedCoupon[];
   onRedeemCoupon: (coupon: Coupon, pointsCost: number) => void;
   onUseCoupon: (couponId: number) => void;
-  collectedSpecialPromos: number[]; // Changed from usedSpecialPromotions
-  onCollectSpecialPromotion: (promo: Coupon) => void; // Changed logic to pass coupon object
+  collectedSpecialPromos: number[];
+  onCollectSpecialPromotion: (promo: Coupon) => void;
 }
 
 // Map icon names to LucideIcon components
 const iconMap: Record<string, LucideIcon> = {
-  Scissors, Sparkles, Gift, Ticket, ShowerHead, Leaf, Hand, Tag, Heart, History, Crown, PawPrint
+  Scissors, Sparkles, Gift, Ticket, ShowerHead, Leaf, Hand, Tag, Heart, History, Crown, PawPrint, Award
 };
 
 // Helper function to get the icon component
@@ -68,10 +68,10 @@ const Promotions = ({
   onCollectSpecialPromotion 
 }: PromotionsProps) => {
   
-  // Data for Special Promotions - defined here to map easily to Coupons
+  // Data for Special Promotions
   const specialPromotionsData: SpecialPromotionItem[] = [
     {
-      id: 201, // Use unique IDs that won't clash with redeemable ones
+      id: 201,
       tag: 'HOT',
       title: 'สปาคู่รัก',
       description: 'พาน้องมา 2 ตัว ลด 30%',
@@ -170,6 +170,45 @@ const Promotions = ({
               </motion.div>
             );
           })}
+        </div>
+      </div>
+
+      {/* Member Deals Section */}
+      <div>
+        <div className="flex items-center gap-2 mb-4 px-1">
+          <Award size={18} className="text-emerald-500" />
+          <h2 className="text-xl font-bold text-slate-800">ดีลส่วนลดสำหรับสมาชิก</h2>
+        </div>
+        <div className="space-y-3">
+          {memberDealsData.map((deal, index) => (
+            <motion.div
+              key={deal.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className={`bg-white p-4 rounded-3xl shadow-sm border border-slate-50 flex items-center gap-4 relative overflow-hidden`}
+            >
+              <div className="absolute top-0 right-0 bg-pink-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-2xl">
+                ลด {deal.discountPercentage}%
+              </div>
+              <div className={`w-14 h-14 ${deal.bgColor} rounded-2xl flex items-center justify-center shadow-inner`}>
+                {getIconComponent(deal.iconName, 24, deal.iconColor)}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                   <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full">{deal.membershipLevelRequired}</span>
+                </div>
+                <h4 className="font-bold text-slate-800 text-sm">{deal.serviceName}</h4>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <span className="text-sm font-bold text-pink-500">{deal.currentPrice}</span>
+                  <span className="text-[10px] text-slate-400 line-through">{deal.originalPrice}</span>
+                </div>
+              </div>
+              <button className="bg-emerald-100 text-emerald-700 text-xs font-bold px-4 py-2 rounded-full active:scale-95 transition-all">
+                จองเลย
+              </button>
+            </motion.div>
+          ))}
         </div>
       </div>
 
