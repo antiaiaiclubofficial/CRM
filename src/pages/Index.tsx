@@ -166,6 +166,15 @@ const Index = () => {
     }
   };
 
+  // --- SORTING LOGIC ---
+  // Sort pets: favorites first, then alphabetically by name
+  const sortedPets = [...pets].sort((a, b) => {
+    if (a.isFavorite === b.isFavorite) {
+      return a.name.localeCompare(b.name, 'th'); // Alphabetical sort (Thai compatible)
+    }
+    return a.isFavorite ? -1 : 1; // Favorites first
+  });
+
   return (
     <div className="max-w-[390px] h-[844px] mx-auto bg-[#FFF9F0] relative shadow-2xl overflow-hidden flex flex-col font-['Prompt']">
       <header className="px-6 pt-10 pb-6 flex justify-between items-center shrink-0">
@@ -199,7 +208,7 @@ const Index = () => {
                   <span className="font-bold text-sm text-slate-700">โปรโมชั่น</span>
                 </button>
               </div>
-              <PetList pets={pets} onPetClick={(pet) => { setSelectedPetForDetail(pet); setActiveTab('pets'); }} />
+              <PetList pets={sortedPets} onPetClick={(pet) => { setSelectedPetForDetail(pet); setActiveTab('pets'); }} />
               <MyCouponsHomePreview coupons={collectedCoupons} onViewAll={() => setActiveTab('promo')} />
             </motion.div>
           )}
@@ -224,7 +233,7 @@ const Index = () => {
                   onToggleFavorite={() => handleToggleFavorite(selectedPetForDetail.id)} 
                 />
               ) : (
-                <PetManagement pets={pets} onBack={() => setActiveTab('home')} onViewDetails={(pet) => setSelectedPetForDetail(pet)} onAddPet={() => setIsPetFormOpen(true)} />
+                <PetManagement pets={sortedPets} onBack={() => setActiveTab('home')} onViewDetails={(pet) => setSelectedPetForDetail(pet)} onAddPet={() => setIsPetFormOpen(true)} />
               )}
             </motion.div>
           )}
