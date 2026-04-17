@@ -64,7 +64,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
       <PawPrint className="absolute -left-8 -bottom-8 w-24 h-24 text-white/10 -rotate-12" />
 
       <div className="relative z-10">
-        <div className="flex justify-between items-start mb-0.5"> {/* Minimal margin here */}
+        <div className="flex justify-between items-start mb-0.5">
           <div>
             <h2 className="text-xs font-medium text-slate-600">สมาชิกระดับ</h2>
             <div className="flex items-center gap-2 mt-1">
@@ -77,14 +77,6 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           <div className="flex flex-col items-end">
             <p className="text-[10px] text-slate-500">ID: {ownerProfile.phone}</p>
             <p className="font-bold text-slate-800">คุณ{ownerProfile.firstName} {ownerProfile.lastName}</p>
-            <motion.button 
-              whileTap={{ scale: 0.9 }}
-              onClick={onShowQR}
-              className="mt-1 bg-white/90 p-1.5 rounded-2xl shadow-sm text-pink-500 hover:text-pink-600 transition-colors flex items-center gap-2 px-3"
-            >
-              <QrCode size={16} />
-              <span className="text-[10px] font-bold">QR สมาชิก</span>
-            </motion.button>
           </div>
         </div>
 
@@ -96,11 +88,22 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               <span className="text-sm text-slate-600">Points</span>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-[10px] text-slate-500 mb-0.5">คะแนนสะสมทั้งหมด</p>
-            <p className="text-sm font-bold text-slate-800">
-              {totalAccumulatedPoints.toLocaleString()} / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'} Points
-            </p>
+          <div className="text-right flex flex-col items-end gap-1">
+            {/* QR Button moved here, above accumulated points */}
+            <motion.button 
+              whileTap={{ scale: 0.9 }}
+              onClick={onShowQR}
+              className="mb-1 bg-white/90 p-1.5 rounded-2xl shadow-sm text-pink-500 hover:text-pink-600 transition-colors flex items-center gap-2 px-3"
+            >
+              <QrCode size={16} />
+              <span className="text-[10px] font-bold">QR สมาชิก</span>
+            </motion.button>
+            <div>
+              <p className="text-[10px] text-slate-500 mb-0.5">คะแนนสะสมทั้งหมด</p>
+              <p className="text-sm font-bold text-slate-800">
+                {totalAccumulatedPoints.toLocaleString()} / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'} Points
+              </p>
+            </div>
           </div>
         </div>
 
