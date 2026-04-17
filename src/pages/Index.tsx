@@ -14,7 +14,8 @@ import ServiceHistoryDetail from '@/components/ServiceHistoryDetail';
 import PetPreferenceForm from '@/components/PetPreferenceForm';
 import PetManagement from '@/components/PetManagement';
 import QRCodeModal from '@/components/QRCodeModal';
-import MyCouponsHomePreview from '@/components/MyCouponsHomePreview'; // New import
+import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
+import CouponUseModal from '@/components/CouponUseModal'; // New import
 import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History, Scissors, Sparkles, Bath, X, LayoutGrid } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -50,6 +51,7 @@ interface Coupon {
   color: string;
   bg: string;
   pointsRequired: number;
+  conditions?: string[];
 }
 
 interface UsedCoupon extends Coupon {
@@ -78,6 +80,10 @@ const Index = () => {
   const [isProfileEditing, setIsProfileEditing] = useState(false);
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
   
+  // States for Coupon Modal
+  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
+  const [selectedCouponToUse, setSelectedCouponToUse] = useState<Coupon | null>(null);
+
   const [ownerProfile, setOwnerProfile] = useState({
     firstName: 'ซาร่า',
     lastName: 'เจน',
@@ -336,11 +342,23 @@ const Index = () => {
     }
   };
 
+  // Modified handleUseCoupon to show modal first
   const handleUseCoupon = (couponId: number) => {
+    const coupon = collectedCoupons.find(c => c.id === couponId);
+    if (coupon) {
+      setSelectedCouponToUse(coupon);
+      setIsCouponModalOpen(true);
+    }
+  };
+
+  // New function for final confirmation from the modal
+  const handleConfirmCouponUse = (couponId: number) => {
     const couponToUse = collectedCoupons.find(c => c.id === couponId);
     if (couponToUse) {
       setCollectedCoupons(prev => prev.filter(c => c.id !== couponId));
       setUsedOrExpiredCoupons(prev => [...prev, { ...couponToUse, usedDate: new Date().toLocaleDateString('th-TH') }]);
+      setIsCouponModalOpen(false);
+      setSelectedCouponToUse(null);
       toast.success(`ใช้คูปอง "${couponToUse.title}" สำเร็จแล้วค่ะ!`);
     }
   };
@@ -590,6 +608,14 @@ const Index = () => {
         onClose={() => setIsQRCodeOpen(false)}
         ownerName={ownerProfile.firstName}
         memberId={ownerProfile.phone}
+      />
+
+      {/* Coupon Use Modal */}
+      <CouponUseModal 
+        isOpen={isCouponModalOpen}
+        onClose={() => { setIsCouponModalOpen(false); setSelectedCouponToUse(null); }}
+        coupon={selectedCouponToUse}
+        onConfirmUse={handleConfirmCouponUse}
       />
 
       <PetForm
