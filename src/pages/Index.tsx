@@ -623,8 +623,8 @@ const Index = () => {
         />
       )}
 
-      {/* Brighter White Liquid Glass Nav Bar */}
-      <nav className="absolute bottom-8 left-6 right-6 bg-white/70 backdrop-blur-3xl px-4 py-3 flex justify-between items-center rounded-full shadow-2xl z-50 border border-white/80">
+      {/* More Transparent Glass Nav Bar */}
+      <nav className="absolute bottom-8 left-6 right-6 bg-white/30 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-2xl z-50 border border-white/40">
         <NavButton 
           active={activeTab === 'home'} 
           icon={<Home size={22} />} 
