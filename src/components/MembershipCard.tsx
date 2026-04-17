@@ -68,7 +68,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           <div>
             <h2 className="text-sm font-medium text-slate-600">สมาชิกระดับ</h2>
             <div className="flex items-center gap-2 mt-1">
-              <span className="bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-amber-600 flex items-center gap-1">
+              <span className="bg-white/90 px-1 py-1 rounded-full text-xs font-bold text-amber-600 flex items-center gap-1">
                 <Crown size={12} fill="currentColor" />
                 {currentLevel.name.toUpperCase()}
               </span>
