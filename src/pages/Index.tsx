@@ -155,6 +155,17 @@ const Index = () => {
     }
   };
 
+  const handleToggleFavorite = (petId: number) => {
+    setPets(prevPets => prevPets.map(pet => 
+      pet.id === petId ? { ...pet, isFavorite: !pet.isFavorite } : pet
+    ));
+    
+    // อัปเดตตัวแปรที่กำลังดูรายละเอียดอยู่ด้วยถ้าตรงกัน
+    if (selectedPetForDetail && selectedPetForDetail.id === petId) {
+      setSelectedPetForDetail(prev => prev ? { ...prev, isFavorite: !prev.isFavorite } : null);
+    }
+  };
+
   return (
     <div className="max-w-[390px] h-[844px] mx-auto bg-[#FFF9F0] relative shadow-2xl overflow-hidden flex flex-col font-['Prompt']">
       <header className="px-6 pt-10 pb-6 flex justify-between items-center shrink-0">
@@ -202,7 +213,16 @@ const Index = () => {
           {activeTab === 'pets' && (
             <motion.div key="pets-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               {selectedPetForDetail ? (
-                <PetDetailView pet={selectedPetForDetail} onBack={() => setSelectedPetForDetail(null)} onStartEdit={() => setIsPetFormOpen(true)} onDeletePet={() => {}} totalServiceCost={0} onViewServiceHistoryForPet={() => {}} onEditPreferences={() => setIsPreferenceFormOpen(true)} onToggleFavorite={() => {}} />
+                <PetDetailView 
+                  pet={selectedPetForDetail} 
+                  onBack={() => setSelectedPetForDetail(null)} 
+                  onStartEdit={() => setIsPetFormOpen(true)} 
+                  onDeletePet={() => {}} 
+                  totalServiceCost={0} 
+                  onViewServiceHistoryForPet={() => {}} 
+                  onEditPreferences={() => setIsPreferenceFormOpen(true)} 
+                  onToggleFavorite={() => handleToggleFavorite(selectedPetForDetail.id)} 
+                />
               ) : (
                 <PetManagement pets={pets} onBack={() => setActiveTab('home')} onViewDetails={(pet) => setSelectedPetForDetail(pet)} onAddPet={() => setIsPetFormOpen(true)} />
               )}
