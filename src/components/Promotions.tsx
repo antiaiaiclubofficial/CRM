@@ -77,8 +77,8 @@ const Promotions = ({
       expiry: '31 มี.ค. 69',
       bgColor: 'bg-[#FFD8E4]',
       textColor: 'text-pink-800',
-      buttonColor: 'bg-pink-200',
-      buttonTextColor: 'text-pink-700',
+      buttonColor: 'bg-white', // Changed to white for better contrast
+      buttonTextColor: 'text-pink-600',
       pawPrintColor: 'text-pink-200',
       iconName: 'Heart',
     },
@@ -90,8 +90,8 @@ const Promotions = ({
       expiry: '15 เม.ย. 69',
       bgColor: 'bg-[#FFE3BC]',
       textColor: 'text-amber-800',
-      buttonColor: 'bg-amber-200',
-      buttonTextColor: 'text-amber-700',
+      buttonColor: 'bg-white', // Changed to white for better contrast
+      buttonTextColor: 'text-amber-600',
       pawPrintColor: 'text-amber-200',
       iconName: 'Sparkles',
     },
@@ -155,10 +155,10 @@ const Promotions = ({
                     <button 
                       onClick={() => onCollectSpecialPromotion(convertToCoupon(promo))}
                       disabled={isCollected}
-                      className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all ${
+                      className={`text-xs font-bold px-5 py-2 rounded-full transition-all shadow-sm ${
                         isCollected
                           ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
-                          : `${promo.buttonColor} ${promo.buttonTextColor} active:scale-95 shadow-sm`
+                          : `${promo.buttonColor} ${promo.buttonTextColor} active:scale-95 border border-white/20`
                       }`}
                     >
                       {isCollected ? 'เก็บแล้ว' : 'เก็บ'}
@@ -184,7 +184,7 @@ const Promotions = ({
               whileTap={{ scale: 0.98 }}
               className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-50 flex flex-col gap-3 relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 bg-pink-500 text-white text-[9px] font-bold px-2 py-1 rounded-bl-xl">
+              <div className="absolute top-0 right-0 bg-pink-500 text-white text-[10px] font-black px-3 py-1.5 rounded-bl-[1.25rem] shadow-sm">
                 -{deal.discountPercentage}%
               </div>
               <div className={`w-12 h-12 ${deal.bgColor} rounded-2xl flex items-center justify-center shadow-inner`}>
@@ -206,7 +206,7 @@ const Promotions = ({
         </div>
       </div>
 
-      {/* Redeem Points Section (List) - CHANGED BACK TO 1 COLUMN */}
+      {/* Redeem Points Section (List) */}
       <div>
         <div className="flex items-center gap-2 mb-4 px-1">
           <Crown size={18} className="text-amber-500" />
