@@ -12,8 +12,9 @@ import UserProfileEdit from '@/components/UserProfileEdit';
 import MembershipLevels from '@/components/MembershipLevels';
 import ServiceHistoryDetail from '@/components/ServiceHistoryDetail';
 import PetPreferenceForm from '@/components/PetPreferenceForm';
-import PetManagement from '@/components/PetManagement'; // Import the updated PetManagement
-import QRCodeModal from '@/components/QRCodeModal'; // Import the new QR modal
+import PetManagement from '@/components/PetManagement';
+import QRCodeModal from '@/components/QRCodeModal';
+import MyCouponsHomePreview from '@/components/MyCouponsHomePreview'; // New import
 import { Home, Award, PawPrint, Megaphone, Calendar, Gift, Bell, History, Scissors, Sparkles, Bath, X, LayoutGrid } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -29,16 +30,15 @@ export interface Pet {
   weight: string;
   medicalCondition: string;
   precautions: string;
-  color: string; // Existing: for old icon background
-  icon: string; // Existing: Emoji icon
+  color: string;
+  icon: string;
   furLength?: string;
   customPreferences?: { id: string; label: string; value: string; }[];
   imageUrl: string;
   cardBgColor: string;
-  isFavorite?: boolean; // New: isFavorite property
+  isFavorite?: boolean;
 }
 
-// Define the Coupon interface here as well, or import it if it were in a shared file
 interface Coupon {
   id: number;
   title: string;
@@ -56,7 +56,6 @@ interface UsedCoupon extends Coupon {
   usedDate?: string;
 }
 
-// Define ServiceHistoryItem interface for consistency
 interface ServiceHistoryItem {
   id: number;
   date: string;
@@ -77,7 +76,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedPetName, setSelectedPetName] = useState<string | null>(null);
   const [isProfileEditing, setIsProfileEditing] = useState(false);
-  const [isQRCodeOpen, setIsQRCodeOpen] = useState(false); // New state for QR Modal
+  const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
   
   const [ownerProfile, setOwnerProfile] = useState({
     firstName: 'ซาร่า',
@@ -211,7 +210,6 @@ const Index = () => {
     },
   ]);
 
-  // Sorting logic for pets: Favorites first (alphabetical), then non-favorites (alphabetical)
   const sortedPets = [...pets].sort((a, b) => {
     if (a.isFavorite && !b.isFavorite) return -1;
     if (!a.isFavorite && b.isFavorite) return 1;
@@ -306,7 +304,6 @@ const Index = () => {
     );
     setPets(updatedPets);
     
-    // Update the detail view state if that pet is currently being viewed
     if (selectedPetForDetail?.id === petId) {
       setSelectedPetForDetail({ ...selectedPetForDetail, isFavorite: !selectedPetForDetail.isFavorite });
     }
@@ -458,7 +455,7 @@ const Index = () => {
                 totalAccumulatedPoints={totalAccumulatedPoints} 
                 redeemablePoints={redeemablePoints} 
                 ownerProfile={ownerProfile}
-                onShowQR={() => setIsQRCodeOpen(true)} // Handle QR click
+                onShowQR={() => setIsQRCodeOpen(true)}
               />
 
               <UpcomingAppointments />
@@ -486,15 +483,11 @@ const Index = () => {
                 onPetClick={handlePetSelection}
               />
 
-              <div className="bg-[#FFE3BC]/40 p-5 rounded-[2rem] border border-[#FFE3BC] flex items-center gap-4">
-                <div className="p-3 bg-white rounded-2xl shadow-sm">
-                  <Megaphone className="text-amber-500" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm text-slate-800">โปรโมชั่นประจำเดือน!</h4>
-                  <p className="text-xs text-slate-600">ลด 20% สำหรับบริการสปาหินร้อน</p>
-                </div>
-              </div>
+              {/* Replaced monthly promotion banner with My Coupons preview */}
+              <MyCouponsHomePreview 
+                coupons={collectedCoupons}
+                onViewAll={() => setActiveTab('promo')}
+              />
             </motion.div>
           )}
 
@@ -585,7 +578,6 @@ const Index = () => {
         </AnimatePresence>
       </main>
 
-      {/* Modals */}
       <UserProfileEdit 
         isOpen={isProfileEditing} 
         onClose={() => setIsProfileEditing(false)} 
@@ -623,7 +615,6 @@ const Index = () => {
         />
       )}
 
-      {/* More Transparent Glass Nav Bar */}
       <nav className="absolute bottom-8 left-6 right-6 bg-white/30 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-2xl z-50 border border-white/40">
         <NavButton 
           active={activeTab === 'home'} 
