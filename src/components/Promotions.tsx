@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Ticket, Gift, Scissors, Sparkles, ShowerHead, Leaf, Hand, Tag, Heart, PawPrint, Crown, History, Award, LucideIcon, ChevronRight } from 'lucide-react';
+import { Ticket, Gift, Scissors, Sparkles, ShowerHead, Leaf, Hand, Tag, Heart, PawPrint, Crown, History, Award, LucideIcon } from 'lucide-react';
 
 // Define the Coupon interface
 interface Coupon {
@@ -206,13 +206,13 @@ const Promotions = ({
         </div>
       </div>
 
-      {/* Redeem Points Section (Tiles) - MOVED UP */}
+      {/* Redeem Points Section (List) - CHANGED BACK TO 1 COLUMN */}
       <div>
         <div className="flex items-center gap-2 mb-4 px-1">
           <Crown size={18} className="text-amber-500" />
           <h2 className="text-xl font-bold text-slate-800">แลกคะแนน</h2>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-3">
           {redeemableCouponsData.map((coupon) => {
             const canRedeem = userPoints >= coupon.pointsRequired;
             const isAlreadyCollected = collectedCoupons.some(c => c.id === coupon.id);
@@ -222,25 +222,25 @@ const Promotions = ({
               <motion.div
                 key={coupon.id}
                 whileTap={{ scale: isDisabled ? 1 : 0.98 }}
-                className={`bg-white p-4 rounded-[2rem] shadow-sm border border-slate-50 flex flex-col gap-3 group ${isDisabled ? 'opacity-60' : ''}`}
+                className={`bg-white p-4 rounded-3xl shadow-sm border border-slate-50 flex items-center gap-4 group ${isDisabled ? 'opacity-50 grayscale' : ''}`}
               >
                 <div className={`w-12 h-12 ${coupon.bg} rounded-2xl flex items-center justify-center text-xl shadow-inner`}>
-                  {getIconComponent(coupon.iconName, 20)}
+                  {getIconComponent(coupon.iconName, 22)}
                 </div>
-                <div>
-                  <h4 className="font-bold text-slate-800 text-xs line-clamp-1">{coupon.title}</h4>
-                  <p className="text-[10px] text-slate-500 line-clamp-1">{coupon.description}</p>
-                  <p className="text-[10px] text-amber-600 font-bold mt-1">
-                    {coupon.pointsRequired} Pts
+                <div className="flex-1">
+                  <h4 className="font-bold text-slate-800 text-sm">{coupon.title}</h4>
+                  <p className="text-[10px] text-slate-500">{coupon.description}</p>
+                  <p className="text-[10px] text-amber-600 font-bold mt-0.5">
+                    {coupon.pointsRequired} คะแนน
                   </p>
                 </div>
                 <button
                   onClick={() => onRedeemCoupon(coupon, coupon.pointsRequired)}
                   disabled={isDisabled}
-                  className={`w-full py-2 rounded-xl text-[10px] font-bold transition-all ${
+                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
                     isDisabled
                       ? 'bg-slate-100 text-slate-400'
-                      : 'bg-pink-50 text-pink-600 active:scale-95'
+                      : 'bg-pink-100 text-pink-700 active:scale-95'
                   }`}
                 >
                   {isAlreadyCollected ? 'แลกแล้ว' : 'แลกเลย'}
