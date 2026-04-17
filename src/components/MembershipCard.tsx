@@ -58,15 +58,15 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden p-6 rounded-[2rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-xl shadow-pink-100/50"
+      className="relative overflow-hidden p-5 rounded-[2rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-xl shadow-pink-100/50"
     >
       <PawPrint className="absolute -right-4 -top-4 w-32 h-32 text-white/20 rotate-12" />
       <PawPrint className="absolute -left-8 -bottom-8 w-24 h-24 text-white/10 -rotate-12" />
 
       <div className="relative z-10">
-        <div className="flex justify-between items-start mb-8">
+        <div className="flex justify-between items-start mb-0.5"> {/* Minimal margin here */}
           <div>
-            <h2 className="text-sm font-medium text-slate-600">สมาชิกระดับ</h2>
+            <h2 className="text-xs font-medium text-slate-600">สมาชิกระดับ</h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-amber-600 flex items-center gap-1">
                 <Crown size={12} fill="currentColor" />
@@ -77,13 +77,12 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           <div className="flex flex-col items-end">
             <p className="text-[10px] text-slate-500">ID: {ownerProfile.phone}</p>
             <p className="font-bold text-slate-800">คุณ{ownerProfile.firstName} {ownerProfile.lastName}</p>
-            {/* Moved QR button to be under the name */}
             <motion.button 
               whileTap={{ scale: 0.9 }}
               onClick={onShowQR}
-              className="mt-2 bg-white/90 p-2 rounded-2xl shadow-sm text-pink-500 hover:text-pink-600 transition-colors flex items-center gap-2 px-3"
+              className="mt-1 bg-white/90 p-1.5 rounded-2xl shadow-sm text-pink-500 hover:text-pink-600 transition-colors flex items-center gap-2 px-3"
             >
-              <QrCode size={18} />
+              <QrCode size={16} />
               <span className="text-[10px] font-bold">QR สมาชิก</span>
             </motion.button>
           </div>
