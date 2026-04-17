@@ -75,15 +75,17 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
             </div>
           </div>
           <div className="flex flex-col items-end">
+            <p className="text-[10px] text-slate-500">ID: {ownerProfile.phone}</p>
+            <p className="font-bold text-slate-800">คุณ{ownerProfile.firstName} {ownerProfile.lastName}</p>
+            {/* Moved QR button to be under the name */}
             <motion.button 
               whileTap={{ scale: 0.9 }}
               onClick={onShowQR}
-              className="bg-white/90 p-2 rounded-2xl shadow-sm mb-2 text-pink-500 hover:text-pink-600 transition-colors"
+              className="mt-2 bg-white/90 p-2 rounded-2xl shadow-sm text-pink-500 hover:text-pink-600 transition-colors flex items-center gap-2 px-3"
             >
-              <QrCode size={20} />
+              <QrCode size={18} />
+              <span className="text-[10px] font-bold">QR สมาชิก</span>
             </motion.button>
-            <p className="text-[10px] text-slate-500">ID: {ownerProfile.phone}</p>
-            <p className="font-bold text-slate-800">คุณ{ownerProfile.firstName} {ownerProfile.lastName}</p>
           </div>
         </div>
 
