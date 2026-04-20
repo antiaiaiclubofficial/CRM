@@ -167,12 +167,11 @@ const Index = () => {
   };
 
   // --- SORTING LOGIC ---
-  // Sort pets: favorites first, then alphabetically by name
   const sortedPets = [...pets].sort((a, b) => {
     if (a.isFavorite === b.isFavorite) {
-      return a.name.localeCompare(b.name, 'th'); // Alphabetical sort (Thai compatible)
+      return a.name.localeCompare(b.name, 'th');
     }
-    return a.isFavorite ? -1 : 1; // Favorites first
+    return a.isFavorite ? -1 : 1;
   });
 
   return (
@@ -208,7 +207,11 @@ const Index = () => {
                   <span className="font-bold text-sm text-slate-700">โปรโมชั่น</span>
                 </button>
               </div>
-              <PetList pets={sortedPets} onPetClick={(pet) => { setSelectedPetForDetail(pet); setActiveTab('pets'); }} />
+              <PetList 
+                pets={sortedPets} 
+                onPetClick={(pet) => { setSelectedPetForDetail(pet); setActiveTab('pets'); }} 
+                onViewAll={() => setActiveTab('pets')} 
+              />
               <MyCouponsHomePreview coupons={collectedCoupons} onViewAll={() => setActiveTab('promo')} />
             </motion.div>
           )}

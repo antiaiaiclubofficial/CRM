@@ -25,14 +25,20 @@ interface Pet {
 interface PetListProps {
   pets: Pet[];
   onPetClick?: (pet: Pet) => void;
+  onViewAll?: () => void; // New prop for 'View All' functionality
 }
 
-const PetList = ({ pets, onPetClick }: PetListProps) => {
+const PetList = ({ pets, onPetClick, onViewAll }: PetListProps) => {
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4 px-1">
         <h3 className="font-bold text-lg text-slate-800">สัตว์เลี้ยงของฉัน 🐾</h3>
-        <button className="text-xs text-pink-500 font-medium">ดูทั้งหมด</button>
+        <button 
+          onClick={onViewAll} 
+          className="text-xs text-pink-500 font-medium active:scale-95 transition-transform"
+        >
+          ดูทั้งหมด
+        </button>
       </div>
       
       <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 px-1">
