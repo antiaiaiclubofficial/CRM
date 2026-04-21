@@ -13,7 +13,7 @@ interface PetCategoryCardProps {
     weight: string;
     gender: string;
     cardBgColor: string;
-    isFavorite?: boolean; // Changed from hasHeartIcon to isFavorite
+    isFavorite?: boolean;
   };
   onClick: (petId: number) => void;
 }

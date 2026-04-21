@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Calendar, Scale, PawPrint, HeartPulse, Info, User, Feather } from 'lucide-react'; // Added Feather
+import { Calendar, Scale, PawPrint, HeartPulse, Info, User, Feather } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Pet {
@@ -16,7 +16,7 @@ interface Pet {
   precautions: string;
   color: string;
   icon: string;
-  furLength?: string; // New field for fur length
+  furLength?: string;
   customPreferences?: { id: string; label: string; value: string; }[];
 }
 
@@ -62,8 +62,8 @@ const PetIDCard = ({ pet }: PetIDCardProps) => {
             <span className="font-medium">น้ำหนัก: <span className="font-bold">{pet.weight || '-'} kg</span></span>
           </div>
           <div className="flex items-center gap-2">
-            <Feather size={16} className="text-purple-500" /> {/* Added Feather icon */}
-            <span className="font-medium">ความยาวขน: <span className="font-bold">{pet.furLength || '-'}</span></span> {/* Display furLength */}
+            <Feather size={16} className="text-purple-500" />
+            <span className="font-medium">ความยาวขน: <span className="font-bold">{pet.furLength || '-'}</span></span>
           </div>
         </div>
 

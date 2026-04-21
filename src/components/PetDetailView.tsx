@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowLeft, Pencil, Heart, PawPrint, Tag, Plus, Settings, Trash2, AlertTriangle, X
+  ArrowLeft, Pencil, Heart, PawPrint, Tag, Plus, Settings, Trash2, AlertTriangle, X, Scale
 } from 'lucide-react';
 
 interface Pet {
@@ -39,8 +39,8 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const getGenderDisplay = (gender: string) => {
-    if (gender === 'ผู้') return 'Male';
-    if (gender === 'เมีย') return 'Female';
+    if (gender === 'ผู้') return 'ชาย (Male)';
+    if (gender === 'เมีย') return 'หญิง (Female)';
     return gender;
   };
 
@@ -98,25 +98,25 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           </motion.button>
         </div>
 
-        {/* Improved Metrics Grid */}
+        {/* Metrics Grid */}
         <div className="grid grid-cols-3 gap-2 mb-6">
           <div className="bg-slate-50 py-4 px-2 rounded-2xl text-center border border-slate-100 flex flex-col justify-center">
             <p className="text-base font-black text-slate-800 leading-none mb-1.5">
               {pet.age} <span className="text-[10px] font-bold">ปี</span>
             </p>
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Age</p>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">อายุ</p>
           </div>
           <div className="bg-slate-50 py-4 px-1 rounded-2xl text-center border border-slate-100 flex flex-col justify-center min-w-0">
-            <p className="text-sm font-black text-slate-800 leading-none mb-1.5 truncate">
-              {getGenderDisplay(pet.gender)}
+            <p className="text-xs font-black text-slate-800 leading-none mb-1.5 truncate">
+              {pet.gender}
             </p>
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Gender</p>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">เพศ</p>
           </div>
           <div className="bg-slate-50 py-4 px-2 rounded-2xl text-center border border-slate-100 flex flex-col justify-center">
             <p className="text-base font-black text-slate-800 leading-none mb-1.5">
               {pet.weight} <span className="text-[10px] font-bold">Kg</span>
             </p>
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Weight</p>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">น้ำหนัก</p>
           </div>
         </div>
 
@@ -124,18 +124,18 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
             <Settings size={18} className="text-pink-500" /> ข้อมูลสุขภาพ
           </h3>
-          <div className="text-sm text-slate-700 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 space-y-2.5">
-            <div className="flex gap-2">
-              <span className="font-black text-slate-400 text-[10px] uppercase w-12 shrink-0 pt-0.5">Fur:</span>
-              <span className="font-bold text-slate-800 text-xs">{pet.furLength || '-'}</span>
+          <div className="text-sm text-slate-700 bg-slate-50/50 p-5 rounded-[1.5rem] border border-slate-100 space-y-4">
+            <div className="flex items-start">
+              <span className="font-black text-slate-400 text-[10px] uppercase w-24 shrink-0 pt-0.5 tracking-wider">ความยาวขน:</span>
+              <span className="font-bold text-slate-800 text-sm leading-tight">{pet.furLength || '-'}</span>
             </div>
-            <div className="flex gap-2">
-              <span className="font-black text-slate-400 text-[10px] uppercase w-12 shrink-0 pt-0.5">Medical:</span>
-              <span className="font-bold text-slate-800 text-xs">{pet.medicalCondition || '-'}</span>
+            <div className="flex items-start">
+              <span className="font-black text-slate-400 text-[10px] uppercase w-24 shrink-0 pt-0.5 tracking-wider">โรคประจำตัว:</span>
+              <span className="font-bold text-slate-800 text-sm leading-tight">{pet.medicalCondition || '-'}</span>
             </div>
-            <div className="flex gap-2">
-              <span className="font-black text-slate-400 text-[10px] uppercase w-12 shrink-0 pt-0.5">Caution:</span>
-              <span className="font-bold text-slate-800 text-xs">{pet.precautions || '-'}</span>
+            <div className="flex items-start">
+              <span className="font-black text-slate-400 text-[10px] uppercase w-24 shrink-0 pt-0.5 tracking-wider">ข้อควรระวัง:</span>
+              <span className="font-bold text-slate-800 text-sm leading-tight">{pet.precautions || '-'}</span>
             </div>
           </div>
         </div>
@@ -195,7 +195,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         </button>
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {/* Neubrutalism Delete Confirmation Modal */}
       <AnimatePresence>
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
@@ -207,32 +207,31 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
             />
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-xs bg-white rounded-[2.5rem] p-8 shadow-2xl text-center overflow-hidden"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="relative w-full max-w-xs bg-white rounded-[2.5rem] border-[3px] border-black shadow-soft p-8 text-center overflow-hidden"
             >
-               <div className="absolute top-0 left-0 right-0 h-2 bg-red-500" />
-               <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
-                  <AlertTriangle size={32} />
+               <div className="w-20 h-20 bg-red-100 border-2 border-black rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                  <AlertTriangle size={40} className="text-red-600" />
                </div>
-               <h3 className="text-xl font-black text-slate-800 mb-2">ยืนยันการลบ?</h3>
-               <p className="text-sm font-bold text-slate-500 mb-6 leading-relaxed">
-                  คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลของ <span className="text-red-500 underline">น้อง{pet.name}</span> ออกจากระบบ?
+               <h3 className="text-2xl font-black text-slate-800 mb-3">ยืนยันการลบ?</h3>
+               <p className="text-sm font-bold text-slate-500 mb-8 leading-relaxed">
+                  คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลของ <span className="text-red-500 underline decoration-2 underline-offset-4">น้อง{pet.name}</span> ออกจากระบบ?
                </p>
-               <div className="space-y-3">
+               <div className="space-y-4">
                   <button 
                     onClick={() => {
                       onDeletePet(pet.id);
                       setShowDeleteConfirm(false);
                     }}
-                    className="w-full py-3.5 bg-red-500 text-white rounded-2xl font-black shadow-lg shadow-red-200 active:scale-95 transition-all"
+                    className="w-full py-4 bg-red-500 text-white rounded-2xl font-black border-2 border-black shadow-[4px_4px_0px_0px_#000] active:translate-y-1 active:shadow-none transition-all"
                   >
-                    ยืนยันการลบ
+                    ยืนยันการลบข้อมูล
                   </button>
                   <button 
                     onClick={() => setShowDeleteConfirm(false)}
-                    className="w-full py-3.5 bg-slate-100 text-slate-600 rounded-2xl font-black active:scale-95 transition-all"
+                    className="w-full py-4 bg-white text-slate-800 rounded-2xl font-black border-2 border-black shadow-[4px_4px_0px_0px_#E2E8F0] active:translate-y-1 active:shadow-none transition-all"
                   >
                     ยกเลิก
                   </button>
