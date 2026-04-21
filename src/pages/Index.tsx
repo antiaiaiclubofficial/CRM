@@ -160,13 +160,46 @@ const Index = () => {
       pet.id === petId ? { ...pet, isFavorite: !pet.isFavorite } : pet
     ));
     
-    // อัปเดตตัวแปรที่กำลังดูรายละเอียดอยู่ด้วยถ้าตรงกัน
     if (selectedPetForDetail && selectedPetForDetail.id === petId) {
       setSelectedPetForDetail(prev => prev ? { ...prev, isFavorite: !prev.isFavorite } : null);
     }
   };
 
-  // --- SORTING LOGIC ---
+  const handleSavePet = (petData: Omit<Pet, 'id'> | Pet) => {
+    if ('id' in petData) {
+      // Editing existing pet
+      setPets(prev => prev.map(p => p.id === petData.id ? (petData as Pet) : p));
+      if (selectedPetForDetail?.id === petData.id) {
+        setSelectedPetForDetail(petData as Pet);
+      }
+      toast.success('อัปเดตข้อมูลน้องเรียบร้อยแล้วค่ะ');
+    } else {
+      // Adding new pet
+      const newPet = {
+        ...petData,
+        id: Math.max(...pets.map(p => p.id), 0) + 1
+      };
+      setPets(prev => [...prev, newPet as Pet]);
+      toast.success('เพิ่มน้องเข้าบ้านเรียบร้อยแล้วค่ะ! 🐾');
+    }
+    setIsPetFormOpen(false);
+    setPetToEdit(null);
+  };
+
+  const handleStartEditPet = (pet: Pet) => {
+    setPetToEdit(pet);
+    setIsPetFormOpen(true);
+  };
+
+  const handleUpdatePreferences = (prefs: { id: string; label: string; value: string; }[]) => {
+    if (selectedPetForDetail) {
+      const updatedPet = { ...selectedPetForDetail, customPreferences: prefs };
+      setPets(prev => prev.map(p => p.id === updatedPet.id ? updatedPet : p));
+      setSelectedPetForDetail(updatedPet);
+      toast.success('บันทึกความชอบส่วนตัวแล้วค่ะ');
+    }
+  };
+
   const sortedPets = [...pets].sort((a, b) => {
     if (a.isFavorite === b.isFavorite) {
       return a.name.localeCompare(b.name, 'th');
@@ -228,7 +261,7 @@ const Index = () => {
                 <PetDetailView 
                   pet={selectedPetForDetail} 
                   onBack={() => setSelectedPetForDetail(null)} 
-                  onStartEdit={() => setIsPetFormOpen(true)} 
+                  onStartEdit={handleStartEditPet} 
                   onDeletePet={() => {}} 
                   totalServiceCost={0} 
                   onViewServiceHistoryForPet={() => {}} 
@@ -236,7 +269,7 @@ const Index = () => {
                   onToggleFavorite={() => handleToggleFavorite(selectedPetForDetail.id)} 
                 />
               ) : (
-                <PetManagement pets={sortedPets} onBack={() => setActiveTab('home')} onViewDetails={(pet) => setSelectedPetForDetail(pet)} onAddPet={() => setIsPetFormOpen(true)} />
+                <PetManagement pets={sortedPets} onBack={() => setActiveTab('home')} onViewDetails={(pet) => setSelectedPetForDetail(pet)} onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} />
               )}
             </motion.div>
           )}
@@ -270,13 +303,18 @@ const Index = () => {
       <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={ownerProfile} onSave={(updated) => setOwnerProfile(updated)} />
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={ownerProfile.firstName} memberId={ownerProfile.phone} />
       <CouponUseModal isOpen={isCouponModalOpen} onClose={() => { setIsCouponModalOpen(false); setSelectedCouponToUse(null); }} coupon={selectedCouponToUse} onConfirmUse={handleConfirmCouponUse} />
-      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={() => {}} initialData={petToEdit} />
+      <PetForm 
+        isOpen={isPetFormOpen} 
+        onClose={() => { setIsPetFormOpen(false); setPetToEdit(null); }} 
+        onSave={handleSavePet} 
+        initialData={petToEdit} 
+      />
       
       {selectedPetForDetail && (
         <PetPreferenceForm
           isOpen={isPreferenceFormOpen}
           onClose={() => setIsPreferenceFormOpen(false)}
-          onSave={() => setIsPreferenceFormOpen(false)}
+          onSave={handleUpdatePreferences}
           initialData={selectedPetForDetail.customPreferences || []}
           petName={selectedPetForDetail.name}
         />

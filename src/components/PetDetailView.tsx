@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  ArrowLeft, Edit2, Heart, MapPin, Tag, Plus 
+  ArrowLeft, Edit2, Heart, MapPin, Tag, Plus, Settings
 } from 'lucide-react';
 
 interface Pet {
@@ -35,11 +35,11 @@ interface PetDetailViewProps {
   onToggleFavorite: () => void;
 }
 
-const PetDetailView = ({ pet, onBack, onEditPreferences, onToggleFavorite }: PetDetailViewProps) => {
+const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences, onToggleFavorite }: PetDetailViewProps) => {
   const getGenderDisplay = (gender: string) => {
     if (gender === 'ผู้') return 'Male';
     if (gender === 'เมีย') return 'Female';
-    return 'Unknown';
+    return gender;
   };
 
   const hasPreferences = pet.customPreferences && pet.customPreferences.length > 0;
@@ -49,10 +49,10 @@ const PetDetailView = ({ pet, onBack, onEditPreferences, onToggleFavorite }: Pet
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="relative bg-[#FFF9F0] pb-20"
+      className="relative bg-[#FFF9F0] pb-24"
     >
-      {/* Back Button - Moved higher and increased Z-index */}
-      <div className="absolute top-2 left-0 z-[60]">
+      {/* Header Buttons */}
+      <div className="absolute top-2 left-2 right-2 flex justify-between items-center z-[60]">
         <button 
           onClick={(e) => {
             e.stopPropagation();
@@ -61,6 +61,14 @@ const PetDetailView = ({ pet, onBack, onEditPreferences, onToggleFavorite }: Pet
           className="p-2.5 bg-emerald-400 text-white rounded-xl shadow-lg active:scale-95 transition-transform"
         >
           <ArrowLeft size={24} />
+        </button>
+        
+        <button 
+          onClick={() => onStartEdit(pet)} 
+          className="p-2.5 bg-slate-900 text-white rounded-xl shadow-lg active:scale-95 transition-transform flex items-center gap-1 px-3"
+        >
+          <Settings size={20} />
+          <span className="text-xs font-bold">แก้ไข</span>
         </button>
       </div>
 
@@ -82,38 +90,49 @@ const PetDetailView = ({ pet, onBack, onEditPreferences, onToggleFavorite }: Pet
           <motion.button 
             whileTap={{ scale: 0.9 }}
             onClick={onToggleFavorite}
-            className={`p-2 rounded-full transition-colors ${pet.isFavorite ? 'bg-pink-100 text-pink-500' : 'bg-slate-100 text-slate-400'}`}
+            className={`p-2 rounded-full transition-colors border-2 ${pet.isFavorite ? 'bg-pink-100 text-pink-500 border-pink-200' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
           >
             <Heart size={20} fill={pet.isFavorite ? "currentColor" : "none"} />
           </motion.button>
         </div>
 
         <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="bg-slate-50 p-3 rounded-xl text-center">
-            <p className="text-lg font-bold text-slate-800">{pet.age} ปี</p>
-            <p className="text-xs text-slate-500">Age</p>
+          <div className="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100">
+            <p className="text-lg font-black text-slate-800">{pet.age} ปี</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase">Age</p>
           </div>
-          <div className="bg-slate-50 p-3 rounded-xl text-center">
-            <p className="text-lg font-bold text-slate-800">{getGenderDisplay(pet.gender)}</p>
-            <p className="text-xs text-slate-500">Gender</p>
+          <div className="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100">
+            <p className="text-lg font-black text-slate-800">{getGenderDisplay(pet.gender)}</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase">Gender</p>
           </div>
-          <div className="bg-slate-50 p-3 rounded-xl text-center">
-            <p className="text-lg font-bold text-slate-800">{pet.weight} Kg</p>
-            <p className="text-xs text-slate-500">Weight</p>
+          <div className="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100">
+            <p className="text-lg font-black text-slate-800">{pet.weight} Kg</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase">Weight</p>
           </div>
         </div>
 
-        <div className="mb-6">
-          <h3 className="text-lg font-bold text-slate-800 mb-2">Note :</h3>
-          <div className="text-sm text-slate-700 space-y-1">
-            {pet.medicalCondition && <p>โรคประจำตัว: <span className="font-medium">{pet.medicalCondition}</span></p>}
-            {pet.precautions && <p>ข้อควรระวัง: <span className="font-medium">{pet.precautions}</span></p>}
-            {(!pet.medicalCondition && !pet.precautions) && <p>ไม่มีข้อมูลเพิ่มเติม</p>}
+        <div className="mb-6 space-y-3">
+          <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+            <Settings size={18} className="text-pink-500" /> ข้อมูลสุขภาพ
+          </h3>
+          <div className="text-sm text-slate-700 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 space-y-2">
+            <div className="flex gap-2">
+              <span className="font-bold text-slate-500 shrink-0">ขน:</span>
+              <span className="font-medium text-slate-800">{pet.furLength || '-'}</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="font-bold text-slate-500 shrink-0">โรค:</span>
+              <span className="font-medium text-slate-800">{pet.medicalCondition || '-'}</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="font-bold text-slate-500 shrink-0">ระวัง:</span>
+              <span className="font-medium text-slate-800">{pet.precautions || '-'}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="pt-4 px-6">
+      <div className="pt-6 px-6">
         <h3 className="text-lg font-black text-slate-800 mb-4">{pet.name}'s collection</h3>
         
         <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative shadow-lg border-2 border-[#c28856] shadow-soft">
@@ -126,7 +145,7 @@ const PetDetailView = ({ pet, onBack, onEditPreferences, onToggleFavorite }: Pet
               <h4 className="text-lg font-black text-[#4A2C0F]">ความชอบส่วนตัว</h4>
               <button 
                 onClick={onEditPreferences} 
-                className="p-1.5 bg-[#D4B89A] rounded-full text-[#4A2C0F] hover:bg-[#E0C7A9] transition-colors"
+                className="p-1.5 bg-[#D4B89A] rounded-full text-[#4A2C0F] hover:bg-[#E0C7A9] transition-colors border border-black/10"
               >
                 <Edit2 size={16} />
               </button>
