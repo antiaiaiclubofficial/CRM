@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, HeartPulse, Calendar, Info, Check, Feather, Camera } from 'lucide-react';
+import { X, HeartPulse, Calendar, Info, Check, Feather, Camera } from 'lucide-react';
 import AnalogScaleIcon from './AnalogScaleIcon';
+import GenderIcon from './GenderIcon';
 
 interface Pet {
   id: number;
@@ -230,7 +231,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 flex items-center justify-center gap-1">
-                    <User size={14} className="text-slate-400" /> เพศ
+                    <GenderIcon size={14} className="text-slate-400" /> เพศ
                   </label>
                   <select 
                     value={formData.gender}
