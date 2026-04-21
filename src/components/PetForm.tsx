@@ -231,7 +231,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 flex items-center justify-center gap-1">
-                    เพศ
+                    <User size={14} className="text-slate-400" /> เพศ
                   </label>
                   <select 
                     value={formData.gender}
