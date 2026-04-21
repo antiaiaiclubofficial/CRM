@@ -126,18 +126,18 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
             <Settings size={18} className="text-pink-500" /> ข้อมูลสุขภาพ
           </h3>
-          <div className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 space-y-5">
-            <div className="flex items-start">
-              <span className="font-bold text-slate-400 text-xs w-[85px] shrink-0 pt-0.5 tracking-tight">ความยาวขน:</span>
-              <span className="font-black text-slate-800 text-sm leading-relaxed flex-1">{pet.furLength || '-'}</span>
+          <div className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 space-y-6">
+            <div className="flex items-start gap-4">
+              <span className="font-bold text-slate-400 text-xs w-24 shrink-0 pt-0.5 tracking-tight">ความยาวขน:</span>
+              <span className="font-black text-slate-800 text-sm leading-tight flex-1">{pet.furLength || '-'}</span>
             </div>
-            <div className="flex items-start">
-              <span className="font-bold text-slate-400 text-xs w-[85px] shrink-0 pt-0.5 tracking-tight">โรคประจำตัว:</span>
-              <span className="font-black text-slate-800 text-sm leading-relaxed flex-1">{pet.medicalCondition || '-'}</span>
+            <div className="flex items-start gap-4">
+              <span className="font-bold text-slate-400 text-xs w-24 shrink-0 pt-0.5 tracking-tight">โรคประจำตัว:</span>
+              <span className="font-black text-slate-800 text-sm leading-tight flex-1">{pet.medicalCondition || '-'}</span>
             </div>
-            <div className="flex items-start">
-              <span className="font-bold text-slate-400 text-xs w-[85px] shrink-0 pt-0.5 tracking-tight">ข้อควรระวัง:</span>
-              <span className="font-black text-slate-800 text-sm leading-relaxed flex-1">{pet.precautions || '-'}</span>
+            <div className="flex items-start gap-4">
+              <span className="font-bold text-slate-400 text-xs w-24 shrink-0 pt-0.5 tracking-tight">ข้อควรระวัง:</span>
+              <span className="font-black text-slate-800 text-sm leading-tight flex-1">{pet.precautions || '-'}</span>
             </div>
           </div>
         </div>
