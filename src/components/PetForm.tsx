@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, HeartPulse, Weight, Calendar, Info, Check, Feather, Camera, Image as ImageIcon } from 'lucide-react';
+import { X, User, HeartPulse, Calendar, Info, Check, Feather, Camera, Image as ImageIcon } from 'lucide-react';
+import AnalogScaleIcon from './AnalogScaleIcon';
 
 interface Pet {
   id: number;
@@ -243,7 +244,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 flex items-center justify-center gap-1">
-                    <Weight size={14} className="text-slate-400" /> นน.
+                    <AnalogScaleIcon size={14} className="text-slate-400" /> นน.
                   </label>
                   <div className="relative group">
                     <input 

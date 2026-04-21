@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Weight } from 'lucide-react';
+import { Heart } from 'lucide-react';
+import AnalogScaleIcon from './AnalogScaleIcon';
 
 interface PetCategoryCardProps {
   pet: {
@@ -40,7 +41,7 @@ const PetCategoryCard = ({ pet, onClick }: PetCategoryCardProps) => {
         <div className="p-4 relative z-10">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-gray-600 font-medium flex items-center gap-1">
-              <Weight size={16} className="text-gray-500" />
+              <AnalogScaleIcon size={16} className="text-gray-500" />
               {pet.weight} kg
             </span>
             <span className="text-xs font-bold px-3 py-1 rounded-full border border-black bg-white text-black">
