@@ -98,25 +98,27 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           </motion.button>
         </div>
 
-        {/* Metrics Grid */}
+        {/* Improved Metrics Grid */}
         <div className="grid grid-cols-3 gap-2 mb-6">
           <div className="bg-slate-50 py-4 px-2 rounded-2xl text-center border border-slate-100 flex flex-col justify-center">
-            <p className="text-base font-black text-slate-800 leading-none mb-1.5">
-              {pet.age} <span className="text-[10px] font-bold">ปี</span>
-            </p>
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">อายุ</p>
+            <div className="flex items-baseline justify-center gap-0.5 mb-1">
+              <span className="text-2xl font-black text-slate-800">{pet.age}</span>
+              <span className="text-xs font-bold text-slate-800">ปี</span>
+            </div>
+            <p className="text-[11px] font-black text-slate-400 uppercase tracking-wider">อายุ</p>
           </div>
           <div className="bg-slate-50 py-4 px-1 rounded-2xl text-center border border-slate-100 flex flex-col justify-center min-w-0">
-            <p className="text-xs font-black text-slate-800 leading-none mb-1.5 truncate">
+            <p className="text-xl font-black text-slate-800 mb-1 truncate">
               {pet.gender}
             </p>
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">เพศ</p>
+            <p className="text-[11px] font-black text-slate-400 uppercase tracking-wider">เพศ</p>
           </div>
           <div className="bg-slate-50 py-4 px-2 rounded-2xl text-center border border-slate-100 flex flex-col justify-center">
-            <p className="text-base font-black text-slate-800 leading-none mb-1.5">
-              {pet.weight} <span className="text-[10px] font-bold">Kg</span>
-            </p>
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">น้ำหนัก</p>
+            <div className="flex items-baseline justify-center gap-0.5 mb-1">
+              <span className="text-2xl font-black text-slate-800">{pet.weight}</span>
+              <span className="text-xs font-bold text-slate-800">Kg</span>
+            </div>
+            <p className="text-[11px] font-black text-slate-400 uppercase tracking-wider">น้ำหนัก</p>
           </div>
         </div>
 
@@ -124,18 +126,18 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
             <Settings size={18} className="text-pink-500" /> ข้อมูลสุขภาพ
           </h3>
-          <div className="text-sm text-slate-700 bg-slate-50/50 p-5 rounded-[1.5rem] border border-slate-100 space-y-4">
+          <div className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 space-y-5">
             <div className="flex items-start">
-              <span className="font-black text-slate-400 text-[10px] uppercase w-24 shrink-0 pt-0.5 tracking-wider">ความยาวขน:</span>
-              <span className="font-bold text-slate-800 text-sm leading-tight">{pet.furLength || '-'}</span>
+              <span className="font-bold text-slate-400 text-xs w-28 shrink-0 pt-0.5 tracking-tight">ความยาวขน:</span>
+              <span className="font-black text-slate-800 text-sm leading-relaxed flex-1">{pet.furLength || '-'}</span>
             </div>
             <div className="flex items-start">
-              <span className="font-black text-slate-400 text-[10px] uppercase w-24 shrink-0 pt-0.5 tracking-wider">โรคประจำตัว:</span>
-              <span className="font-bold text-slate-800 text-sm leading-tight">{pet.medicalCondition || '-'}</span>
+              <span className="font-bold text-slate-400 text-xs w-28 shrink-0 pt-0.5 tracking-tight">โรคประจำตัว:</span>
+              <span className="font-black text-slate-800 text-sm leading-relaxed flex-1">{pet.medicalCondition || '-'}</span>
             </div>
             <div className="flex items-start">
-              <span className="font-black text-slate-400 text-[10px] uppercase w-24 shrink-0 pt-0.5 tracking-wider">ข้อควรระวัง:</span>
-              <span className="font-bold text-slate-800 text-sm leading-tight">{pet.precautions || '-'}</span>
+              <span className="font-bold text-slate-400 text-xs w-28 shrink-0 pt-0.5 tracking-tight">ข้อควรระวัง:</span>
+              <span className="font-black text-slate-800 text-sm leading-relaxed flex-1">{pet.precautions || '-'}</span>
             </div>
           </div>
         </div>
