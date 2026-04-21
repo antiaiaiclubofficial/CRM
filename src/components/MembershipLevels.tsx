@@ -112,7 +112,7 @@ const MembershipLevels = ({ totalAccumulatedPoints }: MembershipLevelsProps) => 
     }
   }
 
-  // Logic to put current level first and others after, greying them out
+  // Logic to put current level first and others after, making them very muted
   const orderedTiers = [
     currentLevel,
     ...sortedTiers.filter(t => t.id !== currentLevel.id)
@@ -198,19 +198,19 @@ const MembershipLevels = ({ totalAccumulatedPoints }: MembershipLevelsProps) => 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className={`relative bg-white rounded-[2.5rem] border-2 border-black shadow-soft overflow-hidden transition-all duration-300 ${
+              className={`relative bg-white rounded-[2.5rem] border-2 shadow-soft overflow-hidden transition-all duration-300 ${
                 !isCurrentLevel 
-                  ? 'grayscale opacity-60 scale-[0.98] bg-slate-50 border-slate-300 shadow-none' 
-                  : 'z-10 ring-4 ring-black/5'
+                  ? 'grayscale opacity-30 scale-[0.95] bg-slate-50 border-slate-200 shadow-none pointer-events-none' 
+                  : 'border-black z-10 ring-4 ring-black/5'
               }`}
             >
-              <div className={`p-5 border-b-2 border-black ${isCurrentLevel ? tier.colorClass : 'bg-slate-200'} flex items-center justify-between`}>
+              <div className={`p-5 border-b-2 ${isCurrentLevel ? 'border-black ' + tier.colorClass : 'border-slate-200 bg-slate-100'} flex items-center justify-between`}>
                 <div className="flex items-center gap-3">
-                   <div className={`w-12 h-12 border-2 border-black rounded-2xl flex items-center justify-center shadow-sm ${isCurrentLevel ? 'bg-white' : 'bg-slate-100'}`}>
+                   <div className={`w-12 h-12 border-2 rounded-2xl flex items-center justify-center shadow-sm ${isCurrentLevel ? 'bg-white border-black' : 'bg-slate-50 border-slate-200 text-slate-200'}`}>
                       {tier.icon}
                    </div>
                    <div>
-                     <h4 className={`font-black ${isCurrentLevel ? 'text-black' : 'text-slate-500'}`}>{tier.name}</h4>
+                     <h4 className={`font-black ${isCurrentLevel ? 'text-black' : 'text-slate-300'}`}>{tier.name}</h4>
                      {isCurrentLevel && (
                        <span className="bg-black text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
                          ระดับปัจจุบัน
@@ -219,17 +219,17 @@ const MembershipLevels = ({ totalAccumulatedPoints }: MembershipLevelsProps) => 
                    </div>
                 </div>
                 <div className="text-right">
-                  <p className={`text-[10px] font-bold uppercase ${isCurrentLevel ? 'text-black/60' : 'text-slate-400'}`}>คะแนนขั้นต่ำ</p>
-                  <p className={`text-lg font-black ${isCurrentLevel ? 'text-black' : 'text-slate-500'}`}>{tier.minPoints.toLocaleString()}</p>
+                  <p className={`text-[10px] font-bold uppercase ${isCurrentLevel ? 'text-black/60' : 'text-slate-200'}`}>คะแนนขั้นต่ำ</p>
+                  <p className={`text-lg font-black ${isCurrentLevel ? 'text-black' : 'text-slate-300'}`}>{tier.minPoints.toLocaleString()}</p>
                 </div>
               </div>
 
               <div className="p-5">
-                <p className={`text-xs font-bold mb-4 ${isCurrentLevel ? 'text-slate-500' : 'text-slate-400'}`}>{tier.description}</p>
+                <p className={`text-xs font-bold mb-4 ${isCurrentLevel ? 'text-slate-500' : 'text-slate-200'}`}>{tier.description}</p>
                 <ul className="space-y-3">
                   {tier.benefits.map((benefit, bIndex) => (
-                    <li key={bIndex} className={`flex items-start gap-3 text-sm font-bold ${isCurrentLevel ? 'text-slate-700' : 'text-slate-400'}`}>
-                      <div className={`${isCurrentLevel ? 'bg-[#B2F2BB] border-black' : 'bg-slate-200 border-slate-300'} border p-0.5 rounded-md mt-0.5`}>
+                    <li key={bIndex} className={`flex items-start gap-3 text-sm font-bold ${isCurrentLevel ? 'text-slate-700' : 'text-slate-200'}`}>
+                      <div className={`${isCurrentLevel ? 'bg-[#B2F2BB] border-black' : 'bg-slate-50 border-slate-200 text-slate-200'} border p-0.5 rounded-md mt-0.5`}>
                         <Check size={12} strokeWidth={4} />
                       </div>
                       <span>{benefit}</span>
