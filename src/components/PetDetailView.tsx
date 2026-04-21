@@ -1,9 +1,9 @@
 "use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowLeft, Pencil, Heart, MapPin, Tag, Plus, Settings, Trash2
+  ArrowLeft, Pencil, Heart, PawPrint, Tag, Plus, Settings, Trash2, AlertTriangle, X
 } from 'lucide-react';
 
 interface Pet {
@@ -36,6 +36,8 @@ interface PetDetailViewProps {
 }
 
 const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreferences, onToggleFavorite }: PetDetailViewProps) => {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   const getGenderDisplay = (gender: string) => {
     if (gender === 'ผู้') return 'Male';
     if (gender === 'เมีย') return 'Female';
@@ -80,34 +82,41 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
 
       <div className="relative bg-white rounded-[2rem] p-6 mx-6 -mt-8 shadow-xl z-10 border-2 border-black shadow-soft">
         <div className="flex justify-between items-start mb-4">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">{pet.name}</h2>
-            <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
-              <MapPin size={14} className="text-slate-400" />
-              {pet.breed} ({pet.type})
+          <div className="min-w-0 flex-1 pr-2">
+            <h2 className="text-2xl font-black text-slate-800 truncate">{pet.name}</h2>
+            <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-1">
+              <PawPrint size={14} className="text-slate-400" />
+              <span className="truncate">{pet.breed} ({pet.type})</span>
             </p>
           </div>
           <motion.button 
             whileTap={{ scale: 0.9 }}
             onClick={onToggleFavorite}
-            className={`p-2 rounded-full transition-colors border-2 ${pet.isFavorite ? 'bg-pink-100 text-pink-500 border-pink-200' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
+            className={`p-2 rounded-full transition-colors border-2 shrink-0 ${pet.isFavorite ? 'bg-pink-100 text-pink-500 border-pink-200' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
           >
             <Heart size={20} fill={pet.isFavorite ? "currentColor" : "none"} />
           </motion.button>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100">
-            <p className="text-lg font-black text-slate-800">{pet.age} ปี</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase">Age</p>
+        {/* Improved Metrics Grid */}
+        <div className="grid grid-cols-3 gap-2 mb-6">
+          <div className="bg-slate-50 py-4 px-2 rounded-2xl text-center border border-slate-100 flex flex-col justify-center">
+            <p className="text-base font-black text-slate-800 leading-none mb-1.5">
+              {pet.age} <span className="text-[10px] font-bold">ปี</span>
+            </p>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Age</p>
           </div>
-          <div className="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100">
-            <p className="text-lg font-black text-slate-800">{getGenderDisplay(pet.gender)}</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase">Gender</p>
+          <div className="bg-slate-50 py-4 px-1 rounded-2xl text-center border border-slate-100 flex flex-col justify-center min-w-0">
+            <p className="text-sm font-black text-slate-800 leading-none mb-1.5 truncate">
+              {getGenderDisplay(pet.gender)}
+            </p>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Gender</p>
           </div>
-          <div className="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100">
-            <p className="text-lg font-black text-slate-800">{pet.weight} Kg</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase">Weight</p>
+          <div className="bg-slate-50 py-4 px-2 rounded-2xl text-center border border-slate-100 flex flex-col justify-center">
+            <p className="text-base font-black text-slate-800 leading-none mb-1.5">
+              {pet.weight} <span className="text-[10px] font-bold">Kg</span>
+            </p>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Weight</p>
           </div>
         </div>
 
@@ -115,18 +124,18 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
             <Settings size={18} className="text-pink-500" /> ข้อมูลสุขภาพ
           </h3>
-          <div className="text-sm text-slate-700 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 space-y-2">
+          <div className="text-sm text-slate-700 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 space-y-2.5">
             <div className="flex gap-2">
-              <span className="font-bold text-slate-500 shrink-0">ขน:</span>
-              <span className="font-medium text-slate-800">{pet.furLength || '-'}</span>
+              <span className="font-black text-slate-400 text-[10px] uppercase w-12 shrink-0 pt-0.5">Fur:</span>
+              <span className="font-bold text-slate-800 text-xs">{pet.furLength || '-'}</span>
             </div>
             <div className="flex gap-2">
-              <span className="font-bold text-slate-500 shrink-0">โรค:</span>
-              <span className="font-medium text-slate-800">{pet.medicalCondition || '-'}</span>
+              <span className="font-black text-slate-400 text-[10px] uppercase w-12 shrink-0 pt-0.5">Medical:</span>
+              <span className="font-bold text-slate-800 text-xs">{pet.medicalCondition || '-'}</span>
             </div>
             <div className="flex gap-2">
-              <span className="font-bold text-slate-500 shrink-0">ระวัง:</span>
-              <span className="font-medium text-slate-800">{pet.precautions || '-'}</span>
+              <span className="font-black text-slate-400 text-[10px] uppercase w-12 shrink-0 pt-0.5">Caution:</span>
+              <span className="font-bold text-slate-800 text-xs">{pet.precautions || '-'}</span>
             </div>
           </div>
         </div>
@@ -176,19 +185,62 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           </div>
         </div>
 
-        {/* Delete Button at the bottom */}
+        {/* Delete Button */}
         <button 
-          onClick={() => {
-            if(window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลสัตว์เลี้ยงตัวนี้?')) {
-              onDeletePet(pet.id);
-            }
-          }}
+          onClick={() => setShowDeleteConfirm(true)}
           className="w-full py-4 flex items-center justify-center gap-2 bg-red-50 text-red-500 font-bold rounded-2xl border-2 border-red-100 hover:bg-red-100 transition-colors active:scale-95"
         >
           <Trash2 size={20} />
           ลบข้อมูลสัตว์เลี้ยง
         </button>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowDeleteConfirm(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-xs bg-white rounded-[2.5rem] p-8 shadow-2xl text-center overflow-hidden"
+            >
+               <div className="absolute top-0 left-0 right-0 h-2 bg-red-500" />
+               <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
+                  <AlertTriangle size={32} />
+               </div>
+               <h3 className="text-xl font-black text-slate-800 mb-2">ยืนยันการลบ?</h3>
+               <p className="text-sm font-bold text-slate-500 mb-6 leading-relaxed">
+                  คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลของ <span className="text-red-500 underline">น้อง{pet.name}</span> ออกจากระบบ?
+               </p>
+               <div className="space-y-3">
+                  <button 
+                    onClick={() => {
+                      onDeletePet(pet.id);
+                      setShowDeleteConfirm(false);
+                    }}
+                    className="w-full py-3.5 bg-red-500 text-white rounded-2xl font-black shadow-lg shadow-red-200 active:scale-95 transition-all"
+                  >
+                    ยืนยันการลบ
+                  </button>
+                  <button 
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="w-full py-3.5 bg-slate-100 text-slate-600 rounded-2xl font-black active:scale-95 transition-all"
+                  >
+                    ยกเลิก
+                  </button>
+               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
