@@ -11,7 +11,7 @@ interface MembershipTier {
   colorClass: string;
   description: string;
   benefits: string[];
-  minPoints: number; // Added minPoints to define tier requirements
+  minPoints: number;
 }
 
 const membershipTiers: MembershipTier[] = [
@@ -19,7 +19,7 @@ const membershipTiers: MembershipTier[] = [
     id: 'bronze',
     name: 'Bronze Member',
     icon: <PawPrint size={20} />,
-    colorClass: 'bg-amber-700',
+    colorClass: 'bg-[#FFD8E4]', // Soft Pink
     description: 'เริ่มต้นการดูแลที่ดีที่สุดสำหรับสัตว์เลี้ยงของคุณ',
     benefits: [
       'ส่วนลด 5% สำหรับบริการอาบน้ำ',
@@ -32,7 +32,7 @@ const membershipTiers: MembershipTier[] = [
     id: 'silver',
     name: 'Silver Member',
     icon: <Star size={20} />,
-    colorClass: 'bg-slate-400',
+    colorClass: 'bg-[#B2F2BB]', // Mint Green
     description: 'ยกระดับการดูแลด้วยสิทธิพิเศษที่มากขึ้น',
     benefits: [
       'ส่วนลด 10% สำหรับบริการอาบน้ำและตัดขน',
@@ -46,7 +46,7 @@ const membershipTiers: MembershipTier[] = [
     id: 'gold',
     name: 'Gold Member',
     icon: <Crown size={20} />,
-    colorClass: 'bg-amber-500',
+    colorClass: 'bg-[#FFE3BC]', // Peach/Gold
     description: 'สัมผัสประสบการณ์การดูแลระดับพรีเมียม',
     benefits: [
       'ส่วนลด 15% สำหรับทุกบริการ',
@@ -61,7 +61,7 @@ const membershipTiers: MembershipTier[] = [
     id: 'platinum',
     name: 'Platinum Member',
     icon: <Gem size={20} />,
-    colorClass: 'bg-blue-400',
+    colorClass: 'bg-[#BBDEFB]', // Sky Blue
     description: 'ที่สุดแห่งการดูแลเหนือระดับสำหรับคนพิเศษ',
     benefits: [
       'ส่วนลด 20% สำหรับทุกบริการ',
@@ -77,7 +77,7 @@ const membershipTiers: MembershipTier[] = [
     id: 'vip',
     name: 'VIP Member',
     icon: <Diamond size={20} />,
-    colorClass: 'bg-purple-600',
+    colorClass: 'bg-[#E1BEE7]', // Lavender
     description: 'เอกสิทธิ์สูงสุดสำหรับผู้ที่ต้องการสิ่งที่ดีที่สุด',
     benefits: [
       'ส่วนลด 25% สำหรับทุกบริการ',
@@ -93,15 +93,14 @@ const membershipTiers: MembershipTier[] = [
 ];
 
 interface MembershipLevelsProps {
-  totalAccumulatedPoints: number; // For tier calculation
-  redeemablePoints: number; // For display
+  totalAccumulatedPoints: number;
+  redeemablePoints: number;
 }
 
-const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: MembershipLevelsProps) => {
-  // Sort tiers by minPoints to ensure correct level determination
+const MembershipLevels = ({ totalAccumulatedPoints }: MembershipLevelsProps) => {
   const sortedTiers = [...membershipTiers].sort((a, b) => a.minPoints - b.minPoints);
 
-  let currentLevel: MembershipTier = sortedTiers[0]; // Default to Bronze
+  let currentLevel: MembershipTier = sortedTiers[0];
   let nextLevel: MembershipTier | null = null;
 
   for (let i = 0; i < sortedTiers.length; i++) {
@@ -117,114 +116,117 @@ const MembershipLevels = ({ totalAccumulatedPoints, redeemablePoints }: Membersh
   
   let progressPercentage = 0;
   if (nextLevel) {
-    // Corrected calculation: progress from 0 towards the next level's minimum points
     progressPercentage = (totalAccumulatedPoints / nextLevel.minPoints) * 100;
   } else {
-    progressPercentage = 100; // Max level reached
+    progressPercentage = 100;
   }
-  progressPercentage = Math.min(100, Math.max(0, progressPercentage)); // Ensure it's between 0 and 100
+  progressPercentage = Math.min(100, Math.max(0, progressPercentage));
 
-  // Create a new array for display order: currentLevel first, then others sorted
-  const otherTiers = sortedTiers.filter(tier => tier.id !== currentLevel.id);
-  const displayTiers = [currentLevel, ...otherTiers];
-
-  // Sub-component for the current membership status card
   const CurrentMembershipStatusCard = () => (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`relative overflow-hidden p-4 rounded-[2rem] ${currentLevel.colorClass} shadow-xl shadow-slate-200/50 text-white`}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className={`relative overflow-hidden p-6 rounded-[2.5rem] ${currentLevel.colorClass} border-2 border-black shadow-soft mb-8 text-black`}
     >
-      {/* Watermark Icon */}
-      <div className="absolute -right-4 -top-4 w-24 h-24 text-white/20 rotate-12 flex items-center justify-center">
-        {React.cloneElement(currentLevel.icon as React.ReactElement, { size: 64 })}
-      </div>
-      <div className="absolute -left-8 -bottom-8 w-16 h-16 text-white/10 -rotate-12 flex items-center justify-center">
-        {React.cloneElement(currentLevel.icon as React.ReactElement, { size: 40 })}
+      <div className="absolute top-4 right-4 text-black/10">
+        {React.cloneElement(currentLevel.icon as React.ReactElement, { size: 100 })}
       </div>
 
-      <div className="relative z-10 text-center space-y-2">
-        <div className="mx-auto text-white/90 mb-1">
-          {React.cloneElement(currentLevel.icon as React.ReactElement, { size: 32 })}
-        </div>
-        <p className="text-xs font-medium text-white/80">ระดับปัจจุบันของคุณ</p>
-        <h3 className="text-2xl font-bold mb-2">{currentLevel.name}</h3>
-
-        {/* Display total accumulated points with next tier target */}
-        <div className="flex items-baseline justify-center gap-1 mb-3">
-          <span className="text-3xl font-bold">{totalAccumulatedPoints.toLocaleString()}</span>
-          <span className="text-sm text-white/80"> / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'} คะแนน</span>
+      <div className="relative z-10 space-y-4">
+        <div className="flex flex-col items-center gap-1">
+          <div className="bg-white border-2 border-black px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider mb-2">
+            ระดับปัจจุบันของคุณ
+          </div>
+          <h3 className="text-3xl font-black">{currentLevel.name}</h3>
         </div>
 
-        <div className="w-full bg-white/30 h-2 rounded-full overflow-hidden mb-2">
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPercentage}%` }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="bg-white h-full rounded-full"
-          />
+        <div className="bg-white border-2 border-black p-4 rounded-3xl text-center">
+          <div className="flex items-baseline justify-center gap-1">
+            <span className="text-4xl font-black">{totalAccumulatedPoints.toLocaleString()}</span>
+            <span className="text-sm font-bold text-slate-500"> / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'} คะแนน</span>
+          </div>
+          
+          <div className="mt-4 space-y-2">
+            <div className="w-full bg-slate-100 border-2 border-black h-4 rounded-full overflow-hidden">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercentage}%` }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="bg-black h-full"
+              />
+            </div>
+            {nextLevel ? (
+              <p className="text-[11px] font-bold text-slate-600 uppercase tracking-tight">
+                อีก <span className="text-black font-black underline">{pointsToNextLevel.toLocaleString()}</span> คะแนน เพื่อเลื่อนเป็น <span className="text-black font-black underline">{nextLevel.name}</span>
+              </p>
+            ) : (
+              <p className="text-[11px] font-bold text-slate-600 uppercase">
+                คุณอยู่ในระดับสูงสุดแล้ว!
+              </p>
+            )}
+          </div>
         </div>
-        {nextLevel ? (
-          <p className="text-xs text-white/80 font-medium">
-            อีก <span className="font-bold">{pointsToNextLevel}</span> คะแนน เพื่อเลื่อนเป็น <span className="font-bold">{nextLevel.name}</span>
-          </p>
-        ) : (
-          <p className="text-xs text-white/80 font-medium">
-            คุณอยู่ในระดับสูงสุดแล้ว!
-          </p>
-        )}
       </div>
     </motion.div>
   );
 
   return (
-    <div className="space-y-6 pb-20">
-      <h2 className="text-xl font-bold text-slate-800 px-1">ระดับสมาชิกและสิทธิประโยชน์</h2>
+    <div className="space-y-6 pb-24">
+      <div className="px-1 flex items-center justify-between">
+        <h2 className="text-2xl font-black text-slate-800">ระดับสมาชิก</h2>
+        <div className="bg-white border-2 border-black px-3 py-1 rounded-full shadow-sm text-xs font-bold">
+          {membershipTiers.length} ระดับ
+        </div>
+      </div>
       
-      {/* Current Membership Status Card */}
       <CurrentMembershipStatusCard />
 
-      <div className="space-y-4">
-        {displayTiers.map((tier, index) => { 
+      <div className="space-y-6">
+        <h3 className="text-lg font-black text-slate-800 px-1">รายละเอียดและสิทธิประโยชน์</h3>
+        {sortedTiers.map((tier, index) => { 
           const isCurrentLevel = tier.id === currentLevel.id;
-          const cardClasses = `bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col relative overflow-hidden ${
-            !isCurrentLevel ? 'grayscale' : '' // Apply grayscale to the card
-          }`;
-
+          
           return (
             <motion.div
               key={tier.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className={cardClasses}
+              className={`relative bg-white rounded-[2.5rem] border-2 border-black shadow-soft overflow-hidden ${!isCurrentLevel ? 'opacity-70' : ''}`}
             >
-              {/* Content of the card */}
-              <div className="relative z-10"> {/* Content is below the overlay */}
-                <div className="flex items-center gap-4 mb-4">
-                  <div className={`w-14 h-14 ${tier.colorClass} rounded-2xl flex items-center justify-center text-white text-2xl shadow-inner`}>
-                    {tier.icon}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-800 text-lg">{tier.name}</h3>
-                    <p className="text-xs text-slate-500">{tier.description}</p>
-                  </div>
+              <div className={`p-5 border-b-2 border-black ${tier.colorClass} flex items-center justify-between`}>
+                <div className="flex items-center gap-3">
+                   <div className="w-12 h-12 bg-white border-2 border-black rounded-2xl flex items-center justify-center shadow-sm">
+                      {tier.icon}
+                   </div>
+                   <div>
+                     <h4 className="font-black text-black">{tier.name}</h4>
+                     {isCurrentLevel && (
+                       <span className="bg-black text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
+                         Current Level
+                       </span>
+                     )}
+                   </div>
                 </div>
-                <div className="border-t border-slate-50 pt-4">
-                  <ul className="space-y-2">
-                    {tier.benefits.map((benefit, bIndex) => (
-                      <li key={bIndex} className="flex items-start gap-2 text-sm text-slate-700">
-                        <Check size={16} className="text-pink-500 flex-shrink-0 mt-0.5" />
-                        <span>{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <div className="text-right">
+                  <p className="text-[10px] font-bold text-black/60 uppercase">คะแนนขั้นต่ำ</p>
+                  <p className="text-lg font-black">{tier.minPoints.toLocaleString()}</p>
                 </div>
               </div>
-              {!isCurrentLevel && (
-                // Overlay for the "fog" effect, on top of content
-                <div className="absolute inset-0 bg-white/80 z-20 rounded-[2.5rem]" /> 
-              )}
+
+              <div className="p-5">
+                <p className="text-xs font-bold text-slate-500 mb-4">{tier.description}</p>
+                <ul className="space-y-3">
+                  {tier.benefits.map((benefit, bIndex) => (
+                    <li key={bIndex} className="flex items-start gap-3 text-sm font-bold text-slate-700">
+                      <div className="bg-[#B2F2BB] border border-black p-0.5 rounded-md mt-0.5">
+                        <Check size={12} strokeWidth={4} />
+                      </div>
+                      <span>{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </motion.div>
           );
         })}
