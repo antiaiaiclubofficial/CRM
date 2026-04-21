@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowLeft, Pencil, Heart, PawPrint, Tag, Plus, Settings, Trash2, AlertTriangle, X, Scale
+  ArrowLeft, Pencil, Heart, PawPrint, Tag, Plus, HeartPulse, Trash2, AlertTriangle, X
 } from 'lucide-react';
 
 interface Pet {
@@ -37,12 +37,6 @@ interface PetDetailViewProps {
 
 const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreferences, onToggleFavorite }: PetDetailViewProps) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  const getGenderDisplay = (gender: string) => {
-    if (gender === 'ผู้') return 'ชาย (Male)';
-    if (gender === 'เมีย') return 'หญิง (Female)';
-    return gender;
-  };
 
   const hasPreferences = pet.customPreferences && pet.customPreferences.length > 0;
 
@@ -124,7 +118,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
 
         <div className="mb-6 space-y-3">
           <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
-            <Settings size={18} className="text-pink-500" /> ข้อมูลสุขภาพ
+            <HeartPulse size={18} className="text-pink-500" /> ข้อมูลสุขภาพ
           </h3>
           <div className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 space-y-4">
             <div className="flex items-baseline gap-1">
@@ -197,7 +191,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         </button>
       </div>
 
-      {/* Neubrutalism Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal */}
       <AnimatePresence>
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">

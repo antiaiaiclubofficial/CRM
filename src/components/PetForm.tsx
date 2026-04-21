@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, HeartPulse, Calendar, Info, Check, Feather, Camera, Image as ImageIcon } from 'lucide-react';
+import { X, User, HeartPulse, Calendar, Info, Check, Feather, Camera } from 'lucide-react';
 import AnalogScaleIcon from './AnalogScaleIcon';
 
 interface Pet {
@@ -150,7 +150,6 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
             </div>
 
             <div className="space-y-6 px-8 pb-24">
-              {/* Image Upload Section */}
               <div className="flex flex-col items-center gap-3">
                 <div 
                   onClick={() => fileInputRef.current?.click()}
