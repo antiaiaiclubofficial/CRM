@@ -77,7 +77,7 @@ const Promotions = ({
       expiry: '31 มี.ค. 69',
       bgColor: 'bg-[#FFD8E4]',
       textColor: 'text-pink-800',
-      buttonColor: 'bg-white', // Changed to white for better contrast
+      buttonColor: 'bg-white',
       buttonTextColor: 'text-pink-600',
       pawPrintColor: 'text-pink-200',
       iconName: 'Heart',
@@ -90,7 +90,7 @@ const Promotions = ({
       expiry: '15 เม.ย. 69',
       bgColor: 'bg-[#FFE3BC]',
       textColor: 'text-amber-800',
-      buttonColor: 'bg-white', // Changed to white for better contrast
+      buttonColor: 'bg-white',
       buttonTextColor: 'text-amber-600',
       pawPrintColor: 'text-amber-200',
       iconName: 'Sparkles',
@@ -128,7 +128,7 @@ const Promotions = ({
       <div>
         <div className="flex items-center gap-2 mb-4 px-1">
           <Tag size={18} className="text-pink-500" />
-          <h2 className="text-xl font-bold text-slate-800">โปรโมชั่นพิเศษ</h2>
+          <h2 className="text-xl font-bold text-slate-800 uppercase tracking-tight">โปรโมชั่นพิเศษ</h2>
         </div>
         <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 px-1">
           {specialPromotionsData.map((promo) => {
@@ -137,31 +137,31 @@ const Promotions = ({
               <motion.div
                 key={promo.id}
                 whileTap={{ scale: isCollected ? 1 : 0.98 }}
-                className={`relative flex-shrink-0 w-[280px] h-36 ${promo.bgColor} rounded-[2rem] p-5 overflow-hidden shadow-sm border border-slate-50 ${isCollected ? 'opacity-60 grayscale' : ''}`}
+                className={`relative flex-shrink-0 w-[280px] h-36 ${promo.bgColor} rounded-[2rem] p-5 overflow-hidden border-2 border-black shadow-soft ${isCollected ? 'grayscale opacity-40 pointer-events-none' : ''}`}
               >
                 <PawPrint className={`absolute -right-4 -bottom-4 w-24 h-24 ${promo.pawPrintColor} opacity-50 rotate-12`} />
                 <div className="relative z-10 flex flex-col justify-between h-full">
                   <div>
-                    <span className={`text-[10px] font-bold ${promo.textColor} bg-white/60 backdrop-blur-sm px-2 py-0.5 rounded-full mb-2 inline-block`}>
+                    <span className={`text-[9px] font-black ${promo.textColor} bg-white border border-black px-2 py-0.5 rounded-full mb-2 inline-block`}>
                       {promo.tag}
                     </span>
-                    <h3 className={`text-lg font-bold ${promo.textColor} flex items-center gap-1`}>
+                    <h3 className={`text-lg font-black ${promo.textColor} flex items-center gap-1`}>
                       {promo.title} {promo.iconName && getIconComponent(promo.iconName, 18, promo.textColor)}
                     </h3>
-                    <p className={`text-xs ${promo.textColor} opacity-80`}>{promo.description}</p>
+                    <p className={`text-[10px] font-bold ${promo.textColor} opacity-80`}>{promo.description}</p>
                   </div>
                   <div className="flex justify-between items-end">
-                    <span className={`text-[10px] ${promo.textColor} opacity-70`}>{promo.expiry}</span>
+                    <span className={`text-[9px] font-bold ${promo.textColor} opacity-70`}>{promo.expiry}</span>
                     <button 
                       onClick={() => onCollectSpecialPromotion(convertToCoupon(promo))}
                       disabled={isCollected}
-                      className={`text-xs font-bold px-5 py-2 rounded-full transition-all shadow-sm ${
+                      className={`text-[10px] font-black px-4 py-1.5 rounded-xl transition-all shadow-sm ${
                         isCollected
-                          ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
-                          : `${promo.buttonColor} ${promo.buttonTextColor} active:scale-95 border border-white/20`
+                          ? 'bg-slate-200 text-slate-500 border border-slate-300'
+                          : `${promo.buttonColor} ${promo.buttonTextColor} border-2 border-black active:translate-y-0.5 active:shadow-none`
                       }`}
                     >
-                      {isCollected ? 'เก็บแล้ว' : 'เก็บ'}
+                      {isCollected ? 'เก็บแล้ว' : 'เก็บโปรโมชั่น'}
                     </button>
                   </div>
                 </div>
@@ -175,30 +175,30 @@ const Promotions = ({
       <div>
         <div className="flex items-center gap-2 mb-4 px-1">
           <Award size={18} className="text-emerald-500" />
-          <h2 className="text-xl font-bold text-slate-800">ดีลส่วนลดสมาชิก</h2>
+          <h2 className="text-xl font-bold text-slate-800 uppercase tracking-tight">ดีลส่วนลดสมาชิก</h2>
         </div>
         <div className="grid grid-cols-2 gap-4">
           {memberDealsData.map((deal) => (
             <motion.div
               key={deal.id}
               whileTap={{ scale: 0.98 }}
-              className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-50 flex flex-col gap-3 relative overflow-hidden"
+              className="bg-white p-4 rounded-[2rem] border-2 border-black shadow-soft flex flex-col gap-3 relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 bg-pink-500 text-white text-[10px] font-black px-3 py-1.5 rounded-bl-[1.25rem] shadow-sm">
+              <div className="absolute top-0 right-0 bg-pink-500 text-white text-[9px] font-black px-2 py-1 border-l-2 border-b-2 border-black rounded-bl-xl">
                 -{deal.discountPercentage}%
               </div>
-              <div className={`w-12 h-12 ${deal.bgColor} rounded-2xl flex items-center justify-center shadow-inner`}>
-                {getIconComponent(deal.iconName, 20, deal.iconColor)}
+              <div className={`w-10 h-10 ${deal.bgColor} border-2 border-black rounded-xl flex items-center justify-center shadow-sm`}>
+                {getIconComponent(deal.iconName, 18, deal.iconColor)}
               </div>
               <div>
-                <h4 className="font-bold text-slate-800 text-xs line-clamp-1">{deal.serviceName}</h4>
+                <h4 className="font-black text-slate-800 text-xs line-clamp-1">{deal.serviceName}</h4>
                 <div className="flex items-baseline gap-1.5 mt-1">
-                  <span className="text-sm font-bold text-pink-500">{deal.currentPrice}</span>
-                  <span className="text-[9px] text-slate-400 line-through">{deal.originalPrice}</span>
+                  <span className="text-sm font-black text-pink-500">{deal.currentPrice}</span>
+                  <span className="text-[8px] font-bold text-slate-400 line-through">{deal.originalPrice}</span>
                 </div>
-                <p className="text-[9px] text-slate-400 mt-1">{deal.membershipLevelRequired}</p>
+                <p className="text-[8px] font-bold text-slate-400 mt-1 uppercase">{deal.membershipLevelRequired}</p>
               </div>
-              <button className="w-full bg-emerald-50 text-emerald-700 text-[10px] font-bold py-2 rounded-xl active:scale-95 transition-all">
+              <button className="w-full bg-emerald-50 text-emerald-700 border-2 border-black text-[10px] font-black py-2 rounded-xl active:translate-y-0.5 active:shadow-none shadow-sm transition-all">
                 จองเลย
               </button>
             </motion.div>
@@ -210,7 +210,7 @@ const Promotions = ({
       <div>
         <div className="flex items-center gap-2 mb-4 px-1">
           <Crown size={18} className="text-amber-500" />
-          <h2 className="text-xl font-bold text-slate-800">แลกคะแนน</h2>
+          <h2 className="text-xl font-bold text-slate-800 uppercase tracking-tight">แลกคะแนน</h2>
         </div>
         <div className="space-y-3">
           {redeemableCouponsData.map((coupon) => {
@@ -222,25 +222,25 @@ const Promotions = ({
               <motion.div
                 key={coupon.id}
                 whileTap={{ scale: isDisabled ? 1 : 0.98 }}
-                className={`bg-white p-4 rounded-3xl shadow-sm border border-slate-50 flex items-center gap-4 group ${isDisabled ? 'opacity-50 grayscale' : ''}`}
+                className={`bg-white p-4 rounded-[2rem] border-2 border-black shadow-soft flex items-center gap-4 group ${isDisabled ? 'opacity-40 grayscale pointer-events-none' : ''}`}
               >
-                <div className={`w-12 h-12 ${coupon.bg} rounded-2xl flex items-center justify-center text-xl shadow-inner`}>
+                <div className={`w-12 h-12 ${coupon.bg} border-2 border-black rounded-2xl flex items-center justify-center text-xl shadow-sm`}>
                   {getIconComponent(coupon.iconName, 22)}
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-slate-800 text-sm">{coupon.title}</h4>
-                  <p className="text-[10px] text-slate-500">{coupon.description}</p>
-                  <p className="text-[10px] text-amber-600 font-bold mt-0.5">
+                  <h4 className="font-black text-slate-800 text-sm">{coupon.title}</h4>
+                  <p className="text-[10px] font-bold text-slate-500">{coupon.description}</p>
+                  <p className="text-[10px] text-amber-600 font-black mt-0.5">
                     {coupon.pointsRequired} คะแนน
                   </p>
                 </div>
                 <button
                   onClick={() => onRedeemCoupon(coupon, coupon.pointsRequired)}
                   disabled={isDisabled}
-                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                  className={`px-4 py-2 rounded-xl text-[10px] font-black border-2 border-black shadow-sm transition-all ${
                     isDisabled
-                      ? 'bg-slate-100 text-slate-400'
-                      : 'bg-pink-100 text-pink-700 active:scale-95'
+                      ? 'bg-slate-100 text-slate-400 border-slate-300 shadow-none'
+                      : 'bg-pink-100 text-pink-700 active:translate-y-0.5 active:shadow-none'
                   }`}
                 >
                   {isAlreadyCollected ? 'แลกแล้ว' : 'แลกเลย'}
@@ -255,7 +255,7 @@ const Promotions = ({
       <div>
         <div className="flex items-center gap-2 mb-4 px-1">
           <Ticket size={18} className="text-pink-500" />
-          <h2 className="text-xl font-bold text-slate-800">คูปองของฉัน</h2>
+          <h2 className="text-xl font-bold text-slate-800 uppercase tracking-tight">คูปองของฉัน</h2>
         </div>
         <div className="space-y-3">
           {collectedCoupons.length > 0 ? (
@@ -265,25 +265,25 @@ const Promotions = ({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-50 flex items-center gap-4"
+                className="bg-white p-4 rounded-[2rem] border-2 border-black shadow-soft flex items-center gap-4"
               >
-                <div className={`w-10 h-10 ${coupon.bg} rounded-lg flex items-center justify-center text-xl shadow-inner`}>
+                <div className={`w-10 h-10 ${coupon.bg} border-2 border-black rounded-xl flex items-center justify-center text-xl shadow-sm`}>
                   {getIconComponent(coupon.iconName, 20)}
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-slate-800 text-sm">{coupon.title}</h4>
-                  <p className="text-xs text-slate-500">{coupon.description}</p>
+                  <h4 className="font-black text-slate-800 text-sm">{coupon.title}</h4>
+                  <p className="text-[10px] font-bold text-slate-500">{coupon.description}</p>
                 </div>
                 <button
                   onClick={() => onUseCoupon(coupon.id)}
-                  className="bg-pink-100 text-pink-700 text-xs font-bold px-3 py-1.5 rounded-full active:scale-95 transition-all"
+                  className="bg-pink-100 text-pink-700 text-[10px] font-black px-4 py-2 rounded-xl border-2 border-black shadow-sm active:translate-y-0.5 active:shadow-none transition-all"
                 >
                   ใช้เลย
                 </button>
               </motion.div>
             ))
           ) : (
-            <div className="text-center py-6 text-slate-400 text-sm">คุณยังไม่มีคูปองที่เก็บไว้ค่ะ</div>
+            <div className="text-center py-6 border-2 border-dashed border-slate-300 rounded-[2rem] text-slate-400 font-bold text-xs uppercase">คุณยังไม่มีคูปองที่เก็บไว้ค่ะ</div>
           )}
         </div>
       </div>
@@ -292,7 +292,7 @@ const Promotions = ({
       <div>
         <div className="flex items-center gap-2 mb-4 px-1">
           <History size={18} className="text-slate-500" />
-          <h2 className="text-xl font-bold text-slate-800 text-lg">ประวัติคูปอง</h2>
+          <h2 className="text-xl font-bold text-slate-800 uppercase tracking-tight opacity-50">ประวัติคูปอง</h2>
         </div>
         <div className="space-y-3">
           {usedOrExpiredCoupons.length > 0 ? (
@@ -302,19 +302,19 @@ const Promotions = ({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-50 flex items-center gap-4 opacity-50 grayscale"
+                className="bg-slate-50 p-4 rounded-[2rem] border-2 border-slate-200 flex items-center gap-4 opacity-40 grayscale pointer-events-none"
               >
-                <div className={`w-10 h-10 ${coupon.bg} rounded-lg flex items-center justify-center shadow-inner`}>
+                <div className={`w-10 h-10 bg-white border-2 border-slate-200 rounded-xl flex items-center justify-center shadow-none`}>
                   {getIconComponent(coupon.iconName, 20)}
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-slate-800 text-sm line-through">{coupon.title}</h4>
-                  <p className="text-[10px] text-slate-500">{coupon.usedDate ? `ใช้เมื่อ ${coupon.usedDate}` : 'หมดอายุ'}</p>
+                  <h4 className="font-bold text-slate-400 text-sm line-through">{coupon.title}</h4>
+                  <p className="text-[9px] font-bold text-slate-400 uppercase">{coupon.usedDate ? `ใช้เมื่อ ${coupon.usedDate}` : 'หมดอายุ'}</p>
                 </div>
               </motion.div>
             ))
           ) : (
-            <div className="text-center py-4 text-slate-400 text-xs">ไม่มีประวัติการใช้คูปอง</div>
+            <div className="text-center py-4 text-slate-300 font-bold text-[10px] uppercase">ไม่มีประวัติการใช้คูปอง</div>
           )}
         </div>
       </div>
