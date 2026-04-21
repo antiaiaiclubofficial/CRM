@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  ArrowLeft, Edit2, Heart, MapPin, Tag, Plus, Settings
+  ArrowLeft, Pencil, Heart, MapPin, Tag, Plus, Settings
 } from 'lucide-react';
 
 interface Pet {
@@ -67,7 +67,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences, onToggleFa
           onClick={() => onStartEdit(pet)} 
           className="p-2.5 bg-slate-900 text-white rounded-xl shadow-lg active:scale-95 transition-transform flex items-center gap-1 px-3"
         >
-          <Settings size={20} />
+          <Pencil size={18} />
           <span className="text-xs font-bold">แก้ไข</span>
         </button>
       </div>
@@ -147,7 +147,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences, onToggleFa
                 onClick={onEditPreferences} 
                 className="p-1.5 bg-[#D4B89A] rounded-full text-[#4A2C0F] hover:bg-[#E0C7A9] transition-colors border border-black/10"
               >
-                <Edit2 size={16} />
+                <Pencil size={16} />
               </button>
             </div>
 

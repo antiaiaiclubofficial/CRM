@@ -77,11 +77,17 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
   }, [initialData, isOpen]);
 
   const handleSave = () => {
+    // Auto-fill "-" if fields are empty
+    const medicalCondition = formData.medicalCondition.trim() || "-";
+    const precautions = formData.precautions.trim() || "-";
+
+    const finalData = { ...formData, medicalCondition, precautions };
+
     if (initialData) {
       const updatedPet: Pet = {
         ...initialData,
-        ...formData,
-        icon: petIcons[formData.type] || '🐾',
+        ...finalData,
+        icon: petIcons[finalData.type] || '🐾',
       };
       onSave(updatedPet);
     } else {
@@ -89,15 +95,14 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
       const randomColor = defaultCardBgColors[Math.floor(Math.random() * defaultCardBgColors.length)];
       
       const newPet: Omit<Pet, 'id'> = {
-        ...formData,
+        ...finalData,
         color: colors[Math.floor(Math.random() * colors.length)],
-        icon: petIcons[formData.type] || '🐾',
+        icon: petIcons[finalData.type] || '🐾',
         customPreferences: [],
-        imageUrl: formData.type === 'แมว' 
+        imageUrl: finalData.type === 'แมว' 
           ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2043&auto=format&fit=crop' 
           : 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1974&auto=format&fit=crop',
         cardBgColor: randomColor,
-        hasHeartIcon: false,
       };
       onSave(newPet);
     }
@@ -129,9 +134,9 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
             </div>
 
             <div className="space-y-6 px-8 pb-24">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 items-end">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 px-1 flex items-center gap-1"><User size={14} className="text-pink-500"/> ชื่อสัตว์เลี้ยง</label>
+                  <label className="text-xs font-bold text-slate-500 px-1">ชื่อสัตว์เลี้ยง</label>
                   <input 
                     type="text" 
                     value={formData.name}
@@ -163,21 +168,23 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                 />
               </div>
 
-              {/* Metrics Row - Fixed Alignment to match Image */}
+              {/* Metrics Row - Fixed Overlap */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 flex items-center justify-center gap-1">
                     <Calendar size={14} className="text-slate-400" /> อายุ
                   </label>
-                  <div className="relative">
+                  <div className="relative group">
                     <input 
                       type="number" 
                       value={formData.age}
                       onChange={(e) => setFormData({...formData, age: e.target.value})}
                       placeholder="ปี"
-                      className="w-full p-4 bg-slate-50 rounded-2xl text-center border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-sm font-bold text-slate-700"
+                      className="w-full p-4 bg-slate-50 rounded-2xl text-center border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-sm font-bold text-slate-700 placeholder:text-slate-300"
                     />
-                    {!formData.age && <span className="absolute inset-0 flex items-center justify-center pointer-events-none text-slate-400 text-sm font-medium">ปี</span>}
+                    {formData.age && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 pointer-events-none">ปี</span>
+                    )}
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -197,15 +204,17 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                   <label className="text-xs font-bold text-slate-500 flex items-center justify-center gap-1">
                     <Scale size={14} className="text-slate-400" /> นน.
                   </label>
-                  <div className="relative">
+                  <div className="relative group">
                     <input 
                       type="number" 
                       value={formData.weight}
                       onChange={(e) => setFormData({...formData, weight: e.target.value})}
                       placeholder="kg"
-                      className="w-full p-4 bg-slate-50 rounded-2xl text-center border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-sm font-bold text-slate-700"
+                      className="w-full p-4 bg-slate-50 rounded-2xl text-center border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-sm font-bold text-slate-700 placeholder:text-slate-300"
                     />
-                    {!formData.weight && <span className="absolute inset-0 flex items-center justify-center pointer-events-none text-slate-400 text-sm font-medium">kg</span>}
+                    {formData.weight && (
+                      <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 pointer-events-none">kg</span>
+                    )}
                   </div>
                 </div>
               </div>
