@@ -98,7 +98,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           </motion.button>
         </div>
 
-        {/* Improved Metrics Grid */}
+        {/* Metrics Grid */}
         <div className="grid grid-cols-3 gap-2 mb-6">
           <div className="bg-slate-50 py-4 px-2 rounded-2xl text-center border border-slate-100 flex flex-col justify-center">
             <div className="flex items-baseline justify-center gap-0.5 mb-1">
@@ -128,15 +128,15 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           </h3>
           <div className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 space-y-5">
             <div className="flex items-start">
-              <span className="font-bold text-slate-400 text-xs w-28 shrink-0 pt-0.5 tracking-tight">ความยาวขน:</span>
+              <span className="font-bold text-slate-400 text-xs w-[85px] shrink-0 pt-0.5 tracking-tight">ความยาวขน:</span>
               <span className="font-black text-slate-800 text-sm leading-relaxed flex-1">{pet.furLength || '-'}</span>
             </div>
             <div className="flex items-start">
-              <span className="font-bold text-slate-400 text-xs w-28 shrink-0 pt-0.5 tracking-tight">โรคประจำตัว:</span>
+              <span className="font-bold text-slate-400 text-xs w-[85px] shrink-0 pt-0.5 tracking-tight">โรคประจำตัว:</span>
               <span className="font-black text-slate-800 text-sm leading-relaxed flex-1">{pet.medicalCondition || '-'}</span>
             </div>
             <div className="flex items-start">
-              <span className="font-bold text-slate-400 text-xs w-28 shrink-0 pt-0.5 tracking-tight">ข้อควรระวัง:</span>
+              <span className="font-bold text-slate-400 text-xs w-[85px] shrink-0 pt-0.5 tracking-tight">ข้อควรระวัง:</span>
               <span className="font-black text-slate-800 text-sm leading-relaxed flex-1">{pet.precautions || '-'}</span>
             </div>
           </div>
