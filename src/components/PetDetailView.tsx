@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  ArrowLeft, Pencil, Heart, MapPin, Tag, Plus, Settings
+  ArrowLeft, Pencil, Heart, MapPin, Tag, Plus, Settings, Trash2
 } from 'lucide-react';
 
 interface Pet {
@@ -35,7 +35,7 @@ interface PetDetailViewProps {
   onToggleFavorite: () => void;
 }
 
-const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences, onToggleFavorite }: PetDetailViewProps) => {
+const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreferences, onToggleFavorite }: PetDetailViewProps) => {
   const getGenderDisplay = (gender: string) => {
     if (gender === 'ผู้') return 'Male';
     if (gender === 'เมีย') return 'Female';
@@ -135,7 +135,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences, onToggleFa
       <div className="pt-6 px-6">
         <h3 className="text-lg font-black text-slate-800 mb-4">{pet.name}'s collection</h3>
         
-        <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative shadow-lg border-2 border-[#c28856] shadow-soft">
+        <div className="bg-[#fff6ed] rounded-[2.5rem] border-t-8 border-[#c28856] relative shadow-lg border-2 border-[#c28856] shadow-soft mb-8">
           <div className="absolute -top-3 left-0 right-0 flex justify-around px-8">
             {[1,2,3,4,5].map(i => <div key={i} className="w-3 h-5 bg-[#c28856] rounded-full" />)}
           </div>
@@ -175,6 +175,19 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onEditPreferences, onToggleFa
             </div>
           </div>
         </div>
+
+        {/* Delete Button at the bottom */}
+        <button 
+          onClick={() => {
+            if(window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลสัตว์เลี้ยงตัวนี้?')) {
+              onDeletePet(pet.id);
+            }
+          }}
+          className="w-full py-4 flex items-center justify-center gap-2 bg-red-50 text-red-500 font-bold rounded-2xl border-2 border-red-100 hover:bg-red-100 transition-colors active:scale-95"
+        >
+          <Trash2 size={20} />
+          ลบข้อมูลสัตว์เลี้ยง
+        </button>
       </div>
     </motion.div>
   );

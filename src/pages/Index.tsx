@@ -186,6 +186,12 @@ const Index = () => {
     setPetToEdit(null);
   };
 
+  const handleDeletePet = (id: number) => {
+    setPets(prev => prev.filter(p => p.id !== id));
+    setSelectedPetForDetail(null);
+    toast.success('ลบข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ');
+  };
+
   const handleStartEditPet = (pet: Pet) => {
     setPetToEdit(pet);
     setIsPetFormOpen(true);
@@ -262,7 +268,7 @@ const Index = () => {
                   pet={selectedPetForDetail} 
                   onBack={() => setSelectedPetForDetail(null)} 
                   onStartEdit={handleStartEditPet} 
-                  onDeletePet={() => {}} 
+                  onDeletePet={handleDeletePet} 
                   totalServiceCost={0} 
                   onViewServiceHistoryForPet={() => {}} 
                   onEditPreferences={() => setIsPreferenceFormOpen(true)} 

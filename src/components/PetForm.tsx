@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, HeartPulse, Scale, Calendar, Info, Check, Feather } from 'lucide-react';
+import { X, User, HeartPulse, Scale, Calendar, Info, Check, Feather, Camera, Image as ImageIcon } from 'lucide-react';
 
 interface Pet {
   id: number;
@@ -20,7 +20,7 @@ interface Pet {
   customPreferences?: { id: string; label: string; value: string; }[];
   imageUrl: string;
   cardBgColor: string;
-  hasHeartIcon?: boolean;
+  isFavorite?: boolean;
 }
 
 interface PetFormProps {
@@ -33,9 +33,10 @@ interface PetFormProps {
 const petIcons: Record<string, string> = { 'สุนัข': '🐶', 'แมว': '🐱', 'กระต่าย': '🐰', 'หนูแฮมสเตอร์': '🐹', 'นก': '🦜' };
 const colors = ['bg-orange-100', 'bg-blue-100', 'bg-yellow-100', 'bg-pink-100', 'bg-purple-100', 'bg-green-100'];
 
-type EditablePetFields = Omit<Pet, 'id' | 'color' | 'icon' | 'customPreferences' | 'imageUrl' | 'cardBgColor' | 'hasHeartIcon'>;
+type EditablePetFields = Omit<Pet, 'id' | 'color' | 'icon' | 'customPreferences' | 'cardBgColor' | 'isFavorite'>;
 
 const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<EditablePetFields>({
     name: '',
     type: 'สุนัข',
@@ -46,6 +47,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     medicalCondition: '',
     precautions: '',
     furLength: '',
+    imageUrl: '',
   });
 
   useEffect(() => {
@@ -60,6 +62,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         medicalCondition: initialData.medicalCondition,
         precautions: initialData.precautions,
         furLength: initialData.furLength || '',
+        imageUrl: initialData.imageUrl,
       });
     } else {
       setFormData({
@@ -72,16 +75,30 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         medicalCondition: '',
         precautions: '',
         furLength: '',
+        imageUrl: '',
       });
     }
   }, [initialData, isOpen]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = () => {
-    // Auto-fill "-" if fields are empty
     const medicalCondition = formData.medicalCondition.trim() || "-";
     const precautions = formData.precautions.trim() || "-";
+    const imageUrl = formData.imageUrl || (formData.type === 'แมว' 
+      ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2043&auto=format&fit=crop' 
+      : 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1974&auto=format&fit=crop');
 
-    const finalData = { ...formData, medicalCondition, precautions };
+    const finalData = { ...formData, medicalCondition, precautions, imageUrl };
 
     if (initialData) {
       const updatedPet: Pet = {
@@ -99,10 +116,8 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         color: colors[Math.floor(Math.random() * colors.length)],
         icon: petIcons[finalData.type] || '🐾',
         customPreferences: [],
-        imageUrl: finalData.type === 'แมว' 
-          ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2043&auto=format&fit=crop' 
-          : 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1974&auto=format&fit=crop',
         cardBgColor: randomColor,
+        isFavorite: false,
       };
       onSave(newPet);
     }
@@ -134,6 +149,33 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
             </div>
 
             <div className="space-y-6 px-8 pb-24">
+              {/* Image Upload Section */}
+              <div className="flex flex-col items-center gap-3">
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="relative w-28 h-28 rounded-full border-4 border-dashed border-pink-200 bg-pink-50 flex items-center justify-center overflow-hidden cursor-pointer group hover:border-pink-400 transition-colors shadow-inner"
+                >
+                  {formData.imageUrl ? (
+                    <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="flex flex-col items-center text-pink-300">
+                      <Camera size={32} />
+                      <span className="text-[10px] font-bold mt-1">อัปโหลดรูป</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                     <Camera size={24} className="text-white" />
+                  </div>
+                </div>
+                <input 
+                  type="file" 
+                  ref={fileInputRef}
+                  onChange={handleImageChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-4 items-end">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-500 px-1">ชื่อสัตว์เลี้ยง</label>
@@ -168,7 +210,6 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                 />
               </div>
 
-              {/* Metrics Row - Fixed Overlap */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 flex items-center justify-center gap-1">
@@ -238,7 +279,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                   <textarea 
                     value={formData.medicalCondition}
                     onChange={(e) => setFormData({...formData, medicalCondition: e.target.value})}
-                    placeholder="ระบุโรคประจำตัว (ถ้าไม่มีให้ใส่ -)"
+                    placeholder="ระบุโรคประจำตัว"
                     className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-red-100 focus:bg-white transition-all outline-none text-sm font-medium h-24 resize-none"
                   />
                 </div>
