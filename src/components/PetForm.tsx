@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, HeartPulse, Scale, Calendar, Info, Check, Feather, Camera, Image as ImageIcon } from 'lucide-react';
+import { X, User, HeartPulse, Weight, Calendar, Info, Check, Feather, Camera, Image as ImageIcon } from 'lucide-react';
 
 interface Pet {
   id: number;
@@ -243,7 +243,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 flex items-center justify-center gap-1">
-                    <Scale size={14} className="text-slate-400" /> นน.
+                    <Weight size={14} className="text-slate-400" /> นน.
                   </label>
                   <div className="relative group">
                     <input 

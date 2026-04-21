@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Calendar, Scale, PawPrint, HeartPulse, Info, User, Feather } from 'lucide-react';
+import { Calendar, Weight, PawPrint, HeartPulse, Info, User, Feather } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Pet {
@@ -58,7 +58,7 @@ const PetIDCard = ({ pet }: PetIDCardProps) => {
             <span className="font-medium">อายุ: <span className="font-bold">{pet.age || '-'} ปี</span></span>
           </div>
           <div className="flex items-center gap-2">
-            <Scale size={16} className="text-amber-500" />
+            <Weight size={16} className="text-amber-500" />
             <span className="font-medium">น้ำหนัก: <span className="font-bold">{pet.weight || '-'} kg</span></span>
           </div>
           <div className="flex items-center gap-2">
