@@ -16,11 +16,11 @@ import PetManagement from '@/components/PetManagement';
 import QRCodeModal from '@/components/QRCodeModal';
 import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
 import CouponUseModal from '@/components/CouponUseModal';
-import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, AlertTriangle } from 'lucide-react';
+import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useLiff } from '@/hooks/use-liff';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface Pet {
   id: number;
@@ -61,14 +61,12 @@ const Index = () => {
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
 
   useEffect(() => {
-    if (liffProfile && supabase) {
+    if (liffProfile) {
       fetchUserData(liffProfile.userId);
     }
   }, [liffProfile]);
 
   const fetchUserData = async (lineUserId: string) => {
-    if (!supabase) return;
-
     try {
       let { data: profile, error: profileError } = await supabase
         .from('profiles')
@@ -142,7 +140,7 @@ const Index = () => {
   };
 
   const handleSavePet = async (petData: any) => {
-    if (!supabase || !ownerProfile) return;
+    if (!ownerProfile) return;
 
     const dbPetData = {
       owner_id: ownerProfile.id,
@@ -181,7 +179,6 @@ const Index = () => {
   };
 
   const handleDeletePet = async (id: number) => {
-    if (!supabase) return;
     try {
       const { error } = await supabase.from('pets').delete().eq('id', id);
       if (error) throw error;
@@ -199,7 +196,7 @@ const Index = () => {
   };
 
   const handleUpdateProfile = async (updatedProfile: any) => {
-    if (!supabase || !ownerProfile) return;
+    if (!ownerProfile) return;
     try {
       const dbProfileData = {
         first_name: updatedProfile.firstName,
@@ -219,16 +216,6 @@ const Index = () => {
     }
   };
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFF9F0] p-8 text-center">
-        <AlertTriangle className="text-amber-500 mb-4" size={48} />
-        <h2 className="text-xl font-bold mb-2">ยังไม่ได้เชื่อมต่อ Supabase</h2>
-        <p className="text-slate-500 text-sm mb-6">กรุณากดปุ่ม 'Connect Supabase' ที่ด้านบนเพื่อเริ่มใช้งานฐานข้อมูลจริง</p>
-      </div>
-    );
-  }
-
   if (isLiffLoading || !ownerProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FFF9F0]">
@@ -238,6 +225,8 @@ const Index = () => {
       </div>
     );
   }
+
+  const sortedPets = [...pets].sort((a, b) => (a.isFavorite === b.isFavorite ? 0 : a.isFavorite ? -1 : 1));
 
   return (
     <div className="w-full min-h-screen max-w-lg mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt']">
@@ -286,7 +275,7 @@ const Index = () => {
                 </button>
               </div>
               <PetList 
-                pets={pets} 
+                pets={sortedPets} 
                 onPetClick={(pet) => { setSelectedPetForDetail(pet); setActiveTab('pets'); }} 
                 onViewAll={() => setActiveTab('pets')} 
               />
@@ -314,7 +303,7 @@ const Index = () => {
                   onToggleFavorite={() => {}} 
                 />
               ) : (
-                <PetManagement pets={pets} onBack={() => setActiveTab('home')} onViewDetails={(pet) => setSelectedPetForDetail(pet)} onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} />
+                <PetManagement pets={sortedPets} onBack={() => setActiveTab('home')} onViewDetails={(pet) => setSelectedPetForDetail(pet)} onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} />
               )}
             </motion.div>
           )}
