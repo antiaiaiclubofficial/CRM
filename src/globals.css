@@ -16,21 +16,23 @@
 }
 
 html, body {
-  height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent body scroll, let the app container handle it */
+  background-color: #FFF9F0;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
+  /* Allow natural scrolling but prevent horizontal bounce */
+  overflow-x: hidden;
+  height: auto;
+  min-height: 100%;
 }
 
 body {
   font-family: 'Prompt', 'Nunito', sans-serif;
-  background-color: #FFF9F0;
   @apply text-slate-800;
 }
 
-/* Custom Scrollbar for Pet List */
+/* Custom Scrollbar hidden but functional */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
