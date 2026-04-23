@@ -16,7 +16,7 @@ import PetManagement from '@/components/PetManagement';
 import QRCodeModal from '@/components/QRCodeModal';
 import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
 import CouponUseModal from '@/components/CouponUseModal';
-import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors } from 'lucide-react';
+import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useLiff } from '@/hooks/use-liff';
@@ -62,21 +62,23 @@ const Index = () => {
 
   // Fetch User Data from Supabase when LIFF Profile is ready
   useEffect(() => {
-    if (liffProfile) {
+    if (liffProfile && supabase) {
       fetchUserData(liffProfile.userId);
     }
   }, [liffProfile]);
 
   const fetchUserData = async (lineUserId: string) => {
+    if (!supabase) return;
+
     try {
       // 1. Get or Create Profile
       let { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('line_id', lineUserId)
-        .single();
+        .maybeSingle();
 
-      if (profileError && profileError.code === 'PGRST116') {
+      if (!profile) {
         // Profile doesn't exist, create one
         const { data: newProfile, error: createError } = await supabase
           .from('profiles')
@@ -84,7 +86,8 @@ const Index = () => {
             line_id: lineUserId, 
             first_name: liffProfile.displayName,
             avatar_url: liffProfile.pictureUrl,
-            points: 0 
+            points: 0,
+            total_points: 0
           }])
           .select()
           .single();
@@ -106,7 +109,7 @@ const Index = () => {
           .from('user_coupons')
           .select('*, coupons(*)')
           .eq('owner_id', profile.id);
-        setCollectedCoupons(couponsData?.map(uc => uc.coupons) || []);
+        setCollectedCoupons(couponsData?.map((uc: any) => uc.coupons) || []);
 
         // 4. Fetch History
         const { data: historyData } = await supabase
@@ -121,6 +124,8 @@ const Index = () => {
   };
 
   const handleSavePet = async (petData: any) => {
+    if (!supabase || !ownerProfile) return;
+
     try {
       if (petData.id) {
         const { error } = await supabase.from('pets').update(petData).eq('id', petData.id);
@@ -137,6 +142,34 @@ const Index = () => {
       toast.error('เกิดข้อผิดพลาด');
     }
   };
+
+  const handleDeletePet = async (id: number) => {
+    if (!supabase) return;
+    try {
+      const { error } = await supabase.from('pets').delete().eq('id', id);
+      if (error) throw error;
+      toast.success('ลบข้อมูลเรียบร้อย');
+      fetchUserData(liffProfile.userId);
+      setSelectedPetForDetail(null);
+    } catch (err) {
+      toast.error('ลบไม่สำเร็จ');
+    }
+  };
+
+  const handleStartEditPet = (pet: Pet) => {
+    setPetToEdit(pet);
+    setIsPetFormOpen(true);
+  };
+
+  if (!supabase) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFF9F0] p-8 text-center">
+        <AlertTriangle className="text-amber-500 mb-4" size={48} />
+        <h2 className="text-xl font-bold mb-2">ยังไม่ได้เชื่อมต่อ Supabase</h2>
+        <p className="text-slate-500 text-sm mb-6">กรุณากดปุ่ม 'Connect Supabase' ที่ด้านบนเพื่อเริ่มใช้งานฐานข้อมูลจริง</p>
+      </div>
+    );
+  }
 
   if (isLiffLoading || !ownerProfile) {
     return (
@@ -174,7 +207,15 @@ const Index = () => {
               <MembershipCard 
                 totalAccumulatedPoints={ownerProfile.total_points || 0} 
                 redeemablePoints={ownerProfile.points || 0} 
-                ownerProfile={ownerProfile} 
+                ownerProfile={{
+                  firstName: ownerProfile.first_name,
+                  lastName: ownerProfile.last_name || '',
+                  gender: ownerProfile.gender || '',
+                  age: ownerProfile.age || '',
+                  phone: ownerProfile.phone || '',
+                  address: ownerProfile.address || '',
+                  email: ownerProfile.email || ''
+                }} 
                 onShowQR={() => setIsQRCodeOpen(true)} 
               />
               <UpcomingAppointments />
@@ -248,7 +289,20 @@ const Index = () => {
         </AnimatePresence>
       </main>
 
-      <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={ownerProfile} onSave={() => {}} />
+      <UserProfileEdit 
+        isOpen={isProfileEditing} 
+        onClose={() => setIsProfileEditing(false)} 
+        profile={{
+          firstName: ownerProfile.first_name,
+          lastName: ownerProfile.last_name || '',
+          gender: ownerProfile.gender || '',
+          age: ownerProfile.age || '',
+          phone: ownerProfile.phone || '',
+          address: ownerProfile.address || '',
+          email: ownerProfile.email || ''
+        }} 
+        onSave={() => {}} 
+      />
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={ownerProfile.first_name} memberId={ownerProfile.phone || ownerProfile.line_id} />
       <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={handleSavePet} initialData={petToEdit} />
       
