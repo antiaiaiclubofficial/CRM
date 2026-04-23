@@ -12,7 +12,7 @@ export const useLiff = () => {
       try {
         // ดึง LIFF ID จาก Backend (Nest.JS)
         // โปรดเปลี่ยน URL ด้านล่างเป็น URL ของ Nest.JS Backend ของคุณ
-        const response = await fetch('https://your-nestjs-backend.com/api/config/liff-id');
+        const response = await fetch('https://bubbling-silly-fading.ngrok-free.dev');
         const { liffId } = await response.json();
 
         if (!liffId) throw new Error('LIFF ID not found from backend');
