@@ -214,8 +214,8 @@ const Index = () => {
   });
 
   return (
-    <div className="max-w-[390px] h-[844px] mx-auto bg-[#FFF9F0] relative shadow-2xl overflow-hidden flex flex-col font-['Prompt']">
-      <header className="px-6 pt-10 pb-6 flex justify-between items-center shrink-0">
+    <div className="w-full min-h-dvh max-w-lg mx-auto bg-[#FFF9F0] relative shadow-2xl overflow-hidden flex flex-col font-['Prompt']">
+      <header className="px-6 pt-[calc(2.5rem+env(safe-area-inset-top))] pb-6 flex justify-between items-center shrink-0">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-slate-800">สวัสดี, คุณ{ownerProfile.firstName}!</h1>
@@ -230,7 +230,7 @@ const Index = () => {
         </motion.div>
       </header>
 
-      <main className="px-6 flex-1 overflow-y-auto no-scrollbar pb-32">
+      <main className="px-6 flex-1 overflow-y-auto no-scrollbar pb-[calc(6rem+env(safe-area-inset-bottom))]">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
@@ -326,7 +326,7 @@ const Index = () => {
         />
       )}
 
-      <nav className="absolute bottom-8 left-6 right-6 bg-white/30 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-2xl z-50 border border-white/40">
+      <nav className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-6 right-6 max-w-[calc(theme(maxWidth.lg)-3rem)] mx-auto bg-white/30 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-2xl z-50 border border-white/40">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => setActiveTab('home')} />
         <NavButton active={activeTab === 'level'} icon={<Award size={22} />} onClick={() => setActiveTab('level')} />
         <NavButton active={activeTab === 'pets'} icon={<PawPrint size={22} />} onClick={() => setActiveTab('pets')} />
