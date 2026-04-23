@@ -60,7 +60,6 @@ const Index = () => {
   const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<any>(null);
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
 
-  // Fetch User Data from Supabase when LIFF Profile is ready
   useEffect(() => {
     if (liffProfile && supabase) {
       fetchUserData(liffProfile.userId);
@@ -71,7 +70,6 @@ const Index = () => {
     if (!supabase) return;
 
     try {
-      // 1. Get or Create Profile
       let { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -79,7 +77,6 @@ const Index = () => {
         .maybeSingle();
 
       if (!profile) {
-        // Profile doesn't exist, create one
         const { data: newProfile, error: createError } = await supabase
           .from('profiles')
           .insert([{ 
@@ -97,26 +94,47 @@ const Index = () => {
       setOwnerProfile(profile);
 
       if (profile) {
-        // 2. Fetch Pets
         const { data: petsData } = await supabase
           .from('pets')
           .select('*')
           .eq('owner_id', profile.id);
-        setPets(petsData || []);
+        
+        const mappedPets = (petsData || []).map(p => ({
+          ...p,
+          medicalCondition: p.medical_condition,
+          furLength: p.fur_length,
+          imageUrl: p.image_url,
+          cardBgColor: p.card_bg_color,
+          isFavorite: p.is_favorite,
+          customPreferences: p.custom_preferences
+        }));
+        setPets(mappedPets);
 
-        // 3. Fetch Coupons
         const { data: couponsData } = await supabase
           .from('user_coupons')
           .select('*, coupons(*)')
           .eq('owner_id', profile.id);
-        setCollectedCoupons(couponsData?.map((uc: any) => uc.coupons) || []);
+        setCollectedCoupons(couponsData?.map((uc: any) => ({
+          ...uc.coupons,
+          iconName: uc.coupons.icon_name,
+          pointsRequired: uc.coupons.points_required
+        })) || []);
 
-        // 4. Fetch History
         const { data: historyData } = await supabase
           .from('service_history')
           .select('*')
           .eq('owner_id', profile.id);
-        setServiceHistory(historyData || []);
+        
+        const mappedHistory = (historyData || []).map(h => ({
+          ...h,
+          petName: h.pet_name,
+          iconName: h.icon_name,
+          shampooUsed: h.shampoo_used,
+          spaTreatment: h.spa_treatment,
+          groomerNotes: h.groomer_notes,
+          icon: <Scissors size={18} /> // Placeholder icon
+        }));
+        setServiceHistory(mappedHistory);
       }
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -126,13 +144,32 @@ const Index = () => {
   const handleSavePet = async (petData: any) => {
     if (!supabase || !ownerProfile) return;
 
+    const dbPetData = {
+      owner_id: ownerProfile.id,
+      name: petData.name,
+      type: petData.type,
+      breed: petData.breed,
+      age: petData.age,
+      gender: petData.gender,
+      weight: petData.weight,
+      medical_condition: petData.medicalCondition,
+      precautions: petData.precautions,
+      color: petData.color,
+      icon: petData.icon,
+      fur_length: petData.furLength,
+      image_url: petData.imageUrl,
+      card_bg_color: petData.cardBgColor,
+      is_favorite: petData.isFavorite,
+      custom_preferences: petData.customPreferences
+    };
+
     try {
       if (petData.id) {
-        const { error } = await supabase.from('pets').update(petData).eq('id', petData.id);
+        const { error } = await supabase.from('pets').update(dbPetData).eq('id', petData.id);
         if (error) throw error;
         toast.success('อัปเดตข้อมูลสำเร็จ');
       } else {
-        const { error } = await supabase.from('pets').insert([{ ...petData, owner_id: ownerProfile.id }]);
+        const { error } = await supabase.from('pets').insert([dbPetData]);
         if (error) throw error;
         toast.success('เพิ่มสัตว์เลี้ยงสำเร็จ');
       }
@@ -161,6 +198,27 @@ const Index = () => {
     setIsPetFormOpen(true);
   };
 
+  const handleUpdateProfile = async (updatedProfile: any) => {
+    if (!supabase || !ownerProfile) return;
+    try {
+      const dbProfileData = {
+        first_name: updatedProfile.firstName,
+        last_name: updatedProfile.lastName,
+        gender: updatedProfile.gender,
+        age: updatedProfile.age,
+        phone: updatedProfile.phone,
+        address: updatedProfile.address,
+        email: updatedProfile.email
+      };
+      const { error } = await supabase.from('profiles').update(dbProfileData).eq('id', ownerProfile.id);
+      if (error) throw error;
+      toast.success('บันทึกข้อมูลส่วนตัวสำเร็จ');
+      fetchUserData(liffProfile.userId);
+    } catch (err) {
+      toast.error('บันทึกไม่สำเร็จ');
+    }
+  };
+
   if (!supabase) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFF9F0] p-8 text-center">
@@ -180,8 +238,6 @@ const Index = () => {
       </div>
     );
   }
-
-  const sortedPets = [...pets].sort((a, b) => (a.isFavorite === b.isFavorite ? 0 : a.isFavorite ? -1 : 1));
 
   return (
     <div className="w-full min-h-screen max-w-lg mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt']">
@@ -230,7 +286,7 @@ const Index = () => {
                 </button>
               </div>
               <PetList 
-                pets={sortedPets} 
+                pets={pets} 
                 onPetClick={(pet) => { setSelectedPetForDetail(pet); setActiveTab('pets'); }} 
                 onViewAll={() => setActiveTab('pets')} 
               />
@@ -258,7 +314,7 @@ const Index = () => {
                   onToggleFavorite={() => {}} 
                 />
               ) : (
-                <PetManagement pets={sortedPets} onBack={() => setActiveTab('home')} onViewDetails={(pet) => setSelectedPetForDetail(pet)} onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} />
+                <PetManagement pets={pets} onBack={() => setActiveTab('home')} onViewDetails={(pet) => setSelectedPetForDetail(pet)} onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} />
               )}
             </motion.div>
           )}
@@ -301,12 +357,11 @@ const Index = () => {
           address: ownerProfile.address || '',
           email: ownerProfile.email || ''
         }} 
-        onSave={() => {}} 
+        onSave={handleUpdateProfile} 
       />
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={ownerProfile.first_name} memberId={ownerProfile.phone || ownerProfile.line_id} />
       <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={handleSavePet} initialData={petToEdit} />
       
-      {/* Navigation Buttons */}
       <nav className="fixed bottom-[calc(5px+env(safe-area-inset-bottom))] left-6 right-6 max-w-[calc(theme(maxWidth.lg)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-50 border border-white/60">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => setActiveTab('home')} />
         <NavButton active={activeTab === 'level'} icon={<Award size={22} />} onClick={() => setActiveTab('level')} />
