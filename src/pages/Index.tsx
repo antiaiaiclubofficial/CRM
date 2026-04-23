@@ -55,14 +55,16 @@ const Index = () => {
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
 
-  // Queries
   const { data: pets = [] } = useQuery({
     queryKey: ['pets', userProfile?.id],
     queryFn: async () => {
       if (!userProfile?.id) return [];
-      const { data, error } = await supabase.from('pets').select('*').eq('owner_id', userProfile.id);
+      const { data, error } = await supabase
+        .from('pets')
+        .select('*')
+        .eq('owner_id', userProfile.id);
       if (error) throw error;
-      return data;
+      return data as Pet[];
     },
     enabled: !!userProfile?.id
   });
@@ -71,24 +73,39 @@ const Index = () => {
     queryKey: ['history', userProfile?.id],
     queryFn: async () => {
       if (!userProfile?.id) return [];
-      const { data, error } = await supabase.from('service_history').select('*').eq('owner_id', userProfile.id);
+      const { data, error } = await supabase
+        .from('service_history')
+        .select('*')
+        .eq('owner_id', userProfile.id)
+        .order('created_at', { ascending: false });
       if (error) throw error;
+      
       return data.map(h => ({
         ...h,
-        icon: h.icon_name === 'Scissors' ? <Scissors className="text-pink-500" /> : <Sparkles className="text-blue-500" />
+        icon: h.icon_name === 'Scissors' ? <Scissors className="text-pink-500" /> : <Sparkles className="text-blue-500" />,
+        bg: h.bg || 'bg-slate-50'
       }));
     },
     enabled: !!userProfile?.id
   });
 
-  // Mutations
   const savePetMutation = useMutation({
     mutationFn: async (petData: any) => {
+      const dataToSave = {
+        ...petData,
+        owner_id: userProfile?.id,
+        medical_condition: petData.medicalCondition || petData.medical_condition,
+        image_url: petData.imageUrl || petData.image_url,
+        card_bg_color: petData.cardBgColor || petData.card_bg_color,
+        fur_length: petData.furLength || petData.fur_length,
+        is_favorite: petData.isFavorite !== undefined ? petData.isFavorite : petData.is_favorite
+      };
+
       if (petData.id) {
-        const { error } = await supabase.from('pets').update(petData).eq('id', petData.id);
+        const { error } = await supabase.from('pets').update(dataToSave).eq('id', petData.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('pets').insert([{ ...petData, owner_id: userProfile?.id }]);
+        const { error } = await supabase.from('pets').insert([dataToSave]);
         if (error) throw error;
       }
     },
@@ -96,7 +113,7 @@ const Index = () => {
       queryClient.invalidateQueries({ queryKey: ['pets'] });
       setIsPetFormOpen(false);
       setPetToEdit(null);
-      toast.success('บันทึกข้อมูลเรียบร้อยแล้ว');
+      toast.success('บันทึกข้อมูลเรียบร้อยแล้วค่ะ');
     }
   });
 
@@ -108,7 +125,7 @@ const Index = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pets'] });
       setSelectedPetForDetail(null);
-      toast.success('ลบข้อมูลเรียบร้อยแล้ว');
+      toast.success('ลบข้อมูลเรียบร้อยแล้วค่ะ');
     }
   });
 
@@ -116,7 +133,7 @@ const Index = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFF9F0]">
         <PawPrint className="text-pink-400 animate-bounce" size={48} />
-        <p className="mt-4 font-bold text-slate-600">กำลังเข้าสู่ระบบ LINE...</p>
+        <p className="mt-4 font-bold text-slate-600">กำลังเชื่อมต่อ LINE LIFF...</p>
       </div>
     );
   }
@@ -130,7 +147,11 @@ const Index = () => {
           <h1 className="text-2xl font-bold text-slate-800">สวัสดี, คุณ{userProfile?.first_name}!</h1>
           <p className="text-slate-500 text-sm">วันนี้พาน้องๆ ไปสปากันเถอะ ✨</p>
         </div>
-        <motion.div whileTap={{ scale: 0.9 }} onClick={() => setIsProfileEditing(true)} className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100 cursor-pointer">
+        <motion.div 
+          whileTap={{ scale: 0.9 }} 
+          onClick={() => setIsProfileEditing(true)} 
+          className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100 cursor-pointer"
+        >
           <img src={userProfile?.avatar_url || "https://api.dicebear.com/7.x/avataaars/svg?seed=Pet"} alt="Profile" className="w-full h-full object-cover" />
         </motion.div>
       </header>
@@ -139,9 +160,36 @@ const Index = () => {
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-              <MembershipCard totalAccumulatedPoints={userProfile?.total_points || 0} redeemablePoints={userProfile?.points || 0} ownerProfile={userProfile} onShowQR={() => setIsQRCodeOpen(true)} />
+              <MembershipCard 
+                totalAccumulatedPoints={userProfile?.total_points || 0} 
+                redeemablePoints={userProfile?.points || 0} 
+                ownerProfile={{
+                  firstName: userProfile?.first_name || '',
+                  lastName: userProfile?.last_name || '',
+                  gender: userProfile?.gender || '',
+                  age: userProfile?.age || '',
+                  phone: userProfile?.phone || '',
+                  address: userProfile?.address || '',
+                  email: userProfile?.email || ''
+                }} 
+                onShowQR={() => setIsQRCodeOpen(true)} 
+              />
               <UpcomingAppointments />
-              <PetList pets={sortedPets} onPetClick={(pet) => { setSelectedPetForDetail(pet); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
+              <PetList 
+                pets={sortedPets.map(p => ({
+                  ...p,
+                  medicalCondition: p.medical_condition,
+                  imageUrl: p.image_url,
+                  cardBgColor: p.card_bg_color,
+                  isFavorite: p.is_favorite
+                }))} 
+                onPetClick={(p) => { 
+                  const pet = pets.find(item => item.id === p.id);
+                  if (pet) setSelectedPetForDetail(pet);
+                  setActiveTab('pets'); 
+                }} 
+                onViewAll={() => setActiveTab('pets')} 
+              />
             </motion.div>
           )}
 
@@ -156,15 +204,41 @@ const Index = () => {
                     isFavorite: selectedPetForDetail.is_favorite
                   }} 
                   onBack={() => setSelectedPetForDetail(null)} 
-                  onStartEdit={(p) => { setPetToEdit(p); setIsPetFormOpen(true); }} 
+                  onStartEdit={(p) => { 
+                    const pet = pets.find(item => item.id === p.id);
+                    if (pet) {
+                      setPetToEdit(pet);
+                      setIsPetFormOpen(true);
+                    }
+                  }} 
                   onDeletePet={(id) => deletePetMutation.mutate(id)} 
                   totalServiceCost={0} 
                   onViewServiceHistoryForPet={() => {}} 
                   onEditPreferences={() => setIsPreferenceFormOpen(true)} 
-                  onToggleFavorite={() => {}}
+                  onToggleFavorite={() => {
+                    if (selectedPetForDetail) {
+                      const updatedFavorite = !selectedPetForDetail.is_favorite;
+                      savePetMutation.mutate({ ...selectedPetForDetail, isFavorite: updatedFavorite });
+                      setSelectedPetForDetail({ ...selectedPetForDetail, is_favorite: updatedFavorite });
+                    }
+                  }}
                 />
               ) : (
-                <PetManagement pets={sortedPets} onBack={() => setActiveTab('home')} onViewDetails={(pet) => setSelectedPetForDetail(pet)} onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} />
+                <PetManagement 
+                  pets={sortedPets.map(p => ({
+                    ...p,
+                    medicalCondition: p.medical_condition,
+                    imageUrl: p.image_url,
+                    cardBgColor: p.card_bg_color,
+                    isFavorite: p.is_favorite
+                  }))} 
+                  onBack={() => setActiveTab('home')} 
+                  onViewDetails={(p) => {
+                    const pet = pets.find(item => item.id === p.id);
+                    if (pet) setSelectedPetForDetail(pet);
+                  }} 
+                  onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} 
+                />
               )}
             </motion.div>
           )}
@@ -179,12 +253,41 @@ const Index = () => {
             </motion.div>
           )}
           
-          {/* ส่วน Tab อื่นๆ ปรับใช้ react-query ในลักษณะเดียวกัน */}
+          {activeTab === 'level' && (
+            <motion.div key="level-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+              <MembershipLevels totalAccumulatedPoints={userProfile?.total_points || 0} redeemablePoints={userProfile?.points || 0} />
+            </motion.div>
+          )}
+
+          {activeTab === 'promo' && (
+            <motion.div key="promo-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+               <Promotions 
+                userPoints={userProfile?.points || 0}
+                collectedCoupons={[]} 
+                usedOrExpiredCoupons={[]}
+                onRedeemCoupon={() => {}}
+                onUseCoupon={() => {}}
+                collectedSpecialPromos={[]}
+                onCollectSpecialPromotion={() => {}}
+              />
+            </motion.div>
+          )}
         </AnimatePresence>
       </main>
 
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={userProfile?.first_name || ''} memberId={userProfile?.phone || ''} />
-      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => savePetMutation.mutate(data)} initialData={petToEdit} />
+      <PetForm 
+        isOpen={isPetFormOpen} 
+        onClose={() => setIsPetFormOpen(false)} 
+        onSave={(data) => savePetMutation.mutate(data)} 
+        initialData={petToEdit ? {
+          ...petToEdit,
+          medicalCondition: petToEdit.medical_condition,
+          imageUrl: petToEdit.image_url,
+          cardBgColor: petToEdit.card_bg_color,
+          isFavorite: petToEdit.is_favorite
+        } : null} 
+      />
 
       <nav className="fixed bottom-[calc(5px+env(safe-area-inset-bottom))] left-6 right-6 max-w-[calc(theme(maxWidth.lg)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-50 border border-white/60">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => setActiveTab('home')} />
@@ -199,7 +302,7 @@ const Index = () => {
 
 const NavButton = ({ active, icon, onClick }: { active: boolean; icon: any; onClick: () => void }) => (
   <button onClick={onClick} className="relative flex items-center justify-center w-12 h-12">
-    {active && <motion.div layoutId="activeNavBg" className="absolute inset-0 bg-gradient-to-b from-[#FFA14A] to-[#FF4B91] rounded-full shadow-lg" />}
+    {active && <motion.div layoutId="activeNavBg" className="absolute inset-0 bg-gradient-to-b from-[#FFA14A] to-[#FF4B91] rounded-full shadow-lg" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />}
     <div className={`relative z-10 ${active ? 'text-white' : 'text-slate-600'}`}>{icon}</div>
   </button>
 );

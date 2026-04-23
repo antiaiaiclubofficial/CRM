@@ -11,9 +11,11 @@ export const useLiff = () => {
     const initLiff = async () => {
       try {
         // ดึง LIFF ID จาก Backend (Nest.JS)
-        // หมายเหตุ: ปรับเปลี่ยน URL ตรงนี้ตาม endpoint จริงของ Nest.JS
-        const response = await fetch('YOUR_NESTJS_BACKEND_URL/config/liff-id');
+        // โปรดเปลี่ยน URL ด้านล่างเป็น URL ของ Nest.JS Backend ของคุณ
+        const response = await fetch('https://your-nestjs-backend.com/api/config/liff-id');
         const { liffId } = await response.json();
+
+        if (!liffId) throw new Error('LIFF ID not found from backend');
 
         await liff.init({ liffId });
 
@@ -24,14 +26,14 @@ export const useLiff = () => {
 
         const lineProfile = await liff.getProfile();
         
-        // ตรวจสอบหรือสร้างโปรไฟล์ใน Supabase
+        // ตรวจสอบหรือสร้างโปรไฟล์ใน Supabase โดยใช้ line_id
         const { data: existingUser, error: fetchError } = await supabase
           .from('profiles')
           .select('*')
           .eq('line_id', lineProfile.userId)
-          .single();
+          .maybeSingle();
 
-        if (fetchError && fetchError.code === 'PGRST116') {
+        if (!existingUser) {
           // ไม่พบผู้ใช้ สร้างใหม่
           const { data: newUser, error: insertError } = await supabase
             .from('profiles')
@@ -49,7 +51,7 @@ export const useLiff = () => {
           
           if (insertError) throw insertError;
           setProfile(newUser);
-        } else if (existingUser) {
+        } else {
           setProfile(existingUser);
         }
 
