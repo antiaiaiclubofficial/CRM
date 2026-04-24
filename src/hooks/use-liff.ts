@@ -1,70 +1,29 @@
-import { useState, useEffect } from 'react';
-import liff from '@line/liff';
-import { supabase } from '@/integrations/supabase/client';
+import { useEffect, useState } from 'react';
+import initLiff from '@line/liff';
+
+// กำหนด LIFF ID เป็นค่าคงที่ใน Frontend ตามที่ร้องขอ
+const LIFF_ID = '2009880118-LZxzQe3c';
 
 export const useLiff = () => {
-  const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLiffReady, setIsLiffReady] = useState(false);
+  const [isInClient, setIsInClient] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const initLiff = async () => {
+    const initializeLiff = async () => {
       try {
-        // ดึง LIFF ID จาก Backend (Nest.JS)
-        // โปรดเปลี่ยน URL ด้านล่างเป็น URL ของ Nest.JS Backend ของคุณ
-        const response = await fetch('https://bubbling-silly-fading.ngrok-free.dev');
-        const { liffId } = await response.json();
-
-        if (!liffId) throw new Error('LIFF ID not found from backend');
-
-        await liff.init({ liffId });
-
-        if (!liff.isLoggedIn()) {
-          liff.login();
-          return;
-        }
-
-        const lineProfile = await liff.getProfile();
-        
-        // ตรวจสอบหรือสร้างโปรไฟล์ใน Supabase โดยใช้ line_id
-        const { data: existingUser, error: fetchError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('line_id', lineProfile.userId)
-          .maybeSingle();
-
-        if (!existingUser) {
-          // ไม่พบผู้ใช้ สร้างใหม่
-          const { data: newUser, error: insertError } = await supabase
-            .from('profiles')
-            .insert([
-              { 
-                line_id: lineProfile.userId,
-                first_name: lineProfile.displayName,
-                avatar_url: lineProfile.pictureUrl,
-                points: 0,
-                total_points: 0
-              }
-            ])
-            .select()
-            .single();
-          
-          if (insertError) throw insertError;
-          setProfile(newUser);
-        } else {
-          setProfile(existingUser);
-        }
-
-      } catch (err: any) {
-        console.error('LIFF Init Error:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        // ใช้ LIFF ID ที่กำหนดไว้คงที่แทนการดึงจาก Backend
+        await initLiff({ liffId: LIFF_ID });
+        setIsLiffReady(true);
+        setIsInClient(window.liff.isInClient());
+      } catch (err) {
+        console.error('Failed to initialize LIFF:', err);
+        setError(err instanceof Error ? err.message : 'Unknown error');
       }
     };
 
-    initLiff();
+    initializeLiff();
   }, []);
 
-  return { profile, loading, error };
+  return { isLiffReady, isInClient, error };
 };
