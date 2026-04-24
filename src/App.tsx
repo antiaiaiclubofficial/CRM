@@ -14,7 +14,7 @@ const App = () => (
       <Toaster />
       <Sonner 
         position="bottom-center" 
-        offset={200} 
+        offset={300} 
       />
       <BrowserRouter>
         <Routes>
