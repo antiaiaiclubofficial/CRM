@@ -19,6 +19,7 @@ import PetManagement from '@/components/PetManagement';
 import QRCodeModal from '@/components/QRCodeModal';
 import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
 import CouponUseModal from '@/components/CouponUseModal';
+import HomeQuickActions from '@/components/HomeQuickActions';
 import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -276,7 +277,13 @@ const Index = () => {
                 ownerProfile={{ firstName: lineProfile?.displayName?.split(' ')[0] || '', lastName: '', gender: '', age: '', phone: '', address: '', email: '' }} 
                 onShowQR={() => setIsQRCodeOpen(true)} 
               />
-              <UpcomingAppointments />
+              <div className="space-y-0">
+                <UpcomingAppointments />
+                <HomeQuickActions 
+                  onPromoClick={() => setActiveTab('promo')}
+                  onAppointmentClick={() => toast.info('ฟังก์ชันจองคิวจะมาเร็วๆ นี้ค่ะ')}
+                />
+              </div>
               <PetList pets={mappedPetsForUI} onPetClick={(p) => { setSelectedPetForDetail(pets.find(i => i.id === p.id) || null); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
               <MyCouponsHomePreview coupons={collectedCoupons} onViewAll={() => setActiveTab('promo')} />
             </motion.div>
