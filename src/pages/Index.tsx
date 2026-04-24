@@ -425,7 +425,7 @@ const Index = () => {
       <QRCodeModal 
         isOpen={isQRCodeOpen} 
         onClose={() => setIsQRCodeOpen(false)} 
-        ownerName={profile?.first_name || ''} 
+        lineId={profile?.line_id || ''} 
         memberId={profile?.phone || ''} 
       />
       

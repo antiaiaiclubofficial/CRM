@@ -7,11 +7,11 @@ import { X, QrCode, Share2, Download, Copy } from 'lucide-react';
 interface QRCodeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  ownerName: string;
+  lineId: string;
   memberId: string;
 }
 
-const QRCodeModal = ({ isOpen, onClose, ownerName, memberId }: QRCodeModalProps) => {
+const QRCodeModal = ({ isOpen, onClose, lineId, memberId }: QRCodeModalProps) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -45,9 +45,9 @@ const QRCodeModal = ({ isOpen, onClose, ownerName, memberId }: QRCodeModalProps)
               {/* Profile Info */}
               <div className="text-center mb-8">
                 <p className="text-sm text-slate-500 mb-1">แสดงต่อพนักงานเพื่อสะสมคะแนน</p>
-                <h4 className="text-xl font-bold text-slate-800">คุณ{ownerName}</h4>
+                <h4 className="text-lg font-bold text-slate-800 break-all px-4">Line ID: {lineId}</h4>
                 <div className="inline-flex items-center gap-2 bg-slate-50 px-3 py-1 rounded-full border border-slate-100 mt-2">
-                  <span className="text-xs font-medium text-slate-500">ID: {memberId}</span>
+                  <span className="text-xs font-medium text-slate-500">Member ID: {memberId}</span>
                   <button className="text-pink-500 hover:text-pink-600 transition-colors">
                     <Copy size={12} />
                   </button>
