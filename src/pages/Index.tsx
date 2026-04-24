@@ -242,7 +242,7 @@ const Index = () => {
         custom_preferences: petData.customPreferences || petData.custom_preferences || [],
         image_url: petData.imageUrl || petData.image_url || '',
         card_bg_color: petData.cardBgColor || petData.card_bg_color || '#FFF9C4',
-        is_favorite: petData.isFavorite !== undefined ? petData.is_favorite : (petData.is_favorite || false),
+        is_favorite: petData.is_favorite !== undefined ? petData.is_favorite : (petData.is_favorite || false),
         owner_id: lineProfile.userId,
       };
       
@@ -256,14 +256,29 @@ const Index = () => {
       if (result.error) throw result.error;
       return result.data;
     },
-    onSuccess: (data) => {
+    onMutate: () => {
+      const toastId = toast.loading('กำลังบันทึกข้อมูล...');
+      return { toastId };
+    },
+    onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: ['pets'] });
       if (selectedPetForDetail && selectedPetForDetail.id === data.id) {
         setSelectedPetForDetail(data);
       }
       setIsPetFormOpen(false);
       setPetToEdit(null);
-      toast.success('บันทึกข้อมูลเรียบร้อยแล้วค่ะ');
+      if (context?.toastId) {
+        toast.success('บันทึกข้อมูลเรียบร้อยแล้วค่ะ', { id: context.toastId });
+      } else {
+        toast.success('บันทึกข้อมูลเรียบร้อยแล้วค่ะ');
+      }
+    },
+    onError: (error: any, variables, context) => {
+      if (context?.toastId) {
+        toast.error('เกิดข้อผิดพลาด: ' + error.message, { id: context.toastId });
+      } else {
+        toast.error('เกิดข้อผิดพลาด: ' + error.message);
+      }
     }
   });
 
