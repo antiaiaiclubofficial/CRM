@@ -45,10 +45,10 @@ const CouponUseModal = ({ isOpen, onClose, coupon, onConfirmUse }: CouponUseModa
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3.5rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+            className="relative w-full max-w-[390px] bg-white rounded-t-[3.5rem] shadow-2xl max-h-[90vh] flex flex-col"
           >
-            {/* Header */}
-            <div className="pt-8 pb-4 px-8 flex justify-between items-center bg-white sticky top-0 z-10">
+            {/* Improved Header Area */}
+            <div className="pt-8 pb-4 px-8 flex justify-between items-center bg-white rounded-t-[3.5rem]">
               <h3 className="font-bold text-xl text-slate-800">ใช้คูปองส่วนลด</h3>
               <button 
                 onClick={onClose} 
@@ -58,7 +58,7 @@ const CouponUseModal = ({ isOpen, onClose, coupon, onConfirmUse }: CouponUseModa
               </button>
             </div>
 
-            <div className="px-8 pb-10 overflow-y-auto no-scrollbar">
+            <div className="px-8 pb-10 overflow-y-auto no-scrollbar flex-1">
               {/* Coupon Info Preview */}
               <div className="bg-pink-50 p-6 rounded-3xl border-2 border-dashed border-pink-200 mb-8 text-center relative overflow-hidden">
                 <div className="absolute -top-4 -left-4 w-10 h-10 bg-white rounded-full" />
