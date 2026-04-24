@@ -144,7 +144,7 @@ const Index = () => {
     <div className="w-full min-h-screen max-w-lg mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt']">
       <header className="px-6 pt-[calc(5px+env(safe-area-inset-top))] pb-6 flex justify-between items-center shrink-0">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">สวัสดี, คุณ{userProfile?.first_name}!</h1>
+          <h1 className="text-2xl font-bold text-slate-800">สวัสดี, คุณ{userProfile?.first_name || userProfile?.displayName}!</h1>
           <p className="text-slate-500 text-sm">วันนี้พาน้องๆ ไปสปากันเถอะ ✨</p>
         </div>
         <motion.div 
@@ -152,7 +152,7 @@ const Index = () => {
           onClick={() => setIsProfileEditing(true)} 
           className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100 cursor-pointer"
         >
-          <img src={userProfile?.avatar_url || "https://api.dicebear.com/7.x/avataaars/svg?seed=Pet"} alt="Profile" className="w-full h-full object-cover" />
+          <img src={userProfile?.avatar_url || userProfile?.pictureUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=Pet"} alt="Profile" className="w-full h-full object-cover" />
         </motion.div>
       </header>
 
@@ -164,7 +164,7 @@ const Index = () => {
                 totalAccumulatedPoints={userProfile?.total_points || 0} 
                 redeemablePoints={userProfile?.points || 0} 
                 ownerProfile={{
-                  firstName: userProfile?.first_name || '',
+                  firstName: userProfile?.first_name || userProfile?.displayName || '',
                   lastName: userProfile?.last_name || '',
                   gender: userProfile?.gender || '',
                   age: userProfile?.age || '',
@@ -275,7 +275,7 @@ const Index = () => {
         </AnimatePresence>
       </main>
 
-      <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={userProfile?.first_name || ''} memberId={userProfile?.phone || ''} />
+      <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={userProfile?.first_name || userProfile?.displayName || ''} memberId={userProfile?.phone || ''} />
       <PetForm 
         isOpen={isPetFormOpen} 
         onClose={() => setIsPetFormOpen(false)} 
