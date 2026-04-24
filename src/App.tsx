@@ -12,7 +12,7 @@ const App = () => (
     <TooltipProvider>
       <Sonner 
         position="bottom-center" 
-        offset={120}
+        offset={140}
         visibleToasts={1}
         toastOptions={{
           style: {
