@@ -45,7 +45,7 @@ export interface Pet {
 
 const Index = () => {
   const queryClient = useQueryClient();
-  const { profile: userProfile, loading: liffLoading } = useLiff();
+  const { profile: lineProfile, loading: liffLoading } = useLiff();
   const [activeTab, setActiveTab] = useState('home');
   const [isProfileEditing, setIsProfileEditing] = useState(false);
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
@@ -56,27 +56,27 @@ const Index = () => {
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
 
   const { data: pets = [] } = useQuery({
-    queryKey: ['pets', userProfile?.id],
+    queryKey: ['pets', lineProfile?.id],
     queryFn: async () => {
-      if (!userProfile?.id) return [];
+      if (!lineProfile?.id) return [];
       const { data, error } = await supabase
         .from('pets')
         .select('*')
-        .eq('owner_id', userProfile.id);
+        .eq('owner_id', lineProfile.id);
       if (error) throw error;
       return data as Pet[];
     },
-    enabled: !!userProfile?.id
+    enabled: !!lineProfile?.id
   });
 
   const { data: serviceHistory = [] } = useQuery({
-    queryKey: ['history', userProfile?.id],
+    queryKey: ['history', lineProfile?.id],
     queryFn: async () => {
-      if (!userProfile?.id) return [];
+      if (!lineProfile?.id) return [];
       const { data, error } = await supabase
         .from('service_history')
         .select('*')
-        .eq('owner_id', userProfile.id)
+        .eq('owner_id', lineProfile.id)
         .order('created_at', { ascending: false });
       if (error) throw error;
       
@@ -86,14 +86,14 @@ const Index = () => {
         bg: h.bg || 'bg-slate-50'
       }));
     },
-    enabled: !!userProfile?.id
+    enabled: !!lineProfile?.id
   });
 
   const savePetMutation = useMutation({
     mutationFn: async (petData: any) => {
       const dataToSave = {
         ...petData,
-        owner_id: userProfile?.id,
+        owner_id: lineProfile?.id,
         medical_condition: petData.medicalCondition || petData.medical_condition,
         image_url: petData.imageUrl || petData.image_url,
         card_bg_color: petData.cardBgColor || petData.card_bg_color,
@@ -144,7 +144,9 @@ const Index = () => {
     <div className="w-full min-h-screen max-w-lg mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt']">
       <header className="px-6 pt-[calc(5px+env(safe-area-inset-top))] pb-6 flex justify-between items-center shrink-0">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">สวัสดี, คุณ{userProfile?.first_name || userProfile?.displayName}!</h1>
+          <h1 className="text-2xl font-bold text-slate-800">
+            สวัสดี, คุณ {lineProfile?.displayName || 'คุณ'}
+          </h1>
           <p className="text-slate-500 text-sm">วันนี้พาน้องๆ ไปสปากันเถอะ ✨</p>
         </div>
         <motion.div 
@@ -152,7 +154,17 @@ const Index = () => {
           onClick={() => setIsProfileEditing(true)} 
           className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100 cursor-pointer"
         >
-          <img src={userProfile?.avatar_url || userProfile?.pictureUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=Pet"} alt="Profile" className="w-full h-full object-cover" />
+          {lineProfile?.pictureUrl ? (
+            <img 
+              src={lineProfile.pictureUrl} 
+              alt="Line Profile" 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-4xl">
+              🐾
+            </div>
+          )}
         </motion.div>
       </header>
 
@@ -161,16 +173,16 @@ const Index = () => {
           {activeTab === 'home' && (
             <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <MembershipCard 
-                totalAccumulatedPoints={userProfile?.total_points || 0} 
-                redeemablePoints={userProfile?.points || 0} 
+                totalAccumulatedPoints={lineProfile?.total_points || 0} 
+                redeemablePoints={lineProfile?.points || 0} 
                 ownerProfile={{
-                  firstName: userProfile?.first_name || userProfile?.displayName || '',
-                  lastName: userProfile?.last_name || '',
-                  gender: userProfile?.gender || '',
-                  age: userProfile?.age || '',
-                  phone: userProfile?.phone || '',
-                  address: userProfile?.address || '',
-                  email: userProfile?.email || ''
+                  firstName: lineProfile?.first_name || lineProfile?.displayName || '',
+                  lastName: lineProfile?.last_name || '',
+                  gender: lineProfile?.gender || '',
+                  age: lineProfile?.age || '',
+                  phone: lineProfile?.phone || '',
+                  address: lineProfile?.address || '',
+                  email: lineProfile?.email || ''
                 }} 
                 onShowQR={() => setIsQRCodeOpen(true)} 
               />
@@ -255,14 +267,14 @@ const Index = () => {
           
           {activeTab === 'level' && (
             <motion.div key="level-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <MembershipLevels totalAccumulatedPoints={userProfile?.total_points || 0} redeemablePoints={userProfile?.points || 0} />
+              <MembershipLevels totalAccumulatedPoints={lineProfile?.total_points || 0} redeemablePoints={lineProfile?.points || 0} />
             </motion.div>
           )}
 
           {activeTab === 'promo' && (
             <motion.div key="promo-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                <Promotions 
-                userPoints={userProfile?.points || 0}
+                userPoints={lineProfile?.points || 0}
                 collectedCoupons={[]} 
                 usedOrExpiredCoupons={[]}
                 onRedeemCoupon={() => {}}
@@ -275,7 +287,7 @@ const Index = () => {
         </AnimatePresence>
       </main>
 
-      <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={userProfile?.first_name || userProfile?.displayName || ''} memberId={userProfile?.phone || ''} />
+      <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={lineProfile?.displayName || ''} memberId={lineProfile?.phone || ''} />
       <PetForm 
         isOpen={isPetFormOpen} 
         onClose={() => setIsPetFormOpen(false)} 
