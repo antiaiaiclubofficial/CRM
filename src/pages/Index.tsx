@@ -318,7 +318,7 @@ const Index = () => {
       <header className="px-6 pt-[calc(5px+env(safe-area-inset-top))] pb-6 flex justify-between items-center shrink-0">
         <div>
           <h1 className="text-2xl font-black text-slate-800">
-            สวัสดี, {profile?.first_name || 'คุณ'}
+            สวัสดี, {lineProfile?.displayName || profile?.first_name || 'คุณ'}
           </h1>
           <p className="text-slate-500 text-sm font-medium">วันนี้พาน้องๆ ไปสปากันเถอะ ✨</p>
         </div>
