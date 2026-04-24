@@ -31,16 +31,9 @@ body {
   @apply text-slate-800;
 }
 
-/* Force Sonner Toaster to the top layer */
+/* Ensure Toaster is above navigation but not stacking messily */
 [data-sonner-toaster] {
   z-index: 99999 !important;
-}
-
-/* Mobile specific adjustment for toast positioning */
-@media (max-width: 768px) {
-  [data-sonner-toaster] {
-    bottom: 120px !important; /* Force space for the bottom nav bar */
-  }
 }
 
 .no-scrollbar::-webkit-scrollbar {

@@ -13,6 +13,7 @@ const App = () => (
       <Sonner 
         position="bottom-center" 
         offset={120}
+        visibleToasts={1}
         toastOptions={{
           style: {
             zIndex: 99999,
