@@ -14,12 +14,7 @@ const App = () => (
       <Toaster />
       <Sonner 
         position="bottom-center" 
-        offset={140} 
-        toastOptions={{
-          style: {
-            marginBottom: '20px',
-          }
-        }}
+        offset={200} 
       />
       <BrowserRouter>
         <Routes>
