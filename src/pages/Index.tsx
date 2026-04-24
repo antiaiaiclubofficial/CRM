@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLiff } from '@/hooks/use-liff';
@@ -20,6 +20,7 @@ import QRCodeModal from '@/components/QRCodeModal';
 import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
 import CouponUseModal from '@/components/CouponUseModal';
 import HomeQuickActions from '@/components/HomeQuickActions';
+import Register from './Register';
 import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -44,19 +45,6 @@ export interface Pet {
   is_favorite?: boolean;
 }
 
-interface Coupon {
-  id: number;
-  title: string;
-  description: string;
-  value: string;
-  type: string;
-  expiry: string;
-  iconName: string;
-  color: string;
-  bg: string;
-  pointsRequired: number;
-}
-
 const Index = () => {
   const queryClient = useQueryClient();
   const { profile: lineProfile, loading: liffLoading } = useLiff();
@@ -69,9 +57,24 @@ const Index = () => {
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
 
-  // Coupon usage modal state
   const [selectedCouponToUse, setSelectedCouponToUse] = useState<any | null>(null);
   const [isCouponUseModalOpen, setIsCouponUseModalOpen] = useState(false);
+
+  // Profile Query
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ['profile', lineProfile?.userId],
+    queryFn: async () => {
+      if (!lineProfile?.userId) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('line_id', lineProfile.userId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!lineProfile?.userId
+  });
 
   // Queries
   const { data: pets = [] } = useQuery({
@@ -126,6 +129,49 @@ const Index = () => {
   });
 
   // Mutations
+  const registerMutation = useMutation({
+    mutationFn: async (userData: any) => {
+      if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
+      const { error } = await supabase.from('profiles').insert([{
+        line_id: lineProfile.userId,
+        first_name: userData.firstName,
+        last_name: userData.lastName,
+        gender: userData.gender,
+        age: userData.age,
+        phone: userData.phone,
+        address: userData.address,
+        email: userData.email,
+        avatar_url: lineProfile.pictureUrl,
+        points: 0,
+        total_points: 0
+      }]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      toast.success('ลงทะเบียนเรียบร้อยแล้วค่ะ');
+    }
+  });
+
+  const saveProfileMutation = useMutation({
+    mutationFn: async (userData: any) => {
+      const { error } = await supabase.from('profiles').update({
+        first_name: userData.firstName,
+        last_name: userData.lastName,
+        gender: userData.gender,
+        age: userData.age,
+        phone: userData.phone,
+        address: userData.address,
+        email: userData.email
+      }).eq('line_id', lineProfile.userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      toast.success('อัปเดตข้อมูลเรียบร้อยแล้วค่ะ');
+    }
+  });
+
   const savePetMutation = useMutation({
     mutationFn: async (petData: any) => {
       if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
@@ -173,9 +219,6 @@ const Index = () => {
       queryClient.invalidateQueries({ queryKey: ['pets'] });
       setSelectedPetForDetail(null);
       toast.success('ลบข้อมูลเรียบร้อยแล้วค่ะ');
-    },
-    onError: (error: any) => {
-      toast.error(`เกิดข้อผิดพลาด: ${error.message}`);
     }
   });
 
@@ -211,12 +254,23 @@ const Index = () => {
     }
   });
 
-  if (liffLoading) {
+  if (liffLoading || profileLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFF9F0]">
         <PawPrint className="text-pink-400 animate-bounce" size={48} />
-        <p className="mt-4 font-bold text-slate-600">กำลังเชื่อมต่อ LINE LIFF...</p>
+        <p className="mt-4 font-bold text-slate-600">กำลังเตรียมความพร้อมให้น้องๆ...</p>
       </div>
+    );
+  }
+
+  // If user is not registered yet
+  if (lineProfile && !profile) {
+    return (
+      <Register 
+        lineProfile={lineProfile} 
+        onSuccess={() => {}} 
+        onSave={(data) => registerMutation.mutateAsync(data)} 
+      />
     );
   }
 
@@ -249,32 +303,44 @@ const Index = () => {
     isFavorite: p.is_favorite
   }));
 
+  const ownerProfile = {
+    firstName: profile?.first_name || '',
+    lastName: profile?.last_name || '',
+    gender: profile?.gender || '',
+    age: profile?.age || '',
+    phone: profile?.phone || '',
+    address: profile?.address || '',
+    email: profile?.email || ''
+  };
+
   return (
     <div className="w-full min-h-screen max-w-lg mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt']">
       <header className="px-6 pt-[calc(5px+env(safe-area-inset-top))] pb-6 flex justify-between items-center shrink-0">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">
-            สวัสดี, คุณ {lineProfile?.displayName || 'คุณ'}
+          <h1 className="text-2xl font-black text-slate-800">
+            สวัสดี, {profile?.first_name || 'คุณ'}
           </h1>
-          <p className="text-slate-500 text-sm">วันนี้พาน้องๆ ไปสปากันเถอะ ✨</p>
+          <p className="text-slate-500 text-sm font-medium">วันนี้พาน้องๆ ไปสปากันเถอะ ✨</p>
         </div>
         <motion.div 
           whileTap={{ scale: 0.9 }} 
           onClick={() => setIsProfileEditing(true)} 
-          className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100 cursor-pointer"
+          className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100 cursor-pointer border-2 border-black"
         >
-          {lineProfile?.pictureUrl && <img src={lineProfile.pictureUrl} alt="Line Profile" className="w-full h-full object-cover"/>}
+          {(profile?.avatar_url || lineProfile?.pictureUrl) && (
+            <img src={profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
+          )}
         </motion.div>
       </header>
 
-      <main className="px-6 flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))]">
+      <main className="px-6 flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))] overflow-y-auto no-scrollbar">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <MembershipCard 
-                totalAccumulatedPoints={0} 
-                redeemablePoints={0} 
-                ownerProfile={{ firstName: lineProfile?.displayName?.split(' ')[0] || '', lastName: '', gender: '', age: '', phone: '', address: '', email: '' }} 
+                totalAccumulatedPoints={profile?.total_points || 0} 
+                redeemablePoints={profile?.points || 0} 
+                ownerProfile={ownerProfile} 
                 onShowQR={() => setIsQRCodeOpen(true)} 
               />
               <div className="space-y-0">
@@ -320,14 +386,14 @@ const Index = () => {
           
           {activeTab === 'level' && (
             <motion.div key="level-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <MembershipLevels totalAccumulatedPoints={0} redeemablePoints={0} />
+              <MembershipLevels totalAccumulatedPoints={profile?.total_points || 0} redeemablePoints={profile?.points || 0} />
             </motion.div>
           )}
 
           {activeTab === 'promo' && (
             <motion.div key="promo-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                <Promotions 
-                userPoints={0}
+                userPoints={profile?.points || 0}
                 collectedCoupons={collectedCoupons} 
                 usedOrExpiredCoupons={usedCoupons}
                 onRedeemCoupon={(c) => collectCouponMutation.mutate(c.id)}
@@ -343,8 +409,19 @@ const Index = () => {
         </AnimatePresence>
       </main>
 
-      <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={{ firstName: lineProfile?.displayName?.split(' ')[0] || '', lastName: '', gender: '', age: '', phone: '', address: '', email: '' }} onSave={() => setIsProfileEditing(false)} />
-      <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={lineProfile?.displayName || ''} memberId={lineProfile?.userId || ''} />
+      <UserProfileEdit 
+        isOpen={isProfileEditing} 
+        onClose={() => setIsProfileEditing(false)} 
+        profile={ownerProfile} 
+        onSave={(data) => saveProfileMutation.mutate(data)} 
+      />
+      
+      <QRCodeModal 
+        isOpen={isQRCodeOpen} 
+        onClose={() => setIsQRCodeOpen(false)} 
+        ownerName={profile?.first_name || ''} 
+        memberId={profile?.phone || ''} 
+      />
       
       <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => savePetMutation.mutate(data)} initialData={petToEdit ? { ...petToEdit, medicalCondition: petToEdit.medical_condition, imageUrl: petToEdit.image_url, cardBgColor: petToEdit.card_bg_color, isFavorite: petToEdit.is_favorite } : null} />
       <PetPreferenceForm isOpen={isPreferenceFormOpen} onClose={() => setIsPreferenceFormOpen(false)} onSave={() => setIsPreferenceFormOpen(false)} initialData={selectedPetForDetail?.custom_preferences || []} petName={selectedPetForDetail?.name || ''} />

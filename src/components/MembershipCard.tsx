@@ -18,7 +18,7 @@ interface MembershipCardProps {
   totalAccumulatedPoints: number;
   redeemablePoints: number;
   ownerProfile: OwnerProfile;
-  onShowQR: () => void; // New prop
+  onShowQR: () => void;
 }
 
 const membershipTiers = [
@@ -68,15 +68,15 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           <div>
             <h2 className="text-xs font-medium text-slate-600">สมาชิกระดับ</h2>
             <div className="flex items-center gap-2 mt-1">
-              <span className="bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-amber-600 flex items-center gap-1">
+              <span className="bg-white/90 border border-black/10 px-3 py-1 rounded-full text-xs font-bold text-amber-600 flex items-center gap-1 shadow-sm">
                 <Crown size={12} fill="currentColor" />
                 {currentLevel.name.toUpperCase()}
               </span>
             </div>
           </div>
           <div className="flex flex-col items-end">
-            <p className="text-[10px] text-slate-500">ID: {ownerProfile.phone}</p>
-            <p className="font-bold text-slate-800">คุณ{ownerProfile.firstName} {ownerProfile.lastName}</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">ID: {ownerProfile.phone || '0XX-XXX-XXXX'}</p>
+            <p className="font-black text-slate-800 text-lg">{ownerProfile.firstName} {ownerProfile.lastName}</p>
           </div>
         </div>
 
@@ -84,31 +84,30 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           <div>
             <p className="text-xs text-slate-600 mb-1">คะแนนปัจจุบันของคุณ</p>
             <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold text-slate-800">{redeemablePoints.toLocaleString()}</span>
-              <span className="text-sm text-slate-600">Points</span>
+              <span className="text-4xl font-black text-slate-800">{redeemablePoints.toLocaleString()}</span>
+              <span className="text-sm font-bold text-slate-600 uppercase">Points</span>
             </div>
           </div>
           <div className="text-right flex flex-col items-end gap-1">
-            {/* QR Button moved here, above accumulated points */}
             <motion.button 
               whileTap={{ scale: 0.9 }}
               onClick={onShowQR}
-              className="mb-1 bg-white/90 p-1.5 rounded-2xl shadow-sm text-pink-500 hover:text-pink-600 transition-colors flex items-center gap-2 px-3"
+              className="mb-1 bg-white border-2 border-black p-1.5 rounded-2xl shadow-sm text-pink-500 hover:text-pink-600 transition-colors flex items-center gap-2 px-3"
             >
               <QrCode size={16} />
-              <span className="text-[10px] font-bold">QR สมาชิก</span>
+              <span className="text-[10px] font-black uppercase">QR สมาชิก</span>
             </motion.button>
             <div>
-              <p className="text-[10px] text-slate-500 mb-0.5">คะแนนสะสมทั้งหมด</p>
-              <p className="text-sm font-bold text-slate-800">
-                {totalAccumulatedPoints.toLocaleString()} / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'} Points
+              <p className="text-[10px] text-slate-500 mb-0.5 font-bold uppercase">คะแนนสะสมทั้งหมด</p>
+              <p className="text-sm font-black text-slate-800">
+                {totalAccumulatedPoints.toLocaleString()} / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'}
               </p>
             </div>
           </div>
         </div>
 
         <div className="space-y-2">
-          <div className="w-full bg-white/40 h-3 rounded-full overflow-hidden">
+          <div className="w-full bg-white/40 h-3 rounded-full overflow-hidden border border-white/50">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
@@ -116,9 +115,9 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               className="bg-white h-full rounded-full"
             />
           </div>
-          <p className="text-[10px] text-slate-600 text-center font-medium">
+          <p className="text-[10px] text-slate-600 text-center font-bold uppercase tracking-tight">
             {nextLevel ? (
-              <>อีก {pointsToNextLevel} คะแนน เพื่อเลื่อนเป็น <span className="text-slate-800 font-bold">{nextLevel.name}</span></>
+              <>อีก {pointsToNextLevel} คะแนน เพื่อเป็น <span className="text-slate-800 font-black underline underline-offset-2">{nextLevel.name}</span></>
             ) : (
               <>คุณอยู่ในระดับสูงสุดแล้ว!</>
             )}
