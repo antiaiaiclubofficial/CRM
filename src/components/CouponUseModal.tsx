@@ -47,19 +47,18 @@ const CouponUseModal = ({ isOpen, onClose, coupon, onConfirmUse }: CouponUseModa
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="relative w-full max-w-[390px] bg-white rounded-t-[3.5rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
           >
-            {/* Improved Sticky Header */}
-            <div className="shrink-0 pt-8 pb-4 px-8 flex justify-between items-center bg-white border-b border-slate-50 sticky top-0 z-30">
+            {/* Header */}
+            <div className="pt-8 pb-4 px-8 flex justify-between items-center bg-white sticky top-0 z-10">
               <h3 className="font-bold text-xl text-slate-800">ใช้คูปองส่วนลด</h3>
               <button 
                 onClick={onClose} 
-                className="p-2 bg-slate-100 rounded-full text-slate-400 active:scale-90 transition-all hover:bg-slate-200"
+                className="p-2 bg-slate-100 rounded-full text-slate-400 active:scale-90 transition-transform"
               >
                 <X size={20} />
               </button>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto no-scrollbar px-8 pb-10 pt-6">
+            <div className="px-8 pb-10 overflow-y-auto no-scrollbar">
               {/* Coupon Info Preview */}
               <div className="bg-pink-50 p-6 rounded-3xl border-2 border-dashed border-pink-200 mb-8 text-center relative overflow-hidden">
                 <div className="absolute -top-4 -left-4 w-10 h-10 bg-white rounded-full" />
@@ -82,7 +81,7 @@ const CouponUseModal = ({ isOpen, onClose, coupon, onConfirmUse }: CouponUseModa
                     <Barcode size={180} className="text-slate-400 opacity-40 absolute" />
                     <span className="relative z-10 font-mono text-lg font-bold tracking-widest text-slate-800">{couponCode}</span>
                   </div>
-                  <button className="flex items-center gap-1 text-[10px] font-bold text-pink-500 mt-2 hover:underline">
+                  <button className="flex items-center gap-1 text-[10px] font-bold text-pink-500 mt-2">
                     <Copy size={12} /> คัดลอกรหัส
                   </button>
                 </div>
