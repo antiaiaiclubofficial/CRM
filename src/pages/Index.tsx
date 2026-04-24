@@ -213,6 +213,7 @@ const Index = () => {
       }
       setIsPetFormOpen(false);
       setPetToEdit(null);
+      toast.success('บันทึกข้อมูลเรียบร้อยแล้วค่ะ');
     }
   });
 
