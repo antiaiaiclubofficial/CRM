@@ -194,19 +194,25 @@ const Index = () => {
         is_favorite: petData.isFavorite !== undefined ? petData.isFavorite : (petData.is_favorite || false),
         owner_id: lineProfile.userId,
       };
+      
+      let result;
       if (isEdit) {
-        const { error } = await supabase.from('pets').update(dataToSave).eq('id', petData.id);
-        if (error) throw error;
+        result = await supabase.from('pets').update(dataToSave).eq('id', petData.id).select().single();
       } else {
-        const { error } = await supabase.from('pets').insert([dataToSave]);
-        if (error) throw error;
+        result = await supabase.from('pets').insert([dataToSave]).select().single();
       }
+      
+      if (result.error) throw result.error;
+      return result.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['pets'] });
+      // Update the selected pet in detail view immediately if it was the one being edited
+      if (selectedPetForDetail && selectedPetForDetail.id === data.id) {
+        setSelectedPetForDetail(data);
+      }
       setIsPetFormOpen(false);
       setPetToEdit(null);
-      toast.success('บันทึกข้อมูลเรียบร้อยแล้วค่ะ');
     }
   });
 
@@ -369,7 +375,6 @@ const Index = () => {
                   onToggleFavorite={() => {
                     const updatedFavorite = !selectedPetForDetail.is_favorite;
                     savePetMutation.mutate({ ...selectedPetForDetail, isFavorite: updatedFavorite });
-                    setSelectedPetForDetail({ ...selectedPetForDetail, is_favorite: updatedFavorite });
                   }}
                 />
               ) : (

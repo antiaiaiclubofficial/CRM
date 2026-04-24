@@ -93,7 +93,13 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     }
   };
 
-  const handleSave = () => {
+  const executeSave = () => {
+    // Only save if name and breed are present to avoid junk data
+    if (!formData.name.trim()) {
+      onClose();
+      return;
+    }
+
     const medicalCondition = formData.medicalCondition.trim() || "-";
     const precautions = formData.precautions.trim() || "-";
     const imageUrl = formData.imageUrl || (formData.type === 'แมว' 
@@ -134,7 +140,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={executeSave}
             className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
           />
           <motion.div 
@@ -145,7 +151,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
           >
             <div className="flex justify-between items-center sticky top-0 bg-white pt-8 pb-4 px-8 z-10 rounded-t-[3rem]">
               <h3 className="font-bold text-xl text-slate-800">{initialData ? 'แก้ไขข้อมูลสัตว์เลี้ยง' : 'เพิ่มสัตว์เลี้ยงใหม่'}</h3>
-              <button onClick={onClose} className="p-2 bg-slate-100 rounded-full text-slate-400">
+              <button onClick={executeSave} className="p-2 bg-slate-100 rounded-full text-slate-400">
                 <X size={20} />
               </button>
             </div>
@@ -296,7 +302,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
               </div>
 
               <button 
-                onClick={handleSave}
+                onClick={executeSave}
                 disabled={!formData.name || !formData.breed}
                 className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-lg mt-4 disabled:opacity-50 transition-all active:scale-95 flex items-center justify-center gap-2"
               >
