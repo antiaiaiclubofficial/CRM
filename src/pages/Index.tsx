@@ -68,32 +68,34 @@ const Index = () => {
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
 
-  // Promotion states
+  // Promotion & Coupon states
   const [collectedCoupons, setCollectedCoupons] = useState<Coupon[]>([]);
   const [collectedSpecialPromos, setCollectedSpecialPromos] = useState<number[]>([]);
+  const [selectedCouponToUse, setSelectedCouponToUse] = useState<Coupon | null>(null);
+  const [isCouponUseModalOpen, setIsCouponUseModalOpen] = useState(false);
 
   const { data: pets = [] } = useQuery({
-    queryKey: ['pets', lineProfile?.id],
+    queryKey: ['pets', lineProfile?.userId],
     queryFn: async () => {
-      if (!lineProfile?.id) return [];
+      if (!lineProfile?.userId) return [];
       const { data, error } = await supabase
         .from('pets')
         .select('*')
-        .eq('owner_id', lineProfile.id);
+        .eq('owner_id', lineProfile.userId);
       if (error) throw error;
       return data as Pet[];
     },
-    enabled: !!lineProfile?.id
+    enabled: !!lineProfile?.userId
   });
 
   const { data: serviceHistory = [] } = useQuery({
-    queryKey: ['history', lineProfile?.id],
+    queryKey: ['history', lineProfile?.userId],
     queryFn: async () => {
-      if (!lineProfile?.id) return [];
+      if (!lineProfile?.userId) return [];
       const { data, error } = await supabase
         .from('service_history')
         .select('*')
-        .eq('owner_id', lineProfile.id)
+        .eq('owner_id', lineProfile.userId)
         .order('created_at', { ascending: false });
       if (error) throw error;
       
@@ -103,7 +105,7 @@ const Index = () => {
         bg: h.bg || 'bg-slate-50'
       }));
     },
-    enabled: !!lineProfile?.id
+    enabled: !!lineProfile?.userId
   });
 
   const savePetMutation = useMutation({
@@ -125,7 +127,7 @@ const Index = () => {
         image_url: petData.imageUrl || petData.image_url,
         card_bg_color: petData.cardBgColor || petData.card_bg_color,
         is_favorite: petData.isFavorite !== undefined ? petData.isFavorite : petData.is_favorite,
-        owner_id: lineProfile?.id,
+        owner_id: lineProfile?.userId,
       };
 
       if (isEdit) {
@@ -168,6 +170,21 @@ const Index = () => {
       setCollectedCoupons([...collectedCoupons, coupon]);
       toast.success('เก็บโปรโมชั่นเรียบร้อยแล้วค่ะ');
     }
+  };
+
+  const handleUseCoupon = (couponId: number) => {
+    const coupon = collectedCoupons.find(c => c.id === couponId);
+    if (coupon) {
+      setSelectedCouponToUse(coupon);
+      setIsCouponUseModalOpen(true);
+    }
+  };
+
+  const handleConfirmUseCoupon = (couponId: number) => {
+    setCollectedCoupons(prev => prev.filter(c => c.id !== couponId));
+    setIsCouponUseModalOpen(false);
+    setSelectedCouponToUse(null);
+    toast.success('ใช้คูปองเรียบร้อยแล้วค่ะ ขอบคุณที่ใช้บริการนะคะ');
   };
 
   if (liffLoading) {
@@ -319,7 +336,7 @@ const Index = () => {
                 collectedCoupons={collectedCoupons} 
                 usedOrExpiredCoupons={[]}
                 onRedeemCoupon={() => toast.info('ฟังก์ชันแลกคะแนนจะมาเร็วๆ นี้ค่ะ')}
-                onUseCoupon={() => toast.info('ฟังก์ชันใช้คูปองจะมาเร็วๆ นี้ค่ะ')}
+                onUseCoupon={handleUseCoupon}
                 collectedSpecialPromos={collectedSpecialPromos}
                 onCollectSpecialPromotion={handleCollectSpecialPromotion}
               />
@@ -348,6 +365,7 @@ const Index = () => {
       />
 
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={lineProfile?.displayName || ''} memberId={lineProfile?.userId || ''} />
+      
       <PetForm 
         isOpen={isPetFormOpen} 
         onClose={() => setIsPetFormOpen(false)} 
@@ -360,12 +378,20 @@ const Index = () => {
           isFavorite: petToEdit.is_favorite
         } : null} 
       />
+
       <PetPreferenceForm 
         isOpen={isPreferenceFormOpen} 
         onClose={() => setIsPreferenceFormOpen(false)} 
         onSave={() => setIsPreferenceFormOpen(false)} 
         initialData={selectedPetForDetail?.custom_preferences || []} 
         petName={selectedPetForDetail?.name || ''} 
+      />
+
+      <CouponUseModal 
+        isOpen={isCouponUseModalOpen} 
+        onClose={() => setIsCouponUseModalOpen(false)} 
+        coupon={selectedCouponToUse} 
+        onConfirmUse={handleConfirmUseCoupon} 
       />
 
       <nav className="fixed bottom-[calc(5px+env(safe-area-inset-bottom))] left-6 right-6 max-w-[calc(theme(maxWidth.lg)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-50 border border-white/60">
