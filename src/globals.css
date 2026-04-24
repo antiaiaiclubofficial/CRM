@@ -31,16 +31,9 @@ body {
   @apply text-slate-800;
 }
 
-/* Ensure Toaster is above navigation and not obscured */
+/* Force Toaster to always be on top */
 [data-sonner-toaster] {
   z-index: 99999 !important;
-}
-
-/* Force higher position on mobile to clear the bottom nav bar */
-@media (max-width: 768px) {
-  [data-sonner-toaster] {
-    --offset: 160px !important;
-  }
 }
 
 .no-scrollbar::-webkit-scrollbar {
