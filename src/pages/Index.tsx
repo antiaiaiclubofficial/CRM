@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLiff } from '@/hooks/use-liff';
@@ -56,6 +56,10 @@ interface Coupon {
   pointsRequired: number;
 }
 
+interface UsedCoupon extends Coupon {
+  usedDate: string;
+}
+
 const Index = () => {
   const queryClient = useQueryClient();
   const { profile: lineProfile, loading: liffLoading } = useLiff();
@@ -70,6 +74,7 @@ const Index = () => {
 
   // Promotion & Coupon states
   const [collectedCoupons, setCollectedCoupons] = useState<Coupon[]>([]);
+  const [usedCoupons, setUsedCoupons] = useState<UsedCoupon[]>([]);
   const [collectedSpecialPromos, setCollectedSpecialPromos] = useState<number[]>([]);
   const [selectedCouponToUse, setSelectedCouponToUse] = useState<Coupon | null>(null);
   const [isCouponUseModalOpen, setIsCouponUseModalOpen] = useState(false);
@@ -110,24 +115,26 @@ const Index = () => {
 
   const savePetMutation = useMutation({
     mutationFn: async (petData: any) => {
+      if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
+      
       const isEdit = !!petData.id;
       const dataToSave = {
         name: petData.name,
         type: petData.type,
         breed: petData.breed,
-        age: petData.age,
+        age: petData.age?.toString() || '',
         gender: petData.gender,
-        weight: petData.weight,
-        medical_condition: petData.medicalCondition || petData.medical_condition,
-        precautions: petData.precautions,
-        color: petData.color,
-        icon: petData.icon,
-        fur_length: petData.furLength || petData.fur_length,
-        custom_preferences: petData.customPreferences || petData.custom_preferences,
-        image_url: petData.imageUrl || petData.image_url,
-        card_bg_color: petData.cardBgColor || petData.card_bg_color,
-        is_favorite: petData.isFavorite !== undefined ? petData.isFavorite : petData.is_favorite,
-        owner_id: lineProfile?.userId,
+        weight: petData.weight?.toString() || '',
+        medical_condition: petData.medicalCondition || petData.medical_condition || '-',
+        precautions: petData.precautions || '-',
+        color: petData.color || 'bg-orange-100',
+        icon: petData.icon || '🐾',
+        fur_length: petData.furLength || petData.fur_length || '',
+        custom_preferences: petData.customPreferences || petData.custom_preferences || [],
+        image_url: petData.imageUrl || petData.image_url || '',
+        card_bg_color: petData.cardBgColor || petData.card_bg_color || '#FFF9C4',
+        is_favorite: petData.isFavorite !== undefined ? petData.isFavorite : (petData.is_favorite || false),
+        owner_id: lineProfile.userId,
       };
 
       if (isEdit) {
@@ -144,7 +151,7 @@ const Index = () => {
       setPetToEdit(null);
       toast.success('บันทึกข้อมูลเรียบร้อยแล้วค่ะ');
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`เกิดข้อผิดพลาด: ${error.message}`);
     }
   });
@@ -159,7 +166,7 @@ const Index = () => {
       setSelectedPetForDetail(null);
       toast.success('ลบข้อมูลเรียบร้อยแล้วค่ะ');
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`เกิดข้อผิดพลาด: ${error.message}`);
     }
   });
@@ -181,6 +188,13 @@ const Index = () => {
   };
 
   const handleConfirmUseCoupon = (couponId: number) => {
+    const coupon = collectedCoupons.find(c => c.id === couponId);
+    if (coupon) {
+      setUsedCoupons(prev => [
+        { ...coupon, usedDate: new Date().toLocaleDateString('th-TH') },
+        ...prev
+      ]);
+    }
     setCollectedCoupons(prev => prev.filter(c => c.id !== couponId));
     setIsCouponUseModalOpen(false);
     setSelectedCouponToUse(null);
@@ -196,7 +210,20 @@ const Index = () => {
     );
   }
 
-  const sortedPets = [...pets].sort((a, b) => (a.is_favorite === b.is_favorite ? 0 : a.is_favorite ? -1 : 1));
+  const sortedPets = [...pets].sort((a, b) => {
+    if (a.is_favorite === b.is_favorite) return 0;
+    return a.is_favorite ? -1 : 1;
+  });
+
+  const mappedPetsForUI = sortedPets.map(p => ({
+    ...p,
+    medicalCondition: p.medical_condition,
+    imageUrl: p.image_url,
+    cardBgColor: p.card_bg_color,
+    isFavorite: p.is_favorite,
+    furLength: p.fur_length,
+    customPreferences: p.custom_preferences
+  }));
 
   return (
     <div className="w-full min-h-screen max-w-lg mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt']">
@@ -246,13 +273,7 @@ const Index = () => {
               />
               <UpcomingAppointments />
               <PetList 
-                pets={sortedPets.map(p => ({
-                  ...p,
-                  medicalCondition: p.medical_condition,
-                  imageUrl: p.image_url,
-                  cardBgColor: p.card_bg_color,
-                  isFavorite: p.is_favorite
-                }))} 
+                pets={mappedPetsForUI} 
                 onPetClick={(p) => { 
                   const pet = pets.find(item => item.id === p.id);
                   if (pet) setSelectedPetForDetail(pet);
@@ -260,6 +281,7 @@ const Index = () => {
                 }} 
                 onViewAll={() => setActiveTab('pets')} 
               />
+              <MyCouponsHomePreview coupons={collectedCoupons} onViewAll={() => setActiveTab('promo')} />
             </motion.div>
           )}
 
@@ -271,7 +293,9 @@ const Index = () => {
                     ...selectedPetForDetail,
                     medicalCondition: selectedPetForDetail.medical_condition,
                     imageUrl: selectedPetForDetail.image_url,
-                    isFavorite: selectedPetForDetail.is_favorite
+                    isFavorite: selectedPetForDetail.is_favorite,
+                    furLength: selectedPetForDetail.fur_length,
+                    customPreferences: selectedPetForDetail.custom_preferences
                   }} 
                   onBack={() => setSelectedPetForDetail(null)} 
                   onStartEdit={(p) => { 
@@ -295,13 +319,7 @@ const Index = () => {
                 />
               ) : (
                 <PetManagement 
-                  pets={sortedPets.map(p => ({
-                    ...p,
-                    medicalCondition: p.medical_condition,
-                    imageUrl: p.image_url,
-                    cardBgColor: p.card_bg_color,
-                    isFavorite: p.is_favorite
-                  }))} 
+                  pets={mappedPetsForUI} 
                   onBack={() => setActiveTab('home')} 
                   onViewDetails={(p) => {
                     const pet = pets.find(item => item.id === p.id);
@@ -334,7 +352,7 @@ const Index = () => {
                <Promotions 
                 userPoints={0}
                 collectedCoupons={collectedCoupons} 
-                usedOrExpiredCoupons={[]}
+                usedOrExpiredCoupons={usedCoupons}
                 onRedeemCoupon={() => toast.info('ฟังก์ชันแลกคะแนนจะมาเร็วๆ นี้ค่ะ')}
                 onUseCoupon={handleUseCoupon}
                 collectedSpecialPromos={collectedSpecialPromos}
@@ -375,7 +393,9 @@ const Index = () => {
           medicalCondition: petToEdit.medical_condition,
           imageUrl: petToEdit.image_url,
           cardBgColor: petToEdit.card_bg_color,
-          isFavorite: petToEdit.is_favorite
+          isFavorite: petToEdit.is_favorite,
+          furLength: petToEdit.fur_length,
+          customPreferences: petToEdit.custom_preferences
         } : null} 
       />
 
