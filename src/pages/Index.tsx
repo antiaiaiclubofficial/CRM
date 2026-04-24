@@ -21,7 +21,7 @@ import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
 import CouponUseModal from '@/components/CouponUseModal';
 import HomeQuickActions from '@/components/HomeQuickActions';
 import Register from './Register';
-import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles } from 'lucide-react';
+import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles, PlusCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -172,6 +172,57 @@ const Index = () => {
     }
   });
 
+  const updatePointsMutation = useMutation({
+    mutationFn: async ({ points, totalPoints }: { points: number; totalPoints?: number }) => {
+      const updates: any = { points };
+      if (totalPoints !== undefined) updates.total_points = totalPoints;
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('line_id', lineProfile.userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    }
+  });
+
+  const collectCouponMutation = useMutation({
+    mutationFn: async ({ couponId, cost }: { couponId: number; cost: number }) => {
+      if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
+      
+      // 1. Check if user has enough points
+      if ((profile?.points || 0) < cost) {
+        throw new Error("คะแนนสะสมไม่เพียงพอค่ะ");
+      }
+
+      // 2. Add coupon to user_coupons
+      const { error: couponError } = await supabase.from('user_coupons').insert([{
+        owner_id: lineProfile.userId,
+        coupon_id: couponId,
+        is_used: false
+      }]);
+      if (couponError) throw couponError;
+
+      // 3. Deduct points from profile
+      const newPoints = (profile?.points || 0) - cost;
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ points: newPoints })
+        .eq('line_id', lineProfile.userId);
+      if (profileError) throw profileError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_coupons'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      toast.success('เก็บคูปองเรียบร้อยแล้วค่ะ');
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
+    }
+  });
+
   const savePetMutation = useMutation({
     mutationFn: async (petData: any) => {
       if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
@@ -207,7 +258,6 @@ const Index = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['pets'] });
-      // Update the selected pet in detail view immediately if it was the one being edited
       if (selectedPetForDetail && selectedPetForDetail.id === data.id) {
         setSelectedPetForDetail(data);
       }
@@ -229,22 +279,6 @@ const Index = () => {
     }
   });
 
-  const collectCouponMutation = useMutation({
-    mutationFn: async (couponId: number) => {
-      if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
-      const { error } = await supabase.from('user_coupons').insert([{
-        owner_id: lineProfile.userId,
-        coupon_id: couponId,
-        is_used: false
-      }]);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user_coupons'] });
-      toast.success('เก็บคูปองเรียบร้อยแล้วค่ะ');
-    }
-  });
-
   const useCouponMutation = useMutation({
     mutationFn: async (userCouponId: number) => {
       const { error } = await supabase
@@ -261,6 +295,16 @@ const Index = () => {
     }
   });
 
+  const handleSimulatePoints = () => {
+    const currentPoints = profile?.points || 0;
+    const currentTotal = profile?.total_points || 0;
+    updatePointsMutation.mutate({ 
+      points: currentPoints + 100, 
+      totalPoints: currentTotal + 100 
+    });
+    toast.success('เย้! คุณได้รับเพิ่ม 100 คะแนนค่ะ');
+  };
+
   if (liffLoading || profileLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFF9F0]">
@@ -270,7 +314,6 @@ const Index = () => {
     );
   }
 
-  // If user is not registered yet
   if (lineProfile && !profile) {
     return (
       <Register 
@@ -281,7 +324,6 @@ const Index = () => {
     );
   }
 
-  // Filter UI Data
   const collectedCoupons = userCoupons
     .filter(uc => !uc.is_used)
     .map(uc => ({
@@ -329,15 +371,25 @@ const Index = () => {
           </h1>
           <p className="text-slate-500 text-sm font-medium">วันนี้พาน้องๆ ไปสปากันเถอะ ✨</p>
         </div>
-        <motion.div 
-          whileTap={{ scale: 0.9 }} 
-          onClick={() => setIsProfileEditing(true)} 
-          className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100 cursor-pointer border-2 border-black"
-        >
-          {(profile?.avatar_url || lineProfile?.pictureUrl) && (
-            <img src={profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
-          )}
-        </motion.div>
+        <div className="flex items-center gap-3">
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={handleSimulatePoints}
+            className="p-2 bg-amber-100 text-amber-600 rounded-full border border-amber-200 shadow-sm"
+            title="จำลองการเพิ่มคะแนน"
+          >
+            <PlusCircle size={20} />
+          </motion.button>
+          <motion.div 
+            whileTap={{ scale: 0.9 }} 
+            onClick={() => setIsProfileEditing(true)} 
+            className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100 cursor-pointer border-2 border-black"
+          >
+            {(profile?.avatar_url || lineProfile?.pictureUrl) && (
+              <img src={profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
+            )}
+          </motion.div>
+        </div>
       </header>
 
       <main className="px-6 flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))] overflow-y-auto no-scrollbar">
@@ -402,13 +454,13 @@ const Index = () => {
                 userPoints={profile?.points || 0}
                 collectedCoupons={collectedCoupons} 
                 usedOrExpiredCoupons={usedCoupons}
-                onRedeemCoupon={(c) => collectCouponMutation.mutate(c.id)}
+                onRedeemCoupon={(c, cost) => collectCouponMutation.mutate({ couponId: c.id, cost })}
                 onUseCoupon={(couponId) => {
                   const uc = collectedCoupons.find(c => c.id === couponId);
                   if (uc) { setSelectedCouponToUse(uc); setIsCouponUseModalOpen(true); }
                 }}
                 collectedSpecialPromos={collectedSpecialPromoIds}
-                onCollectSpecialPromotion={(c) => collectCouponMutation.mutate(c.id)}
+                onCollectSpecialPromotion={(c) => collectCouponMutation.mutate({ couponId: c.id, cost: 0 })}
               />
             </motion.div>
           )}
