@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLiff } from '@/hooks/use-liff';
@@ -56,10 +56,6 @@ interface Coupon {
   pointsRequired: number;
 }
 
-interface UsedCoupon extends Coupon {
-  usedDate: string;
-}
-
 const Index = () => {
   const queryClient = useQueryClient();
   const { profile: lineProfile, loading: liffLoading } = useLiff();
@@ -72,13 +68,11 @@ const Index = () => {
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
 
-  // Promotion & Coupon states
-  const [collectedCoupons, setCollectedCoupons] = useState<Coupon[]>([]);
-  const [usedCoupons, setUsedCoupons] = useState<UsedCoupon[]>([]);
-  const [collectedSpecialPromos, setCollectedSpecialPromos] = useState<number[]>([]);
-  const [selectedCouponToUse, setSelectedCouponToUse] = useState<Coupon | null>(null);
+  // Coupon usage modal state
+  const [selectedCouponToUse, setSelectedCouponToUse] = useState<any | null>(null);
   const [isCouponUseModalOpen, setIsCouponUseModalOpen] = useState(false);
 
+  // Queries
   const { data: pets = [] } = useQuery({
     queryKey: ['pets', lineProfile?.userId],
     queryFn: async () => {
@@ -89,6 +83,23 @@ const Index = () => {
         .eq('owner_id', lineProfile.userId);
       if (error) throw error;
       return data as Pet[];
+    },
+    enabled: !!lineProfile?.userId
+  });
+
+  const { data: userCoupons = [] } = useQuery({
+    queryKey: ['user_coupons', lineProfile?.userId],
+    queryFn: async () => {
+      if (!lineProfile?.userId) return [];
+      const { data, error } = await supabase
+        .from('user_coupons')
+        .select(`
+          *,
+          coupons (*)
+        `)
+        .eq('owner_id', lineProfile.userId);
+      if (error) throw error;
+      return data;
     },
     enabled: !!lineProfile?.userId
   });
@@ -113,10 +124,10 @@ const Index = () => {
     enabled: !!lineProfile?.userId
   });
 
+  // Mutations
   const savePetMutation = useMutation({
     mutationFn: async (petData: any) => {
       if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
-      
       const isEdit = !!petData.id;
       const dataToSave = {
         name: petData.name,
@@ -136,7 +147,6 @@ const Index = () => {
         is_favorite: petData.isFavorite !== undefined ? petData.isFavorite : (petData.is_favorite || false),
         owner_id: lineProfile.userId,
       };
-
       if (isEdit) {
         const { error } = await supabase.from('pets').update(dataToSave).eq('id', petData.id);
         if (error) throw error;
@@ -150,9 +160,6 @@ const Index = () => {
       setIsPetFormOpen(false);
       setPetToEdit(null);
       toast.success('บันทึกข้อมูลเรียบร้อยแล้วค่ะ');
-    },
-    onError: (error: any) => {
-      toast.error(`เกิดข้อผิดพลาด: ${error.message}`);
     }
   });
 
@@ -171,35 +178,37 @@ const Index = () => {
     }
   });
 
-  const handleCollectSpecialPromotion = (coupon: Coupon) => {
-    if (!collectedSpecialPromos.includes(coupon.id)) {
-      setCollectedSpecialPromos([...collectedSpecialPromos, coupon.id]);
-      setCollectedCoupons([...collectedCoupons, coupon]);
-      toast.success('เก็บโปรโมชั่นเรียบร้อยแล้วค่ะ');
+  const collectCouponMutation = useMutation({
+    mutationFn: async (couponId: number) => {
+      if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
+      const { error } = await supabase.from('user_coupons').insert([{
+        owner_id: lineProfile.userId,
+        coupon_id: couponId,
+        is_used: false
+      }]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_coupons'] });
+      toast.success('เก็บคูปองเรียบร้อยแล้วค่ะ');
     }
-  };
+  });
 
-  const handleUseCoupon = (couponId: number) => {
-    const coupon = collectedCoupons.find(c => c.id === couponId);
-    if (coupon) {
-      setSelectedCouponToUse(coupon);
-      setIsCouponUseModalOpen(true);
+  const useCouponMutation = useMutation({
+    mutationFn: async (userCouponId: number) => {
+      const { error } = await supabase
+        .from('user_coupons')
+        .update({ is_used: true, used_at: new Date().toISOString() })
+        .eq('id', userCouponId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_coupons'] });
+      setIsCouponUseModalOpen(false);
+      setSelectedCouponToUse(null);
+      toast.success('ใช้คูปองเรียบร้อยแล้วค่ะ');
     }
-  };
-
-  const handleConfirmUseCoupon = (couponId: number) => {
-    const coupon = collectedCoupons.find(c => c.id === couponId);
-    if (coupon) {
-      setUsedCoupons(prev => [
-        { ...coupon, usedDate: new Date().toLocaleDateString('th-TH') },
-        ...prev
-      ]);
-    }
-    setCollectedCoupons(prev => prev.filter(c => c.id !== couponId));
-    setIsCouponUseModalOpen(false);
-    setSelectedCouponToUse(null);
-    toast.success('ใช้คูปองเรียบร้อยแล้วค่ะ ขอบคุณที่ใช้บริการนะคะ');
-  };
+  });
 
   if (liffLoading) {
     return (
@@ -210,19 +219,33 @@ const Index = () => {
     );
   }
 
-  const sortedPets = [...pets].sort((a, b) => {
-    if (a.is_favorite === b.is_favorite) return 0;
-    return a.is_favorite ? -1 : 1;
-  });
+  // Filter UI Data
+  const collectedCoupons = userCoupons
+    .filter(uc => !uc.is_used)
+    .map(uc => ({
+      ...uc.coupons,
+      userCouponId: uc.id,
+      pointsRequired: uc.coupons.points_required,
+      iconName: uc.coupons.icon_name
+    }));
 
+  const usedCoupons = userCoupons
+    .filter(uc => uc.is_used)
+    .map(uc => ({
+      ...uc.coupons,
+      usedDate: uc.used_at ? new Date(uc.used_at).toLocaleDateString('th-TH') : '',
+      iconName: uc.coupons.icon_name
+    }));
+
+  const collectedSpecialPromoIds = userCoupons.map(uc => uc.coupon_id);
+
+  const sortedPets = [...pets].sort((a, b) => (a.is_favorite === b.is_favorite ? 0 : a.is_favorite ? -1 : 1));
   const mappedPetsForUI = sortedPets.map(p => ({
     ...p,
     medicalCondition: p.medical_condition,
     imageUrl: p.image_url,
     cardBgColor: p.card_bg_color,
-    isFavorite: p.is_favorite,
-    furLength: p.fur_length,
-    customPreferences: p.custom_preferences
+    isFavorite: p.is_favorite
   }));
 
   return (
@@ -239,17 +262,7 @@ const Index = () => {
           onClick={() => setIsProfileEditing(true)} 
           className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100 cursor-pointer"
         >
-          {lineProfile?.pictureUrl ? (
-            <img 
-              src={lineProfile.pictureUrl} 
-              alt="Line Profile" 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-4xl">
-              🐾
-            </div>
-          )}
+          {lineProfile?.pictureUrl && <img src={lineProfile.pictureUrl} alt="Line Profile" className="w-full h-full object-cover"/>}
         </motion.div>
       </header>
 
@@ -260,27 +273,11 @@ const Index = () => {
               <MembershipCard 
                 totalAccumulatedPoints={0} 
                 redeemablePoints={0} 
-                ownerProfile={{
-                  firstName: lineProfile?.displayName?.split(' ')[0] || '',
-                  lastName: lineProfile?.displayName?.split(' ')[1] || '',
-                  gender: '',
-                  age: '',
-                  phone: '',
-                  address: '',
-                  email: ''
-                }} 
+                ownerProfile={{ firstName: lineProfile?.displayName?.split(' ')[0] || '', lastName: '', gender: '', age: '', phone: '', address: '', email: '' }} 
                 onShowQR={() => setIsQRCodeOpen(true)} 
               />
               <UpcomingAppointments />
-              <PetList 
-                pets={mappedPetsForUI} 
-                onPetClick={(p) => { 
-                  const pet = pets.find(item => item.id === p.id);
-                  if (pet) setSelectedPetForDetail(pet);
-                  setActiveTab('pets'); 
-                }} 
-                onViewAll={() => setActiveTab('pets')} 
-              />
+              <PetList pets={mappedPetsForUI} onPetClick={(p) => { setSelectedPetForDetail(pets.find(i => i.id === p.id) || null); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
               <MyCouponsHomePreview coupons={collectedCoupons} onViewAll={() => setActiveTab('promo')} />
             </motion.div>
           )}
@@ -289,55 +286,28 @@ const Index = () => {
             <motion.div key="pets-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               {selectedPetForDetail ? (
                 <PetDetailView 
-                  pet={{
-                    ...selectedPetForDetail,
-                    medicalCondition: selectedPetForDetail.medical_condition,
-                    imageUrl: selectedPetForDetail.image_url,
-                    isFavorite: selectedPetForDetail.is_favorite,
-                    furLength: selectedPetForDetail.fur_length,
-                    customPreferences: selectedPetForDetail.custom_preferences
-                  }} 
+                  pet={{ ...selectedPetForDetail, medicalCondition: selectedPetForDetail.medical_condition, imageUrl: selectedPetForDetail.image_url, isFavorite: selectedPetForDetail.is_favorite }} 
                   onBack={() => setSelectedPetForDetail(null)} 
-                  onStartEdit={(p) => { 
-                    const pet = pets.find(item => item.id === p.id);
-                    if (pet) {
-                      setPetToEdit(pet);
-                      setIsPetFormOpen(true);
-                    }
-                  }} 
+                  onStartEdit={(p) => { setPetToEdit(pets.find(i => i.id === p.id) || null); setIsPetFormOpen(true); }} 
                   onDeletePet={(id) => deletePetMutation.mutate(id)} 
                   totalServiceCost={0} 
                   onViewServiceHistoryForPet={() => {}} 
                   onEditPreferences={() => setIsPreferenceFormOpen(true)} 
                   onToggleFavorite={() => {
-                    if (selectedPetForDetail) {
-                      const updatedFavorite = !selectedPetForDetail.is_favorite;
-                      savePetMutation.mutate({ ...selectedPetForDetail, isFavorite: updatedFavorite });
-                      setSelectedPetForDetail({ ...selectedPetForDetail, is_favorite: updatedFavorite });
-                    }
+                    const updatedFavorite = !selectedPetForDetail.is_favorite;
+                    savePetMutation.mutate({ ...selectedPetForDetail, isFavorite: updatedFavorite });
+                    setSelectedPetForDetail({ ...selectedPetForDetail, is_favorite: updatedFavorite });
                   }}
                 />
               ) : (
-                <PetManagement 
-                  pets={mappedPetsForUI} 
-                  onBack={() => setActiveTab('home')} 
-                  onViewDetails={(p) => {
-                    const pet = pets.find(item => item.id === p.id);
-                    if (pet) setSelectedPetForDetail(pet);
-                  }} 
-                  onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} 
-                />
+                <PetManagement pets={mappedPetsForUI} onBack={() => setActiveTab('home')} onViewDetails={(p) => setSelectedPetForDetail(pets.find(i => i.id === p.id) || null)} onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} />
               )}
             </motion.div>
           )}
 
           {activeTab === 'history' && (
             <motion.div key="history-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              {selectedServiceForDetail ? (
-                <ServiceHistoryDetail service={selectedServiceForDetail} onBack={() => setSelectedServiceForDetail(null)} />
-              ) : (
-                <ServiceHistory historyData={serviceHistory} onServiceClick={(s) => setSelectedServiceForDetail(s)} />
-              )}
+              {selectedServiceForDetail ? <ServiceHistoryDetail service={selectedServiceForDetail} onBack={() => setSelectedServiceForDetail(null)} /> : <ServiceHistory historyData={serviceHistory} onServiceClick={(s) => setSelectedServiceForDetail(s)} />}
             </motion.div>
           )}
           
@@ -353,65 +323,30 @@ const Index = () => {
                 userPoints={0}
                 collectedCoupons={collectedCoupons} 
                 usedOrExpiredCoupons={usedCoupons}
-                onRedeemCoupon={() => toast.info('ฟังก์ชันแลกคะแนนจะมาเร็วๆ นี้ค่ะ')}
-                onUseCoupon={handleUseCoupon}
-                collectedSpecialPromos={collectedSpecialPromos}
-                onCollectSpecialPromotion={handleCollectSpecialPromotion}
+                onRedeemCoupon={(c) => collectCouponMutation.mutate(c.id)}
+                onUseCoupon={(couponId) => {
+                  const uc = collectedCoupons.find(c => c.id === couponId);
+                  if (uc) { setSelectedCouponToUse(uc); setIsCouponUseModalOpen(true); }
+                }}
+                collectedSpecialPromos={collectedSpecialPromoIds}
+                onCollectSpecialPromotion={(c) => collectCouponMutation.mutate(c.id)}
               />
             </motion.div>
           )}
         </AnimatePresence>
       </main>
 
-      {/* Profile Edit Modal */}
-      <UserProfileEdit 
-        isOpen={isProfileEditing} 
-        onClose={() => setIsProfileEditing(false)} 
-        profile={{
-          firstName: lineProfile?.displayName?.split(' ')[0] || '',
-          lastName: lineProfile?.displayName?.split(' ')[1] || '',
-          gender: '',
-          age: '',
-          phone: '',
-          address: '',
-          email: ''
-        }} 
-        onSave={() => {
-          setIsProfileEditing(false);
-          toast.success('บันทึกข้อมูลส่วนตัวแล้วค่ะ');
-        }} 
-      />
-
+      <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={{ firstName: lineProfile?.displayName?.split(' ')[0] || '', lastName: '', gender: '', age: '', phone: '', address: '', email: '' }} onSave={() => setIsProfileEditing(false)} />
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={lineProfile?.displayName || ''} memberId={lineProfile?.userId || ''} />
       
-      <PetForm 
-        isOpen={isPetFormOpen} 
-        onClose={() => setIsPetFormOpen(false)} 
-        onSave={(data) => savePetMutation.mutate(data)} 
-        initialData={petToEdit ? {
-          ...petToEdit,
-          medicalCondition: petToEdit.medical_condition,
-          imageUrl: petToEdit.image_url,
-          cardBgColor: petToEdit.card_bg_color,
-          isFavorite: petToEdit.is_favorite,
-          furLength: petToEdit.fur_length,
-          customPreferences: petToEdit.custom_preferences
-        } : null} 
-      />
-
-      <PetPreferenceForm 
-        isOpen={isPreferenceFormOpen} 
-        onClose={() => setIsPreferenceFormOpen(false)} 
-        onSave={() => setIsPreferenceFormOpen(false)} 
-        initialData={selectedPetForDetail?.custom_preferences || []} 
-        petName={selectedPetForDetail?.name || ''} 
-      />
-
+      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => savePetMutation.mutate(data)} initialData={petToEdit ? { ...petToEdit, medicalCondition: petToEdit.medical_condition, imageUrl: petToEdit.image_url, cardBgColor: petToEdit.card_bg_color, isFavorite: petToEdit.is_favorite } : null} />
+      <PetPreferenceForm isOpen={isPreferenceFormOpen} onClose={() => setIsPreferenceFormOpen(false)} onSave={() => setIsPreferenceFormOpen(false)} initialData={selectedPetForDetail?.custom_preferences || []} petName={selectedPetForDetail?.name || ''} />
+      
       <CouponUseModal 
         isOpen={isCouponUseModalOpen} 
         onClose={() => setIsCouponUseModalOpen(false)} 
         coupon={selectedCouponToUse} 
-        onConfirmUse={handleConfirmUseCoupon} 
+        onConfirmUse={() => selectedCouponToUse && useCouponMutation.mutate(selectedCouponToUse.userCouponId)} 
       />
 
       <nav className="fixed bottom-[calc(5px+env(safe-area-inset-bottom))] left-6 right-6 max-w-[calc(theme(maxWidth.lg)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-50 border border-white/60">
