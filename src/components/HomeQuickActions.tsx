@@ -17,7 +17,7 @@ const HomeQuickActions = ({ onPromoClick, onAppointmentClick }: HomeQuickActions
         onClick={onAppointmentClick}
         className="flex items-center justify-center gap-3 p-4 bg-white rounded-[2rem] border border-slate-100 shadow-sm active:bg-slate-50 transition-all"
       >
-        <div className="w-10 h-10 bg-pink-100 rounded-2xl flex items-center justify-center text-pink-600">
+        <div className="w-10 h-10 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600">
           <Calendar size={20} />
         </div>
         <span className="font-bold text-slate-700">นัดหมาย</span>
