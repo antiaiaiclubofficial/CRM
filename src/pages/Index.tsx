@@ -43,6 +43,19 @@ export interface Pet {
   is_favorite?: boolean;
 }
 
+interface Coupon {
+  id: number;
+  title: string;
+  description: string;
+  value: string;
+  type: string;
+  expiry: string;
+  iconName: string;
+  color: string;
+  bg: string;
+  pointsRequired: number;
+}
+
 const Index = () => {
   const queryClient = useQueryClient();
   const { profile: lineProfile, loading: liffLoading } = useLiff();
@@ -54,6 +67,10 @@ const Index = () => {
   const [isPetFormOpen, setIsPetFormOpen] = useState(false);
   const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
+
+  // Promotion states
+  const [collectedCoupons, setCollectedCoupons] = useState<Coupon[]>([]);
+  const [collectedSpecialPromos, setCollectedSpecialPromos] = useState<number[]>([]);
 
   const { data: pets = [] } = useQuery({
     queryKey: ['pets', lineProfile?.id],
@@ -91,17 +108,27 @@ const Index = () => {
 
   const savePetMutation = useMutation({
     mutationFn: async (petData: any) => {
+      const isEdit = !!petData.id;
       const dataToSave = {
-        ...petData,
-        owner_id: lineProfile?.id,
+        name: petData.name,
+        type: petData.type,
+        breed: petData.breed,
+        age: petData.age,
+        gender: petData.gender,
+        weight: petData.weight,
         medical_condition: petData.medicalCondition || petData.medical_condition,
+        precautions: petData.precautions,
+        color: petData.color,
+        icon: petData.icon,
+        fur_length: petData.furLength || petData.fur_length,
+        custom_preferences: petData.customPreferences || petData.custom_preferences,
         image_url: petData.imageUrl || petData.image_url,
         card_bg_color: petData.cardBgColor || petData.card_bg_color,
-        fur_length: petData.furLength || petData.fur_length,
-        is_favorite: petData.isFavorite !== undefined ? petData.isFavorite : petData.is_favorite
+        is_favorite: petData.isFavorite !== undefined ? petData.isFavorite : petData.is_favorite,
+        owner_id: lineProfile?.id,
       };
 
-      if (petData.id) {
+      if (isEdit) {
         const { error } = await supabase.from('pets').update(dataToSave).eq('id', petData.id);
         if (error) throw error;
       } else {
@@ -114,6 +141,9 @@ const Index = () => {
       setIsPetFormOpen(false);
       setPetToEdit(null);
       toast.success('บันทึกข้อมูลเรียบร้อยแล้วค่ะ');
+    },
+    onError: (error) => {
+      toast.error(`เกิดข้อผิดพลาด: ${error.message}`);
     }
   });
 
@@ -126,8 +156,19 @@ const Index = () => {
       queryClient.invalidateQueries({ queryKey: ['pets'] });
       setSelectedPetForDetail(null);
       toast.success('ลบข้อมูลเรียบร้อยแล้วค่ะ');
+    },
+    onError: (error) => {
+      toast.error(`เกิดข้อผิดพลาด: ${error.message}`);
     }
   });
+
+  const handleCollectSpecialPromotion = (coupon: Coupon) => {
+    if (!collectedSpecialPromos.includes(coupon.id)) {
+      setCollectedSpecialPromos([...collectedSpecialPromos, coupon.id]);
+      setCollectedCoupons([...collectedCoupons, coupon]);
+      toast.success('เก็บโปรโมชั่นเรียบร้อยแล้วค่ะ');
+    }
+  };
 
   if (liffLoading) {
     return (
@@ -173,16 +214,16 @@ const Index = () => {
           {activeTab === 'home' && (
             <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <MembershipCard 
-                totalAccumulatedPoints={lineProfile?.total_points || 0} 
-                redeemablePoints={lineProfile?.points || 0} 
+                totalAccumulatedPoints={0} 
+                redeemablePoints={0} 
                 ownerProfile={{
-                  firstName: lineProfile?.first_name || lineProfile?.displayName || '',
-                  lastName: lineProfile?.last_name || '',
-                  gender: lineProfile?.gender || '',
-                  age: lineProfile?.age || '',
-                  phone: lineProfile?.phone || '',
-                  address: lineProfile?.address || '',
-                  email: lineProfile?.email || ''
+                  firstName: lineProfile?.displayName?.split(' ')[0] || '',
+                  lastName: lineProfile?.displayName?.split(' ')[1] || '',
+                  gender: '',
+                  age: '',
+                  phone: '',
+                  address: '',
+                  email: ''
                 }} 
                 onShowQR={() => setIsQRCodeOpen(true)} 
               />
@@ -267,27 +308,46 @@ const Index = () => {
           
           {activeTab === 'level' && (
             <motion.div key="level-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <MembershipLevels totalAccumulatedPoints={lineProfile?.total_points || 0} redeemablePoints={lineProfile?.points || 0} />
+              <MembershipLevels totalAccumulatedPoints={0} redeemablePoints={0} />
             </motion.div>
           )}
 
           {activeTab === 'promo' && (
             <motion.div key="promo-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                <Promotions 
-                userPoints={lineProfile?.points || 0}
-                collectedCoupons={[]} 
+                userPoints={0}
+                collectedCoupons={collectedCoupons} 
                 usedOrExpiredCoupons={[]}
-                onRedeemCoupon={() => {}}
-                onUseCoupon={() => {}}
-                collectedSpecialPromos={[]}
-                onCollectSpecialPromotion={() => {}}
+                onRedeemCoupon={() => toast.info('ฟังก์ชันแลกคะแนนจะมาเร็วๆ นี้ค่ะ')}
+                onUseCoupon={() => toast.info('ฟังก์ชันใช้คูปองจะมาเร็วๆ นี้ค่ะ')}
+                collectedSpecialPromos={collectedSpecialPromos}
+                onCollectSpecialPromotion={handleCollectSpecialPromotion}
               />
             </motion.div>
           )}
         </AnimatePresence>
       </main>
 
-      <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={lineProfile?.displayName || ''} memberId={lineProfile?.phone || ''} />
+      {/* Profile Edit Modal */}
+      <UserProfileEdit 
+        isOpen={isProfileEditing} 
+        onClose={() => setIsProfileEditing(false)} 
+        profile={{
+          firstName: lineProfile?.displayName?.split(' ')[0] || '',
+          lastName: lineProfile?.displayName?.split(' ')[1] || '',
+          gender: '',
+          age: '',
+          phone: '',
+          address: '',
+          email: ''
+        }} 
+        onSave={() => {
+          setIsProfileEditing(false);
+          toast.success('บันทึกข้อมูลส่วนตัวแล้วค่ะ');
+        }} 
+      />
+
+      <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} ownerName={lineProfile?.displayName || ''} memberId={lineProfile?.userId || ''} />
       <PetForm 
         isOpen={isPetFormOpen} 
         onClose={() => setIsPetFormOpen(false)} 
@@ -299,6 +359,13 @@ const Index = () => {
           cardBgColor: petToEdit.card_bg_color,
           isFavorite: petToEdit.is_favorite
         } : null} 
+      />
+      <PetPreferenceForm 
+        isOpen={isPreferenceFormOpen} 
+        onClose={() => setIsPreferenceFormOpen(false)} 
+        onSave={() => setIsPreferenceFormOpen(false)} 
+        initialData={selectedPetForDetail?.custom_preferences || []} 
+        petName={selectedPetForDetail?.name || ''} 
       />
 
       <nav className="fixed bottom-[calc(5px+env(safe-area-inset-bottom))] left-6 right-6 max-w-[calc(theme(maxWidth.lg)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-50 border border-white/60">
