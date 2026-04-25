@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Crown, Star, Gem, Diamond, PawPrint, Check } from 'lucide-react';
+import { Crown, Star, Gem, Diamond, PawPrint, Check, Clock, ShieldCheck } from 'lucide-react';
 
 interface MembershipTier {
   id: string;
@@ -95,9 +95,10 @@ const membershipTiers: MembershipTier[] = [
 interface MembershipLevelsProps {
   totalAccumulatedPoints: number;
   redeemablePoints: number;
+  tierExpiry?: string;
 }
 
-const MembershipLevels = ({ totalAccumulatedPoints }: MembershipLevelsProps) => {
+const MembershipLevels = ({ totalAccumulatedPoints, tierExpiry }: MembershipLevelsProps) => {
   const sortedTiers = [...membershipTiers].sort((a, b) => a.minPoints - b.minPoints);
 
   let currentLevel: MembershipTier = sortedTiers[0];
@@ -112,7 +113,6 @@ const MembershipLevels = ({ totalAccumulatedPoints }: MembershipLevelsProps) => 
     }
   }
 
-  // Logic to put current level first and others after, making them very muted
   const orderedTiers = [
     currentLevel,
     ...sortedTiers.filter(t => t.id !== currentLevel.id)
@@ -144,6 +144,12 @@ const MembershipLevels = ({ totalAccumulatedPoints }: MembershipLevelsProps) => 
             ระดับปัจจุบันของคุณ
           </div>
           <h3 className="text-3xl font-black">{currentLevel.name}</h3>
+          {tierExpiry && (
+             <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-600 bg-white/40 px-3 py-1 rounded-full border border-black/10">
+               <Clock size={12} />
+               รักษาระดับถึง: <span className="text-black font-black underline">{tierExpiry}</span>
+             </div>
+          )}
         </div>
 
         <div className="bg-white border-2 border-black p-4 rounded-3xl text-center">
@@ -171,6 +177,16 @@ const MembershipLevels = ({ totalAccumulatedPoints }: MembershipLevelsProps) => 
               </p>
             )}
           </div>
+        </div>
+
+        <div className="bg-white/60 p-3 rounded-2xl border border-black/5 flex items-start gap-3">
+           <ShieldCheck size={20} className="text-emerald-600 shrink-0 mt-0.5" />
+           <div>
+              <p className="text-[11px] font-black text-black leading-tight">เงื่อนไขการรักษาระดับ</p>
+              <p className="text-[10px] font-bold text-slate-600 leading-tight mt-1">
+                สะสมให้ครบ {currentLevel.minPoints.toLocaleString()} คะแนน ภายในวันที่กำหนดเพื่อรักษาระดับสมาชิก หรือสะสมเพิ่มเพื่อเลื่อนระดับ
+              </p>
+           </div>
         </div>
       </div>
     </motion.div>

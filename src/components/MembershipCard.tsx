@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Crown, PawPrint, QrCode } from 'lucide-react';
+import { Crown, PawPrint, QrCode, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface OwnerProfile {
@@ -12,6 +12,7 @@ interface OwnerProfile {
   phone: string;
   address: string;
   email: string;
+  pointsExpiry?: string;
 }
 
 interface MembershipCardProps {
@@ -74,19 +75,25 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               </span>
             </div>
           </div>
-          <div className="flex flex-col items-end">
+          <div className="flex flex-col items-end text-right">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">ID: {ownerProfile.phone || '0XX-XXX-XXXX'}</p>
-            <p className="font-black text-slate-800 text-lg">{ownerProfile.firstName} {ownerProfile.lastName}</p>
+            <p className="font-black text-slate-800 text-lg leading-tight">{ownerProfile.firstName} {ownerProfile.lastName}</p>
           </div>
         </div>
 
         <div className="flex justify-between items-end mb-4">
-          <div>
-            <p className="text-xs text-slate-600 mb-1">คะแนนปัจจุบันของคุณ</p>
+          <div className="space-y-1">
+            <p className="text-xs text-slate-600">คะแนนปัจจุบัน</p>
             <div className="flex items-baseline gap-1">
               <span className="text-4xl font-black text-slate-800">{redeemablePoints.toLocaleString()}</span>
-              <span className="text-sm font-bold text-slate-600 uppercase">Points</span>
+              <span className="text-xs font-bold text-slate-600 uppercase">Points</span>
             </div>
+            {ownerProfile.pointsExpiry && (
+              <div className="flex items-center gap-1.5 text-[9px] font-bold text-pink-600 bg-white/50 px-2 py-0.5 rounded-full border border-pink-100 w-fit">
+                <Clock size={10} />
+                คะแนนหมดอายุ: {ownerProfile.pointsExpiry}
+              </div>
+            )}
           </div>
           <div className="text-right flex flex-col items-end gap-1">
             <motion.button 
@@ -98,7 +105,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               <span className="text-[10px] font-black uppercase">QR สมาชิก</span>
             </motion.button>
             <div>
-              <p className="text-[10px] text-slate-500 mb-0.5 font-bold uppercase">คะแนนสะสมทั้งหมด</p>
+              <p className="text-[10px] text-slate-500 mb-0.5 font-bold uppercase">คะแนนสะสมรวม</p>
               <p className="text-sm font-black text-slate-800">
                 {totalAccumulatedPoints.toLocaleString()} / {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'}
               </p>

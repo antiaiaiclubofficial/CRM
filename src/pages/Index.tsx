@@ -46,6 +46,12 @@ export interface Pet {
   is_favorite?: boolean;
 }
 
+const formatDateThai = (dateString?: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
+};
+
 const Index = () => {
   const queryClient = useQueryClient();
   const { profile: lineProfile, loading: liffLoading } = useLiff();
@@ -84,7 +90,6 @@ const Index = () => {
     }
   };
 
-  // Profile Query - Increased staleTime to improve speed
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['profile', lineProfile?.userId],
     queryFn: async () => {
@@ -98,10 +103,9 @@ const Index = () => {
       return data;
     },
     enabled: !!lineProfile?.userId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 
-  // Pets Query - Parallel fetch with profile
   const { data: pets = [], isLoading: petsLoading } = useQuery({
     queryKey: ['pets', lineProfile?.userId],
     queryFn: async () => {
@@ -152,7 +156,6 @@ const Index = () => {
     staleTime: 1000 * 60 * 10,
   });
 
-  // Mutations
   const registerMutation = useMutation({
     mutationFn: async (userData: any) => {
       if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
@@ -167,7 +170,9 @@ const Index = () => {
         email: userData.email,
         avatar_url: lineProfile.pictureUrl,
         points: 0,
-        total_points: 0
+        total_points: 0,
+        points_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
+        tier_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
       }]);
       if (error) throw error;
     },
@@ -338,7 +343,6 @@ const Index = () => {
     );
   }
 
-  // Show register only if profile is definitely loaded and null
   if (lineProfile && !profile && !profileLoading) {
     return (
       <Register 
@@ -383,7 +387,8 @@ const Index = () => {
     age: profile?.age || '',
     phone: profile?.phone || '',
     address: profile?.address || '',
-    email: profile?.email || ''
+    email: profile?.email || '',
+    pointsExpiry: formatDateThai(profile?.points_expiry)
   };
 
   return (
@@ -461,7 +466,11 @@ const Index = () => {
           
           {activeTab === 'level' && (
             <motion.div key="level-tab" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }}>
-              <MembershipLevels totalAccumulatedPoints={profile?.total_points || 0} redeemablePoints={profile?.points || 0} />
+              <MembershipLevels 
+                totalAccumulatedPoints={profile?.total_points || 0} 
+                redeemablePoints={profile?.points || 0} 
+                tierExpiry={formatDateThai(profile?.tier_expiry)}
+              />
             </motion.div>
           )}
 
