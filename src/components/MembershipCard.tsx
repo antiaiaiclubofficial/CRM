@@ -125,27 +125,27 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           </div>
         </div>
 
-        {/* Progress Bar Area */}
-        <div className="space-y-2 bg-white/20 p-2 rounded-[1rem] border border-white/30">
-          <div className="w-full bg-slate-200/50 h-2 rounded-full overflow-hidden border border-slate-300/20 p-0.5 shadow-inner">
+        {/* Progress Bar - Original Brutalist Style */}
+        <div className="mt-2 space-y-1.5">
+          <div className="w-full bg-white/40 border border-black/10 h-2.5 rounded-full overflow-hidden p-0.5">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-              className="bg-gradient-to-r from-pink-400 to-amber-400 h-full rounded-full"
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="bg-black h-full rounded-full"
             />
           </div>
           <div className="flex justify-between items-center px-0.5">
-            <p className="text-[8px] text-slate-700 font-bold uppercase tracking-tight truncate mr-2">
+            <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tight">
               {nextLevel ? (
-                <>อีก <span className="font-black text-pink-600">{pointsToNextLevel.toLocaleString()}</span> คะแนน เพื่อเลื่อนระดับ</>
+                <>อีก <span className="text-black font-black underline">{pointsToNextLevel.toLocaleString()}</span> คะแนน เพื่อเลื่อนระดับ</>
               ) : (
                 <span className="text-emerald-600 font-black">ระดับสูงสุดแล้ว! ✨</span>
               )}
             </p>
             {nextLevel && (
-              <span className="text-[7px] font-black bg-white/80 border border-black/5 px-1.5 py-0.5 rounded-md text-slate-800 whitespace-nowrap">
-                NEXT: {nextLevel.name.split(' ')[0]}
+              <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest">
+                Target: {nextLevel.name}
               </span>
             )}
           </div>
