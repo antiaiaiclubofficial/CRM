@@ -399,7 +399,7 @@ const Index = () => {
           <motion.div 
             whileTap={{ scale: 0.9 }} 
             onClick={() => setIsProfileEditing(true)} 
-            className="w-12 h-12 rounded-full border-2 border-black shadow-md overflow-hidden bg-pink-100 cursor-pointer"
+            className="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden bg-pink-100 cursor-pointer"
           >
             {(profile?.avatar_url || lineProfile?.pictureUrl) && (
               <img src={profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
