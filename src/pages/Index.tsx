@@ -406,25 +406,25 @@ const Index = () => {
 
   return (
     <div className="w-full h-[100dvh] max-w-md mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt'] overflow-hidden border-x border-slate-100/50">
-      <header className="px-6 pt-[calc(5px+env(safe-area-inset-top))] pb-6 flex justify-between items-center shrink-0 z-[50]">
-        <div>
-          <h1 className="text-2xl font-black text-slate-800">
+      <header className="px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-[5px] flex justify-between items-center shrink-0 z-[50]">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl font-black text-slate-800 truncate">
             สวัสดี, {lineProfile?.displayName || profile?.first_name || 'คุณ'}
           </h1>
-          <p className="text-slate-500 text-sm font-medium">วันนี้พาน้องๆ ไปสปากันเถอะ ✨</p>
+          <p className="text-slate-500 text-xs font-medium">วันนี้พาน้องๆ ไปสปากันเถอะ ✨</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 ml-4">
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={handleSimulatePoints}
-            className="p-2 bg-amber-100 text-amber-600 rounded-full border border-amber-200 shadow-sm"
+            className="p-1.5 bg-amber-100 text-amber-600 rounded-full border border-amber-200 shadow-sm"
           >
-            <PlusCircle size={20} />
+            <PlusCircle size={18} />
           </motion.button>
           <motion.div 
             whileTap={{ scale: 0.9 }} 
             onClick={() => setIsProfileEditing(true)} 
-            className="w-16 h-16 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-pink-100 cursor-pointer border-2 border-black"
+            className="w-12 h-12 rounded-full border-2 border-black shadow-md overflow-hidden bg-pink-100 cursor-pointer"
           >
             {(profile?.avatar_url || lineProfile?.pictureUrl) && (
               <img src={profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
