@@ -111,7 +111,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
             <motion.button 
               whileTap={{ scale: 0.9 }}
               onClick={onShowQR}
-              className="bg-white border-2 border-black p-1.5 rounded-xl shadow-[3px_3px_0px_0px_#000] active:translate-y-0.5 active:shadow-none transition-all text-slate-800 flex items-center gap-1.5 px-3"
+              className="bg-white p-2 px-4 rounded-xl shadow-sm border border-white/50 transition-all text-slate-800 flex items-center gap-1.5"
             >
               <QrCode size={14} />
               <span className="text-[9px] font-black uppercase whitespace-nowrap">My QR</span>
@@ -125,14 +125,14 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           </div>
         </div>
 
-        {/* Progress Bar - Original Brutalist Style */}
+        {/* Progress Bar - Updated to solid white */}
         <div className="mt-2 space-y-1.5">
-          <div className="w-full bg-white/40 border border-black/10 h-2.5 rounded-full overflow-hidden p-0.5">
+          <div className="w-full bg-black/5 h-2 rounded-full overflow-hidden p-0.5">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
               transition={{ duration: 1, ease: "easeOut" }}
-              className="bg-black h-full rounded-full"
+              className="bg-white h-full rounded-full shadow-sm"
             />
           </div>
           <div className="flex justify-center items-center px-0.5">
