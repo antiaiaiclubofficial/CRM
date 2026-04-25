@@ -80,7 +80,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative w-full aspect-[1.58/1] overflow-hidden p-5 rounded-[1.5rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-xl shadow-pink-100/50 border-[3px] border-white/30 flex flex-col justify-between"
+      className="relative w-full aspect-[1.58/1] overflow-hidden p-5 rounded-[1.5rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-2xl shadow-pink-200/40 border-[3px] border-white/30 flex flex-col justify-between"
     >
       {/* Background Decorative Elements */}
       <PawPrint className="absolute -right-4 -top-4 w-28 h-28 text-white/20 rotate-12" />
@@ -141,7 +141,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
             <motion.button 
               whileTap={{ scale: 0.9 }}
               onClick={onShowQR}
-              className="bg-white py-1.5 px-3 rounded-xl shadow-sm border border-white/30 transition-all text-slate-800 flex items-center gap-1"
+              className="bg-white py-1.5 px-3 rounded-xl shadow-sm border border-white/50 transition-all text-slate-800 flex items-center gap-1"
             >
               <QrCode size={13} />
               <span className="text-[9px] font-black uppercase whitespace-nowrap">My QR</span>
