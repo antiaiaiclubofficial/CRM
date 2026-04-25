@@ -184,7 +184,7 @@ const MembershipLevels = ({ totalAccumulatedPoints, tierExpiry }: MembershipLeve
            <div>
               <p className="text-[11px] font-black text-black leading-tight">เงื่อนไขการรักษาระดับ</p>
               <p className="text-[10px] font-bold text-slate-600 leading-tight mt-1">
-                สะสมให้ครบ {currentLevel.minPoints.toLocaleString()} คะแนน ภายในวันที่กำหนดเพื่อรักษาระดับสมาชิก หรือสะสมเพิ่มเพื่อเลื่อนระดับ
+                สะสมให้ครบ <span className="text-black font-black underline">{currentLevel.minPoints.toLocaleString()}</span> คะแนน ภายในวันที่กำหนดเพื่อรักษาระดับสมาชิก หรือสะสมเพิ่มเพื่อเลื่อนระดับ
               </p>
            </div>
         </div>
