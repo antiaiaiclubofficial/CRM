@@ -14,6 +14,7 @@ interface OwnerProfile {
   email: string;
   pointsExpiry?: string;
   rawPointsExpiry?: string;
+  pointsLedger?: { amount: number; earned_at: string }[];
 }
 
 interface MembershipCardProps {
@@ -56,21 +57,39 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
   }
   progressPercentage = Math.min(100, Math.max(0, progressPercentage));
 
-  // Logic to calculate points expiring within 30 days
+  // Logic to calculate points expiring within 30 days (based on 2-year tenure)
   const getExpiringPointsInfo = () => {
-    if (!ownerProfile.rawPointsExpiry) return null;
+    if (!ownerProfile.pointsLedger || ownerProfile.pointsLedger.length === 0) return null;
     
-    const expiryDate = new Date(ownerProfile.rawPointsExpiry);
     const now = new Date();
     const thirtyDaysFromNow = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
     
-    // If expiry is within 30 days
-    if (expiryDate <= thirtyDaysFromNow && expiryDate > now) {
+    let totalExpiring = 0;
+    let earliestExpiryDate: Date | null = null;
+
+    ownerProfile.pointsLedger.forEach(entry => {
+      const earnedDate = new Date(entry.earned_at);
+      // Expiry is 2 years after earned date
+      const expiryDate = new Date(earnedDate);
+      expiryDate.setFullYear(expiryDate.getFullYear() + 2);
+      
+      // If expiry is within the next 30 days and hasn't passed yet
+      if (expiryDate > now && expiryDate <= thirtyDaysFromNow) {
+        totalExpiring += entry.amount;
+        if (!earliestExpiryDate || expiryDate < earliestExpiryDate) {
+          earliestExpiryDate = expiryDate;
+        }
+      }
+    });
+
+    if (totalExpiring > 0 && earliestExpiryDate) {
+      const daysRemaining = Math.ceil((earliestExpiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
       return {
-        points: redeemablePoints, // Since we only have one expiry date per profile, all current points are expiring
-        daysRemaining: Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+        points: totalExpiring,
+        daysRemaining: daysRemaining
       };
     }
+    
     return null;
   };
 
@@ -87,7 +106,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
       <PawPrint className="absolute -left-8 -bottom-8 w-20 h-20 text-white/10 -rotate-12" />
 
       <div className="relative z-10 flex flex-col h-full justify-between">
-        {/* Top Header Row - Fixed to 1 line */}
+        {/* Top Header Row */}
         <div className="flex justify-between items-start gap-2">
           <div className="space-y-1 min-w-0 flex-1">
             <h2 className="text-[9px] font-black text-slate-500 uppercase tracking-widest truncate">Membership Status</h2>
@@ -117,7 +136,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               <span className="text-[10px] font-black text-slate-600 uppercase">Pts</span>
             </div>
             
-            {/* EXPIRY INFO - Updated with 30-day logic */}
+            {/* EXPIRY WARNING LOGIC */}
             <div className="mt-1">
               {expiringInfo ? (
                 <div className="flex items-center gap-1 text-red-600 font-black animate-pulse">
@@ -155,7 +174,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           </div>
         </div>
 
-        {/* Progress Bar - Thicker design */}
+        {/* Progress Bar */}
         <div className="mt-2 space-y-1.5">
           <div className="w-full bg-black/5 h-4 rounded-full overflow-hidden p-0.5 border border-white/30">
             <motion.div 

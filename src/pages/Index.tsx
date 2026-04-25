@@ -89,7 +89,6 @@ const Index = () => {
     }
   };
 
-  // FETCH EVERYTHING FROM PROFILES
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['profile', lineProfile?.userId],
     queryFn: async () => {
@@ -109,6 +108,7 @@ const Index = () => {
   const pets = (profile?.pets_data as Pet[]) || [];
   const serviceHistoryRaw = (profile?.service_history_data as any[]) || [];
   const userCoupons = (profile?.coupons_data as any[]) || [];
+  const pointsLedger = (profile?.points_ledger as any[]) || [];
 
   const serviceHistory = serviceHistoryRaw.map(h => ({
     ...h,
@@ -138,6 +138,7 @@ const Index = () => {
         pets_data: [],
         service_history_data: [],
         coupons_data: [],
+        points_ledger: [],
         points_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
         tier_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
       }]);
@@ -184,6 +185,32 @@ const Index = () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
     }
   });
+
+  const handleSimulatePoints = () => {
+    const amount = 100;
+    const currentPoints = profile?.points || 0;
+    const currentTotal = profile?.total_points || 0;
+    
+    const newEntry = {
+      amount: amount,
+      earned_at: new Date().toISOString()
+    };
+    
+    const expiringEntry = {
+      amount: 50,
+      earned_at: new Date(new Date().setFullYear(new Date().getFullYear() - 2, new Date().getMonth() + 1, new Date().getDate() - 5)).toISOString()
+    };
+
+    const newLedger = [...pointsLedger, newEntry, expiringEntry];
+    
+    updateProfileDataMutation.mutate({ 
+      points: currentPoints + amount + 50, 
+      total_points: currentTotal + amount + 50,
+      points_ledger: newLedger
+    });
+    
+    toast.success('ได้รับคะแนนเพิ่มแล้วค่ะ');
+  };
 
   const savePetMutation = useMutation({
     mutationFn: async (petData: any) => {
@@ -313,13 +340,6 @@ const Index = () => {
     }
   });
 
-  const handleSimulatePoints = () => {
-    const currentPoints = profile?.points || 0;
-    const currentTotal = profile?.total_points || 0;
-    updateProfileDataMutation.mutate({ points: currentPoints + 100, total_points: currentTotal + 100 });
-    toast.success('เย้! คุณได้รับเพิ่ม 100 คะแนนค่ะ');
-  };
-
   const handleCouponsQuickAction = () => {
     setActiveTab('promo');
     setTimeout(() => {
@@ -355,6 +375,7 @@ const Index = () => {
 
   const collectedCouponIds = userCoupons.map(uc => uc.coupon_id);
   const sortedPetsList = [...pets].sort((a, b) => (a.is_favorite === b.is_favorite ? 0 : a.is_favorite ? -1 : 1));
+  
   const mappedPetsForUI = sortedPetsList.map(p => ({
     ...p,
     medicalCondition: p.medical_condition,
@@ -376,12 +397,13 @@ const Index = () => {
     postalCode: profile?.postal_code || '',
     email: profile?.email || '',
     pointsExpiry: formatDateThai(profile?.points_expiry),
-    rawPointsExpiry: profile?.points_expiry
+    rawPointsExpiry: profile?.points_expiry,
+    pointsLedger: profile?.points_ledger || []
   };
 
   return (
     <div className="w-full h-[100dvh] max-w-md mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt'] overflow-hidden border-x border-slate-100/50">
-      <header className="px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-[15px] flex justify-between items-center shrink-0 z-[50]">
+      <header className="px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-[5px] flex justify-between items-center shrink-0 z-[50]">
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-black text-slate-800 truncate">
             สวัสดี, {lineProfile?.displayName || profile?.first_name || 'คุณ'}
@@ -399,7 +421,7 @@ const Index = () => {
           <motion.div 
             whileTap={{ scale: 0.9 }} 
             onClick={() => setIsProfileEditing(true)} 
-            className="w-12 h-12 rounded-full border-1 border-white shadow-md overflow-hidden bg-pink-100 cursor-pointer"
+            className="w-12 h-12 rounded-full border-2 border-black shadow-md overflow-hidden bg-pink-100 cursor-pointer"
           >
             {(profile?.avatar_url || lineProfile?.pictureUrl) && (
               <img src={profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
