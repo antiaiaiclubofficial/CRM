@@ -66,10 +66,10 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
       <PawPrint className="absolute -left-8 -bottom-8 w-20 h-20 text-white/10 -rotate-12" />
 
       <div className="relative z-10 flex flex-col h-full justify-between">
-        {/* Top Header Row */}
-        <div className="flex justify-between items-start">
-          <div className="space-y-1">
-            <h2 className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Membership Status</h2>
+        {/* Top Header Row - Fixed to 1 line */}
+        <div className="flex justify-between items-start gap-2">
+          <div className="space-y-1 min-w-0 flex-1">
+            <h2 className="text-[9px] font-black text-slate-500 uppercase tracking-widest truncate">Membership Status</h2>
             <div className="flex items-center mt-0.5">
               <span className="bg-white border-2 border-black px-3 py-1 rounded-full text-[10px] font-black text-slate-800 flex items-center gap-1.5 shadow-sm whitespace-nowrap">
                 <Crown size={12} className="text-amber-500" fill="currentColor" />
@@ -77,11 +77,11 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               </span>
             </div>
           </div>
-          <div className="flex flex-col items-end text-right">
+          <div className="flex flex-col items-end text-right min-w-0 flex-1">
             <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5 whitespace-nowrap">
               Owner ID: {ownerProfile.phone || '0XX-XXX-XXXX'}
             </p>
-            <p className="font-black text-slate-800 text-lg leading-tight drop-shadow-sm truncate max-w-[150px]">
+            <p className="font-black text-slate-800 text-lg leading-tight drop-shadow-sm truncate w-full">
               {ownerProfile.firstName} {ownerProfile.lastName}
             </p>
           </div>
