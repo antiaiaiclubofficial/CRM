@@ -16,8 +16,12 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
     lastName: '',
     gender: 'หญิง',
     age: '',
-    phone: lineProfile?.phone || '', // Pull from LIFF if available
+    phone: lineProfile?.phone || '',
     address: '',
+    subDistrict: '',
+    district: '',
+    province: '',
+    postalCode: '',
     email: lineProfile?.email || '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -117,29 +121,63 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
             />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 pt-2 border-t border-slate-50">
             <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1">
-              <Mail size={12} className="text-pink-500" /> Email
+              <MapPin size={12} className="text-pink-500" /> ที่อยู่ (บ้านเลขที่ / ถนน)
             </label>
             <input 
-              type="email" 
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-              placeholder="example@mail.com"
+              type="text" 
+              value={formData.address}
+              onChange={(e) => setFormData({...formData, address: e.target.value})}
+              placeholder="เลขที่บ้าน, หมู่, ซอย, ถนน"
               className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1">
-              <MapPin size={12} className="text-pink-500" /> ที่อยู่
-            </label>
-            <textarea 
-              value={formData.address}
-              onChange={(e) => setFormData({...formData, address: e.target.value})}
-              placeholder="สำหรับจัดส่งของรางวัล..."
-              className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold h-20 resize-none"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-500 px-1">แขวง / ตำบล</label>
+              <input 
+                type="text" 
+                value={formData.subDistrict}
+                onChange={(e) => setFormData({...formData, subDistrict: e.target.value})}
+                placeholder="ตำบล"
+                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-500 px-1">เขต / อำเภอ</label>
+              <input 
+                type="text" 
+                value={formData.district}
+                onChange={(e) => setFormData({...formData, district: e.target.value})}
+                placeholder="อำเภอ"
+                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-500 px-1">จังหวัด</label>
+              <input 
+                type="text" 
+                value={formData.province}
+                onChange={(e) => setFormData({...formData, province: e.target.value})}
+                placeholder="จังหวัด"
+                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-500 px-1">รหัสไปรษณีย์</label>
+              <input 
+                type="text" 
+                value={formData.postalCode}
+                onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
+                placeholder="10XXX"
+                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+              />
+            </div>
           </div>
 
           <button 

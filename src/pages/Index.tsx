@@ -167,6 +167,10 @@ const Index = () => {
         age: userData.age,
         phone: userData.phone,
         address: userData.address,
+        sub_district: userData.subDistrict,
+        district: userData.district,
+        province: userData.province,
+        postal_code: userData.postalCode,
         email: userData.email,
         avatar_url: lineProfile.pictureUrl,
         points: 0,
@@ -191,6 +195,10 @@ const Index = () => {
         age: userData.age,
         phone: userData.phone,
         address: userData.address,
+        sub_district: userData.subDistrict,
+        district: userData.district,
+        province: userData.province,
+        postal_code: userData.postalCode,
         email: userData.email
       }).eq('line_id', lineProfile.userId);
       if (error) throw error;
@@ -387,9 +395,13 @@ const Index = () => {
     age: profile?.age || '',
     phone: profile?.phone || '',
     address: profile?.address || '',
+    subDistrict: profile?.sub_district || '',
+    district: profile?.district || '',
+    province: profile?.province || '',
+    postalCode: profile?.postal_code || '',
     email: profile?.email || '',
     pointsExpiry: formatDateThai(profile?.points_expiry),
-    rawPointsExpiry: profile?.points_expiry // Passing raw date for calculation
+    rawPointsExpiry: profile?.points_expiry
   };
 
   return (

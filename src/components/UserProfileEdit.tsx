@@ -11,6 +11,10 @@ interface OwnerProfile {
   age: string;
   phone: string;
   address: string;
+  subDistrict: string;
+  district: string;
+  province: string;
+  postalCode: string;
   email: string;
 }
 
@@ -23,6 +27,13 @@ interface UserProfileEditProps {
 
 const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditProps) => {
   const [formData, setFormData] = React.useState(profile);
+
+  // Sync with prop when it opens
+  React.useEffect(() => {
+    if (isOpen) {
+      setFormData(profile);
+    }
+  }, [isOpen, profile]);
 
   const handleSave = () => {
     onSave(formData);
@@ -46,7 +57,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
             exit={{ y: "100%" }}
             className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
           >
-            {/* Improved Sticky Header */}
+            {/* Header */}
             <div className="flex justify-between items-center sticky top-0 bg-white pt-8 pb-4 px-8 z-10 rounded-t-[3rem]">
               <h3 className="font-bold text-xl text-slate-800">ข้อมูลส่วนตัวเจ้าของ</h3>
               <button onClick={onClose} className="p-2 bg-slate-100 rounded-full text-slate-400">
@@ -54,7 +65,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
               </button>
             </div>
 
-            <div className="space-y-5 px-8 pb-24"> {/* Increased bottom padding */}
+            <div className="space-y-5 px-8 pb-24">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 h-4">
@@ -126,14 +137,64 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1"><MapPin size={12}/> ที่อยู่</label>
-                <textarea 
-                  value={formData.address}
-                  onChange={(e) => setFormData({...formData, address: e.target.value})}
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base h-24 resize-none"
-                  placeholder="บ้านเลขที่, ถนน, แขวง/ตำบล..."
-                />
+              {/* Separated Address Fields */}
+              <div className="space-y-4 pt-2 border-t border-slate-50">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1"><MapPin size={12}/> บ้านเลขที่ / ถนน</label>
+                  <input 
+                    type="text" 
+                    value={formData.address}
+                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                    placeholder="เลขที่บ้าน, หมู่, ซอย, ถนน"
+                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-500 px-2">แขวง / ตำบล</label>
+                    <input 
+                      type="text" 
+                      value={formData.subDistrict}
+                      onChange={(e) => setFormData({...formData, subDistrict: e.target.value})}
+                      placeholder="ตำบล"
+                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-500 px-2">เขต / อำเภอ</label>
+                    <input 
+                      type="text" 
+                      value={formData.district}
+                      onChange={(e) => setFormData({...formData, district: e.target.value})}
+                      placeholder="อำเภอ"
+                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-500 px-2">จังหวัด</label>
+                    <input 
+                      type="text" 
+                      value={formData.province}
+                      onChange={(e) => setFormData({...formData, province: e.target.value})}
+                      placeholder="จังหวัด"
+                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-500 px-2">รหัสไปรษณีย์</label>
+                    <input 
+                      type="text" 
+                      value={formData.postalCode}
+                      onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
+                      placeholder="10XXX"
+                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                    />
+                  </div>
+                </div>
               </div>
 
               <button 
