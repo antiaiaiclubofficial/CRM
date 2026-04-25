@@ -98,15 +98,15 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
                         type="text" 
                         value={pref.label}
                         onChange={(e) => handlePreferenceChange(pref.id, 'label', e.target.value)}
-                        placeholder="หัวข้อ (เช่น แชมพูที่ชอบ)"
-                        className="w-0 flex-grow p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
+                        placeholder="หัวข้อ"
+                        className="w-0 flex-grow p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-base"
                       />
                       <input 
                         type="text" 
                         value={pref.value}
                         onChange={(e) => handlePreferenceChange(pref.id, 'value', e.target.value)}
                         placeholder="รายละเอียด"
-                        className="w-0 flex-grow p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-sm"
+                        className="w-0 flex-grow p-2 bg-white rounded-xl border border-slate-100 focus:ring-1 focus:ring-pink-200 outline-none text-base"
                       />
                       <button 
                         onClick={() => handleRemovePreference(pref.id)}
@@ -127,14 +127,14 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
                     value={newPreferenceLabel}
                     onChange={(e) => setNewPreferenceLabel(e.target.value)}
                     placeholder="หัวข้อ (เช่น ของเล่นที่ชอบ)"
-                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
                   />
                   <input 
                     type="text" 
                     value={newPreferenceValue}
                     onChange={(e) => setNewPreferenceValue(e.target.value)}
                     placeholder="รายละเอียด (เช่น ลูกบอลยางสีแดง)"
-                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
                   />
                 </div>
                 <button 

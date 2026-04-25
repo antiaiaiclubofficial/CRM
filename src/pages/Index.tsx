@@ -62,23 +62,28 @@ const Index = () => {
   
   const mainScrollRef = useRef<HTMLElement>(null);
 
-  // Instant scroll to top when tab changes
+  // Robust scroll reset logic for all view changes
   useEffect(() => {
-    if (mainScrollRef.current) {
-      mainScrollRef.current.scrollTop = 0;
-    }
-  }, [activeTab]);
-
-  const handleNavClick = (tabId: string) => {
-    if (activeTab === tabId) {
-      // Smooth scroll if clicking current tab
-      mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      // Force jump to top instantly before switching tab
+    const reset = () => {
       if (mainScrollRef.current) {
         mainScrollRef.current.scrollTop = 0;
       }
+    };
+    
+    reset(); // Immediate reset
+    const timer = setTimeout(reset, 50); // Delayed reset to ensure DOM updated
+    return () => clearTimeout(timer);
+  }, [activeTab, selectedPetForDetail, selectedServiceForDetail]);
+
+  const handleNavClick = (tabId: string) => {
+    if (activeTab === tabId) {
+      // If clicking already active tab, smooth scroll to top
+      mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
       setActiveTab(tabId);
+      // Clear detail views when switching tabs
+      setSelectedPetForDetail(null);
+      setSelectedServiceForDetail(null);
     }
   };
 
