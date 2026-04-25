@@ -28,7 +28,6 @@ import { toast } from 'sonner';
 
 export interface Pet {
   id: number;
-  owner_id: string;
   name: string;
   type: string;
   breed: string;
@@ -90,6 +89,7 @@ const Index = () => {
     }
   };
 
+  // FETCH EVERYTHING FROM PROFILES
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['profile', lineProfile?.userId],
     queryFn: async () => {
@@ -106,55 +106,15 @@ const Index = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  const { data: pets = [], isLoading: petsLoading } = useQuery({
-    queryKey: ['pets', lineProfile?.userId],
-    queryFn: async () => {
-      if (!lineProfile?.userId) return [];
-      const { data, error } = await supabase
-        .from('pets')
-        .select('*')
-        .eq('owner_id', lineProfile.userId);
-      if (error) throw error;
-      return data as Pet[];
-    },
-    enabled: !!lineProfile?.userId,
-    staleTime: 1000 * 60 * 5,
-  });
+  const pets = (profile?.pets_data as Pet[]) || [];
+  const serviceHistoryRaw = (profile?.service_history_data as any[]) || [];
+  const userCoupons = (profile?.coupons_data as any[]) || [];
 
-  const { data: userCoupons = [] } = useQuery({
-    queryKey: ['user_coupons', lineProfile?.userId],
-    queryFn: async () => {
-      if (!lineProfile?.userId) return [];
-      const { data, error } = await supabase
-        .from('user_coupons')
-        .select(`*, coupons (*)`)
-        .eq('owner_id', lineProfile.userId);
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!lineProfile?.userId,
-    staleTime: 1000 * 60,
-  });
-
-  const { data: serviceHistory = [] } = useQuery({
-    queryKey: ['history', lineProfile?.userId],
-    queryFn: async () => {
-      if (!lineProfile?.userId) return [];
-      const { data, error } = await supabase
-        .from('service_history')
-        .select('*')
-        .eq('owner_id', lineProfile.userId)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data.map(h => ({
-        ...h,
-        icon: h.icon_name === 'Scissors' ? <Scissors className="text-pink-500" /> : <Sparkles className="text-blue-500" />,
-        bg: h.bg || 'bg-slate-50'
-      }));
-    },
-    enabled: !!lineProfile?.userId,
-    staleTime: 1000 * 60 * 10,
-  });
+  const serviceHistory = serviceHistoryRaw.map(h => ({
+    ...h,
+    icon: h.icon_name === 'Scissors' ? <Scissors className="text-pink-500" /> : <Sparkles className="text-blue-500" />,
+    bg: h.bg || 'bg-slate-50'
+  }));
 
   const registerMutation = useMutation({
     mutationFn: async (userData: any) => {
@@ -175,6 +135,9 @@ const Index = () => {
         avatar_url: lineProfile.pictureUrl,
         points: 0,
         total_points: 0,
+        pets_data: [],
+        service_history_data: [],
+        coupons_data: [],
         points_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
         tier_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
       }]);
@@ -209,13 +172,11 @@ const Index = () => {
     }
   });
 
-  const updatePointsMutation = useMutation({
-    mutationFn: async ({ points, totalPoints }: { points: number; totalPoints?: number }) => {
-      const updates: any = { points };
-      if (totalPoints !== undefined) updates.total_points = totalPoints;
+  const updateProfileDataMutation = useMutation({
+    mutationFn: async (newData: any) => {
       const { error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update(newData)
         .eq('line_id', lineProfile.userId);
       if (error) throw error;
     },
@@ -224,38 +185,15 @@ const Index = () => {
     }
   });
 
-  const collectCouponMutation = useMutation({
-    mutationFn: async ({ couponId, cost }: { couponId: number; cost: number }) => {
-      if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
-      if ((profile?.points || 0) < cost) throw new Error("คะแนนสะสมไม่เพียงพอค่ะ");
-
-      const { error: couponError } = await supabase.from('user_coupons').insert([{
-        owner_id: lineProfile.userId,
-        coupon_id: couponId,
-        is_used: false
-      }]);
-      if (couponError) throw couponError;
-
-      const newPoints = (profile?.points || 0) - cost;
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ points: newPoints })
-        .eq('line_id', lineProfile.userId);
-      if (profileError) throw profileError;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user_coupons'] });
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      toast.success('เก็บคูปองเรียบร้อยแล้วค่ะ');
-    },
-    onError: (error: any) => toast.error(error.message)
-  });
-
   const savePetMutation = useMutation({
     mutationFn: async (petData: any) => {
       if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
+      
+      const currentPets = [...pets];
       const isEdit = !!petData.id;
-      const dataToSave = {
+      
+      const petToSave = {
+        id: isEdit ? petData.id : Date.now(),
         name: petData.name,
         type: petData.type,
         breed: petData.breed,
@@ -270,25 +208,30 @@ const Index = () => {
         custom_preferences: petData.custom_preferences || [],
         image_url: petData.image_url || '',
         card_bg_color: petData.card_bg_color || '#FFF9C4',
-        is_favorite: petData.is_favorite !== undefined ? petData.is_favorite : (petData.is_favorite || false),
-        owner_id: lineProfile.userId,
+        is_favorite: petData.is_favorite !== undefined ? petData.is_favorite : false,
       };
-      
-      let result;
+
+      let newPetsList;
       if (isEdit) {
-        result = await supabase.from('pets').update(dataToSave).eq('id', petData.id).select().single();
+        newPetsList = currentPets.map(p => p.id === petData.id ? petToSave : p);
       } else {
-        result = await supabase.from('pets').insert([dataToSave]).select().single();
+        newPetsList = [...currentPets, petToSave];
       }
-      if (result.error) throw result.error;
-      return result.data;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ pets_data: newPetsList })
+        .eq('line_id', lineProfile.userId);
+        
+      if (error) throw error;
+      return petToSave;
     },
     onMutate: () => {
       const toastId = toast.loading('กำลังบันทึกข้อมูล...');
       return { toastId };
     },
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: ['pets'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
       if (selectedPetForDetail && selectedPetForDetail.id === data.id) setSelectedPetForDetail(data);
       setIsPetFormOpen(false);
       setPetToEdit(null);
@@ -301,26 +244,69 @@ const Index = () => {
 
   const deletePetMutation = useMutation({
     mutationFn: async (id: number) => {
-      const { error } = await supabase.from('pets').delete().eq('id', id);
+      const newPetsList = pets.filter(p => p.id !== id);
+      const { error } = await supabase
+        .from('profiles')
+        .update({ pets_data: newPetsList })
+        .eq('line_id', lineProfile.userId);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pets'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
       setSelectedPetForDetail(null);
       toast.success('ลบข้อมูลเรียบร้อยแล้วค่ะ');
     }
   });
 
-  const useCouponMutation = useMutation({
-    mutationFn: async (userCouponId: number) => {
+  const collectCouponMutation = useMutation({
+    mutationFn: async ({ coupon, cost }: { coupon: any; cost: number }) => {
+      if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
+      if ((profile?.points || 0) < cost) throw new Error("คะแนนสะสมไม่เพียงพอค่ะ");
+
+      const newCoupon = {
+        id: Date.now(),
+        coupon_id: coupon.id,
+        title: coupon.title,
+        description: coupon.description,
+        value: coupon.value,
+        type: coupon.type,
+        expiry: coupon.expiry,
+        iconName: coupon.iconName,
+        color: coupon.color,
+        bg: coupon.bg,
+        is_used: false,
+        collected_at: new Date().toISOString()
+      };
+
+      const newCouponsList = [...userCoupons, newCoupon];
+      const newPoints = (profile?.points || 0) - cost;
+
       const { error } = await supabase
-        .from('user_coupons')
-        .update({ is_used: true, used_at: new Date().toISOString() })
-        .eq('id', userCouponId);
+        .from('profiles')
+        .update({ coupons_data: newCouponsList, points: newPoints })
+        .eq('line_id', lineProfile.userId);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user_coupons'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      toast.success('เก็บคูปองเรียบร้อยแล้วค่ะ');
+    },
+    onError: (error: any) => toast.error(error.message)
+  });
+
+  const useCouponMutation = useMutation({
+    mutationFn: async (couponId: number) => {
+      const newCouponsList = userCoupons.map(c => 
+        c.id === couponId ? { ...c, is_used: true, used_at: new Date().toISOString() } : c
+      );
+      const { error } = await supabase
+        .from('profiles')
+        .update({ coupons_data: newCouponsList })
+        .eq('line_id', lineProfile.userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
       setIsCouponUseModalOpen(false);
       setSelectedCouponToUse(null);
       toast.success('ใช้คูปองเรียบร้อยแล้วค่ะ');
@@ -330,7 +316,7 @@ const Index = () => {
   const handleSimulatePoints = () => {
     const currentPoints = profile?.points || 0;
     const currentTotal = profile?.total_points || 0;
-    updatePointsMutation.mutate({ points: currentPoints + 100, totalPoints: currentTotal + 100 });
+    updateProfileDataMutation.mutate({ points: currentPoints + 100, total_points: currentTotal + 100 });
     toast.success('เย้! คุณได้รับเพิ่ม 100 คะแนนค่ะ');
   };
 
@@ -361,26 +347,15 @@ const Index = () => {
     );
   }
 
-  const collectedCoupons = userCoupons
-    .filter(uc => !uc.is_used)
-    .map(uc => ({
-      ...uc.coupons,
-      userCouponId: uc.id,
-      pointsRequired: uc.coupons.points_required,
-      iconName: uc.coupons.icon_name
-    }));
+  const collectedCoupons = userCoupons.filter(uc => !uc.is_used);
+  const usedCoupons = userCoupons.filter(uc => uc.is_used).map(uc => ({
+    ...uc,
+    usedDate: uc.used_at ? new Date(uc.used_at).toLocaleDateString('th-TH') : '',
+  }));
 
-  const usedCoupons = userCoupons
-    .filter(uc => uc.is_used)
-    .map(uc => ({
-      ...uc.coupons,
-      usedDate: uc.used_at ? new Date(uc.used_at).toLocaleDateString('th-TH') : '',
-      iconName: uc.coupons.icon_name
-    }));
-
-  const collectedSpecialPromoIds = userCoupons.map(uc => uc.coupon_id);
-  const sortedPets = [...pets].sort((a, b) => (a.is_favorite === b.is_favorite ? 0 : a.is_favorite ? -1 : 1));
-  const mappedPetsForUI = sortedPets.map(p => ({
+  const collectedCouponIds = userCoupons.map(uc => uc.coupon_id);
+  const sortedPetsList = [...pets].sort((a, b) => (a.is_favorite === b.is_favorite ? 0 : a.is_favorite ? -1 : 1));
+  const mappedPetsForUI = sortedPetsList.map(p => ({
     ...p,
     medicalCondition: p.medical_condition,
     imageUrl: p.image_url,
@@ -406,7 +381,7 @@ const Index = () => {
 
   return (
     <div className="w-full h-[100dvh] max-w-md mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt'] overflow-hidden border-x border-slate-100/50">
-      <header className="px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-[10px] flex justify-between items-center shrink-0 z-[50]">
+      <header className="px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-[5px] flex justify-between items-center shrink-0 z-[50]">
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-black text-slate-800 truncate">
             สวัสดี, {lineProfile?.displayName || profile?.first_name || 'คุณ'}
@@ -422,9 +397,9 @@ const Index = () => {
             <PlusCircle size={18} />
           </motion.button>
           <motion.div 
-            whileTap={{ scale: 0.7 }} 
+            whileTap={{ scale: 0.9 }} 
             onClick={() => setIsProfileEditing(true)} 
-            className="w-14 h-14 rounded-full border-2 border-white shadow-md overflow-hidden bg-pink-100 cursor-pointer"
+            className="w-12 h-12 rounded-full border-2 border-black shadow-md overflow-hidden bg-pink-100 cursor-pointer"
           >
             {(profile?.avatar_url || lineProfile?.pictureUrl) && (
               <img src={profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
@@ -451,12 +426,7 @@ const Index = () => {
                 <HomeQuickActions onCouponsClick={handleCouponsQuickAction} onAppointmentClick={() => toast.info('ฟังก์ชันจองคิวจะมาเร็วๆ นี้ค่ะ')} />
               </div>
 
-              {petsLoading ? (
-                <PetListSkeleton />
-              ) : (
-                <PetList pets={mappedPetsForUI} onPetClick={(p) => { setSelectedPetForDetail(pets.find(i => i.id === p.id) || null); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
-              )}
-              
+              <PetList pets={mappedPetsForUI} onPetClick={(p) => { setSelectedPetForDetail(pets.find(i => i.id === p.id) || null); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
               < MyCouponsHomePreview coupons={collectedCoupons} onViewAll={() => setActiveTab('promo')} />
             </motion.div>
           )}
@@ -489,7 +459,7 @@ const Index = () => {
 
           {activeTab === 'promo' && (
             <motion.div key="promo-tab" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }}>
-               <Promotions userPoints={profile?.points || 0} collectedCoupons={collectedCoupons} usedOrExpiredCoupons={usedCoupons} onRedeemCoupon={(c, cost) => collectCouponMutation.mutate({ couponId: c.id, cost })} onUseCoupon={(couponId) => { const uc = collectedCoupons.find(c => c.id === couponId); if (uc) { setSelectedCouponToUse(uc); setIsCouponUseModalOpen(true); } }} collectedSpecialPromos={collectedSpecialPromoIds} onCollectSpecialPromotion={(c) => collectCouponMutation.mutate({ couponId: c.id, cost: 0 })} />
+               <Promotions userPoints={profile?.points || 0} collectedCoupons={collectedCoupons} usedOrExpiredCoupons={usedCoupons} onRedeemCoupon={(c, cost) => collectCouponMutation.mutate({ coupon: c, cost })} onUseCoupon={(couponId) => { const uc = collectedCoupons.find(c => c.id === couponId); if (uc) { setSelectedCouponToUse(uc); setIsCouponUseModalOpen(true); } }} collectedSpecialPromos={collectedCouponIds} onCollectSpecialPromotion={(c) => collectCouponMutation.mutate({ coupon: c, cost: 0 })} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -499,7 +469,7 @@ const Index = () => {
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || profile?.first_name || 'สมาชิก'} memberId={profile?.phone || ''} />
       <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => savePetMutation.mutate(data)} initialData={petToEdit} />
       <PetPreferenceForm isOpen={isPreferenceFormOpen} onClose={() => setIsPreferenceFormOpen(false)} onSave={() => setIsPreferenceFormOpen(false)} initialData={selectedPetForDetail?.custom_preferences || []} petName={selectedPetForDetail?.name || ''} />
-      <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => selectedCouponToUse && useCouponMutation.mutate(selectedCouponToUse.userCouponId)} />
+      <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => selectedCouponToUse && useCouponMutation.mutate(selectedCouponToUse.id)} />
 
       <nav className="fixed bottom-[10px] left-6 right-6 max-w-[calc(theme(maxWidth.md)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-[40] border border-white/60">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
