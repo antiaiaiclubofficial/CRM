@@ -252,7 +252,7 @@ const Promotions = ({
       </div>
 
       {/* My Coupons Section */}
-      <div>
+      <div id="my-coupons-section">
         <div className="flex items-center gap-2 mb-4 px-1">
           <Ticket size={18} className="text-pink-500" />
           <h2 className="text-xl font-bold text-slate-800 uppercase tracking-tight">คูปองของฉัน</h2>

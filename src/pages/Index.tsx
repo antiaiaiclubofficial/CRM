@@ -320,6 +320,17 @@ const Index = () => {
     toast.success('เย้! คุณได้รับเพิ่ม 100 คะแนนค่ะ');
   };
 
+  const handleCouponsQuickAction = () => {
+    setActiveTab('promo');
+    // Small delay to allow the tab to mount before scrolling
+    setTimeout(() => {
+      const element = document.getElementById('my-coupons-section');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
+
   if (liffLoading || profileLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFF9F0]">
@@ -420,7 +431,7 @@ const Index = () => {
               <div className="space-y-0">
                 <UpcomingAppointments />
                 <HomeQuickActions 
-                  onPromoClick={() => setActiveTab('promo')}
+                  onCouponsClick={handleCouponsQuickAction}
                   onAppointmentClick={() => toast.info('ฟังก์ชันจองคิวจะมาเร็วๆ นี้ค่ะ')}
                 />
               </div>
