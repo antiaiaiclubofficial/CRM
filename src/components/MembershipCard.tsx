@@ -13,6 +13,7 @@ interface OwnerProfile {
   address: string;
   email: string;
   pointsExpiry?: string;
+  rawPointsExpiry?: string;
 }
 
 interface MembershipCardProps {
@@ -55,6 +56,26 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
   }
   progressPercentage = Math.min(100, Math.max(0, progressPercentage));
 
+  // Logic to calculate points expiring within 30 days
+  const getExpiringPointsInfo = () => {
+    if (!ownerProfile.rawPointsExpiry) return null;
+    
+    const expiryDate = new Date(ownerProfile.rawPointsExpiry);
+    const now = new Date();
+    const thirtyDaysFromNow = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
+    
+    // If expiry is within 30 days
+    if (expiryDate <= thirtyDaysFromNow && expiryDate > now) {
+      return {
+        points: redeemablePoints, // Since we only have one expiry date per profile, all current points are expiring
+        daysRemaining: Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+      };
+    }
+    return null;
+  };
+
+  const expiringInfo = getExpiringPointsInfo();
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -96,15 +117,24 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               <span className="text-[10px] font-black text-slate-600 uppercase">Pts</span>
             </div>
             
-            {/* SIMPLIFIED EXPIRY */}
-            {ownerProfile.pointsExpiry && (
-              <div className="flex items-center gap-1 text-pink-600 mt-1">
-                <Clock size={10} strokeWidth={3} />
-                <span className="text-[8px] font-black uppercase tracking-tight">
-                  หมดอายุ: {ownerProfile.pointsExpiry}
-                </span>
-              </div>
-            )}
+            {/* EXPIRY INFO - Updated with 30-day logic */}
+            <div className="mt-1">
+              {expiringInfo ? (
+                <div className="flex items-center gap-1 text-red-600 font-black animate-pulse">
+                   <Clock size={10} strokeWidth={3} />
+                   <span className="text-[8px] uppercase tracking-tight">
+                     อีก {expiringInfo.points.toLocaleString()} คะแนน จะหมดอายุใน {expiringInfo.daysRemaining} วัน
+                   </span>
+                </div>
+              ) : ownerProfile.pointsExpiry && (
+                <div className="flex items-center gap-1 text-pink-600">
+                  <Clock size={10} strokeWidth={3} />
+                  <span className="text-[8px] font-black uppercase tracking-tight">
+                    หมดอายุ: {ownerProfile.pointsExpiry}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-col items-end gap-2">
@@ -125,9 +155,9 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           </div>
         </div>
 
-        {/* Progress Bar - Updated to solid white */}
+        {/* Progress Bar - Thicker design */}
         <div className="mt-2 space-y-1.5">
-          <div className="w-full bg-black/5 h-2 rounded-full overflow-hidden p-0.5">
+          <div className="w-full bg-black/5 h-4 rounded-full overflow-hidden p-0.5 border border-white/30">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}

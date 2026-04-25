@@ -388,7 +388,8 @@ const Index = () => {
     phone: profile?.phone || '',
     address: profile?.address || '',
     email: profile?.email || '',
-    pointsExpiry: formatDateThai(profile?.points_expiry)
+    pointsExpiry: formatDateThai(profile?.points_expiry),
+    rawPointsExpiry: profile?.points_expiry // Passing raw date for calculation
   };
 
   return (
@@ -444,7 +445,7 @@ const Index = () => {
                 <PetList pets={mappedPetsForUI} onPetClick={(p) => { setSelectedPetForDetail(pets.find(i => i.id === p.id) || null); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
               )}
               
-              <MyCouponsHomePreview coupons={collectedCoupons} onViewAll={() => setActiveTab('promo')} />
+              < MyCouponsHomePreview coupons={collectedCoupons} onViewAll={() => setActiveTab('promo')} />
             </motion.div>
           )}
 
