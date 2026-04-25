@@ -140,7 +140,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
               {/* Separated Address Fields */}
               <div className="space-y-4 pt-2 border-t border-slate-50">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1"><MapPin size={12}/> บ้านเลขที่ / ถนน</label>
+                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1"><MapPin size={12}/> ที่อยู่</label>
                   <input 
                     type="text" 
                     value={formData.address}
