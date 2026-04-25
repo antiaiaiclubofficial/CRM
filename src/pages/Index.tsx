@@ -71,9 +71,13 @@ const Index = () => {
 
   const handleNavClick = (tabId: string) => {
     if (activeTab === tabId) {
-      // If clicking already active tab, smooth scroll to top
+      // Smooth scroll if clicking current tab
       mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
+      // Force jump to top instantly before switching tab
+      if (mainScrollRef.current) {
+        mainScrollRef.current.scrollTop = 0;
+      }
       setActiveTab(tabId);
     }
   };
@@ -252,14 +256,14 @@ const Index = () => {
         age: petData.age?.toString() || '',
         gender: petData.gender,
         weight: petData.weight?.toString() || '',
-        medical_condition: petData.medicalCondition || petData.medical_condition || '-',
+        medical_condition: petData.medical_condition || '-',
         precautions: petData.precautions || '-',
         color: petData.color || 'bg-orange-100',
         icon: petData.icon || '🐾',
-        fur_length: petData.furLength || petData.fur_length || '',
-        custom_preferences: petData.customPreferences || petData.custom_preferences || [],
-        image_url: petData.imageUrl || petData.image_url || '',
-        card_bg_color: petData.cardBgColor || petData.card_bg_color || '#FFF9C4',
+        fur_length: petData.fur_length || '',
+        custom_preferences: petData.custom_preferences || [],
+        image_url: petData.image_url || '',
+        card_bg_color: petData.card_bg_color || '#FFF9C4',
         is_favorite: petData.is_favorite !== undefined ? petData.is_favorite : (petData.is_favorite || false),
         owner_id: lineProfile.userId,
       };
