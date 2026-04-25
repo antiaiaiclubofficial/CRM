@@ -59,93 +59,93 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden p-6 rounded-[2.5rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-xl shadow-pink-100/50 border-2 border-white/50"
+      className="relative w-full aspect-[1.58/1] overflow-hidden p-5 rounded-[1.5rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-xl shadow-pink-100/50 border-2 border-white/50 flex flex-col justify-between"
     >
       {/* Background Decorative Elements */}
-      <PawPrint className="absolute -right-4 -top-4 w-32 h-32 text-white/20 rotate-12" />
-      <PawPrint className="absolute -left-8 -bottom-8 w-24 h-24 text-white/10 -rotate-12" />
+      <PawPrint className="absolute -right-4 -top-4 w-28 h-28 text-white/20 rotate-12" />
+      <PawPrint className="absolute -left-8 -bottom-8 w-20 h-20 text-white/10 -rotate-12" />
 
-      <div className="relative z-10">
+      <div className="relative z-10 flex flex-col h-full justify-between">
         {/* Top Header Row */}
-        <div className="flex justify-between items-start mb-4">
+        <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Membership Status</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="bg-white border-2 border-black px-4 py-1.5 rounded-full text-xs font-black text-slate-800 flex items-center gap-1.5 shadow-sm">
-                <Crown size={14} className="text-amber-500" fill="currentColor" />
+            <h2 className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Membership Status</h2>
+            <div className="flex items-center mt-0.5">
+              <span className="bg-white border-2 border-black px-3 py-1 rounded-full text-[10px] font-black text-slate-800 flex items-center gap-1.5 shadow-sm whitespace-nowrap">
+                <Crown size={12} className="text-amber-500" fill="currentColor" />
                 {currentLevel.name.toUpperCase()}
               </span>
             </div>
           </div>
           <div className="flex flex-col items-end text-right">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Owner ID: {ownerProfile.phone || '0XX-XXX-XXXX'}</p>
-            <p className="font-black text-slate-800 text-xl leading-tight drop-shadow-sm">{ownerProfile.firstName} {ownerProfile.lastName}</p>
+            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5 whitespace-nowrap">
+              Owner ID: {ownerProfile.phone || '0XX-XXX-XXXX'}
+            </p>
+            <p className="font-black text-slate-800 text-lg leading-tight drop-shadow-sm truncate max-w-[150px]">
+              {ownerProfile.firstName} {ownerProfile.lastName}
+            </p>
           </div>
         </div>
 
         {/* Points & QR Section */}
-        <div className="flex justify-between items-end mb-6">
-          <div className="space-y-2">
-            <p className="text-[11px] font-bold text-slate-600 uppercase tracking-tight">คะแนนสะสมปัจจุบัน</p>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-5xl font-black text-slate-800 leading-none">{redeemablePoints.toLocaleString()}</span>
-              <span className="text-sm font-black text-slate-600 uppercase">Pts</span>
+        <div className="flex justify-between items-end">
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-tight">คะแนนสะสมปัจจุบัน</p>
+            <div className="flex items-baseline gap-1">
+              <span className="text-4xl font-black text-slate-800 leading-none">{redeemablePoints.toLocaleString()}</span>
+              <span className="text-[10px] font-black text-slate-600 uppercase">Pts</span>
             </div>
             
-            {/* EXPIRY BADGE - NEW DESIGN */}
+            {/* EXPIRY BADGE */}
             {ownerProfile.pointsExpiry && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex items-center gap-2 bg-pink-500 text-white px-3 py-1.5 rounded-2xl border-2 border-white shadow-md w-fit mt-2"
-              >
-                <Clock size={12} strokeWidth={3} />
-                <span className="text-[10px] font-black uppercase tracking-tight">
+              <div className="flex items-center gap-1.5 bg-pink-500 text-white px-2 py-1 rounded-xl border border-white shadow-sm w-fit mt-1">
+                <Clock size={10} strokeWidth={3} />
+                <span className="text-[8px] font-black uppercase tracking-tight whitespace-nowrap">
                   หมดอายุ: {ownerProfile.pointsExpiry}
                 </span>
-              </motion.div>
+              </div>
             )}
           </div>
 
-          <div className="flex flex-col items-end gap-3">
+          <div className="flex flex-col items-end gap-2">
             <motion.button 
               whileTap={{ scale: 0.9 }}
               onClick={onShowQR}
-              className="bg-white border-2 border-black p-2 rounded-2xl shadow-[4px_4px_0px_0px_#000] active:translate-y-1 active:shadow-none transition-all text-slate-800 flex items-center gap-2 px-4"
+              className="bg-white border-2 border-black p-1.5 rounded-xl shadow-[3px_3px_0px_0px_#000] active:translate-y-0.5 active:shadow-none transition-all text-slate-800 flex items-center gap-1.5 px-3"
             >
-              <QrCode size={18} />
-              <span className="text-xs font-black uppercase">My QR</span>
+              <QrCode size={14} />
+              <span className="text-[9px] font-black uppercase whitespace-nowrap">My QR</span>
             </motion.button>
             <div className="text-right">
-              <p className="text-[9px] text-slate-500 mb-0.5 font-black uppercase tracking-widest">Total Points</p>
-              <p className="text-sm font-black text-slate-800">
-                {totalAccumulatedPoints.toLocaleString()} <span className="text-[10px] text-slate-400">/ {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'}</span>
+              <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">Total Points</p>
+              <p className="text-[11px] font-black text-slate-800 whitespace-nowrap">
+                {totalAccumulatedPoints.toLocaleString()} <span className="text-[9px] text-slate-400">/ {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'}</span>
               </p>
             </div>
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="space-y-3 bg-white/30 p-3 rounded-[1.5rem] border border-white/40">
-          <div className="w-full bg-slate-200/50 h-3 rounded-full overflow-hidden border border-slate-300/30 p-0.5 shadow-inner">
+        {/* Progress Bar Area */}
+        <div className="space-y-2 bg-white/20 p-2 rounded-[1rem] border border-white/30">
+          <div className="w-full bg-slate-200/50 h-2 rounded-full overflow-hidden border border-slate-300/20 p-0.5 shadow-inner">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
               transition={{ duration: 1.2, ease: "easeOut" }}
-              className="bg-gradient-to-r from-pink-400 to-amber-400 h-full rounded-full shadow-sm"
+              className="bg-gradient-to-r from-pink-400 to-amber-400 h-full rounded-full"
             />
           </div>
-          <div className="flex justify-between items-center px-1">
-            <p className="text-[10px] text-slate-700 font-bold uppercase tracking-tight">
+          <div className="flex justify-between items-center px-0.5">
+            <p className="text-[8px] text-slate-700 font-bold uppercase tracking-tight truncate mr-2">
               {nextLevel ? (
                 <>อีก <span className="font-black text-pink-600">{pointsToNextLevel.toLocaleString()}</span> คะแนน เพื่อเลื่อนระดับ</>
               ) : (
-                <span className="text-emerald-600 font-black">คุณอยู่ในระดับสูงสุดแล้ว! ✨</span>
+                <span className="text-emerald-600 font-black">ระดับสูงสุดแล้ว! ✨</span>
               )}
             </p>
             {nextLevel && (
-              <span className="text-[9px] font-black bg-white border border-black/10 px-2 py-0.5 rounded-lg text-slate-800">
-                GOAL: {nextLevel.name}
+              <span className="text-[7px] font-black bg-white/80 border border-black/5 px-1.5 py-0.5 rounded-md text-slate-800 whitespace-nowrap">
+                NEXT: {nextLevel.name.split(' ')[0]}
               </span>
             )}
           </div>
