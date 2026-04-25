@@ -62,12 +62,21 @@ const Index = () => {
   
   const mainScrollRef = useRef<HTMLElement>(null);
 
-  // Scroll to top on tab change
+  // Instant scroll to top when tab changes
   useEffect(() => {
     if (mainScrollRef.current) {
-      mainScrollRef.current.scrollTo(0, 0);
+      mainScrollRef.current.scrollTop = 0;
     }
   }, [activeTab]);
+
+  const handleNavClick = (tabId: string) => {
+    if (activeTab === tabId) {
+      // If clicking already active tab, smooth scroll to top
+      mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setActiveTab(tabId);
+    }
+  };
 
   // Profile Query
   const { data: profile, isLoading: profileLoading } = useQuery({
@@ -536,11 +545,11 @@ const Index = () => {
       />
 
       <nav className="fixed bottom-[10px] left-6 right-6 max-w-[calc(theme(maxWidth.lg)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-[40] border border-white/60">
-        <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => setActiveTab('home')} />
-        <NavButton active={activeTab === 'level'} icon={<Award size={22} />} onClick={() => setActiveTab('level')} />
-        <NavButton active={activeTab === 'pets'} icon={<PawPrint size={22} />} onClick={() => setActiveTab('pets')} />
-        <NavButton active={activeTab === 'promo'} icon={<Megaphone size={22} />} onClick={() => setActiveTab('promo')} />
-        <NavButton active={activeTab === 'history'} icon={<History size={22} />} onClick={() => setActiveTab('history')} />
+        <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
+        <NavButton active={activeTab === 'level'} icon={<Award size={22} />} onClick={() => handleNavClick('level')} />
+        <NavButton active={activeTab === 'pets'} icon={<PawPrint size={22} />} onClick={() => handleNavClick('pets')} />
+        <NavButton active={activeTab === 'promo'} icon={<Megaphone size={22} />} onClick={() => handleNavClick('promo')} />
+        <NavButton active={activeTab === 'history'} icon={<History size={22} />} onClick={() => handleNavClick('history')} />
       </nav>
     </div>
   );
