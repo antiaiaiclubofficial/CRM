@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLiff } from '@/hooks/use-liff';
@@ -59,6 +59,15 @@ const Index = () => {
 
   const [selectedCouponToUse, setSelectedCouponToUse] = useState<any | null>(null);
   const [isCouponUseModalOpen, setIsCouponUseModalOpen] = useState(false);
+  
+  const mainScrollRef = useRef<HTMLElement>(null);
+
+  // Scroll to top on tab change
+  useEffect(() => {
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTo(0, 0);
+    }
+  }, [activeTab]);
 
   // Profile Query
   const { data: profile, isLoading: profileLoading } = useQuery({
@@ -418,7 +427,10 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="px-6 flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))] overflow-y-auto no-scrollbar">
+      <main 
+        ref={mainScrollRef}
+        className="px-6 flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))] overflow-y-auto no-scrollbar"
+      >
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
@@ -507,7 +519,13 @@ const Index = () => {
         memberId={profile?.phone || ''} 
       />
       
-      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => savePetMutation.mutate(data)} initialData={petToEdit ? { ...petToEdit, medicalCondition: petToEdit.medical_condition, imageUrl: petToEdit.image_url, cardBgColor: petToEdit.card_bg_color, isFavorite: petToEdit.is_favorite } : null} />
+      <PetForm 
+        isOpen={isPetFormOpen} 
+        onClose={() => setIsPetFormOpen(false)} 
+        onSave={(data) => savePetMutation.mutate(data)} 
+        initialData={petToEdit}
+      />
+      
       <PetPreferenceForm isOpen={isPreferenceFormOpen} onClose={() => setIsPreferenceFormOpen(false)} onSave={() => setIsPreferenceFormOpen(false)} initialData={selectedPetForDetail?.custom_preferences || []} petName={selectedPetForDetail?.name || ''} />
       
       <CouponUseModal 

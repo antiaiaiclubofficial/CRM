@@ -62,7 +62,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
                 value={formData.firstName}
                 onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                 placeholder="ชื่อจริง"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
               />
             </div>
             <div className="space-y-1.5">
@@ -73,7 +73,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
                 value={formData.lastName}
                 onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                 placeholder="นามสกุล"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
               />
             </div>
           </div>
@@ -84,7 +84,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
               <select 
                 value={formData.gender}
                 onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold appearance-none"
+                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold appearance-none"
               >
                 <option value="หญิง">หญิง</option>
                 <option value="ชาย">ชาย</option>
@@ -98,7 +98,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
                 value={formData.age}
                 onChange={(e) => setFormData({...formData, age: e.target.value})}
                 placeholder="ปี"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
               />
             </div>
           </div>
@@ -113,7 +113,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
               value={formData.phone}
               onChange={(e) => setFormData({...formData, phone: e.target.value})}
               placeholder="08X-XXX-XXXX"
-              className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+              className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
             />
           </div>
 
@@ -126,7 +126,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
               placeholder="example@mail.com"
-              className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+              className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
             />
           </div>
 
@@ -138,7 +138,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
               value={formData.address}
               onChange={(e) => setFormData({...formData, address: e.target.value})}
               placeholder="สำหรับจัดส่งของรางวัล..."
-              className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold h-20 resize-none"
+              className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold h-20 resize-none"
             />
           </div>
 

@@ -14,15 +14,15 @@ interface Pet {
   age: string;
   gender: string;
   weight: string;
-  medicalCondition: string;
+  medical_condition: string;
   precautions: string;
   color: string;
   icon: string;
-  furLength?: string;
-  customPreferences?: { id: string; label: string; value: string; }[];
-  imageUrl: string;
-  cardBgColor: string;
-  isFavorite?: boolean;
+  fur_length?: string;
+  custom_preferences?: { id: string; label: string; value: string; }[];
+  image_url: string;
+  card_bg_color: string;
+  is_favorite?: boolean;
 }
 
 interface PetFormProps {
@@ -35,7 +35,7 @@ interface PetFormProps {
 const petIcons: Record<string, string> = { 'สุนัข': '🐶', 'แมว': '🐱', 'กระต่าย': '🐰', 'หนูแฮมสเตอร์': '🐹', 'นก': '🦜' };
 const colors = ['bg-orange-100', 'bg-blue-100', 'bg-yellow-100', 'bg-pink-100', 'bg-purple-100', 'bg-green-100'];
 
-type EditablePetFields = Omit<Pet, 'id' | 'color' | 'icon' | 'customPreferences' | 'cardBgColor' | 'isFavorite'>;
+type EditablePetFields = Omit<Pet, 'id' | 'color' | 'icon' | 'custom_preferences' | 'card_bg_color' | 'is_favorite'>;
 
 const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,10 +46,10 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     age: '',
     gender: 'ผู้',
     weight: '',
-    medicalCondition: '',
+    medical_condition: '',
     precautions: '',
-    furLength: '',
-    imageUrl: '',
+    fur_length: '',
+    image_url: '',
   });
 
   useEffect(() => {
@@ -61,10 +61,10 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         age: initialData.age,
         gender: initialData.gender,
         weight: initialData.weight,
-        medicalCondition: initialData.medicalCondition,
+        medical_condition: initialData.medical_condition,
         precautions: initialData.precautions,
-        furLength: initialData.furLength || '',
-        imageUrl: initialData.imageUrl,
+        fur_length: initialData.fur_length || '',
+        image_url: initialData.image_url,
       });
     } else {
       setFormData({
@@ -74,10 +74,10 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         age: '',
         gender: 'ผู้',
         weight: '',
-        medicalCondition: '',
+        medical_condition: '',
         precautions: '',
-        furLength: '',
-        imageUrl: '',
+        fur_length: '',
+        image_url: '',
       });
     }
   }, [initialData, isOpen]);
@@ -87,26 +87,25 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
+        setFormData(prev => ({ ...prev, image_url: reader.result as string }));
       };
       reader.readAsDataURL(file);
     }
   };
 
   const executeSave = () => {
-    // Only save if name and breed are present to avoid junk data
     if (!formData.name.trim()) {
       onClose();
       return;
     }
 
-    const medicalCondition = formData.medicalCondition.trim() || "-";
+    const medical_condition = formData.medical_condition.trim() || "-";
     const precautions = formData.precautions.trim() || "-";
-    const imageUrl = formData.imageUrl || (formData.type === 'แมว' 
+    const image_url = formData.image_url || (formData.type === 'แมว' 
       ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2043&auto=format&fit=crop' 
       : 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1974&auto=format&fit=crop');
 
-    const finalData = { ...formData, medicalCondition, precautions, imageUrl };
+    const finalData = { ...formData, medical_condition, precautions, image_url };
 
     if (initialData) {
       const updatedPet: Pet = {
@@ -123,9 +122,9 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
         ...finalData,
         color: colors[Math.floor(Math.random() * colors.length)],
         icon: petIcons[finalData.type] || '🐾',
-        customPreferences: [],
-        cardBgColor: randomColor,
-        isFavorite: false,
+        custom_preferences: [],
+        card_bg_color: randomColor,
+        is_favorite: false,
       };
       onSave(newPet);
     }
@@ -162,8 +161,8 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                   onClick={() => fileInputRef.current?.click()}
                   className="relative w-28 h-28 rounded-full border-4 border-dashed border-pink-200 bg-pink-50 flex items-center justify-center overflow-hidden cursor-pointer group hover:border-pink-400 transition-colors shadow-inner"
                 >
-                  {formData.imageUrl ? (
-                    <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  {formData.image_url ? (
+                    <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
                   ) : (
                     <div className="flex flex-col items-center text-pink-300">
                       <Camera size={32} />
@@ -191,7 +190,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     placeholder="ชื่อน้อง"
-                    className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-sm font-medium"
+                    className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-base font-medium"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -199,7 +198,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                   <select 
                     value={formData.type}
                     onChange={(e) => setFormData({...formData, type: e.target.value})}
-                    className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-sm font-medium appearance-none"
+                    className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-base font-medium appearance-none"
                   >
                     {Object.keys(petIcons).map(type => <option key={type} value={type}>{type}</option>)}
                   </select>
@@ -213,7 +212,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                   value={formData.breed}
                   onChange={(e) => setFormData({...formData, breed: e.target.value})}
                   placeholder="เช่น Golden Retriever"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-sm font-medium"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-base font-medium"
                 />
               </div>
 
@@ -228,7 +227,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                       value={formData.age}
                       onChange={(e) => setFormData({...formData, age: e.target.value})}
                       placeholder="ปี"
-                      className="w-full p-4 bg-slate-50 rounded-2xl text-center border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-sm font-bold text-slate-700 placeholder:text-slate-300"
+                      className="w-full p-4 bg-slate-50 rounded-2xl text-center border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-base font-bold text-slate-700 placeholder:text-slate-300"
                     />
                     {formData.age && (
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 pointer-events-none">ปี</span>
@@ -242,7 +241,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                   <select 
                     value={formData.gender}
                     onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                    className="w-full p-4 bg-slate-50 rounded-2xl text-center border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-sm font-bold text-slate-700 appearance-none"
+                    className="w-full p-4 bg-slate-50 rounded-2xl text-center border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-base font-bold text-slate-700 appearance-none"
                   >
                     <option value="ผู้">ผู้</option>
                     <option value="เมีย">เมีย</option>
@@ -258,7 +257,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                       value={formData.weight}
                       onChange={(e) => setFormData({...formData, weight: e.target.value})}
                       placeholder="kg"
-                      className="w-full p-4 bg-slate-50 rounded-2xl text-center border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-sm font-bold text-slate-700 placeholder:text-slate-300"
+                      className="w-full p-4 bg-slate-50 rounded-2xl text-center border-2 border-transparent focus:border-pink-200 focus:bg-white transition-all outline-none text-base font-bold text-slate-700 placeholder:text-slate-300"
                     />
                     {formData.weight && (
                       <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 pointer-events-none">kg</span>
@@ -270,9 +269,9 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 px-1 flex items-center gap-1 text-purple-500"><Feather size={14}/> ความยาวขน</label>
                 <select 
-                  value={formData.furLength}
-                  onChange={(e) => setFormData({...formData, furLength: e.target.value})}
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-purple-200 focus:bg-white transition-all outline-none text-sm font-medium appearance-none"
+                  value={formData.fur_length}
+                  onChange={(e) => setFormData({...formData, fur_length: e.target.value})}
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-purple-200 focus:bg-white transition-all outline-none text-base font-medium appearance-none"
                 >
                   <option value="">เลือกความยาวขน</option>
                   <option value="ขนสั้น">ขนสั้น</option>
@@ -284,10 +283,10 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-500 px-1 flex items-center gap-1 text-red-500"><HeartPulse size={14}/> โรคประจำตัว</label>
                   <textarea 
-                    value={formData.medicalCondition}
-                    onChange={(e) => setFormData({...formData, medicalCondition: e.target.value})}
+                    value={formData.medical_condition}
+                    onChange={(e) => setFormData({...formData, medical_condition: e.target.value})}
                     placeholder="ระบุโรคประจำตัว"
-                    className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-red-100 focus:bg-white transition-all outline-none text-sm font-medium h-24 resize-none"
+                    className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-red-100 focus:bg-white transition-all outline-none text-base font-medium h-24 resize-none"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -296,7 +295,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                     value={formData.precautions}
                     onChange={(e) => setFormData({...formData, precautions: e.target.value})}
                     placeholder="ระบุสิ่งที่ร้านควรระวังเป็นพิเศษ"
-                    className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-amber-100 focus:bg-white transition-all outline-none text-sm font-medium h-24 resize-none"
+                    className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-amber-100 focus:bg-white transition-all outline-none text-base font-medium h-24 resize-none"
                   />
                 </div>
               </div>
