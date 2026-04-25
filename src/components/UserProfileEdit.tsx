@@ -59,7 +59,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
           >
             {/* Header */}
             <div className="flex justify-between items-center sticky top-0 bg-white pt-8 pb-4 px-8 z-10 rounded-t-[3rem]">
-              <h3 className="font-bold text-xl text-slate-800">ข้อมูลส่วนตัวเจ้าของ</h3>
+              <h3 className="font-bold text-xl text-slate-800">ข้อมูลส่วนตัว</h3>
               <button onClick={onClose} className="p-2 bg-slate-100 rounded-full text-slate-400">
                 <X size={20} />
               </button>
