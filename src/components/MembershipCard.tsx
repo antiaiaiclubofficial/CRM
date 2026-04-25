@@ -141,7 +141,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
             <motion.button 
               whileTap={{ scale: 0.9 }}
               onClick={onShowQR}
-              className="bg-white py-1.5 px-3 rounded-xl shadow-sm border border-white/50 transition-all text-slate-800 flex items-center gap-1"
+              className="bg-white py-1.5 px-3 rounded-xl shadow-sm border border-white/100 transition-all text-slate-800 flex items-center gap-1"
             >
               <QrCode size={13} />
               <span className="text-[9px] font-black uppercase whitespace-nowrap">My QR</span>
