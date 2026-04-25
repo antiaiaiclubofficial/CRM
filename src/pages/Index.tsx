@@ -62,28 +62,31 @@ const Index = () => {
   
   const mainScrollRef = useRef<HTMLElement>(null);
 
-  // Robust scroll reset logic for all view changes
+  // Aggressive scroll reset for all view changes
   useEffect(() => {
-    const reset = () => {
+    const performReset = () => {
       if (mainScrollRef.current) {
         mainScrollRef.current.scrollTop = 0;
       }
+      window.scrollTo(0, 0); // Extra precaution for global scroll
     };
     
-    reset(); // Immediate reset
-    const timer = setTimeout(reset, 50); // Delayed reset to ensure DOM updated
-    return () => clearTimeout(timer);
+    performReset();
+    
+    // Multiple delayed resets to handle content rendering/animation timing
+    const timers = [10, 50, 150].map(ms => setTimeout(performReset, ms));
+    
+    return () => timers.forEach(clearTimeout);
   }, [activeTab, selectedPetForDetail, selectedServiceForDetail]);
 
   const handleNavClick = (tabId: string) => {
     if (activeTab === tabId) {
-      // If clicking already active tab, smooth scroll to top
       mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      setActiveTab(tabId);
-      // Clear detail views when switching tabs
+      // Clear detail views before switching
       setSelectedPetForDetail(null);
       setSelectedServiceForDetail(null);
+      setActiveTab(tabId);
     }
   };
 
@@ -219,12 +222,10 @@ const Index = () => {
     mutationFn: async ({ couponId, cost }: { couponId: number; cost: number }) => {
       if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
       
-      // 1. Check if user has enough points
       if ((profile?.points || 0) < cost) {
         throw new Error("คะแนนสะสมไม่เพียงพอค่ะ");
       }
 
-      // 2. Add coupon to user_coupons
       const { error: couponError } = await supabase.from('user_coupons').insert([{
         owner_id: lineProfile.userId,
         coupon_id: couponId,
@@ -232,7 +233,6 @@ const Index = () => {
       }]);
       if (couponError) throw couponError;
 
-      // 3. Deduct points from profile
       const newPoints = (profile?.points || 0) - cost;
       const { error: profileError } = await supabase
         .from('profiles')
@@ -349,7 +349,6 @@ const Index = () => {
 
   const handleCouponsQuickAction = () => {
     setActiveTab('promo');
-    // Increase delay to ensure Promotions component is mounted and transition is near finished
     setTimeout(() => {
       const element = document.getElementById('my-coupons-section');
       if (element) {
@@ -416,8 +415,8 @@ const Index = () => {
   };
 
   return (
-    <div className="w-full min-h-screen max-w-lg mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt']">
-      <header className="px-6 pt-[calc(5px+env(safe-area-inset-top))] pb-6 flex justify-between items-center shrink-0">
+    <div className="w-full h-[100dvh] max-w-lg mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt'] overflow-hidden">
+      <header className="px-6 pt-[calc(5px+env(safe-area-inset-top))] pb-6 flex justify-between items-center shrink-0 z-[50]">
         <div>
           <h1 className="text-2xl font-black text-slate-800">
             สวัสดี, {lineProfile?.displayName || profile?.first_name || 'คุณ'}
@@ -447,23 +446,15 @@ const Index = () => {
 
       <main 
         ref={mainScrollRef}
-        className="px-6 flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))] overflow-y-auto no-scrollbar"
+        className="px-6 flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))] overflow-y-scroll no-scrollbar touch-pan-y"
       >
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
-            <motion.div key="home" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-              <MembershipCard 
-                totalAccumulatedPoints={profile?.total_points || 0} 
-                redeemablePoints={profile?.points || 0} 
-                ownerProfile={ownerProfile} 
-                onShowQR={() => setIsQRCodeOpen(true)} 
-              />
+            <motion.div key="home" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }} className="space-y-6">
+              <MembershipCard totalAccumulatedPoints={profile?.total_points || 0} redeemablePoints={profile?.points || 0} ownerProfile={ownerProfile} onShowQR={() => setIsQRCodeOpen(true)} />
               <div className="space-y-0">
                 <UpcomingAppointments />
-                <HomeQuickActions 
-                  onCouponsClick={handleCouponsQuickAction}
-                  onAppointmentClick={() => toast.info('ฟังก์ชันจองคิวจะมาเร็วๆ นี้ค่ะ')}
-                />
+                <HomeQuickActions onCouponsClick={handleCouponsQuickAction} onAppointmentClick={() => toast.info('ฟังก์ชันจองคิวจะมาเร็วๆ นี้ค่ะ')} />
               </div>
               <PetList pets={mappedPetsForUI} onPetClick={(p) => { setSelectedPetForDetail(pets.find(i => i.id === p.id) || null); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
               <MyCouponsHomePreview coupons={collectedCoupons} onViewAll={() => setActiveTab('promo')} />
@@ -471,21 +462,9 @@ const Index = () => {
           )}
 
           {activeTab === 'pets' && (
-            <motion.div key="pets-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <motion.div key="pets-tab" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }}>
               {selectedPetForDetail ? (
-                <PetDetailView 
-                  pet={{ ...selectedPetForDetail, medicalCondition: selectedPetForDetail.medical_condition, imageUrl: selectedPetForDetail.image_url, isFavorite: selectedPetForDetail.is_favorite }} 
-                  onBack={() => setSelectedPetForDetail(null)} 
-                  onStartEdit={(p) => { setPetToEdit(pets.find(i => i.id === p.id) || null); setIsPetFormOpen(true); }} 
-                  onDeletePet={(id) => deletePetMutation.mutate(id)} 
-                  totalServiceCost={0} 
-                  onViewServiceHistoryForPet={() => {}} 
-                  onEditPreferences={() => setIsPreferenceFormOpen(true)} 
-                  onToggleFavorite={() => {
-                    const updatedFavorite = !selectedPetForDetail.is_favorite;
-                    savePetMutation.mutate({ ...selectedPetForDetail, is_favorite: updatedFavorite });
-                  }}
-                />
+                <PetDetailView pet={{ ...selectedPetForDetail, medicalCondition: selectedPetForDetail.medical_condition, imageUrl: selectedPetForDetail.image_url, isFavorite: selectedPetForDetail.is_favorite }} onBack={() => setSelectedPetForDetail(null)} onStartEdit={(p) => { setPetToEdit(pets.find(i => i.id === p.id) || null); setIsPetFormOpen(true); }} onDeletePet={(id) => deletePetMutation.mutate(id)} totalServiceCost={0} onViewServiceHistoryForPet={() => {}} onEditPreferences={() => setIsPreferenceFormOpen(true)} onToggleFavorite={() => { const updatedFavorite = !selectedPetForDetail.is_favorite; savePetMutation.mutate({ ...selectedPetForDetail, is_favorite: updatedFavorite }); }} />
               ) : (
                 <PetManagement pets={mappedPetsForUI} onBack={() => setActiveTab('home')} onViewDetails={(p) => setSelectedPetForDetail(pets.find(i => i.id === p.id) || null)} onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} />
               )}
@@ -493,65 +472,30 @@ const Index = () => {
           )}
 
           {activeTab === 'history' && (
-            <motion.div key="history-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <motion.div key="history-tab" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }}>
               {selectedServiceForDetail ? <ServiceHistoryDetail service={selectedServiceForDetail} onBack={() => setSelectedServiceForDetail(null)} /> : <ServiceHistory historyData={serviceHistory} onServiceClick={(s) => setSelectedServiceForDetail(s)} />}
             </motion.div>
           )}
           
           {activeTab === 'level' && (
-            <motion.div key="level-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <motion.div key="level-tab" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }}>
               <MembershipLevels totalAccumulatedPoints={profile?.total_points || 0} redeemablePoints={profile?.points || 0} />
             </motion.div>
           )}
 
           {activeTab === 'promo' && (
-            <motion.div key="promo-tab" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-               <Promotions 
-                userPoints={profile?.points || 0}
-                collectedCoupons={collectedCoupons} 
-                usedOrExpiredCoupons={usedCoupons}
-                onRedeemCoupon={(c, cost) => collectCouponMutation.mutate({ couponId: c.id, cost })}
-                onUseCoupon={(couponId) => {
-                  const uc = collectedCoupons.find(c => c.id === couponId);
-                  if (uc) { setSelectedCouponToUse(uc); setIsCouponUseModalOpen(true); }
-                }}
-                collectedSpecialPromos={collectedSpecialPromoIds}
-                onCollectSpecialPromotion={(c) => collectCouponMutation.mutate({ couponId: c.id, cost: 0 })}
-              />
+            <motion.div key="promo-tab" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }}>
+               <Promotions userPoints={profile?.points || 0} collectedCoupons={collectedCoupons} usedOrExpiredCoupons={usedCoupons} onRedeemCoupon={(c, cost) => collectCouponMutation.mutate({ couponId: c.id, cost })} onUseCoupon={(couponId) => { const uc = collectedCoupons.find(c => c.id === couponId); if (uc) { setSelectedCouponToUse(uc); setIsCouponUseModalOpen(true); } }} collectedSpecialPromos={collectedSpecialPromoIds} onCollectSpecialPromotion={(c) => collectCouponMutation.mutate({ couponId: c.id, cost: 0 })} />
             </motion.div>
           )}
         </AnimatePresence>
       </main>
 
-      <UserProfileEdit 
-        isOpen={isProfileEditing} 
-        onClose={() => setIsProfileEditing(false)} 
-        profile={ownerProfile} 
-        onSave={(data) => saveProfileMutation.mutate(data)} 
-      />
-      
-      <QRCodeModal 
-        isOpen={isQRCodeOpen} 
-        onClose={() => setIsQRCodeOpen(false)} 
-        lineId={lineProfile?.displayName || profile?.first_name || 'สมาชิก'} 
-        memberId={profile?.phone || ''} 
-      />
-      
-      <PetForm 
-        isOpen={isPetFormOpen} 
-        onClose={() => setIsPetFormOpen(false)} 
-        onSave={(data) => savePetMutation.mutate(data)} 
-        initialData={petToEdit}
-      />
-      
+      <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={ownerProfile} onSave={(data) => saveProfileMutation.mutate(data)} />
+      <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || profile?.first_name || 'สมาชิก'} memberId={profile?.phone || ''} />
+      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => savePetMutation.mutate(data)} initialData={petToEdit} />
       <PetPreferenceForm isOpen={isPreferenceFormOpen} onClose={() => setIsPreferenceFormOpen(false)} onSave={() => setIsPreferenceFormOpen(false)} initialData={selectedPetForDetail?.custom_preferences || []} petName={selectedPetForDetail?.name || ''} />
-      
-      <CouponUseModal 
-        isOpen={isCouponUseModalOpen} 
-        onClose={() => setIsCouponUseModalOpen(false)} 
-        coupon={selectedCouponToUse} 
-        onConfirmUse={() => selectedCouponToUse && useCouponMutation.mutate(selectedCouponToUse.userCouponId)} 
-      />
+      <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => selectedCouponToUse && useCouponMutation.mutate(selectedCouponToUse.userCouponId)} />
 
       <nav className="fixed bottom-[10px] left-6 right-6 max-w-[calc(theme(maxWidth.lg)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-[40] border border-white/60">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
