@@ -128,6 +128,9 @@ const MembershipLevels = ({ totalAccumulatedPoints, tierExpiry }: MembershipLeve
   }
   progressPercentage = Math.min(100, Math.max(0, progressPercentage));
 
+  // Find the "Max Points" for the current tier (which is the threshold for the next tier)
+  const currentTierMaxPoints = nextLevel ? nextLevel.minPoints : currentLevel.minPoints;
+
   const CurrentMembershipStatusCard = () => (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -184,7 +187,7 @@ const MembershipLevels = ({ totalAccumulatedPoints, tierExpiry }: MembershipLeve
            <div>
               <p className="text-[11px] font-black text-black leading-tight">เงื่อนไขการรักษาระดับ</p>
               <p className="text-[10px] font-bold text-slate-600 leading-tight mt-1">
-                สะสมให้ครบ <span className="text-black font-black underline">{currentLevel.minPoints.toLocaleString()}</span> คะแนน ภายในวันที่กำหนดเพื่อรักษาระดับสมาชิก หรือสะสมเพิ่มเพื่อเลื่อนระดับ
+                สะสมให้ครบ <span className="text-black font-black underline">{currentTierMaxPoints.toLocaleString()}</span> คะแนน ภายในวันที่กำหนดเพื่อรักษาระดับสมาชิก หรือสะสมเพิ่มเพื่อเลื่อนระดับ
               </p>
            </div>
         </div>
