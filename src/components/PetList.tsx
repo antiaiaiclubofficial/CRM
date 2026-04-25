@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { PawPrint, Plus } from 'lucide-react';
+import { PawPrint } from 'lucide-react';
 
 interface Pet {
   id: number;
@@ -59,6 +59,7 @@ const PetList = ({ pets, onPetClick, onViewAll }: PetListProps) => {
                   src={pet.imageUrl} 
                   alt={pet.name} 
                   className="w-full h-full object-cover" 
+                  loading="lazy"
                 />
               </div>
               <h4 className="font-bold text-sm text-slate-800 truncate">{pet.name}</h4>

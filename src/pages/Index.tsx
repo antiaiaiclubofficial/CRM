@@ -20,6 +20,7 @@ import QRCodeModal from '@/components/QRCodeModal';
 import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
 import CouponUseModal from '@/components/CouponUseModal';
 import HomeQuickActions from '@/components/HomeQuickActions';
+import PetListSkeleton from '@/components/PetListSkeleton';
 import Register from './Register';
 import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles, PlusCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -62,35 +63,28 @@ const Index = () => {
   
   const mainScrollRef = useRef<HTMLElement>(null);
 
-  // Aggressive scroll reset for all view changes
   useEffect(() => {
     const performReset = () => {
       if (mainScrollRef.current) {
         mainScrollRef.current.scrollTop = 0;
       }
-      window.scrollTo(0, 0); // Extra precaution for global scroll
     };
-    
     performReset();
-    
-    // Multiple delayed resets to handle content rendering/animation timing
-    const timers = [10, 50, 150].map(ms => setTimeout(performReset, ms));
-    
-    return () => timers.forEach(clearTimeout);
+    const timer = setTimeout(performReset, 50);
+    return () => clearTimeout(timer);
   }, [activeTab, selectedPetForDetail, selectedServiceForDetail]);
 
   const handleNavClick = (tabId: string) => {
     if (activeTab === tabId) {
       mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      // Clear detail views before switching
       setSelectedPetForDetail(null);
       setSelectedServiceForDetail(null);
       setActiveTab(tabId);
     }
   };
 
-  // Profile Query
+  // Profile Query - Increased staleTime to improve speed
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['profile', lineProfile?.userId],
     queryFn: async () => {
@@ -103,11 +97,12 @@ const Index = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!lineProfile?.userId
+    enabled: !!lineProfile?.userId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Queries
-  const { data: pets = [] } = useQuery({
+  // Pets Query - Parallel fetch with profile
+  const { data: pets = [], isLoading: petsLoading } = useQuery({
     queryKey: ['pets', lineProfile?.userId],
     queryFn: async () => {
       if (!lineProfile?.userId) return [];
@@ -118,7 +113,8 @@ const Index = () => {
       if (error) throw error;
       return data as Pet[];
     },
-    enabled: !!lineProfile?.userId
+    enabled: !!lineProfile?.userId,
+    staleTime: 1000 * 60 * 5,
   });
 
   const { data: userCoupons = [] } = useQuery({
@@ -127,15 +123,13 @@ const Index = () => {
       if (!lineProfile?.userId) return [];
       const { data, error } = await supabase
         .from('user_coupons')
-        .select(`
-          *,
-          coupons (*)
-        `)
+        .select(`*, coupons (*)`)
         .eq('owner_id', lineProfile.userId);
       if (error) throw error;
       return data;
     },
-    enabled: !!lineProfile?.userId
+    enabled: !!lineProfile?.userId,
+    staleTime: 1000 * 60,
   });
 
   const { data: serviceHistory = [] } = useQuery({
@@ -148,14 +142,14 @@ const Index = () => {
         .eq('owner_id', lineProfile.userId)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      
       return data.map(h => ({
         ...h,
         icon: h.icon_name === 'Scissors' ? <Scissors className="text-pink-500" /> : <Sparkles className="text-blue-500" />,
         bg: h.bg || 'bg-slate-50'
       }));
     },
-    enabled: !!lineProfile?.userId
+    enabled: !!lineProfile?.userId,
+    staleTime: 1000 * 60 * 10,
   });
 
   // Mutations
@@ -206,7 +200,6 @@ const Index = () => {
     mutationFn: async ({ points, totalPoints }: { points: number; totalPoints?: number }) => {
       const updates: any = { points };
       if (totalPoints !== undefined) updates.total_points = totalPoints;
-      
       const { error } = await supabase
         .from('profiles')
         .update(updates)
@@ -221,10 +214,7 @@ const Index = () => {
   const collectCouponMutation = useMutation({
     mutationFn: async ({ couponId, cost }: { couponId: number; cost: number }) => {
       if (!lineProfile?.userId) throw new Error("ไม่พบข้อมูลผู้ใช้งาน LINE");
-      
-      if ((profile?.points || 0) < cost) {
-        throw new Error("คะแนนสะสมไม่เพียงพอค่ะ");
-      }
+      if ((profile?.points || 0) < cost) throw new Error("คะแนนสะสมไม่เพียงพอค่ะ");
 
       const { error: couponError } = await supabase.from('user_coupons').insert([{
         owner_id: lineProfile.userId,
@@ -245,9 +235,7 @@ const Index = () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       toast.success('เก็บคูปองเรียบร้อยแล้วค่ะ');
     },
-    onError: (error: any) => {
-      toast.error(error.message);
-    }
+    onError: (error: any) => toast.error(error.message)
   });
 
   const savePetMutation = useMutation({
@@ -279,7 +267,6 @@ const Index = () => {
       } else {
         result = await supabase.from('pets').insert([dataToSave]).select().single();
       }
-      
       if (result.error) throw result.error;
       return result.data;
     },
@@ -289,23 +276,13 @@ const Index = () => {
     },
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: ['pets'] });
-      if (selectedPetForDetail && selectedPetForDetail.id === data.id) {
-        setSelectedPetForDetail(data);
-      }
+      if (selectedPetForDetail && selectedPetForDetail.id === data.id) setSelectedPetForDetail(data);
       setIsPetFormOpen(false);
       setPetToEdit(null);
-      if (context?.toastId) {
-        toast.success('บันทึกข้อมูลเรียบร้อยแล้วค่ะ', { id: context.toastId });
-      } else {
-        toast.success('บันทึกข้อมูลเรียบร้อยแล้วค่ะ');
-      }
+      toast.success('บันทึกข้อมูลเรียบร้อยแล้วค่ะ', { id: context?.toastId });
     },
     onError: (error: any, variables, context) => {
-      if (context?.toastId) {
-        toast.error('เกิดข้อผิดพลาด: ' + error.message, { id: context.toastId });
-      } else {
-        toast.error('เกิดข้อผิดพลาด: ' + error.message);
-      }
+      toast.error('เกิดข้อผิดพลาด: ' + error.message, { id: context?.toastId });
     }
   });
 
@@ -340,10 +317,7 @@ const Index = () => {
   const handleSimulatePoints = () => {
     const currentPoints = profile?.points || 0;
     const currentTotal = profile?.total_points || 0;
-    updatePointsMutation.mutate({ 
-      points: currentPoints + 100, 
-      totalPoints: currentTotal + 100 
-    });
+    updatePointsMutation.mutate({ points: currentPoints + 100, totalPoints: currentTotal + 100 });
     toast.success('เย้! คุณได้รับเพิ่ม 100 คะแนนค่ะ');
   };
 
@@ -351,13 +325,11 @@ const Index = () => {
     setActiveTab('promo');
     setTimeout(() => {
       const element = document.getElementById('my-coupons-section');
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 350); 
   };
 
-  if (liffLoading || profileLoading) {
+  if (liffLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFF9F0]">
         <PawPrint className="text-pink-400 animate-bounce" size={48} />
@@ -366,7 +338,8 @@ const Index = () => {
     );
   }
 
-  if (lineProfile && !profile) {
+  // Show register only if profile is definitely loaded and null
+  if (lineProfile && !profile && !profileLoading) {
     return (
       <Register 
         lineProfile={lineProfile} 
@@ -394,7 +367,6 @@ const Index = () => {
     }));
 
   const collectedSpecialPromoIds = userCoupons.map(uc => uc.coupon_id);
-
   const sortedPets = [...pets].sort((a, b) => (a.is_favorite === b.is_favorite ? 0 : a.is_favorite ? -1 : 1));
   const mappedPetsForUI = sortedPets.map(p => ({
     ...p,
@@ -428,7 +400,6 @@ const Index = () => {
             whileTap={{ scale: 0.9 }}
             onClick={handleSimulatePoints}
             className="p-2 bg-amber-100 text-amber-600 rounded-full border border-amber-200 shadow-sm"
-            title="จำลองการเพิ่มคะแนน"
           >
             <PlusCircle size={20} />
           </motion.button>
@@ -451,12 +422,23 @@ const Index = () => {
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div key="home" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }} className="space-y-6">
-              <MembershipCard totalAccumulatedPoints={profile?.total_points || 0} redeemablePoints={profile?.points || 0} ownerProfile={ownerProfile} onShowQR={() => setIsQRCodeOpen(true)} />
+              {profileLoading ? (
+                <div className="w-full h-48 bg-slate-100 rounded-[2rem] animate-pulse" />
+              ) : (
+                <MembershipCard totalAccumulatedPoints={profile?.total_points || 0} redeemablePoints={profile?.points || 0} ownerProfile={ownerProfile} onShowQR={() => setIsQRCodeOpen(true)} />
+              )}
+              
               <div className="space-y-0">
                 <UpcomingAppointments />
                 <HomeQuickActions onCouponsClick={handleCouponsQuickAction} onAppointmentClick={() => toast.info('ฟังก์ชันจองคิวจะมาเร็วๆ นี้ค่ะ')} />
               </div>
-              <PetList pets={mappedPetsForUI} onPetClick={(p) => { setSelectedPetForDetail(pets.find(i => i.id === p.id) || null); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
+
+              {petsLoading ? (
+                <PetListSkeleton />
+              ) : (
+                <PetList pets={mappedPetsForUI} onPetClick={(p) => { setSelectedPetForDetail(pets.find(i => i.id === p.id) || null); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
+              )}
+              
               <MyCouponsHomePreview coupons={collectedCoupons} onViewAll={() => setActiveTab('promo')} />
             </motion.div>
           )}
