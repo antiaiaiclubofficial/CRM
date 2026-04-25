@@ -419,7 +419,7 @@ const Index = () => {
             onClick={handleSimulatePoints}
             className="p-1.5 bg-amber-100 text-amber-600 rounded-full border border-amber-200 shadow-sm"
           >
-            <PlusCircle size={18} />
+            <PlusCircle size={16} />
           </motion.button>
           <motion.div 
             whileTap={{ scale: 0.9 }} 
