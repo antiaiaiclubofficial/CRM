@@ -71,8 +71,8 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           <div className="space-y-1 min-w-0 flex-1">
             <h2 className="text-[9px] font-black text-slate-500 uppercase tracking-widest truncate">Membership Status</h2>
             <div className="flex items-center mt-0.5">
-              <span className="bg-white border-2 border-black px-3 py-1 rounded-full text-[10px] font-black text-slate-800 flex items-center gap-1.5 shadow-sm whitespace-nowrap">
-                <Crown size={12} className="text-amber-500" fill="currentColor" />
+              <span className="bg-white/60 px-2.5 py-0.5 rounded-full text-[9px] font-black text-slate-800 flex items-center gap-1.5 whitespace-nowrap">
+                <Crown size={10} className="text-amber-500" fill="currentColor" />
                 {currentLevel.name.toUpperCase()}
               </span>
             </div>
@@ -96,11 +96,11 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               <span className="text-[10px] font-black text-slate-600 uppercase">Pts</span>
             </div>
             
-            {/* EXPIRY BADGE */}
+            {/* SIMPLIFIED EXPIRY */}
             {ownerProfile.pointsExpiry && (
-              <div className="flex items-center gap-1.5 bg-pink-500 text-white px-2 py-1 rounded-xl border border-white shadow-sm w-fit mt-1">
+              <div className="flex items-center gap-1 text-pink-600 mt-1">
                 <Clock size={10} strokeWidth={3} />
-                <span className="text-[8px] font-black uppercase tracking-tight whitespace-nowrap">
+                <span className="text-[8px] font-black uppercase tracking-tight">
                   หมดอายุ: {ownerProfile.pointsExpiry}
                 </span>
               </div>
@@ -135,19 +135,14 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               className="bg-black h-full rounded-full"
             />
           </div>
-          <div className="flex justify-between items-center px-0.5">
-            <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tight">
+          <div className="flex justify-center items-center px-0.5">
+            <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tight text-center">
               {nextLevel ? (
-                <>อีก <span className="text-black font-black underline">{pointsToNextLevel.toLocaleString()}</span> คะแนน เพื่อเลื่อนระดับ</>
+                <>อีก <span className="text-black font-black underline">{pointsToNextLevel.toLocaleString()}</span> คะแนน เพื่อเลื่อนระดับเป็น <span className="text-black font-black">{nextLevel.name}</span></>
               ) : (
-                <span className="text-emerald-600 font-black">ระดับสูงสุดแล้ว! ✨</span>
+                <span className="text-emerald-600 font-black">คุณอยู่ในระดับสูงสุดแล้ว! ✨</span>
               )}
             </p>
-            {nextLevel && (
-              <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest">
-                Target: {nextLevel.name}
-              </span>
-            )}
           </div>
         </div>
       </div>
