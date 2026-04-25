@@ -57,7 +57,9 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
             <div className="space-y-5 px-8 pb-24"> {/* Increased bottom padding */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1"><User size={12}/> ชื่อ</label>
+                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 h-4">
+                    <User size={12}/> ชื่อ
+                  </label>
                   <input 
                     type="text" 
                     value={formData.firstName}
@@ -66,7 +68,9 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2">นามสกุล</label>
+                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 h-4">
+                    <span className="w-3" /> นามสกุล
+                  </label>
                   <input 
                     type="text" 
                     value={formData.lastName}
@@ -78,7 +82,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1"><User size={12}/> เพศ</label>
+                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 h-4"><User size={12}/> เพศ</label>
                   <select 
                     value={formData.gender}
                     onChange={(e) => setFormData({...formData, gender: e.target.value})}
@@ -90,7 +94,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1"><Calendar size={12}/> อายุ</label>
+                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 h-4"><Calendar size={12}/> อายุ</label>
                   <input 
                     type="number" 
                     value={formData.age}
