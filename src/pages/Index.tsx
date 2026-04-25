@@ -322,13 +322,13 @@ const Index = () => {
 
   const handleCouponsQuickAction = () => {
     setActiveTab('promo');
-    // Small delay to allow the tab to mount before scrolling
+    // Increase delay to ensure Promotions component is mounted and transition is near finished
     setTimeout(() => {
       const element = document.getElementById('my-coupons-section');
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 100);
+    }, 350); 
   };
 
   if (liffLoading || profileLoading) {
