@@ -49,12 +49,22 @@ const Index = () => {
   
   const mainScrollRef = useRef<HTMLElement>(null);
 
-  // Get Store Info
+  // Get Store Info - Optimized to prioritize the specific store ID
   const { data: store, isLoading: storeLoading } = useQuery({
     queryKey: ['current_store'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('stores').select('*').limit(1).maybeSingle();
-      if (error) throw error;
+      const targetStoreId = 'b0f3c613-f742-4c86-951a-eaa65c8b1667';
+      const { data, error } = await supabase
+        .from('stores')
+        .select('*')
+        .eq('id', targetStoreId)
+        .maybeSingle();
+        
+      if (error || !data) {
+        // Fallback to first store if target not found
+        const { data: fallback } = await supabase.from('stores').select('*').limit(1).maybeSingle();
+        return fallback;
+      }
       return data;
     }
   });
