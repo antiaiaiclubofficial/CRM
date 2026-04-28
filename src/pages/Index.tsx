@@ -130,31 +130,63 @@ const Index = () => {
     enabled: !!lineProfile?.userId && !!store?.id,
   });
 
+  const updateProfileMutation = useMutation({
+    mutationFn: async (updatedData: any) => {
+      if (!customerData?.profile?.id) throw new Error("Missing ID");
+      
+      const { error } = await supabase
+        .from('customers')
+        .update({
+          first_name: updatedData.firstName,
+          last_name: updatedData.lastName,
+          display_name: `${updatedData.firstName} ${updatedData.lastName}`,
+          email: updatedData.email,
+          phone: updatedData.phone,
+          gender: updatedData.gender,
+          age: updatedData.age,
+          address: updatedData.address,
+          sub_district: updatedData.subDistrict,
+          district: updatedData.district,
+          province: updatedData.province,
+          postal_code: updatedData.postalCode,
+        })
+        .eq('id', customerData.profile.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+      toast.success('บันทึกข้อมูลส่วนตัวเรียบร้อยแล้วค่ะ ✨');
+    },
+    onError: (error) => {
+      console.error('Update Profile Error:', error);
+      toast.error('เกิดข้อผิดพลาดในการบันทึกข้อมูลค่ะ');
+    }
+  });
+
   const registerMutation = useMutation({
     mutationFn: async (userData: any) => {
-      if (!lineProfile?.userId) {
-        toast.error('ไม่พบข้อมูล LINE Profile กรุณาเปิดแอปใน LINE ค่ะ');
-        throw new Error("Missing LINE ID");
-      }
-      if (!store?.id) {
-        toast.error('ไม่พบข้อมูลร้านค้าในระบบ');
-        throw new Error("Missing Store ID");
-      }
+      if (!lineProfile?.userId || !store?.id) throw new Error("Missing data");
       
-      // 1. Create Customer
       const { data: newCustomer, error: cError } = await supabase.from('customers').insert([{
         line_user_id: lineProfile.userId,
+        first_name: userData.firstName,
+        last_name: userData.lastName,
         display_name: `${userData.firstName} ${userData.lastName}`,
         email: userData.email || null,
+        phone: userData.phone,
+        gender: userData.gender,
+        age: userData.age,
+        address: userData.address,
+        sub_district: userData.subDistrict,
+        district: userData.district,
+        province: userData.province,
+        postal_code: userData.postalCode,
         avatar_url: lineProfile.pictureUrl || null
       }]).select().single();
 
-      if (cError) {
-        toast.error('เกิดข้อผิดพลาดในการบันทึกข้อมูลลูกค้า');
-        throw cError;
-      }
+      if (cError) throw cError;
 
-      // 2. Create Membership for this store
       const { error: mError } = await supabase.from('store_customers').insert([{
         store_id: store.id,
         customer_id: newCustomer.id,
@@ -162,17 +194,11 @@ const Index = () => {
         tier: 'bronze'
       }]);
 
-      if (mError) {
-        toast.error('เกิดข้อผิดพลาดในการสร้างบัตรสมาชิก');
-        throw mError;
-      }
+      if (mError) throw mError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
       toast.success('ลงทะเบียนเรียบร้อยแล้วค่ะ ยินดีต้อนรับนะคะ ✨');
-    },
-    onError: (error) => {
-      console.error('Registration Error:', error);
     }
   });
 
@@ -217,7 +243,6 @@ const Index = () => {
     );
   }
 
-  // Show register page if line profile exists but no customer record in our DB
   if (lineProfile && !customerData?.profile) {
     return (
       <Register 
@@ -228,7 +253,6 @@ const Index = () => {
     );
   }
 
-  // Fallback for development if not in LINE
   if (!lineProfile && !profileLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-[#FFF9F0]">
@@ -242,12 +266,16 @@ const Index = () => {
   }
 
   const ownerProfile = {
-    firstName: customerData?.profile?.display_name?.split(' ')[0] || '',
-    lastName: customerData?.profile?.display_name?.split(' ')[1] || '',
-    gender: 'ไม่ระบุ',
-    age: '0',
-    phone: '0XX-XXX-XXXX',
-    address: '',
+    firstName: customerData?.profile?.first_name || customerData?.profile?.display_name?.split(' ')[0] || '',
+    lastName: customerData?.profile?.last_name || customerData?.profile?.display_name?.split(' ')[1] || '',
+    gender: customerData?.profile?.gender || 'หญิง',
+    age: customerData?.profile?.age || '',
+    phone: customerData?.profile?.phone || '',
+    address: customerData?.profile?.address || '',
+    subDistrict: customerData?.profile?.sub_district || '',
+    district: customerData?.profile?.district || '',
+    province: customerData?.profile?.province || '',
+    postalCode: customerData?.profile?.postal_code || '',
     email: customerData?.profile?.email || '',
   };
 
@@ -354,6 +382,12 @@ const Index = () => {
 
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.id?.slice(0, 8) || ''} />
       <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={() => queryClient.invalidateQueries({ queryKey: ['customer_profile'] })} initialData={petToEdit as any} />
+      <UserProfileEdit 
+        isOpen={isProfileEditing} 
+        onClose={() => setIsProfileEditing(false)} 
+        profile={ownerProfile} 
+        onSave={(data) => updateProfileMutation.mutate(data)} 
+      />
       
       <nav className="fixed bottom-[10px] left-6 right-6 max-w-[calc(theme(maxWidth.md)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-[40] border border-white/60">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
