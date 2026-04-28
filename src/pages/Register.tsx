@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Phone, MapPin, Mail, Calendar, Check, ArrowRight, PawPrint } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface RegisterProps {
   lineProfile: any;
@@ -28,14 +29,18 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.firstName || !formData.lastName || !formData.phone) return;
+    if (!formData.firstName || !formData.lastName || !formData.phone) {
+      toast.error('กรุณากรอกข้อมูลที่จำเป็น (ชื่อ, นามสกุล, เบอร์โทร) ให้ครบถ้วนค่ะ');
+      return;
+    }
     
     setIsSubmitting(true);
     try {
       await onSave(formData);
       onSuccess();
     } catch (error) {
-      console.error(error);
+      console.error('Registration Error:', error);
+      toast.error('เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้งค่ะ');
     } finally {
       setIsSubmitting(false);
     }

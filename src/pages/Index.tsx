@@ -67,8 +67,8 @@ const Index = () => {
   
   const mainScrollRef = useRef<HTMLElement>(null);
 
-  // Get Store Info (In real app, this would be from URL or environment)
-  const { data: store } = useQuery({
+  // Get Store Info
+  const { data: store, isLoading: storeLoading } = useQuery({
     queryKey: ['current_store'],
     queryFn: async () => {
       const { data, error } = await supabase.from('stores').select('*').limit(1).maybeSingle();
@@ -83,7 +83,6 @@ const Index = () => {
     queryFn: async () => {
       if (!lineProfile?.userId || !store?.id) return null;
       
-      // 1. Get Customer record
       const { data: customer, error: customerError } = await supabase
         .from('customers')
         .select('*')
@@ -93,7 +92,6 @@ const Index = () => {
       if (customerError) throw customerError;
       if (!customer) return null;
 
-      // 2. Get Membership for this store
       const { data: membership, error: memberError } = await supabase
         .from('store_customers')
         .select('*')
@@ -103,20 +101,17 @@ const Index = () => {
 
       if (memberError) throw memberError;
 
-      // 3. Get Pets
       const { data: pets, error: petsError } = await supabase
         .from('pets')
         .select('*')
         .eq('customer_id', customer.id);
 
-      // 4. Get Coupons
       const { data: coupons, error: couponError } = await supabase
         .from('customer_coupons')
         .select('*, coupon_templates(*)')
         .eq('customer_id', customer.id)
         .eq('store_id', store.id);
 
-      // 5. Get Service History
       const { data: history, error: historyError } = await supabase
         .from('service_history')
         .select('*, pets(*)')
@@ -135,7 +130,54 @@ const Index = () => {
     enabled: !!lineProfile?.userId && !!store?.id,
   });
 
-  const pets = customerData?.pets || [];
+  const registerMutation = useMutation({
+    mutationFn: async (userData: any) => {
+      if (!lineProfile?.userId) {
+        toast.error('ไม่พบข้อมูล LINE Profile กรุณาเปิดแอปใน LINE ค่ะ');
+        throw new Error("Missing LINE ID");
+      }
+      if (!store?.id) {
+        toast.error('ไม่พบข้อมูลร้านค้าในระบบ');
+        throw new Error("Missing Store ID");
+      }
+      
+      // 1. Create Customer
+      const { data: newCustomer, error: cError } = await supabase.from('customers').insert([{
+        line_user_id: lineProfile.userId,
+        display_name: `${userData.firstName} ${userData.lastName}`,
+        email: userData.email || null,
+        avatar_url: lineProfile.pictureUrl || null
+      }]).select().single();
+
+      if (cError) {
+        toast.error('เกิดข้อผิดพลาดในการบันทึกข้อมูลลูกค้า');
+        throw cError;
+      }
+
+      // 2. Create Membership for this store
+      const { error: mError } = await supabase.from('store_customers').insert([{
+        store_id: store.id,
+        customer_id: newCustomer.id,
+        points: 0,
+        tier: 'bronze'
+      }]);
+
+      if (mError) {
+        toast.error('เกิดข้อผิดพลาดในการสร้างบัตรสมาชิก');
+        throw mError;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+      toast.success('ลงทะเบียนเรียบร้อยแล้วค่ะ ยินดีต้อนรับนะคะ ✨');
+    },
+    onError: (error) => {
+      console.error('Registration Error:', error);
+    }
+  });
+
+  // Derived data
+  const petsList = customerData?.pets || [];
   const serviceHistory = (customerData?.history || []).map(h => ({
     id: h.id,
     date: formatDateThai(h.created_at),
@@ -160,102 +202,42 @@ const Index = () => {
     is_used: c.status === 'used'
   }));
 
-  const registerMutation = useMutation({
-    mutationFn: async (userData: any) => {
-      if (!lineProfile?.userId || !store?.id) throw new Error("Missing ID");
-      
-      // 1. Create Customer
-      const { data: newCustomer, error: cError } = await supabase.from('customers').insert([{
-        line_user_id: lineProfile.userId,
-        display_name: `${userData.firstName} ${userData.lastName}`,
-        email: userData.email,
-        avatar_url: lineProfile.pictureUrl
-      }]).select().single();
-
-      if (cError) throw cError;
-
-      // 2. Create Membership for this store
-      const { error: mError } = await supabase.from('store_customers').insert([{
-        store_id: store.id,
-        customer_id: newCustomer.id,
-        points: 0,
-        tier: 'bronze'
-      }]);
-
-      if (mError) throw mError;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-      toast.success('ลงทะเบียนเรียบร้อยแล้วค่ะ');
-    }
-  });
-
-  const savePetMutation = useMutation({
-    mutationFn: async (petData: any) => {
-      if (!customerData?.profile?.id) throw new Error("Missing Customer ID");
-      
-      const isEdit = !!petData.id && typeof petData.id === 'string';
-      
-      const dbData = {
-        customer_id: customerData.profile.id,
-        name: petData.name,
-        type: petData.type,
-        breed: petData.breed,
-        weight: parseFloat(petData.weight) || 0,
-        image_url: petData.image_url,
-        // medical_condition: petData.medical_condition
-      };
-
-      if (isEdit) {
-        const { error } = await supabase.from('pets').update(dbData).eq('id', petData.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('pets').insert([dbData]);
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-      setIsPetFormOpen(false);
-      setSelectedPetForDetail(null);
-      toast.success('บันทึกข้อมูลสัตว์เลี้ยงแล้วค่ะ');
-    }
-  });
-
-  const deletePetMutation = useMutation({
-    mutationFn: async (id: string | number) => {
-      const { error } = await supabase.from('pets').delete().eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-      setSelectedPetForDetail(null);
-      toast.success('ลบข้อมูลเรียบร้อยแล้วค่ะ');
-    }
-  });
-
   const handleNavClick = (tabId: string) => {
     setSelectedPetForDetail(null);
     setSelectedServiceForDetail(null);
     setActiveTab(tabId);
   };
 
-  if (liffLoading || profileLoading) {
+  if (liffLoading || storeLoading || (lineProfile && profileLoading)) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFF9F0]">
         <PawPrint className="text-pink-400 animate-bounce" size={48} />
-        <p className="mt-4 font-bold text-slate-600">กำลังโหลดข้อมูลร้าน {store?.name || ''}...</p>
+        <p className="mt-4 font-bold text-slate-600">กำลังเตรียมข้อมูลสำหรับคุณ... 🐾</p>
       </div>
     );
   }
 
-  if (lineProfile && !customerData?.profile && !profileLoading) {
+  // Show register page if line profile exists but no customer record in our DB
+  if (lineProfile && !customerData?.profile) {
     return (
       <Register 
         lineProfile={lineProfile} 
         onSuccess={() => {}} 
         onSave={(data) => registerMutation.mutateAsync(data)} 
       />
+    );
+  }
+
+  // Fallback for development if not in LINE
+  if (!lineProfile && !profileLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-[#FFF9F0]">
+        <div className="w-20 h-20 bg-amber-100 rounded-3xl flex items-center justify-center mb-6">
+          <Calendar size={40} className="text-amber-500" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-800 mb-2">กรุณาเข้าใช้งานผ่าน LINE</h2>
+        <p className="text-sm text-slate-500">แอปพลิเคชันนี้ออกแบบมาเพื่อใช้งานร่วมกับ LINE Official Account ค่ะ</p>
+      </div>
     );
   }
 
@@ -304,7 +286,7 @@ const Index = () => {
               <UpcomingAppointments />
               <HomeQuickActions onCouponsClick={() => setActiveTab('promo')} onAppointmentClick={() => toast.info('เร็วๆ นี้')} />
               <PetList 
-                pets={pets.map(p => ({ ...p, imageUrl: p.image_url, cardBgColor: '#FFD8E4' })) as any} 
+                pets={petsList.map(p => ({ ...p, imageUrl: p.image_url, cardBgColor: '#FFD8E4' })) as any} 
                 onPetClick={(p: any) => { setSelectedPetForDetail(p); setActiveTab('pets'); }} 
                 onViewAll={() => setActiveTab('pets')} 
               />
@@ -319,7 +301,7 @@ const Index = () => {
                   pet={{ ...selectedPetForDetail, imageUrl: selectedPetForDetail.image_url } as any} 
                   onBack={() => setSelectedPetForDetail(null)} 
                   onStartEdit={(p: any) => { setPetToEdit(p); setIsPetFormOpen(true); }} 
-                  onDeletePet={(id) => deletePetMutation.mutate(id as any)} 
+                  onDeletePet={(id) => queryClient.invalidateQueries({ queryKey: ['customer_profile'] })} 
                   totalServiceCost={0} 
                   onViewServiceHistoryForPet={() => {}} 
                   onEditPreferences={() => setIsPreferenceFormOpen(true)} 
@@ -327,7 +309,7 @@ const Index = () => {
                 />
               ) : (
                 <PetManagement 
-                  pets={pets.map(p => ({ ...p, imageUrl: p.image_url, cardBgColor: '#FFD8E4' })) as any} 
+                  pets={petsList.map(p => ({ ...p, imageUrl: p.image_url, cardBgColor: '#FFD8E4' })) as any} 
                   onBack={() => setActiveTab('home')} 
                   onViewDetails={(p: any) => setSelectedPetForDetail(p)} 
                   onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} 
@@ -371,7 +353,7 @@ const Index = () => {
       </main>
 
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.id?.slice(0, 8) || ''} />
-      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => savePetMutation.mutate(data)} initialData={petToEdit as any} />
+      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={() => queryClient.invalidateQueries({ queryKey: ['customer_profile'] })} initialData={petToEdit as any} />
       
       <nav className="fixed bottom-[10px] left-6 right-6 max-w-[calc(theme(maxWidth.md)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-[40] border border-white/60">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
