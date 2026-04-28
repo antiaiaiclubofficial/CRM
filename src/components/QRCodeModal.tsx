@@ -47,7 +47,7 @@ const QRCodeModal = ({ isOpen, onClose, lineId, memberId }: QRCodeModalProps) =>
                 <p className="text-sm text-slate-500 mb-1">แสดงต่อพนักงานเพื่อสะสมคะแนน</p>
                 <h4 className="text-lg font-bold text-slate-800 break-all px-4">{lineId}</h4>
                 <div className="inline-flex items-center gap-2 bg-slate-50 px-3 py-1 rounded-full border border-slate-100 mt-2">
-                  <span className="text-xs font-medium text-slate-500">Member ID: {memberId}</span>
+                  <span className="text-xs font-medium text-slate-500">ID: {memberId}</span>
                   <button className="text-pink-500 hover:text-pink-600 transition-colors">
                     <Copy size={12} />
                   </button>

@@ -119,7 +119,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           </div>
           <div className="flex flex-col items-end text-right min-w-0 flex-1">
             <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5 whitespace-nowrap">
-              Owner ID: {ownerProfile.phone || '0XX-XXX-XXXX'}
+              ID: {ownerProfile.phone || '0XX-XXX-XXXX'}
             </p>
             <p className="font-black text-slate-800 text-lg leading-tight drop-shadow-sm truncate w-full">
               {ownerProfile.firstName} {ownerProfile.lastName}

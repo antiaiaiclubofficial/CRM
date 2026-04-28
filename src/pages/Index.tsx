@@ -396,7 +396,7 @@ const Index = () => {
         </AnimatePresence>
       </main>
 
-      <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.id?.slice(0, 8) || ''} />
+      <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.phone || ''} />
       <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={() => queryClient.invalidateQueries({ queryKey: ['customer_profile'] })} initialData={petToEdit as any} />
       <UserProfileEdit 
         isOpen={isProfileEditing} 
