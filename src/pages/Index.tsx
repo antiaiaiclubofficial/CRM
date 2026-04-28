@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLiff } from '@/hooks/use-liff';
@@ -56,12 +56,15 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [isProfileEditing, setIsProfileEditing] = useState(false);
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
-  const [selectedPetForDetail, setSelectedPetForDetail] = useState<any | null>(null);
-  const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<any | null>(null);
+  
+  // Update state types to accept both string and number for flexibility
+  const [selectedPetId, setSelectedPetId] = useState<string | number | null>(null);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | number | null>(null);
+  
   const [isPetFormOpen, setIsPetFormOpen] = useState(false);
-  const [petToEdit, setPetToEdit] = useState<any | null>(null);
+  const [petToEditId, setPetToEditId] = useState<string | number | null>(null);
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
-  const [selectedCouponToUse, setSelectedCouponToUse] = useState<any | null>(null);
+  const [selectedCouponToUseId, setSelectedCouponToUseId] = useState<string | number | null>(null);
   const [isCouponUseModalOpen, setIsCouponUseModalOpen] = useState(false);
   
   const mainScrollRef = useRef<HTMLElement>(null);
@@ -136,6 +139,45 @@ const Index = () => {
     enabled: !!lineProfile?.userId && !!store?.id,
   });
 
+  // Derived data based on fresh customerData
+  const petsList = useMemo(() => customerData?.pets || [], [customerData]);
+  
+  const selectedPetForDetail = useMemo(() => 
+    petsList.find(p => p.id === selectedPetId) || null
+  , [petsList, selectedPetId]);
+
+  const petToEdit = useMemo(() => 
+    petsList.find(p => p.id === petToEditId) || null
+  , [petsList, petToEditId]);
+
+  const serviceHistory = useMemo(() => (customerData?.history || []).map(h => ({
+    id: h.id,
+    date: formatDateThai(h.created_at),
+    petName: h.pets?.name || 'ไม่ระบุ',
+    service: h.note || 'รับบริการทั่วไป',
+    price: h.price?.toString() || '0',
+    icon: <Scissors className="text-pink-500" />,
+    bg: 'bg-pink-50',
+    description: h.note,
+  })), [customerData]);
+
+  const selectedServiceForDetail = useMemo(() => 
+    serviceHistory.find(s => s.id === selectedServiceId) || null
+  , [serviceHistory, selectedServiceId]);
+
+  const userCoupons = useMemo(() => (customerData?.coupons || []).map(c => ({
+    id: c.id,
+    template_id: c.template_id,
+    title: c.coupon_templates?.title || 'คูปอง',
+    description: `ส่วนลดจากร้าน ${store?.name}`,
+    value: c.coupon_templates?.points_required ? `${c.coupon_templates.points_required} pts` : 'FREE',
+    type: 'GIFT',
+    expiry: formatDateThai(c.expires_at),
+    iconName: 'Ticket',
+    bg: 'bg-amber-50',
+    is_used: c.status === 'used'
+  })), [customerData, store]);
+
   const updateProfileMutation = useMutation({
     mutationFn: async (updatedData: any) => {
       if (!customerData?.profile?.id) throw new Error("Missing ID");
@@ -199,18 +241,19 @@ const Index = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
       setIsPetFormOpen(false);
+      setPetToEditId(null);
       toast.success('บันทึกข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ 🐾');
     }
   });
 
   const deletePetMutation = useMutation({
-    mutationFn: async (petId: string) => {
+    mutationFn: async (petId: string | number) => {
       const { error } = await supabase.from('pets').delete().eq('id', petId);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-      setSelectedPetForDetail(null);
+      setSelectedPetId(null);
       toast.success('ลบข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ');
     }
   });
@@ -253,35 +296,9 @@ const Index = () => {
     }
   });
 
-  // Derived data
-  const petsList = customerData?.pets || [];
-  const serviceHistory = (customerData?.history || []).map(h => ({
-    id: h.id,
-    date: formatDateThai(h.created_at),
-    petName: h.pets?.name || 'ไม่ระบุ',
-    service: h.note || 'รับบริการทั่วไป',
-    price: h.price?.toString() || '0',
-    icon: <Scissors className="text-pink-500" />,
-    bg: 'bg-pink-50',
-    description: h.note,
-  }));
-
-  const userCoupons = (customerData?.coupons || []).map(c => ({
-    id: c.id,
-    template_id: c.template_id,
-    title: c.coupon_templates?.title || 'คูปอง',
-    description: `ส่วนลดจากร้าน ${store?.name}`,
-    value: c.coupon_templates?.points_required ? `${c.coupon_templates.points_required} pts` : 'FREE',
-    type: 'GIFT',
-    expiry: formatDateThai(c.expires_at),
-    iconName: 'Ticket',
-    bg: 'bg-amber-50',
-    is_used: c.status === 'used'
-  }));
-
   const handleNavClick = (tabId: string) => {
-    setSelectedPetForDetail(null);
-    setSelectedServiceForDetail(null);
+    setSelectedPetId(null);
+    setSelectedServiceId(null);
     setActiveTab(tabId);
   };
 
@@ -299,7 +316,6 @@ const Index = () => {
     );
   }
 
-  // If we have a profile (either real or mock) but no customer data in DB
   if (lineProfile && !customerData?.profile && !profileLoading) {
     return (
       <Register 
@@ -310,7 +326,6 @@ const Index = () => {
     );
   }
 
-  // Total Fallback (should rarely happen with Mock Mode)
   if (!lineProfile && !profileLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-[#FFF9F0]">
@@ -382,7 +397,7 @@ const Index = () => {
               <HomeQuickActions onCouponsClick={() => setActiveTab('promo')} onAppointmentClick={() => toast.info('เร็วๆ นี้')} />
               <PetList 
                 pets={petsList as any} 
-                onPetClick={(p: any) => { setSelectedPetForDetail(p); setActiveTab('pets'); }} 
+                onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} 
                 onViewAll={() => setActiveTab('pets')} 
               />
               <MyCouponsHomePreview coupons={userCoupons.filter(c => !c.is_used) as any} onViewAll={() => setActiveTab('promo')} />
@@ -394,9 +409,9 @@ const Index = () => {
               {selectedPetForDetail ? (
                 <PetDetailView 
                   pet={selectedPetForDetail as any} 
-                  onBack={() => setSelectedPetForDetail(null)} 
-                  onStartEdit={(p: any) => { setPetToEdit(p); setIsPetFormOpen(true); }} 
-                  onDeletePet={(id) => deletePetMutation.mutate(id.toString())} 
+                  onBack={() => setSelectedPetId(null)} 
+                  onStartEdit={(p: any) => { setPetToEditId(p.id); setIsPetFormOpen(true); }} 
+                  onDeletePet={(id) => deletePetMutation.mutate(id)} 
                   totalServiceCost={0} 
                   onViewServiceHistoryForPet={() => {}} 
                   onEditPreferences={() => setIsPreferenceFormOpen(true)} 
@@ -406,8 +421,8 @@ const Index = () => {
                 <PetManagement 
                   pets={petsList as any} 
                   onBack={() => setActiveTab('home')} 
-                  onViewDetails={(p: any) => setSelectedPetForDetail(p)} 
-                  onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} 
+                  onViewDetails={(p: any) => setSelectedPetId(p.id)} 
+                  onAddPet={() => { setPetToEditId(null); setIsPetFormOpen(true); }} 
                 />
               )}
             </motion.div>
@@ -416,8 +431,8 @@ const Index = () => {
           {activeTab === 'history' && (
             <motion.div key="history-tab">
               {selectedServiceForDetail ? 
-                <ServiceHistoryDetail service={selectedServiceForDetail} onBack={() => setSelectedServiceForDetail(null)} /> : 
-                <ServiceHistory historyData={serviceHistory as any} onServiceClick={(s) => setSelectedServiceForDetail(s)} />
+                <ServiceHistoryDetail service={selectedServiceForDetail as any} onBack={() => setSelectedServiceId(null)} /> : 
+                <ServiceHistory historyData={serviceHistory as any} onServiceClick={(s) => setSelectedServiceId(s.id)} />
               }
             </motion.div>
           )}
@@ -438,7 +453,7 @@ const Index = () => {
                 collectedCoupons={userCoupons.filter(c => !c.is_used) as any} 
                 usedOrExpiredCoupons={userCoupons.filter(c => c.is_used) as any} 
                 onRedeemCoupon={() => {}} 
-                onUseCoupon={(id) => { const c = userCoupons.find(x => x.id === id); setSelectedCouponToUse(c); setIsCouponUseModalOpen(true); }} 
+                onUseCoupon={(id) => { setSelectedCouponToUseId(id); setIsCouponUseModalOpen(true); }} 
                 collectedSpecialPromos={[]} 
                 onCollectSpecialPromotion={() => {}} 
                />

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Scissors, Bath, Sparkles, Calendar, ChevronRight, X } from 'lucide-react';
 
 interface ServiceHistoryItem {
-  id: number;
+  id: string | number;
   date: string;
   petName: string;
   service: string;

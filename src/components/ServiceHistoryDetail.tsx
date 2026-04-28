@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Calendar, Clock, DollarSign, FileText, Image, Info, PawPrint, Droplet, Sparkles, UserCog } from 'lucide-react'; // Added Droplet, Sparkles, UserCog
+import { ArrowLeft, Calendar, Clock, DollarSign, FileText, Image, Info, PawPrint, Droplet, Sparkles, UserCog } from 'lucide-react';
 
 interface ServiceDetail {
-  id: number;
+  id: string | number;
   date: string;
   petName: string;
   service: string;
@@ -14,9 +14,9 @@ interface ServiceDetail {
   bg: string;
   description: string;
   notes?: string;
-  shampooUsed?: string; // New field
-  spaTreatment?: string; // New field
-  groomerNotes?: string; // New field
+  shampooUsed?: string;
+  spaTreatment?: string;
+  groomerNotes?: string;
   beforeAfterImages?: { before: string; after: string; }[];
 }
 
