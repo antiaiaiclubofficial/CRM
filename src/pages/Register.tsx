@@ -105,6 +105,32 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
             </div>
           </div>
 
+          {/* Gender and Age Section (Moved up) */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-500 px-1">เพศ</label>
+              <select 
+                value={formData.gender}
+                onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold appearance-none"
+              >
+                <option value="หญิง">หญิง</option>
+                <option value="ชาย">ชาย</option>
+                <option value="ไม่ระบุ">ไม่ระบุ</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-500 px-1">อายุ</label>
+              <input 
+                type="number" 
+                value={formData.age}
+                onChange={(e) => setFormData({...formData, age: e.target.value})}
+                placeholder="ปี"
+                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+              />
+            </div>
+          </div>
+
           {/* Contact Section */}
           <div className="space-y-4">
             <div className="space-y-1.5">
@@ -130,31 +156,6 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
                 placeholder="example@email.com"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1">เพศ</label>
-              <select 
-                value={formData.gender}
-                onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold appearance-none"
-              >
-                <option value="หญิง">หญิง</option>
-                <option value="ชาย">ชาย</option>
-                <option value="ไม่ระบุ">ไม่ระบุ</option>
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1">อายุ</label>
-              <input 
-                type="number" 
-                value={formData.age}
-                onChange={(e) => setFormData({...formData, age: e.target.value})}
-                placeholder="ปี"
                 className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
               />
             </div>
