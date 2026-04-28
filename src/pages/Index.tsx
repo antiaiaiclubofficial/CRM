@@ -21,7 +21,7 @@ import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
 import CouponUseModal from '@/components/CouponUseModal';
 import HomeQuickActions from '@/components/HomeQuickActions';
 import Register from './Register';
-import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles, PlusCircle, LogIn } from 'lucide-react';
+import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles, PlusCircle, LogIn, FlaskConical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -244,12 +244,12 @@ const Index = () => {
           </div>
         </div>
         <p className="mt-6 font-black text-slate-800 text-lg">กำลังเตรียมข้อมูลสำหรับคุณ... 🐾</p>
-        <p className="text-slate-500 text-sm mt-2">หากระบบไม่พาคุณไปหน้า Login กรุณารอสักครู่ค่ะ</p>
       </div>
     );
   }
 
-  if (lineProfile && !customerData?.profile) {
+  // If we have a profile (either real or mock) but no customer data in DB
+  if (lineProfile && !customerData?.profile && !profileLoading) {
     return (
       <Register 
         lineProfile={lineProfile} 
@@ -259,6 +259,7 @@ const Index = () => {
     );
   }
 
+  // Total Fallback (should rarely happen with Mock Mode)
   if (!lineProfile && !profileLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-[#FFF9F0]">
@@ -266,7 +267,7 @@ const Index = () => {
           <LogIn size={40} className="text-pink-500" />
         </div>
         <h2 className="text-xl font-black text-slate-800 mb-2 uppercase">กรุณาเข้าสู่ระบบผ่าน LINE</h2>
-        <p className="text-sm text-slate-500 font-medium">ระบบกำลังพาคุณไปหน้าเข้าสู่ระบบเพื่อความปลอดภัยและสิทธิประโยชน์ส่วนตัวค่ะ ✨</p>
+        <p className="text-sm text-slate-500 font-medium">เพื่อความปลอดภัย ระบบจำเป็นต้องเข้าสู่ระบบผ่าน LINE ค่ะ</p>
       </div>
     );
   }
@@ -287,6 +288,15 @@ const Index = () => {
 
   return (
     <div className="w-full h-[100dvh] max-w-md mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt'] overflow-hidden border-x border-slate-100/50">
+      {/* Dev Mode Banner */}
+      {lineProfile?.userId === 'U1234567890abcdef' && (
+        <div className="bg-amber-100 py-1 text-center border-b border-amber-200">
+           <p className="text-[10px] font-black text-amber-700 flex items-center justify-center gap-1 uppercase tracking-tighter">
+             <FlaskConical size={12} /> Testing Mode (Local/Web Preview)
+           </p>
+        </div>
+      )}
+
       <header className="px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-[15px] flex justify-between items-center shrink-0 z-[50]">
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-black text-slate-800 truncate">
