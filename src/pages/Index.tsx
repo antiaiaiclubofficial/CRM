@@ -25,26 +25,6 @@ import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
-// Define Interface for the app
-export interface Pet {
-  id: string;
-  name: string;
-  type: string;
-  breed: string;
-  age: string;
-  gender: string;
-  weight: string;
-  medical_condition: string;
-  precautions: string;
-  fur_length: string;
-  color: string;
-  icon: string;
-  image_url: string;
-  card_bg_color: string;
-  custom_preferences: { id: string; label: string; value: string; }[];
-  is_favorite?: boolean;
-}
-
 const formatDateThai = (dateString?: string) => {
   if (!dateString) return '';
   const date = new Date(dateString);
@@ -64,7 +44,7 @@ const Index = () => {
   const [isPetFormOpen, setIsPetFormOpen] = useState(false);
   const [petToEditId, setPetToEditId] = useState<string | number | null>(null);
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
-  const [selectedCouponToUseId, setSelectedCouponToUseId] = useState<string | number | null>(null);
+  const [selectedCouponToUse, setSelectedCouponToUse] = useState<any | null>(null);
   const [isCouponUseModalOpen, setIsCouponUseModalOpen] = useState(false);
   
   const mainScrollRef = useRef<HTMLElement>(null);
@@ -77,6 +57,22 @@ const Index = () => {
       if (error) throw error;
       return data;
     }
+  });
+
+  // Get Available Coupon Templates
+  const { data: couponTemplates } = useQuery({
+    queryKey: ['coupon_templates', store?.id],
+    queryFn: async () => {
+      if (!store?.id) return [];
+      const { data, error } = await supabase
+        .from('coupon_templates')
+        .select('*')
+        .eq('store_id', store.id)
+        .eq('is_active', true);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!store?.id
   });
 
   // Main Customer Data Fetch
@@ -126,9 +122,6 @@ const Index = () => {
         membership: membership,
         pets: (pets || []).map(p => ({
           ...p,
-          medicalCondition: p.medical_condition,
-          precautions: p.precautions,
-          furLength: p.fur_length,
           imageUrl: p.image_url,
           cardBgColor: '#FFD8E4',
           custom_preferences: p.custom_preferences || []
@@ -140,49 +133,44 @@ const Index = () => {
     enabled: !!lineProfile?.userId && !!store?.id,
   });
 
-  // Derived data based on fresh customerData
-  const petsList = useMemo(() => customerData?.pets || [], [customerData]);
-  
-  const selectedPetForDetail = useMemo(() => 
-    petsList.find(p => p.id === selectedPetId) || null
-  , [petsList, selectedPetId]);
-
-  const petToEdit = useMemo(() => 
-    petsList.find(p => p.id === petToEditId) || null
-  , [petsList, petToEditId]);
-
-  const serviceHistory = useMemo(() => (customerData?.history || []).map(h => ({
-    id: h.id,
-    date: formatDateThai(h.created_at),
-    petName: h.pets?.name || 'ไม่ระบุ',
-    service: h.note || 'รับบริการทั่วไป',
-    price: h.price?.toString() || '0',
-    icon: <Scissors className="text-pink-500" />,
-    bg: 'bg-pink-50',
-    description: h.note,
-  })), [customerData]);
-
-  const selectedServiceForDetail = useMemo(() => 
-    serviceHistory.find(s => s.id === selectedServiceId) || null
-  , [serviceHistory, selectedServiceId]);
-
-  const userCoupons = useMemo(() => (customerData?.coupons || []).map(c => ({
-    id: c.id,
-    template_id: c.template_id,
-    title: c.coupon_templates?.title || 'คูปอง',
-    description: `ส่วนลดจากร้าน ${store?.name}`,
-    value: c.coupon_templates?.points_required ? `${c.coupon_templates.points_required} pts` : 'FREE',
-    type: 'GIFT',
-    expiry: formatDateThai(c.expires_at),
-    iconName: 'Ticket',
-    bg: 'bg-amber-50',
-    is_used: c.status === 'used'
-  })), [customerData, store]);
+  // Mutations
+  const registerMutation = useMutation({
+    mutationFn: async (userData: any) => {
+      if (!lineProfile?.userId || !store?.id) throw new Error("Missing data");
+      const { data: newCustomer, error: cError } = await supabase.from('customers').insert([{
+        line_user_id: lineProfile.userId,
+        first_name: userData.firstName,
+        last_name: userData.lastName,
+        display_name: `${userData.firstName} ${userData.lastName}`,
+        email: userData.email || null,
+        phone: userData.phone,
+        gender: userData.gender,
+        age: userData.age,
+        address: userData.address,
+        sub_district: userData.subDistrict,
+        district: userData.district,
+        province: userData.province,
+        postal_code: userData.postalCode,
+        avatar_url: lineProfile.pictureUrl || null
+      }]).select().single();
+      if (cError) throw cError;
+      const { error: mError } = await supabase.from('store_customers').insert([{
+        store_id: store.id,
+        customer_id: newCustomer.id,
+        points: 0,
+        tier: 'bronze'
+      }]);
+      if (mError) throw mError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+      toast.success('ลงทะเบียนเรียบร้อยแล้วค่ะ! ✨');
+    }
+  });
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updatedData: any) => {
       if (!customerData?.profile?.id) throw new Error("Missing ID");
-      
       const { error } = await supabase
         .from('customers')
         .update({
@@ -200,23 +188,18 @@ const Index = () => {
           postal_code: updatedData.postalCode,
         })
         .eq('id', customerData.profile.id);
-
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-      toast.success('บันทึกข้อมูลส่วนตัวเรียบร้อยแล้วค่ะ ✨');
+      toast.success('อัปเดตโปรไฟล์เรียบร้อยแล้วค่ะ ✨');
     }
   });
 
   const petMutation = useMutation({
     mutationFn: async (petData: any) => {
       if (!customerData?.profile?.id) throw new Error("Missing Customer ID");
-
-      const numericWeight = petData.weight && petData.weight.toString().trim() !== '' 
-        ? parseFloat(petData.weight) 
-        : null;
-
+      const numericWeight = petData.weight ? parseFloat(petData.weight) : null;
       const payload = {
         customer_id: customerData.profile.id,
         name: petData.name,
@@ -230,7 +213,6 @@ const Index = () => {
         fur_length: petData.fur_length,
         image_url: petData.image_url
       };
-
       if (petData.id) {
         const { error } = await supabase.from('pets').update(payload).eq('id', petData.id);
         if (error) throw error;
@@ -244,6 +226,18 @@ const Index = () => {
       setIsPetFormOpen(false);
       setPetToEditId(null);
       toast.success('บันทึกข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ 🐾');
+    }
+  });
+
+  const deletePetMutation = useMutation({
+    mutationFn: async (petId: string | number) => {
+      const { error } = await supabase.from('pets').delete().eq('id', petId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+      setSelectedPetId(null);
+      toast.success('ลบข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ');
     }
   });
 
@@ -262,53 +256,48 @@ const Index = () => {
     }
   });
 
-  const deletePetMutation = useMutation({
-    mutationFn: async (petId: string | number) => {
-      const { error } = await supabase.from('pets').delete().eq('id', petId);
+  const redeemCouponMutation = useMutation({
+    mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
+      if (!customerData?.profile?.id || !store?.id) throw new Error("Missing profile or store");
+      if ((customerData?.membership?.points || 0) < pointsCost) throw new Error("Not enough points");
+      const { error: pointError } = await supabase
+        .from('store_customers')
+        .update({ points: customerData.membership.points - pointsCost })
+        .eq('customer_id', customerData.profile.id)
+        .eq('store_id', store.id);
+      if (pointError) throw pointError;
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + (template.expiry_days || 30));
+      const { error: couponError } = await supabase
+        .from('customer_coupons')
+        .insert([{
+          template_id: template.id,
+          customer_id: customerData.profile.id,
+          store_id: store.id,
+          status: 'unused',
+          expires_at: expiryDate.toISOString()
+        }]);
+      if (couponError) throw couponError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+      toast.success('แลกคูปองเรียบร้อยแล้วค่ะ! 🎫');
+    }
+  });
+
+  const confirmUseCouponMutation = useMutation({
+    mutationFn: async (couponId: string | number) => {
+      const { error } = await supabase
+        .from('customer_coupons')
+        .update({ status: 'used', used_at: new Date().toISOString() })
+        .eq('id', couponId);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-      setSelectedPetId(null);
-      toast.success('ลบข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ');
-    }
-  });
-
-  const registerMutation = useMutation({
-    mutationFn: async (userData: any) => {
-      if (!lineProfile?.userId || !store?.id) throw new Error("Missing data");
-      
-      const { data: newCustomer, error: cError } = await supabase.from('customers').insert([{
-        line_user_id: lineProfile.userId,
-        first_name: userData.firstName,
-        last_name: userData.lastName,
-        display_name: `${userData.firstName} ${userData.lastName}`,
-        email: userData.email || null,
-        phone: userData.phone,
-        gender: userData.gender,
-        age: userData.age,
-        address: userData.address,
-        sub_district: userData.subDistrict,
-        district: userData.district,
-        province: userData.province,
-        postal_code: userData.postalCode,
-        avatar_url: lineProfile.pictureUrl || null
-      }]).select().single();
-
-      if (cError) throw cError;
-
-      const { error: mError } = await supabase.from('store_customers').insert([{
-        store_id: store.id,
-        customer_id: newCustomer.id,
-        points: 0,
-        tier: 'bronze'
-      }]);
-
-      if (mError) throw mError;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-      toast.success('ลงทะเบียนเรียบร้อยแล้วค่ะ ยินดีต้อนรับนะคะ ✨');
+      setIsCouponUseModalOpen(false);
+      setSelectedCouponToUse(null);
+      toast.success('ใช้งานคูปองเรียบร้อยแล้วค่ะ ✨');
     }
   });
 
@@ -318,45 +307,52 @@ const Index = () => {
     setActiveTab(tabId);
   };
 
+  const petsList = useMemo(() => customerData?.pets || [], [customerData]);
+  const selectedPetForDetail = useMemo(() => petsList.find(p => p.id === selectedPetId) || null, [petsList, selectedPetId]);
+  const petToEdit = useMemo(() => petsList.find(p => p.id === petToEditId) || null, [petsList, petToEditId]);
+
+  const serviceHistory = useMemo(() => (customerData?.history || []).map(h => ({
+    id: h.id,
+    date: formatDateThai(h.created_at),
+    petName: h.pets?.name || 'ไม่ระบุ',
+    service: h.note || 'รับบริการทั่วไป',
+    price: h.price?.toString() || '0',
+    icon: <Scissors className="text-pink-500" />,
+    bg: 'bg-pink-50',
+    description: h.note,
+  })), [customerData]);
+
+  const selectedServiceForDetail = useMemo(() => serviceHistory.find(s => s.id === selectedServiceId) || null, [serviceHistory, selectedServiceId]);
+
+  const userCoupons = useMemo(() => (customerData?.coupons || []).map(c => ({
+    id: c.id,
+    title: c.coupon_templates?.title || 'คูปอง',
+    description: `หมดอายุ ${formatDateThai(c.expires_at)}`,
+    value: '',
+    type: 'GIFT',
+    expiry: formatDateThai(c.expires_at),
+    iconName: 'Ticket',
+    bg: 'bg-amber-50',
+    color: 'from-amber-400 to-orange-500',
+    is_used: c.status === 'used'
+  })), [customerData]);
+
   if (liffLoading || storeLoading || (lineProfile && profileLoading)) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFF9F0] p-8 text-center">
-        <div className="relative">
-          <PawPrint className="text-pink-400 animate-bounce" size={64} />
-          <div className="absolute -top-2 -right-2">
-            <Sparkles className="text-amber-400 animate-pulse" size={24} />
-          </div>
-        </div>
-        <p className="mt-6 font-black text-slate-800 text-lg">กำลังเตรียมข้อมูลสำหรับคุณ... 🐾</p>
+        <PawPrint className="text-pink-400 animate-bounce" size={64} />
+        <p className="mt-6 font-black text-slate-800 text-lg">กำลังเตรียมข้อมูล... 🐾</p>
       </div>
     );
   }
 
   if (lineProfile && !customerData?.profile && !profileLoading) {
-    return (
-      <Register 
-        lineProfile={lineProfile} 
-        onSuccess={() => {}} 
-        onSave={(data) => registerMutation.mutateAsync(data)} 
-      />
-    );
-  }
-
-  if (!lineProfile && !profileLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-[#FFF9F0]">
-        <div className="w-20 h-20 bg-pink-100 rounded-3xl flex items-center justify-center mb-6 shadow-soft border-2 border-black">
-          <LogIn size={40} className="text-pink-500" />
-        </div>
-        <h2 className="text-xl font-black text-slate-800 mb-2 uppercase">กรุณาเข้าสู่ระบบผ่าน LINE</h2>
-        <p className="text-sm text-slate-500 font-medium">เพื่อความปลอดภัย ระบบจำเป็นต้องเข้าสู่ระบบผ่าน LINE ค่ะ</p>
-      </div>
-    );
+    return <Register lineProfile={lineProfile} onSuccess={() => {}} onSave={(data) => registerMutation.mutateAsync(data)} />;
   }
 
   const ownerProfile = {
-    firstName: customerData?.profile?.first_name || customerData?.profile?.display_name?.split(' ')[0] || '',
-    lastName: customerData?.profile?.last_name || customerData?.profile?.display_name?.split(' ')[1] || '',
+    firstName: customerData?.profile?.first_name || '',
+    lastName: customerData?.profile?.last_name || '',
     gender: customerData?.profile?.gender || 'หญิง',
     age: customerData?.profile?.age || '',
     phone: customerData?.profile?.phone || '',
@@ -370,52 +366,24 @@ const Index = () => {
 
   return (
     <div className="w-full h-[100dvh] max-w-md mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt'] overflow-hidden border-x border-slate-100/50">
-      {/* Dev Mode Banner */}
-      {lineProfile?.userId === 'U1234567890abcdef' && (
-        <div className="bg-amber-100 py-1 text-center border-b border-amber-200">
-           <p className="text-[10px] font-black text-amber-700 flex items-center justify-center gap-1 uppercase tracking-tighter">
-             <FlaskConical size={12} /> Testing Mode (Local/Web Preview)
-           </p>
-        </div>
-      )}
-
       <header className="px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-[15px] flex justify-between items-center shrink-0 z-[50]">
         <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-black text-slate-800 truncate">
-            {store?.name || 'Pet Care App'}
-          </h1>
+          <h1 className="text-xl font-black text-slate-800 truncate">{store?.name || 'Pet Care App'}</h1>
           <p className="text-slate-500 text-xs font-medium">สวัสดีค่ะ คุณ{customerData?.profile?.display_name} ✨</p>
         </div>
-        <div className="flex items-center gap-2.5 ml-4">
-          <motion.div 
-            whileTap={{ scale: 0.9 }} 
-            onClick={() => setIsProfileEditing(true)} 
-            className="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden bg-pink-100 cursor-pointer"
-          >
-            {(customerData?.profile?.avatar_url || lineProfile?.pictureUrl) && (
-              <img src={customerData?.profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
-            )}
-          </motion.div>
-        </div>
+        <motion.div whileTap={{ scale: 0.9 }} onClick={() => setIsProfileEditing(true)} className="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden bg-pink-100 cursor-pointer">
+          <img src={customerData?.profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
+        </motion.div>
       </header>
 
       <main ref={mainScrollRef} className="px-6 flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))] overflow-y-scroll no-scrollbar touch-pan-y">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div key="home" className="space-y-6">
-              <MembershipCard 
-                totalAccumulatedPoints={customerData?.membership?.points || 0} 
-                redeemablePoints={customerData?.membership?.points || 0} 
-                ownerProfile={ownerProfile as any} 
-                onShowQR={() => setIsQRCodeOpen(true)} 
-              />
+              <MembershipCard totalAccumulatedPoints={customerData?.membership?.points || 0} redeemablePoints={customerData?.membership?.points || 0} ownerProfile={ownerProfile as any} onShowQR={() => setIsQRCodeOpen(true)} />
               <UpcomingAppointments />
               <HomeQuickActions onCouponsClick={() => setActiveTab('promo')} onAppointmentClick={() => toast.info('เร็วๆ นี้')} />
-              <PetList 
-                pets={petsList as any} 
-                onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} 
-                onViewAll={() => setActiveTab('pets')} 
-              />
+              <PetList pets={petsList as any} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
               <MyCouponsHomePreview coupons={userCoupons.filter(c => !c.is_used) as any} onViewAll={() => setActiveTab('promo')} />
             </motion.div>
           )}
@@ -423,42 +391,22 @@ const Index = () => {
           {activeTab === 'pets' && (
             <motion.div key="pets-tab">
               {selectedPetForDetail ? (
-                <PetDetailView 
-                  pet={selectedPetForDetail as any} 
-                  onBack={() => setSelectedPetId(null)} 
-                  onStartEdit={(p: any) => { setPetToEditId(p.id); setIsPetFormOpen(true); }} 
-                  onDeletePet={(id) => deletePetMutation.mutate(id)} 
-                  totalServiceCost={0} 
-                  onViewServiceHistoryForPet={() => {}} 
-                  onEditPreferences={() => setIsPreferenceFormOpen(true)} 
-                  onToggleFavorite={() => {}} 
-                />
+                <PetDetailView pet={selectedPetForDetail as any} onBack={() => setSelectedPetId(null)} onStartEdit={(p: any) => { setPetToEditId(p.id); setIsPetFormOpen(true); }} onDeletePet={(id) => deletePetMutation.mutate(id)} totalServiceCost={0} onViewServiceHistoryForPet={() => {}} onEditPreferences={() => setIsPreferenceFormOpen(true)} onToggleFavorite={() => {}} />
               ) : (
-                <PetManagement 
-                  pets={petsList as any} 
-                  onBack={() => setActiveTab('home')} 
-                  onViewDetails={(p: any) => setSelectedPetId(p.id)} 
-                  onAddPet={() => { setPetToEditId(null); setIsPetFormOpen(true); }} 
-                />
+                <PetManagement pets={petsList as any} onBack={() => setActiveTab('home')} onViewDetails={(p: any) => setSelectedPetId(p.id)} onAddPet={() => { setPetToEditId(null); setIsPetFormOpen(true); }} />
               )}
             </motion.div>
           )}
 
           {activeTab === 'history' && (
             <motion.div key="history-tab">
-              {selectedServiceForDetail ? 
-                <ServiceHistoryDetail service={selectedServiceForDetail as any} onBack={() => setSelectedServiceId(null)} /> : 
-                <ServiceHistory historyData={serviceHistory as any} onServiceClick={(s) => setSelectedServiceId(s.id)} />
-              }
+              {selectedServiceForDetail ? <ServiceHistoryDetail service={selectedServiceForDetail as any} onBack={() => setSelectedServiceId(null)} /> : <ServiceHistory historyData={serviceHistory as any} onServiceClick={(s) => setSelectedServiceId(s.id)} />}
             </motion.div>
           )}
           
           {activeTab === 'level' && (
             <motion.div key="level-tab">
-              <MembershipLevels 
-                totalAccumulatedPoints={customerData?.membership?.points || 0} 
-                redeemablePoints={customerData?.membership?.points || 0} 
-              />
+              <MembershipLevels totalAccumulatedPoints={customerData?.membership?.points || 0} redeemablePoints={customerData?.membership?.points || 0} />
             </motion.div>
           )}
 
@@ -468,10 +416,10 @@ const Index = () => {
                 userPoints={customerData?.membership?.points || 0} 
                 collectedCoupons={userCoupons.filter(c => !c.is_used) as any} 
                 usedOrExpiredCoupons={userCoupons.filter(c => c.is_used) as any} 
-                onRedeemCoupon={() => {}} 
-                onUseCoupon={(id) => { setSelectedCouponToUseId(id); setIsCouponUseModalOpen(true); }} 
+                onRedeemCoupon={(c, cost) => redeemCouponMutation.mutate({ template: c, pointsCost: cost })} 
+                onUseCoupon={(id) => { const c = userCoupons.find(x => x.id === id); setSelectedCouponToUse(c); setIsCouponUseModalOpen(true); }} 
                 collectedSpecialPromos={[]} 
-                onCollectSpecialPromotion={() => {}} 
+                onCollectSpecialPromotion={(p) => redeemCouponMutation.mutate({ template: p, pointsCost: 0 })} 
                />
             </motion.div>
           )}
@@ -480,20 +428,10 @@ const Index = () => {
 
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.phone || ''} />
       <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={petToEdit as any} />
-      <UserProfileEdit 
-        isOpen={isProfileEditing} 
-        onClose={() => setIsProfileEditing(false)} 
-        profile={ownerProfile} 
-        onSave={(data) => updateProfileMutation.mutate(data)} 
-      />
-      <PetPreferenceForm 
-        isOpen={isPreferenceFormOpen} 
-        onClose={() => setIsPreferenceFormOpen(false)} 
-        onSave={(prefs) => savePreferencesMutation.mutate(prefs)} 
-        initialData={selectedPetForDetail?.custom_preferences} 
-        petName={selectedPetForDetail?.name || ''} 
-      />
-      
+      <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={ownerProfile as any} onSave={(data) => updateProfileMutation.mutate(data)} />
+      <PetPreferenceForm isOpen={isPreferenceFormOpen} onClose={() => setIsPreferenceFormOpen(false)} onSave={(prefs) => savePreferencesMutation.mutate(prefs)} initialData={selectedPetForDetail?.custom_preferences} petName={selectedPetForDetail?.name || ''} />
+      <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={(id) => confirmUseCouponMutation.mutate(id)} />
+
       <nav className="fixed bottom-[10px] left-6 right-6 max-w-[calc(theme(maxWidth.md)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-[40] border border-white/60">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
         <NavButton active={activeTab === 'level'} icon={<Award size={22} />} onClick={() => handleNavClick('level')} />
