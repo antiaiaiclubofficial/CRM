@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Phone, MapPin, Mail, Calendar, Check, ArrowRight, PawPrint } from 'lucide-react';
+import { User, Phone, MapPin, Mail, Calendar, Check, ArrowRight, PawPrint, Home } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface RegisterProps {
@@ -18,12 +18,16 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
     gender: 'หญิง',
     age: '',
     phone: lineProfile?.phone || '',
-    address: '',
+    email: lineProfile?.email || '',
+    // Split address fields
+    houseNo: '',
+    moo: '',
+    soi: '',
+    road: '',
     subDistrict: '',
     district: '',
     province: '',
     postalCode: '',
-    email: lineProfile?.email || '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -36,7 +40,20 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
     
     setIsSubmitting(true);
     try {
-      await onSave(formData);
+      // Concatenate split address fields into one address string
+      const fullAddress = [
+        formData.houseNo ? `เลขที่ ${formData.houseNo}` : '',
+        formData.moo ? `หมู่ ${formData.moo}` : '',
+        formData.soi ? `ซอย ${formData.soi}` : '',
+        formData.road ? `ถนน ${formData.road}` : ''
+      ].filter(Boolean).join(' ');
+
+      const dataToSave = {
+        ...formData,
+        address: fullAddress
+      };
+
+      await onSave(dataToSave);
       onSuccess();
     } catch (error) {
       console.error('Registration Error:', error);
@@ -62,6 +79,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white p-8 rounded-[3rem] border-2 border-black shadow-soft space-y-5">
+          {/* Name Section */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-black text-slate-500 px-1">ชื่อ</label>
@@ -82,6 +100,36 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
                 value={formData.lastName}
                 onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                 placeholder="นามสกุล"
+                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+              />
+            </div>
+          </div>
+
+          {/* Contact Section */}
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1">
+                <Phone size={12} className="text-pink-500" /> เบอร์โทรศัพท์
+              </label>
+              <input 
+                required
+                type="tel" 
+                value={formData.phone}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                placeholder="08X-XXX-XXXX"
+                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1">
+                <Mail size={12} className="text-pink-500" /> อีเมล (ถ้ามี)
+              </label>
+              <input 
+                type="email" 
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                placeholder="example@email.com"
                 className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
               />
             </div>
@@ -112,76 +160,102 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
             </div>
           </div>
 
-          <div className="space-y-1.5">
+          {/* Split Address Section */}
+          <div className="space-y-4 pt-2 border-t border-slate-50">
             <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1">
-              <Phone size={12} className="text-pink-500" /> เบอร์โทรศัพท์
+              <MapPin size={12} className="text-pink-500" /> ข้อมูลที่อยู่
             </label>
-            <input 
-              required
-              type="tel" 
-              value={formData.phone}
-              onChange={(e) => setFormData({...formData, phone: e.target.value})}
-              placeholder="08X-XXX-XXXX"
-              className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
-            />
-          </div>
-
-          <div className="space-y-1.5 pt-2 border-t border-slate-50">
-            <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1">
-              <MapPin size={12} className="text-pink-500" /> ที่อยู่ (บ้านเลขที่ / ถนน)
-            </label>
-            <input 
-              type="text" 
-              value={formData.address}
-              onChange={(e) => setFormData({...formData, address: e.target.value})}
-              placeholder="เลขที่บ้าน, หมู่, ซอย, ถนน"
-              className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1">แขวง / ตำบล</label>
-              <input 
-                type="text" 
-                value={formData.subDistrict}
-                onChange={(e) => setFormData({...formData, subDistrict: e.target.value})}
-                placeholder="ตำบล"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
-              />
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 px-1">เลขที่บ้าน</label>
+                <input 
+                  type="text" 
+                  value={formData.houseNo}
+                  onChange={(e) => setFormData({...formData, houseNo: e.target.value})}
+                  placeholder="เช่น 123/4"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 px-1">หมู่ที่</label>
+                <input 
+                  type="text" 
+                  value={formData.moo}
+                  onChange={(e) => setFormData({...formData, moo: e.target.value})}
+                  placeholder="เช่น 5"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1">เขต / อำเภอ</label>
-              <input 
-                type="text" 
-                value={formData.district}
-                onChange={(e) => setFormData({...formData, district: e.target.value})}
-                placeholder="อำเภอ"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1">จังหวัด</label>
-              <input 
-                type="text" 
-                value={formData.province}
-                onChange={(e) => setFormData({...formData, province: e.target.value})}
-                placeholder="จังหวัด"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 px-1">ซอย</label>
+                <input 
+                  type="text" 
+                  value={formData.soi}
+                  onChange={(e) => setFormData({...formData, soi: e.target.value})}
+                  placeholder="เช่น สุขุมวิท 1"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 px-1">ถนน</label>
+                <input 
+                  type="text" 
+                  value={formData.road}
+                  onChange={(e) => setFormData({...formData, road: e.target.value})}
+                  placeholder="เช่น รามคำแหง"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1">รหัสไปรษณีย์</label>
-              <input 
-                type="text" 
-                value={formData.postalCode}
-                onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
-                placeholder="10XXX"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
-              />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 px-1">แขวง / ตำบล</label>
+                <input 
+                  type="text" 
+                  value={formData.subDistrict}
+                  onChange={(e) => setFormData({...formData, subDistrict: e.target.value})}
+                  placeholder="ตำบล"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 px-1">เขต / อำเภอ</label>
+                <input 
+                  type="text" 
+                  value={formData.district}
+                  onChange={(e) => setFormData({...formData, district: e.target.value})}
+                  placeholder="อำเภอ"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 px-1">จังหวัด</label>
+                <input 
+                  type="text" 
+                  value={formData.province}
+                  onChange={(e) => setFormData({...formData, province: e.target.value})}
+                  placeholder="จังหวัด"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 px-1">รหัสไปรษณีย์</label>
+                <input 
+                  type="text" 
+                  value={formData.postalCode}
+                  onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
+                  placeholder="10XXX"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                />
+              </div>
             </div>
           </div>
 
