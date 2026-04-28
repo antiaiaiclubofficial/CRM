@@ -49,7 +49,7 @@ const Index = () => {
   
   const mainScrollRef = useRef<HTMLElement>(null);
 
-  // Get Store Info - Optimized to prioritize the specific store ID
+  // Get Store Info
   const { data: store, isLoading: storeLoading } = useQuery({
     queryKey: ['current_store'],
     queryFn: async () => {
@@ -61,7 +61,6 @@ const Index = () => {
         .maybeSingle();
         
       if (error || !data) {
-        // Fallback to first store if target not found
         const { data: fallback } = await supabase.from('stores').select('*').limit(1).maybeSingle();
         return fallback;
       }
@@ -143,7 +142,98 @@ const Index = () => {
     enabled: !!lineProfile?.userId && !!store?.id,
   });
 
-  // Mutations
+  // Mutation for Redeeming Coupon (Optimized with instant UI feedback)
+  const redeemCouponMutation = useMutation({
+    mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
+      if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
+      
+      // Update points
+      const { error: pointError } = await supabase
+        .from('store_customers')
+        .update({ points: customerData.membership.points - pointsCost })
+        .eq('customer_id', customerData.profile.id)
+        .eq('store_id', store.id);
+      if (pointError) throw pointError;
+
+      // Add coupon
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + (template.expiry_days || 30));
+      const { error: couponError } = await supabase
+        .from('customer_coupons')
+        .insert([{
+          template_id: template.id,
+          customer_id: customerData.profile.id,
+          store_id: store.id,
+          status: 'unused',
+          expires_at: expiryDate.toISOString()
+        }]);
+      if (couponError) throw couponError;
+    },
+    onMutate: async ({ pointsCost, template }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['customer_profile'] });
+      // Snapshot previous value
+      const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
+      // Optimistically update to the new value
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => ({
+        ...old,
+        membership: { ...old.membership, points: old.membership.points - pointsCost },
+        coupons: [...old.coupons, { 
+          id: 'temp-' + Date.now(), 
+          template_id: template.id, 
+          status: 'unused', 
+          coupon_templates: template 
+        }]
+      }));
+      return { previousData };
+    },
+    onSuccess: () => {
+      toast.success('แลกคูปองเรียบร้อยแล้วค่ะ! 🎫');
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context?.previousData);
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    }
+  });
+
+  // Mutation for Using Coupon (Optimized with instant UI feedback)
+  const confirmUseCouponMutation = useMutation({
+    mutationFn: async (couponId: string | number) => {
+      const { error } = await supabase
+        .from('customer_coupons')
+        .update({ status: 'used', used_at: new Date().toISOString() })
+        .eq('id', couponId);
+      if (error) throw error;
+    },
+    onMutate: async (couponId) => {
+      await queryClient.cancelQueries({ queryKey: ['customer_profile'] });
+      const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
+      
+      // Mark as used in the local cache immediately
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => ({
+        ...old,
+        coupons: old.coupons.map((c: any) => c.id === couponId ? { ...c, status: 'used', used_at: new Date().toISOString() } : c)
+      }));
+      
+      setIsCouponUseModalOpen(false);
+      setSelectedCouponToUse(null);
+      return { previousData };
+    },
+    onSuccess: () => {
+      toast.success('ใช้งานคูปองเรียบร้อยแล้วค่ะ ✨');
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context?.previousData);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    }
+  });
+
+  // Other Mutations (Profile, Pet, etc.)
   const registerMutation = useMutation({
     mutationFn: async (userData: any) => {
       if (!lineProfile?.userId || !store?.id) throw new Error("Missing data");
@@ -263,51 +353,6 @@ const Index = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
       toast.success('บันทึกความชอบส่วนตัวเรียบร้อยแล้วค่ะ 🦴');
-    }
-  });
-
-  const redeemCouponMutation = useMutation({
-    mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
-      if (!customerData?.profile?.id || !store?.id) throw new Error("Missing profile or store");
-      if ((customerData?.membership?.points || 0) < pointsCost) throw new Error("Not enough points");
-      const { error: pointError } = await supabase
-        .from('store_customers')
-        .update({ points: customerData.membership.points - pointsCost })
-        .eq('customer_id', customerData.profile.id)
-        .eq('store_id', store.id);
-      if (pointError) throw pointError;
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + (template.expiry_days || 30));
-      const { error: couponError } = await supabase
-        .from('customer_coupons')
-        .insert([{
-          template_id: template.id,
-          customer_id: customerData.profile.id,
-          store_id: store.id,
-          status: 'unused',
-          expires_at: expiryDate.toISOString()
-        }]);
-      if (couponError) throw couponError;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-      toast.success('แลกคูปองเรียบร้อยแล้วค่ะ! 🎫');
-    }
-  });
-
-  const confirmUseCouponMutation = useMutation({
-    mutationFn: async (couponId: string | number) => {
-      const { error } = await supabase
-        .from('customer_coupons')
-        .update({ status: 'used', used_at: new Date().toISOString() })
-        .eq('id', couponId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-      setIsCouponUseModalOpen(false);
-      setSelectedCouponToUse(null);
-      toast.success('ใช้งานคูปองเรียบร้อยแล้วค่ะ ✨');
     }
   });
 
