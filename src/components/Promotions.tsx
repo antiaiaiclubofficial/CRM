@@ -2,9 +2,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Ticket, Gift, Scissors, Sparkles, ShowerHead, Leaf, Hand, Tag, Heart, PawPrint, Crown, History, Award, LucideIcon } from 'lucide-react';
+import { Ticket, Gift, Scissors, Sparkles, ShowerHead, Leaf, Hand, Tag, Heart, PawPrint, Crown, History, Award, LucideIcon, Zap } from 'lucide-react';
 
-// Define the Coupon interface
 interface Coupon {
   id: string | number;
   title: string;
@@ -16,10 +15,7 @@ interface Coupon {
   color: string;
   bg: string;
   pointsRequired: number;
-}
-
-interface UsedCoupon extends Coupon {
-  usedDate?: string;
+  is_deal?: boolean;
 }
 
 interface PromotionsProps {
@@ -27,12 +23,14 @@ interface PromotionsProps {
   collectedCoupons: any[];
   usedOrExpiredCoupons: any[];
   redeemableTemplates: any[];
+  dealTemplates: any[];
   onRedeemCoupon: (template: any, pointsCost: number) => void;
-  onUseCoupon: (couponId: string | number) => void;
+  onBuyDeal: (template: any, pointsCost: number) => void;
+  onUseCoupon: (coupon: any) => void;
 }
 
 const iconMap: Record<string, LucideIcon> = {
-  Scissors, Sparkles, Gift, Ticket, ShowerHead, Leaf, Hand, Tag, Heart, History, Crown, PawPrint, Award
+  Scissors, Sparkles, Gift, Ticket, ShowerHead, Leaf, Hand, Tag, Heart, History, Crown, PawPrint, Award, Zap
 };
 
 const getIconComponent = (iconName: string, size: number, className?: string) => {
@@ -45,16 +43,74 @@ const Promotions = ({
   collectedCoupons, 
   usedOrExpiredCoupons, 
   redeemableTemplates,
+  dealTemplates,
   onRedeemCoupon, 
+  onBuyDeal,
   onUseCoupon
 }: PromotionsProps) => {
 
-  // Special promotions can be mapped from templates with 0 points or specific tags
   const specialPromos = redeemableTemplates.filter(t => t.pointsRequired === 0);
   const regularRedeemables = redeemableTemplates.filter(t => t.pointsRequired > 0);
 
   return (
     <div className="space-y-8 pb-20">
+      {/* Exclusive Deals Section */}
+      {dealTemplates.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-4 px-1">
+            <Zap size={18} className="text-amber-500 fill-amber-500" />
+            <h2 className="text-xl font-bold text-slate-800 uppercase tracking-tight">ดีลสุดพิเศษสำหรับคุณ</h2>
+          </div>
+          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 px-1">
+            {dealTemplates.map((deal) => {
+              const isCollected = collectedCoupons.some(c => c.template_id === deal.id && c.is_deal);
+              return (
+                <motion.div
+                  key={deal.id}
+                  whileTap={{ scale: isCollected ? 1 : 0.98 }}
+                  className={`relative flex-shrink-0 w-[280px] h-40 ${deal.bg || 'bg-blue-50'} rounded-[2.5rem] p-6 overflow-hidden border-2 border-black shadow-soft ${isCollected ? 'grayscale opacity-40 pointer-events-none' : ''}`}
+                >
+                  <Zap className="absolute -right-6 -bottom-6 w-32 h-32 text-black/5 rotate-12" />
+                  <div className="relative z-10 flex flex-col justify-between h-full">
+                    <div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-[9px] font-black text-white bg-amber-500 border border-black px-2 py-0.5 rounded-full mb-2 inline-block">
+                          HOT DEAL
+                        </span>
+                        <div className="flex items-center gap-1 bg-white/80 px-2 py-0.5 rounded-full border border-black/10">
+                          <Crown size={10} className="text-amber-500" />
+                          <span className="text-[10px] font-black text-slate-800">{deal.pointsRequired} pts</span>
+                        </div>
+                      </div>
+                      <h3 className="text-lg font-black text-slate-800 leading-tight">
+                        {deal.title}
+                      </h3>
+                      <p className="text-[10px] font-bold text-slate-600 opacity-80 mt-1 line-clamp-1">{deal.description}</p>
+                    </div>
+                    <div className="flex justify-between items-end">
+                      <span className="text-[9px] font-bold text-slate-500">Exp: {deal.expiry}</span>
+                      <button 
+                        onClick={() => onBuyDeal(deal, deal.pointsRequired)}
+                        disabled={isCollected || userPoints < deal.pointsRequired}
+                        className={`text-[10px] font-black px-5 py-2 rounded-xl transition-all shadow-sm ${
+                          isCollected
+                            ? 'bg-slate-200 text-slate-500 border border-slate-300'
+                            : userPoints < deal.pointsRequired
+                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                            : 'bg-white text-slate-800 border-2 border-black active:translate-y-0.5 active:shadow-none'
+                        }`}
+                      >
+                        {isCollected ? 'ซื้อแล้ว' : userPoints < deal.pointsRequired ? 'คะแนนไม่พอ' : 'ซื้อดีลนี้'}
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Special Promotions Section */}
       {specialPromos.length > 0 && (
         <div>
@@ -64,7 +120,7 @@ const Promotions = ({
           </div>
           <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 px-1">
             {specialPromos.map((promo) => {
-              const isCollected = collectedCoupons.some(c => c.template_id === promo.id);
+              const isCollected = collectedCoupons.some(c => c.template_id === promo.id && !c.is_deal);
               return (
                 <motion.div
                   key={promo.id}
@@ -75,7 +131,7 @@ const Promotions = ({
                   <div className="relative z-10 flex flex-col justify-between h-full">
                     <div>
                       <span className={`text-[9px] font-black text-slate-800 bg-white border border-black px-2 py-0.5 rounded-full mb-2 inline-block`}>
-                        HOT
+                        PROMO
                       </span>
                       <h3 className={`text-lg font-black text-slate-800 flex items-center gap-1`}>
                         {promo.title}
@@ -114,7 +170,7 @@ const Promotions = ({
           {regularRedeemables.length > 0 ? (
             regularRedeemables.map((coupon) => {
               const canRedeem = userPoints >= coupon.pointsRequired;
-              const isAlreadyCollected = collectedCoupons.some(c => c.template_id === coupon.id);
+              const isAlreadyCollected = collectedCoupons.some(c => c.template_id === coupon.id && !c.is_deal);
               const isDisabled = !canRedeem || isAlreadyCollected;
 
               return (
@@ -171,17 +227,22 @@ const Promotions = ({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white p-4 rounded-[2rem] border-2 border-black shadow-soft flex items-center gap-4"
+                className={`bg-white p-4 rounded-[2rem] border-2 border-black shadow-soft flex items-center gap-4 ${coupon.is_deal ? 'ring-2 ring-amber-400 ring-offset-2' : ''}`}
               >
                 <div className={`w-10 h-10 ${coupon.bg || 'bg-pink-50'} border-2 border-black rounded-xl flex items-center justify-center text-xl shadow-sm`}>
-                  {getIconComponent(coupon.iconName, 20)}
+                  {getIconComponent(coupon.iconName || (coupon.is_deal ? 'Zap' : 'Ticket'), 20)}
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-black text-slate-800 text-sm">{coupon.title}</h4>
+                  <div className="flex items-center gap-1.5">
+                    <h4 className="font-black text-slate-800 text-sm">{coupon.title}</h4>
+                    {coupon.is_deal && (
+                      <span className="bg-amber-400 text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase">DEAL</span>
+                    )}
+                  </div>
                   <p className="text-[10px] font-bold text-slate-500">{coupon.description}</p>
                 </div>
                 <button
-                  onClick={() => onUseCoupon(coupon.id)}
+                  onClick={() => onUseCoupon(coupon)}
                   className="bg-pink-100 text-pink-700 text-[10px] font-black px-4 py-2 rounded-xl border-2 border-black shadow-sm active:translate-y-0.5 active:shadow-none transition-all"
                 >
                   ใช้เลย
