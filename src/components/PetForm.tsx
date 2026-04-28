@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, HeartPulse, Calendar, Info, Check, Feather, Camera } from 'lucide-react';
+import { X, HeartPulse, Calendar, Info, Check, Feather, Camera, AlertCircle } from 'lucide-react';
 import AnalogScaleIcon from './AnalogScaleIcon';
 import GenderIcon from './GenderIcon';
 
@@ -163,6 +163,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                   type="text" 
                   value={formData.breed}
                   onChange={(e) => setFormData({...formData, breed: e.target.value})}
+                  placeholder="เช่น ชิวาวา, โกลเด้น"
                   className="w-full p-4 bg-slate-50 rounded-2xl outline-none"
                 />
               </div>
@@ -182,6 +183,35 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 text-center block">นน. (kg)</label>
                   <input type="number" value={formData.weight} onChange={(e) => setFormData({...formData, weight: e.target.value})} className="w-full p-4 bg-slate-50 rounded-2xl text-center outline-none" />
+                </div>
+              </div>
+
+              {/* Added Medical Condition and Precautions */}
+              <div className="space-y-4 pt-2 border-t border-slate-50">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500 flex items-center gap-1">
+                    <HeartPulse size={14} className="text-pink-500" /> โรกประจำตัว
+                  </label>
+                  <input 
+                    type="text" 
+                    value={formData.medical_condition}
+                    onChange={(e) => setFormData({...formData, medical_condition: e.target.value})}
+                    placeholder="ระบุโรคประจำตัว (ถ้ามี)"
+                    className="w-full p-4 bg-slate-50 rounded-2xl outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500 flex items-center gap-1">
+                    <AlertCircle size={14} className="text-amber-500" /> ข้อควรระวัง / แพ้อาหาร
+                  </label>
+                  <input 
+                    type="text" 
+                    value={formData.precautions}
+                    onChange={(e) => setFormData({...formData, precautions: e.target.value})}
+                    placeholder="เช่น แพ้แชมพู, ห้ามตัดขนอุ้งเท้า"
+                    className="w-full p-4 bg-slate-50 rounded-2xl outline-none"
+                  />
                 </div>
               </div>
 
