@@ -41,6 +41,7 @@ export interface Pet {
   icon: string;
   image_url: string;
   card_bg_color: string;
+  custom_preferences: { id: string; label: string; value: string; }[];
   is_favorite?: boolean;
 }
 
@@ -57,7 +58,6 @@ const Index = () => {
   const [isProfileEditing, setIsProfileEditing] = useState(false);
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
   
-  // Update state types to accept both string and number for flexibility
   const [selectedPetId, setSelectedPetId] = useState<string | number | null>(null);
   const [selectedServiceId, setSelectedServiceId] = useState<string | number | null>(null);
   
@@ -130,7 +130,8 @@ const Index = () => {
           precautions: p.precautions,
           furLength: p.fur_length,
           imageUrl: p.image_url,
-          cardBgColor: '#FFD8E4'
+          cardBgColor: '#FFD8E4',
+          custom_preferences: p.custom_preferences || []
         })),
         coupons: coupons || [],
         history: history || []
@@ -243,6 +244,21 @@ const Index = () => {
       setIsPetFormOpen(false);
       setPetToEditId(null);
       toast.success('บันทึกข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ 🐾');
+    }
+  });
+
+  const savePreferencesMutation = useMutation({
+    mutationFn: async (preferences: any[]) => {
+      if (!selectedPetId) throw new Error("No pet selected");
+      const { error } = await supabase
+        .from('pets')
+        .update({ custom_preferences: preferences })
+        .eq('id', selectedPetId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+      toast.success('บันทึกความชอบส่วนตัวเรียบร้อยแล้วค่ะ 🦴');
     }
   });
 
@@ -469,6 +485,13 @@ const Index = () => {
         onClose={() => setIsProfileEditing(false)} 
         profile={ownerProfile} 
         onSave={(data) => updateProfileMutation.mutate(data)} 
+      />
+      <PetPreferenceForm 
+        isOpen={isPreferenceFormOpen} 
+        onClose={() => setIsPreferenceFormOpen(false)} 
+        onSave={(prefs) => savePreferencesMutation.mutate(prefs)} 
+        initialData={selectedPetForDetail?.custom_preferences} 
+        petName={selectedPetForDetail?.name || ''} 
       />
       
       <nav className="fixed bottom-[10px] left-6 right-6 max-w-[calc(theme(maxWidth.md)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-[40] border border-white/60">
