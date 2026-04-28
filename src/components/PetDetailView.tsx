@@ -14,14 +14,14 @@ interface Pet {
   age: string;
   gender: string;
   weight: string;
-  medicalCondition: string;
+  medical_condition: string;
   precautions: string;
   color: string;
   icon: string;
-  furLength?: string;
-  customPreferences?: { id: string; label: string; value: string; }[];
-  imageUrl: string;
-  isFavorite?: boolean;
+  fur_length?: string;
+  custom_preferences?: { id: string; label: string; value: string; }[];
+  image_url: string;
+  is_favorite?: boolean;
 }
 
 interface PetDetailViewProps {
@@ -38,7 +38,7 @@ interface PetDetailViewProps {
 const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreferences, onToggleFavorite }: PetDetailViewProps) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const hasPreferences = pet.customPreferences && pet.customPreferences.length > 0;
+  const hasPreferences = pet.custom_preferences && pet.custom_preferences.length > 0;
 
   return (
     <motion.div
@@ -70,7 +70,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
 
       <div className="relative w-full h-64 flex items-center justify-center pt-16 pb-8 z-20">
         <div className="relative w-48 h-48 rounded-full border-[6px] border-amber-400 flex items-center justify-center overflow-hidden shadow-lg">
-          <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+          <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
         </div>
       </div>
 
@@ -86,9 +86,9 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           <motion.button 
             whileTap={{ scale: 0.9 }}
             onClick={onToggleFavorite}
-            className={`p-2 rounded-full transition-colors border-2 shrink-0 ${pet.isFavorite ? 'bg-pink-100 text-pink-500 border-pink-200' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
+            className={`p-2 rounded-full transition-colors border-2 shrink-0 ${pet.is_favorite ? 'bg-pink-100 text-pink-500 border-pink-200' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
           >
-            <Heart size={20} fill={pet.isFavorite ? "currentColor" : "none"} />
+            <Heart size={20} fill={pet.is_favorite ? "currentColor" : "none"} />
           </motion.button>
         </div>
 
@@ -123,11 +123,11 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           <div className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 space-y-4">
             <div className="flex items-baseline gap-1">
               <span className="font-bold text-slate-400 text-xs tracking-tight shrink-0">ความยาวขน :</span>
-              <span className="font-black text-slate-800 text-sm tracking-tight">{pet.furLength || '-'}</span>
+              <span className="font-black text-slate-800 text-sm tracking-tight">{pet.fur_length || '-'}</span>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="font-bold text-slate-400 text-xs tracking-tight shrink-0">โรคประจำตัว :</span>
-              <span className="font-black text-slate-800 text-sm tracking-tight">{pet.medicalCondition || '-'}</span>
+              <span className="font-black text-slate-800 text-sm tracking-tight">{pet.medical_condition || '-'}</span>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="font-bold text-slate-400 text-xs tracking-tight shrink-0">ข้อควรระวัง :</span>
@@ -158,7 +158,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
 
             <div className="space-y-4">
               {hasPreferences ? (
-                pet.customPreferences?.map((pref, index) => (
+                pet.custom_preferences?.map((pref: any, index: number) => (
                   <div key={index} className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
                     <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-500 text-xl shadow-inner">
                       <Tag size={20} /> 
