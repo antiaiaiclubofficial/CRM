@@ -122,7 +122,13 @@ const Index = () => {
       return {
         profile: customer,
         membership: membership,
-        pets: pets || [],
+        pets: (pets || []).map(p => ({
+          ...p,
+          medicalCondition: p.medical_condition,
+          precautions: p.precautions,
+          imageUrl: p.image_url,
+          cardBgColor: '#FFD8E4'
+        })),
         coupons: coupons || [],
         history: history || []
       };
@@ -157,10 +163,49 @@ const Index = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
       toast.success('บันทึกข้อมูลส่วนตัวเรียบร้อยแล้วค่ะ ✨');
+    }
+  });
+
+  const petMutation = useMutation({
+    mutationFn: async (petData: any) => {
+      if (!customerData?.profile?.id) throw new Error("Missing Customer ID");
+
+      const payload = {
+        customer_id: customerData.profile.id,
+        name: petData.name,
+        type: petData.type,
+        breed: petData.breed,
+        age: petData.age,
+        gender: petData.gender,
+        weight: petData.weight,
+        medical_condition: petData.medical_condition,
+        precautions: petData.precautions,
+        image_url: petData.image_url
+      };
+
+      if (petData.id) {
+        const { error } = await supabase.from('pets').update(payload).eq('id', petData.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('pets').insert([payload]);
+        if (error) throw error;
+      }
     },
-    onError: (error) => {
-      console.error('Update Profile Error:', error);
-      toast.error('เกิดข้อผิดพลาดในการบันทึกข้อมูลค่ะ');
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+      toast.success('บันทึกข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ 🐾');
+    }
+  });
+
+  const deletePetMutation = useMutation({
+    mutationFn: async (petId: string) => {
+      const { error } = await supabase.from('pets').delete().eq('id', petId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+      setSelectedPetForDetail(null);
+      toast.success('ลบข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ');
     }
   });
 
@@ -330,7 +375,7 @@ const Index = () => {
               <UpcomingAppointments />
               <HomeQuickActions onCouponsClick={() => setActiveTab('promo')} onAppointmentClick={() => toast.info('เร็วๆ นี้')} />
               <PetList 
-                pets={petsList.map(p => ({ ...p, imageUrl: p.image_url, cardBgColor: '#FFD8E4' })) as any} 
+                pets={petsList as any} 
                 onPetClick={(p: any) => { setSelectedPetForDetail(p); setActiveTab('pets'); }} 
                 onViewAll={() => setActiveTab('pets')} 
               />
@@ -342,10 +387,10 @@ const Index = () => {
             <motion.div key="pets-tab">
               {selectedPetForDetail ? (
                 <PetDetailView 
-                  pet={{ ...selectedPetForDetail, imageUrl: selectedPetForDetail.image_url } as any} 
+                  pet={selectedPetForDetail as any} 
                   onBack={() => setSelectedPetForDetail(null)} 
                   onStartEdit={(p: any) => { setPetToEdit(p); setIsPetFormOpen(true); }} 
-                  onDeletePet={(id) => queryClient.invalidateQueries({ queryKey: ['customer_profile'] })} 
+                  onDeletePet={(id) => deletePetMutation.mutate(id.toString())} 
                   totalServiceCost={0} 
                   onViewServiceHistoryForPet={() => {}} 
                   onEditPreferences={() => setIsPreferenceFormOpen(true)} 
@@ -353,7 +398,7 @@ const Index = () => {
                 />
               ) : (
                 <PetManagement 
-                  pets={petsList.map(p => ({ ...p, imageUrl: p.image_url, cardBgColor: '#FFD8E4' })) as any} 
+                  pets={petsList as any} 
                   onBack={() => setActiveTab('home')} 
                   onViewDetails={(p: any) => setSelectedPetForDetail(p)} 
                   onAddPet={() => { setPetToEdit(null); setIsPetFormOpen(true); }} 
@@ -397,7 +442,7 @@ const Index = () => {
       </main>
 
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.phone || ''} />
-      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={() => queryClient.invalidateQueries({ queryKey: ['customer_profile'] })} initialData={petToEdit as any} />
+      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={petToEdit as any} />
       <UserProfileEdit 
         isOpen={isProfileEditing} 
         onClose={() => setIsProfileEditing(false)} 
