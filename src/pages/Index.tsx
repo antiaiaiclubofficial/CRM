@@ -326,6 +326,7 @@ const Index = () => {
 
   const userCoupons = useMemo(() => (customerData?.coupons || []).map(c => ({
     id: c.id,
+    template_id: c.template_id,
     title: c.coupon_templates?.title || 'คูปอง',
     description: `หมดอายุ ${formatDateThai(c.expires_at)}`,
     value: '',
@@ -336,6 +337,16 @@ const Index = () => {
     color: 'from-amber-400 to-orange-500',
     is_used: c.status === 'used'
   })), [customerData]);
+
+  const availableTemplatesForRedeem = useMemo(() => (couponTemplates || []).map(t => ({
+    id: t.id,
+    title: t.title,
+    description: t.points_required > 0 ? `แลกด้วย ${t.points_required} คะแนน` : 'โปรโมชั่นพิเศษ',
+    pointsRequired: t.points_required,
+    expiry: `${t.expiry_days} วัน`,
+    iconName: 'Tag',
+    bg: t.points_required === 0 ? 'bg-pink-50' : 'bg-rose-50'
+  })), [couponTemplates]);
 
   if (liffLoading || storeLoading || (lineProfile && profileLoading)) {
     return (
@@ -416,10 +427,9 @@ const Index = () => {
                 userPoints={customerData?.membership?.points || 0} 
                 collectedCoupons={userCoupons.filter(c => !c.is_used) as any} 
                 usedOrExpiredCoupons={userCoupons.filter(c => c.is_used) as any} 
+                redeemableTemplates={availableTemplatesForRedeem}
                 onRedeemCoupon={(c, cost) => redeemCouponMutation.mutate({ template: c, pointsCost: cost })} 
                 onUseCoupon={(id) => { const c = userCoupons.find(x => x.id === id); setSelectedCouponToUse(c); setIsCouponUseModalOpen(true); }} 
-                collectedSpecialPromos={[]} 
-                onCollectSpecialPromotion={(p) => redeemCouponMutation.mutate({ template: p, pointsCost: 0 })} 
                />
             </motion.div>
           )}
