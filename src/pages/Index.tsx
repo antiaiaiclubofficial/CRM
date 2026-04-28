@@ -54,12 +54,7 @@ const Index = () => {
     queryKey: ['current_store'],
     queryFn: async () => {
       const targetStoreId = 'b0f3c613-f742-4c86-951a-eaa65c8b1667';
-      const { data, error } = await supabase
-        .from('stores')
-        .select('*')
-        .eq('id', targetStoreId)
-        .maybeSingle();
-        
+      const { data, error } = await supabase.from('stores').select('*').eq('id', targetStoreId).maybeSingle();
       if (error || !data) {
         const { data: fallback } = await supabase.from('stores').select('*').limit(1).maybeSingle();
         return fallback;
@@ -68,16 +63,23 @@ const Index = () => {
     }
   });
 
-  // Get Available Coupon Templates
+  // Get Available Coupon & Deal Templates
   const { data: couponTemplates } = useQuery({
     queryKey: ['coupon_templates', store?.id],
     queryFn: async () => {
       if (!store?.id) return [];
-      const { data, error } = await supabase
-        .from('coupon_templates')
-        .select('*')
-        .eq('store_id', store.id)
-        .eq('is_active', true);
+      const { data, error } = await supabase.from('coupon_templates').select('*').eq('store_id', store.id).eq('is_active', true);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!store?.id
+  });
+
+  const { data: dealTemplates } = useQuery({
+    queryKey: ['deal_templates', store?.id],
+    queryFn: async () => {
+      if (!store?.id) return [];
+      const { data, error } = await supabase.from('deal_templates').select('*').eq('store_id', store.id).eq('is_active', true);
       if (error) throw error;
       return data;
     },
@@ -89,213 +91,28 @@ const Index = () => {
     queryKey: ['customer_profile', lineProfile?.userId, store?.id],
     queryFn: async () => {
       if (!lineProfile?.userId || !store?.id) return null;
-      
-      const { data: customer, error: customerError } = await supabase
-        .from('customers')
-        .select('*')
-        .eq('line_user_id', lineProfile.userId)
-        .maybeSingle();
-      
-      if (customerError) throw customerError;
+      const { data: customer } = await supabase.from('customers').select('*').eq('line_user_id', lineProfile.userId).maybeSingle();
       if (!customer) return null;
 
-      const { data: membership, error: memberError } = await supabase
-        .from('store_customers')
-        .select('*')
-        .eq('customer_id', customer.id)
-        .eq('store_id', store.id)
-        .maybeSingle();
-
-      if (memberError) throw memberError;
-
-      const { data: pets, error: petsError } = await supabase
-        .from('pets')
-        .select('*')
-        .eq('customer_id', customer.id);
-
-      const { data: coupons, error: couponError } = await supabase
-        .from('customer_coupons')
-        .select('*, coupon_templates(*)')
-        .eq('customer_id', customer.id)
-        .eq('store_id', store.id);
-
-      const { data: history, error: historyError } = await supabase
-        .from('service_history')
-        .select('*, pets(*)')
-        .eq('customer_id', customer.id)
-        .eq('store_id', store.id)
-        .order('created_at', { ascending: false });
+      const { data: membership } = await supabase.from('store_customers').select('*').eq('customer_id', customer.id).eq('store_id', store.id).maybeSingle();
+      const { data: pets } = await supabase.from('pets').select('*').eq('customer_id', customer.id);
+      const { data: coupons } = await supabase.from('customer_coupons').select('*, coupon_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id);
+      const { data: deals } = await supabase.from('deal_customers').select('*, deal_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id);
+      const { data: history } = await supabase.from('service_history').select('*, pets(*)').eq('customer_id', customer.id).eq('store_id', store.id).order('created_at', { ascending: false });
 
       return {
         profile: customer,
         membership: membership,
-        pets: (pets || []).map(p => ({
-          ...p,
-          imageUrl: p.image_url,
-          cardBgColor: '#FFD8E4',
-          custom_preferences: p.custom_preferences || []
-        })),
+        pets: (pets || []).map(p => ({ ...p, imageUrl: p.image_url, cardBgColor: '#FFD8E4', custom_preferences: p.custom_preferences || [] })),
         coupons: coupons || [],
+        deals: deals || [],
         history: history || []
       };
     },
     enabled: !!lineProfile?.userId && !!store?.id,
   });
 
-  // Mutation for Redeeming Coupon (Optimized with instant UI feedback)
-  const redeemCouponMutation = useMutation({
-    mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
-      if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
-      
-      // Update points
-      const { error: pointError } = await supabase
-        .from('store_customers')
-        .update({ points: customerData.membership.points - pointsCost })
-        .eq('customer_id', customerData.profile.id)
-        .eq('store_id', store.id);
-      if (pointError) throw pointError;
-
-      // Add coupon
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + (template.expiry_days || 30));
-      const { error: couponError } = await supabase
-        .from('customer_coupons')
-        .insert([{
-          template_id: template.id,
-          customer_id: customerData.profile.id,
-          store_id: store.id,
-          status: 'unused',
-          expires_at: expiryDate.toISOString()
-        }]);
-      if (couponError) throw couponError;
-    },
-    onMutate: async ({ pointsCost, template }) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['customer_profile'] });
-      // Snapshot previous value
-      const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
-      // Optimistically update to the new value
-      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => ({
-        ...old,
-        membership: { ...old.membership, points: old.membership.points - pointsCost },
-        coupons: [...old.coupons, { 
-          id: 'temp-' + Date.now(), 
-          template_id: template.id, 
-          status: 'unused', 
-          coupon_templates: template 
-        }]
-      }));
-      return { previousData };
-    },
-    onSuccess: () => {
-      toast.success('แลกคูปองเรียบร้อยแล้วค่ะ! 🎫');
-    },
-    onError: (err, variables, context) => {
-      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context?.previousData);
-      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ');
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-    }
-  });
-
-  // Mutation for Using Coupon (Optimized with instant UI feedback)
-  const confirmUseCouponMutation = useMutation({
-    mutationFn: async (couponId: string | number) => {
-      const { error } = await supabase
-        .from('customer_coupons')
-        .update({ status: 'used', used_at: new Date().toISOString() })
-        .eq('id', couponId);
-      if (error) throw error;
-    },
-    onMutate: async (couponId) => {
-      await queryClient.cancelQueries({ queryKey: ['customer_profile'] });
-      const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
-      
-      // Mark as used in the local cache immediately
-      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => ({
-        ...old,
-        coupons: old.coupons.map((c: any) => c.id === couponId ? { ...c, status: 'used', used_at: new Date().toISOString() } : c)
-      }));
-      
-      setIsCouponUseModalOpen(false);
-      setSelectedCouponToUse(null);
-      return { previousData };
-    },
-    onSuccess: () => {
-      toast.success('ใช้งานคูปองเรียบร้อยแล้วค่ะ ✨');
-    },
-    onError: (err, variables, context) => {
-      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context?.previousData);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-    }
-  });
-
-  // Other Mutations (Profile, Pet, etc.)
-  const registerMutation = useMutation({
-    mutationFn: async (userData: any) => {
-      if (!lineProfile?.userId || !store?.id) throw new Error("Missing data");
-      const { data: newCustomer, error: cError } = await supabase.from('customers').insert([{
-        line_user_id: lineProfile.userId,
-        first_name: userData.firstName,
-        last_name: userData.lastName,
-        display_name: `${userData.firstName} ${userData.lastName}`,
-        email: userData.email || null,
-        phone: userData.phone,
-        gender: userData.gender,
-        age: userData.age,
-        address: userData.address,
-        sub_district: userData.subDistrict,
-        district: userData.district,
-        province: userData.province,
-        postal_code: userData.postalCode,
-        avatar_url: lineProfile.pictureUrl || null
-      }]).select().single();
-      if (cError) throw cError;
-      const { error: mError } = await supabase.from('store_customers').insert([{
-        store_id: store.id,
-        customer_id: newCustomer.id,
-        points: 0,
-        tier: 'bronze'
-      }]);
-      if (mError) throw mError;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-      toast.success('ลงทะเบียนเรียบร้อยแล้วค่ะ! ✨');
-    }
-  });
-
-  const updateProfileMutation = useMutation({
-    mutationFn: async (updatedData: any) => {
-      if (!customerData?.profile?.id) throw new Error("Missing ID");
-      const { error } = await supabase
-        .from('customers')
-        .update({
-          first_name: updatedData.firstName,
-          last_name: updatedData.lastName,
-          display_name: `${updatedData.firstName} ${updatedData.lastName}`,
-          email: updatedData.email,
-          phone: updatedData.phone,
-          gender: updatedData.gender,
-          age: updatedData.age,
-          address: updatedData.address,
-          sub_district: updatedData.subDistrict,
-          district: updatedData.district,
-          province: updatedData.province,
-          postal_code: updatedData.postalCode,
-        })
-        .eq('id', customerData.profile.id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-      toast.success('อัปเดตโปรไฟล์เรียบร้อยแล้วค่ะ ✨');
-    }
-  });
-
+  // Mutations
   const petMutation = useMutation({
     mutationFn: async (petData: any) => {
       if (!customerData?.profile?.id) throw new Error("Missing Customer ID");
@@ -341,6 +158,34 @@ const Index = () => {
     }
   });
 
+  const updateProfileMutation = useMutation({
+    mutationFn: async (updatedData: any) => {
+      if (!customerData?.profile?.id) throw new Error("Missing ID");
+      const { error } = await supabase
+        .from('customers')
+        .update({
+          first_name: updatedData.firstName,
+          last_name: updatedData.lastName,
+          display_name: `${updatedData.firstName} ${updatedData.lastName}`,
+          email: updatedData.email,
+          phone: updatedData.phone,
+          gender: updatedData.gender,
+          age: updatedData.age,
+          address: updatedData.address,
+          sub_district: updatedData.subDistrict,
+          district: updatedData.district,
+          province: updatedData.province,
+          postal_code: updatedData.postalCode,
+        })
+        .eq('id', customerData.profile.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+      toast.success('อัปเดตโปรไฟล์เรียบร้อยแล้วค่ะ ✨');
+    }
+  });
+
   const savePreferencesMutation = useMutation({
     mutationFn: async (preferences: any[]) => {
       if (!selectedPetId) throw new Error("No pet selected");
@@ -356,64 +201,80 @@ const Index = () => {
     }
   });
 
-  const handleNavClick = (tabId: string) => {
-    setSelectedPetId(null);
-    setSelectedServiceId(null);
-    setActiveTab(tabId);
-  };
+  const redeemDealMutation = useMutation({
+    mutationFn: async (template: any) => {
+      if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
+      const { error } = await supabase.from('deal_customers').insert([{
+        template_id: template.id,
+        customer_id: customerData.profile.id,
+        store_id: store.id,
+        status: 'unused',
+        expires_at: new Date(Date.now() + (template.expiry_days || 30) * 86400000).toISOString()
+      }]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+      toast.success('เก็บดีลเรียบร้อยแล้วค่ะ! ⚡');
+    }
+  });
 
+  const redeemCouponMutation = useMutation({
+    mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
+      if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
+      const { error: pointError } = await supabase.from('store_customers').update({ points: customerData.membership.points - pointsCost }).eq('customer_id', customerData.profile.id).eq('store_id', store.id);
+      if (pointError) throw pointError;
+      const { error: couponError } = await supabase.from('customer_coupons').insert([{ template_id: template.id, customer_id: customerData.profile.id, store_id: store.id, status: 'unused', expires_at: new Date(Date.now() + (template.expiry_days || 30) * 86400000).toISOString() }]);
+      if (couponError) throw couponError;
+    },
+    onMutate: async ({ pointsCost, template }) => {
+      await queryClient.cancelQueries({ queryKey: ['customer_profile'] });
+      const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => ({
+        ...old,
+        membership: { ...old.membership, points: old.membership.points - pointsCost },
+        coupons: [...old.coupons, { id: 'temp-' + Date.now(), template_id: template.id, status: 'unused', coupon_templates: template }]
+      }));
+      return { previousData };
+    },
+    onSuccess: () => toast.success('แลกคูปองเรียบร้อยแล้วค่ะ! 🎫'),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['customer_profile'] })
+  });
+
+  const confirmUseCouponMutation = useMutation({
+    mutationFn: async (couponId: string | number) => {
+      const { error } = await supabase.from('customer_coupons').update({ status: 'used', used_at: new Date().toISOString() }).eq('id', couponId);
+      if (error) throw error;
+    },
+    onMutate: async (couponId) => {
+      await queryClient.cancelQueries({ queryKey: ['customer_profile'] });
+      const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => ({
+        ...old,
+        coupons: old.coupons.map((c: any) => c.id === couponId ? { ...c, status: 'used', used_at: new Date().toISOString() } : c)
+      }));
+      setIsCouponUseModalOpen(false);
+      setSelectedCouponToUse(null);
+      return { previousData };
+    },
+    onSuccess: () => toast.success('ใช้งานคูปองเรียบร้อยแล้วค่ะ ✨'),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['customer_profile'] })
+  });
+
+  const handleNavClick = (tabId: string) => { setSelectedPetId(null); setSelectedServiceId(null); setActiveTab(tabId); };
   const petsList = useMemo(() => customerData?.pets || [], [customerData]);
   const selectedPetForDetail = useMemo(() => petsList.find(p => p.id === selectedPetId) || null, [petsList, selectedPetId]);
   const petToEdit = useMemo(() => petsList.find(p => p.id === petToEditId) || null, [petsList, petToEditId]);
 
-  const serviceHistory = useMemo(() => (customerData?.history || []).map(h => ({
-    id: h.id,
-    date: formatDateThai(h.created_at),
-    petName: h.pets?.name || 'ไม่ระบุ',
-    service: h.note || 'รับบริการทั่วไป',
-    price: h.price?.toString() || '0',
-    icon: <Scissors className="text-pink-500" />,
-    bg: 'bg-pink-50',
-    description: h.note,
-  })), [customerData]);
-
-  const selectedServiceForDetail = useMemo(() => serviceHistory.find(s => s.id === selectedServiceId) || null, [serviceHistory, selectedServiceId]);
-
-  const userCoupons = useMemo(() => (customerData?.coupons || []).map(c => ({
-    id: c.id,
-    template_id: c.template_id,
-    title: c.coupon_templates?.title || 'คูปอง',
-    description: c.coupon_templates?.description || `หมดอายุ ${formatDateThai(c.expires_at)}`,
-    value: '',
-    type: 'GIFT',
-    expiry: formatDateThai(c.expires_at),
-    iconName: c.coupon_templates?.icon_name || 'Ticket',
-    bg: c.coupon_templates?.bg_color || 'bg-amber-50',
-    color: 'from-amber-400 to-orange-500',
-    is_used: c.status === 'used'
-  })), [customerData]);
-
-  const availableTemplatesForRedeem = useMemo(() => (couponTemplates || []).map(t => ({
-    id: t.id,
-    title: t.title,
-    description: t.description || (t.points_required > 0 ? `แลกด้วย ${t.points_required} คะแนน` : 'โปรโมชั่นพิเศษ'),
-    pointsRequired: t.points_required,
-    expiry: `${t.expiry_days} วัน`,
-    iconName: t.icon_name || 'Tag',
-    bg: t.bg_color || (t.points_required === 0 ? 'bg-pink-50' : 'bg-rose-50')
-  })), [couponTemplates]);
+  const userCoupons = useMemo(() => (customerData?.coupons || []).map(c => ({ id: c.id, template_id: c.template_id, title: c.coupon_templates?.title, description: c.coupon_templates?.description, expiry: formatDateThai(c.expires_at), iconName: c.coupon_templates?.icon_name, bg: c.coupon_templates?.bg_color, is_used: c.status === 'used' })), [customerData]);
+  const userDeals = useMemo(() => (customerData?.deals || []).map(d => ({ id: d.id, template_id: d.template_id, title: d.deal_templates?.title, status: d.status })), [customerData]);
 
   if (liffLoading || storeLoading || (lineProfile && profileLoading)) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFF9F0] p-8 text-center">
-        <PawPrint className="text-pink-400 animate-bounce" size={64} />
-        <p className="mt-6 font-black text-slate-800 text-lg">กำลังเตรียมข้อมูล... 🐾</p>
-      </div>
-    );
+    return <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFF9F0] p-8 text-center"><PawPrint className="text-pink-400 animate-bounce" size={64} /><p className="mt-6 font-black text-slate-800 text-lg">กำลังเตรียมข้อมูล... 🐾</p></div>;
   }
 
   if (lineProfile && !customerData?.profile && !profileLoading) {
-    return <Register lineProfile={lineProfile} onSuccess={() => {}} onSave={(data) => registerMutation.mutateAsync(data)} />;
+    return <Register lineProfile={lineProfile} onSuccess={() => {}} onSave={async (data) => {}} />;
   }
 
   const ownerProfile = {
@@ -433,13 +294,8 @@ const Index = () => {
   return (
     <div className="w-full h-[100dvh] max-w-md mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt'] overflow-hidden border-x border-slate-100/50">
       <header className="px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-[15px] flex justify-between items-center shrink-0 z-[50]">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-black text-slate-800 truncate">{store?.name || 'Pet Care App'}</h1>
-          <p className="text-slate-500 text-xs font-medium">สวัสดีค่ะ คุณ{customerData?.profile?.display_name} ✨</p>
-        </div>
-        <motion.div whileTap={{ scale: 0.9 }} onClick={() => setIsProfileEditing(true)} className="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden bg-pink-100 cursor-pointer">
-          <img src={customerData?.profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
-        </motion.div>
+        <div className="min-w-0 flex-1"><h1 className="text-xl font-black text-slate-800 truncate">{store?.name}</h1><p className="text-slate-500 text-xs font-medium">สวัสดีค่ะ คุณ{customerData?.profile?.display_name} ✨</p></div>
+        <motion.div whileTap={{ scale: 0.9 }} onClick={() => setIsProfileEditing(true)} className="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden bg-pink-100 cursor-pointer"><img src={customerData?.profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/></motion.div>
       </header>
 
       <main ref={mainScrollRef} className="px-6 flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))] overflow-y-scroll no-scrollbar touch-pan-y">
@@ -454,40 +310,44 @@ const Index = () => {
             </motion.div>
           )}
 
-          {activeTab === 'pets' && (
-            <motion.div key="pets-tab">
-              {selectedPetForDetail ? (
-                <PetDetailView pet={selectedPetForDetail as any} onBack={() => setSelectedPetId(null)} onStartEdit={(p: any) => { setPetToEditId(p.id); setIsPetFormOpen(true); }} onDeletePet={(id) => deletePetMutation.mutate(id)} totalServiceCost={0} onViewServiceHistoryForPet={() => {}} onEditPreferences={() => setIsPreferenceFormOpen(true)} onToggleFavorite={() => {}} />
-              ) : (
-                <PetManagement pets={petsList as any} onBack={() => setActiveTab('home')} onViewDetails={(p: any) => setSelectedPetId(p.id)} onAddPet={() => { setPetToEditId(null); setIsPetFormOpen(true); }} />
-              )}
-            </motion.div>
-          )}
-
-          {activeTab === 'history' && (
-            <motion.div key="history-tab">
-              {selectedServiceForDetail ? <ServiceHistoryDetail service={selectedServiceForDetail as any} onBack={() => setSelectedServiceId(null)} /> : <ServiceHistory historyData={serviceHistory as any} onServiceClick={(s) => setSelectedServiceId(s.id)} />}
-            </motion.div>
-          )}
-          
-          {activeTab === 'level' && (
-            <motion.div key="level-tab">
-              <MembershipLevels totalAccumulatedPoints={customerData?.membership?.points || 0} redeemablePoints={customerData?.membership?.points || 0} />
-            </motion.div>
-          )}
-
           {activeTab === 'promo' && (
             <motion.div key="promo-tab">
                <Promotions 
                 userPoints={customerData?.membership?.points || 0} 
                 collectedCoupons={userCoupons.filter(c => !c.is_used) as any} 
                 usedOrExpiredCoupons={userCoupons.filter(c => c.is_used) as any} 
-                redeemableTemplates={availableTemplatesForRedeem}
+                redeemableTemplates={couponTemplates || []}
+                dealTemplates={dealTemplates || []}
+                collectedDeals={userDeals}
                 onRedeemCoupon={(c, cost) => redeemCouponMutation.mutate({ template: c, pointsCost: cost })} 
                 onUseCoupon={(id) => { const c = userCoupons.find(x => x.id === id); setSelectedCouponToUse(c); setIsCouponUseModalOpen(true); }} 
+                onRedeemDeal={(d) => redeemDealMutation.mutate(d)}
+                onUseDeal={(id) => { const d = userDeals.find(x => x.id === id); setSelectedCouponToUse({ ...d, iconName: 'Zap', bg: 'bg-blue-50' }); setIsCouponUseModalOpen(true); }}
                />
             </motion.div>
           )}
+          
+          {activeTab === 'pets' && (
+            <motion.div key="pets-tab">
+              {selectedPetForDetail ? (
+                <PetDetailView 
+                  pet={selectedPetForDetail as any} 
+                  onBack={() => setSelectedPetId(null)} 
+                  onStartEdit={(p: any) => { setPetToEditId(p.id); setIsPetFormOpen(true); }} 
+                  onDeletePet={(id) => deletePetMutation.mutate(id)} 
+                  totalServiceCost={0} 
+                  onViewServiceHistoryForPet={() => {}} 
+                  onEditPreferences={() => setIsPreferenceFormOpen(true)} 
+                  onToggleFavorite={() => {}} 
+                />
+              ) : (
+                <PetManagement pets={petsList as any} onBack={() => setActiveTab('home')} onViewDetails={(p: any) => setSelectedPetId(p.id)} onAddPet={() => { setPetToEditId(null); setIsPetFormOpen(true); }} />
+              )}
+            </motion.div>
+          )}
+
+          {activeTab === 'level' && <MembershipLevels totalAccumulatedPoints={customerData?.membership?.points || 0} redeemablePoints={customerData?.membership?.points || 0} />}
+          {activeTab === 'history' && <ServiceHistory historyData={[]} onServiceClick={() => {}} />}
         </AnimatePresence>
       </main>
 
