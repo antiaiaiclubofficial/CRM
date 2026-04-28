@@ -36,10 +36,9 @@ export interface Pet {
   weight: string;
   medical_condition: string;
   precautions: string;
+  fur_length: string;
   color: string;
   icon: string;
-  fur_length?: string;
-  custom_preferences?: any;
   image_url: string;
   card_bg_color: string;
   is_favorite?: boolean;
@@ -57,10 +56,10 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [isProfileEditing, setIsProfileEditing] = useState(false);
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
-  const [selectedPetForDetail, setSelectedPetForDetail] = useState<Pet | null>(null);
+  const [selectedPetForDetail, setSelectedPetForDetail] = useState<any | null>(null);
   const [selectedServiceForDetail, setSelectedServiceForDetail] = useState<any | null>(null);
   const [isPetFormOpen, setIsPetFormOpen] = useState(false);
-  const [petToEdit, setPetToEdit] = useState<Pet | null>(null);
+  const [petToEdit, setPetToEdit] = useState<any | null>(null);
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
   const [selectedCouponToUse, setSelectedCouponToUse] = useState<any | null>(null);
   const [isCouponUseModalOpen, setIsCouponUseModalOpen] = useState(false);
@@ -126,6 +125,7 @@ const Index = () => {
           ...p,
           medicalCondition: p.medical_condition,
           precautions: p.precautions,
+          furLength: p.fur_length,
           imageUrl: p.image_url,
           cardBgColor: '#FFD8E4'
         })),
@@ -170,7 +170,6 @@ const Index = () => {
     mutationFn: async (petData: any) => {
       if (!customerData?.profile?.id) throw new Error("Missing Customer ID");
 
-      // Handle Weight being potentially empty or NaN for Supabase Numeric column
       const numericWeight = petData.weight && petData.weight.toString().trim() !== '' 
         ? parseFloat(petData.weight) 
         : null;
@@ -185,6 +184,7 @@ const Index = () => {
         weight: isNaN(numericWeight as any) ? null : numericWeight,
         medical_condition: petData.medical_condition,
         precautions: petData.precautions,
+        fur_length: petData.fur_length,
         image_url: petData.image_url
       };
 

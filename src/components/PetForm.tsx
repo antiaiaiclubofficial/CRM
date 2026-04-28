@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, HeartPulse, Calendar, Info, Check, Feather, Camera, AlertCircle } from 'lucide-react';
-import AnalogScaleIcon from './AnalogScaleIcon';
-import GenderIcon from './GenderIcon';
+import { toast } from 'sonner';
 
 interface Pet {
   id?: string | number;
@@ -16,8 +15,8 @@ interface Pet {
   weight: string;
   medical_condition: string;
   precautions: string;
+  fur_length: string;
   image_url: string;
-  fur_length?: string;
 }
 
 interface PetFormProps {
@@ -28,6 +27,7 @@ interface PetFormProps {
 }
 
 const petIcons: Record<string, string> = { 'สุนัข': '🐶', 'แมว': '🐱', 'กระต่าย': '🐰', 'หนูแฮมสเตอร์': '🐹', 'นก': '🦜' };
+const furLengths = ['ขนสั้น', 'ขนปานกลาง', 'ขนยาว', 'ขนยาวพิเศษ'];
 
 const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -40,35 +40,40 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     weight: '',
     medical_condition: '',
     precautions: '',
+    fur_length: 'ขนสั้น',
     image_url: '',
   });
 
   useEffect(() => {
-    if (initialData) {
-      setFormData({
-        id: initialData.id,
-        name: initialData.name || '',
-        type: initialData.type || 'สุนัข',
-        breed: initialData.breed || '',
-        age: initialData.age || '',
-        gender: initialData.gender || 'ผู้',
-        weight: initialData.weight || '',
-        medical_condition: initialData.medical_condition || '',
-        precautions: initialData.precautions || '',
-        image_url: initialData.image_url || '',
-      });
-    } else {
-      setFormData({
-        name: '',
-        type: 'สุนัข',
-        breed: '',
-        age: '',
-        gender: 'ผู้',
-        weight: '',
-        medical_condition: '',
-        precautions: '',
-        image_url: '',
-      });
+    if (isOpen) {
+      if (initialData) {
+        setFormData({
+          id: initialData.id,
+          name: initialData.name || '',
+          type: initialData.type || 'สุนัข',
+          breed: initialData.breed || '',
+          age: initialData.age || '',
+          gender: initialData.gender || 'ผู้',
+          weight: initialData.weight || '',
+          medical_condition: initialData.medical_condition || '',
+          precautions: initialData.precautions || '',
+          fur_length: initialData.fur_length || 'ขนสั้น',
+          image_url: initialData.image_url || '',
+        });
+      } else {
+        setFormData({
+          name: '',
+          type: 'สุนัข',
+          breed: '',
+          age: '',
+          gender: 'ผู้',
+          weight: '',
+          medical_condition: '',
+          precautions: '',
+          fur_length: 'ขนสั้น',
+          image_url: '',
+        });
+      }
     }
   }, [initialData, isOpen]);
 
@@ -85,7 +90,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
 
   const executeSave = () => {
     if (!formData.name.trim()) {
-      onClose();
+      toast.error('กรุณาระบุชื่อสัตว์เลี้ยงด้วยค่ะ');
       return;
     }
     onSave(formData);
@@ -117,6 +122,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
             </div>
 
             <div className="space-y-6 px-8 pb-24">
+              {/* Image Upload */}
               <div className="flex flex-col items-center gap-3">
                 <div 
                   onClick={() => fileInputRef.current?.click()}
@@ -134,6 +140,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                 <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
               </div>
 
+              {/* Basic Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-500">ชื่อสัตว์เลี้ยง</label>
@@ -142,7 +149,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     placeholder="ชื่อน้อง"
-                    className="w-full p-4 bg-slate-50 rounded-2xl outline-none"
+                    className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -150,7 +157,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                   <select 
                     value={formData.type}
                     onChange={(e) => setFormData({...formData, type: e.target.value})}
-                    className="w-full p-4 bg-slate-50 rounded-2xl outline-none"
+                    className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold"
                   >
                     {Object.keys(petIcons).map(type => <option key={type} value={type}>{type}</option>)}
                   </select>
@@ -164,40 +171,56 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                   value={formData.breed}
                   onChange={(e) => setFormData({...formData, breed: e.target.value})}
                   placeholder="เช่น ชิวาวา, โกลเด้น"
-                  className="w-full p-4 bg-slate-50 rounded-2xl outline-none"
+                  className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold"
                 />
               </div>
 
+              {/* Metrics */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 text-center block">อายุ</label>
-                  <input type="number" value={formData.age} onChange={(e) => setFormData({...formData, age: e.target.value})} className="w-full p-4 bg-slate-50 rounded-2xl text-center outline-none" />
+                  <label className="text-xs font-bold text-slate-500 text-center block">อายุ (ปี)</label>
+                  <input type="number" value={formData.age} onChange={(e) => setFormData({...formData, age: e.target.value})} className="w-full p-4 bg-slate-50 rounded-2xl text-center outline-none font-bold" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 text-center block">เพศ</label>
-                  <select value={formData.gender} onChange={(e) => setFormData({...formData, gender: e.target.value})} className="w-full p-4 bg-slate-50 rounded-2xl outline-none">
+                  <select value={formData.gender} onChange={(e) => setFormData({...formData, gender: e.target.value})} className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold">
                     <option value="ผู้">ผู้</option>
                     <option value="เมีย">เมีย</option>
                   </select>
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 text-center block">นน. (kg)</label>
-                  <input type="number" value={formData.weight} onChange={(e) => setFormData({...formData, weight: e.target.value})} className="w-full p-4 bg-slate-50 rounded-2xl text-center outline-none" />
+                  <input type="number" step="0.1" value={formData.weight} onChange={(e) => setFormData({...formData, weight: e.target.value})} className="w-full p-4 bg-slate-50 rounded-2xl text-center outline-none font-bold" />
                 </div>
               </div>
 
-              {/* Added Medical Condition and Precautions */}
-              <div className="space-y-4 pt-2 border-t border-slate-50">
+              {/* Health Info Section */}
+              <div className="space-y-4 pt-4 border-t border-slate-50">
+                <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight">ข้อมูลสุขภาพ</h4>
+                
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-500 flex items-center gap-1">
-                    <HeartPulse size={14} className="text-pink-500" /> โรกประจำตัว
+                    <Feather size={14} className="text-purple-500" /> ความยาวขน
+                  </label>
+                  <select 
+                    value={formData.fur_length}
+                    onChange={(e) => setFormData({...formData, fur_length: e.target.value})}
+                    className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold"
+                  >
+                    {furLengths.map(len => <option key={len} value={len}>{len}</option>)}
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500 flex items-center gap-1">
+                    <HeartPulse size={14} className="text-pink-500" /> โรคประจำตัว
                   </label>
                   <input 
                     type="text" 
                     value={formData.medical_condition}
                     onChange={(e) => setFormData({...formData, medical_condition: e.target.value})}
                     placeholder="ระบุโรคประจำตัว (ถ้ามี)"
-                    className="w-full p-4 bg-slate-50 rounded-2xl outline-none"
+                    className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold"
                   />
                 </div>
 
@@ -210,14 +233,14 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                     value={formData.precautions}
                     onChange={(e) => setFormData({...formData, precautions: e.target.value})}
                     placeholder="เช่น แพ้แชมพู, ห้ามตัดขนอุ้งเท้า"
-                    className="w-full p-4 bg-slate-50 rounded-2xl outline-none"
+                    className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold"
                   />
                 </div>
               </div>
 
               <button 
                 onClick={executeSave}
-                className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold mt-4 shadow-lg active:scale-95 transition-all"
+                className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black mt-4 shadow-lg active:scale-95 transition-all border-2 border-black"
               >
                 บันทึกข้อมูล
               </button>
