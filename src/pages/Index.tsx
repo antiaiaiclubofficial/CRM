@@ -170,14 +170,19 @@ const Index = () => {
     mutationFn: async (petData: any) => {
       if (!customerData?.profile?.id) throw new Error("Missing Customer ID");
 
+      // Handle Weight being potentially empty or NaN for Supabase Numeric column
+      const numericWeight = petData.weight && petData.weight.toString().trim() !== '' 
+        ? parseFloat(petData.weight) 
+        : null;
+
       const payload = {
         customer_id: customerData.profile.id,
         name: petData.name,
         type: petData.type,
         breed: petData.breed,
-        age: petData.age,
+        age: petData.age?.toString(),
         gender: petData.gender,
-        weight: petData.weight,
+        weight: isNaN(numericWeight as any) ? null : numericWeight,
         medical_condition: petData.medical_condition,
         precautions: petData.precautions,
         image_url: petData.image_url
@@ -193,6 +198,7 @@ const Index = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+      setIsPetFormOpen(false);
       toast.success('บันทึกข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ 🐾');
     }
   });
