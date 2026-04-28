@@ -328,12 +328,12 @@ const Index = () => {
     id: c.id,
     template_id: c.template_id,
     title: c.coupon_templates?.title || 'คูปอง',
-    description: `หมดอายุ ${formatDateThai(c.expires_at)}`,
+    description: c.coupon_templates?.description || `หมดอายุ ${formatDateThai(c.expires_at)}`,
     value: '',
     type: 'GIFT',
     expiry: formatDateThai(c.expires_at),
-    iconName: 'Ticket',
-    bg: 'bg-amber-50',
+    iconName: c.coupon_templates?.icon_name || 'Ticket',
+    bg: c.coupon_templates?.bg_color || 'bg-amber-50',
     color: 'from-amber-400 to-orange-500',
     is_used: c.status === 'used'
   })), [customerData]);
@@ -341,11 +341,11 @@ const Index = () => {
   const availableTemplatesForRedeem = useMemo(() => (couponTemplates || []).map(t => ({
     id: t.id,
     title: t.title,
-    description: t.points_required > 0 ? `แลกด้วย ${t.points_required} คะแนน` : 'โปรโมชั่นพิเศษ',
+    description: t.description || (t.points_required > 0 ? `แลกด้วย ${t.points_required} คะแนน` : 'โปรโมชั่นพิเศษ'),
     pointsRequired: t.points_required,
     expiry: `${t.expiry_days} วัน`,
-    iconName: 'Tag',
-    bg: t.points_required === 0 ? 'bg-pink-50' : 'bg-rose-50'
+    iconName: t.icon_name || 'Tag',
+    bg: t.bg_color || (t.points_required === 0 ? 'bg-pink-50' : 'bg-rose-50')
   })), [couponTemplates]);
 
   if (liffLoading || storeLoading || (lineProfile && profileLoading)) {
