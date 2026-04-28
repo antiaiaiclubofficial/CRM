@@ -21,7 +21,7 @@ import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
 import CouponUseModal from '@/components/CouponUseModal';
 import HomeQuickActions from '@/components/HomeQuickActions';
 import Register from './Register';
-import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles, PlusCircle } from 'lucide-react';
+import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles, PlusCircle, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -236,9 +236,15 @@ const Index = () => {
 
   if (liffLoading || storeLoading || (lineProfile && profileLoading)) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFF9F0]">
-        <PawPrint className="text-pink-400 animate-bounce" size={48} />
-        <p className="mt-4 font-bold text-slate-600">กำลังเตรียมข้อมูลสำหรับคุณ... 🐾</p>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFF9F0] p-8 text-center">
+        <div className="relative">
+          <PawPrint className="text-pink-400 animate-bounce" size={64} />
+          <div className="absolute -top-2 -right-2">
+            <Sparkles className="text-amber-400 animate-pulse" size={24} />
+          </div>
+        </div>
+        <p className="mt-6 font-black text-slate-800 text-lg">กำลังเตรียมข้อมูลสำหรับคุณ... 🐾</p>
+        <p className="text-slate-500 text-sm mt-2">หากระบบไม่พาคุณไปหน้า Login กรุณารอสักครู่ค่ะ</p>
       </div>
     );
   }
@@ -256,11 +262,11 @@ const Index = () => {
   if (!lineProfile && !profileLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-[#FFF9F0]">
-        <div className="w-20 h-20 bg-amber-100 rounded-3xl flex items-center justify-center mb-6">
-          <Calendar size={40} className="text-amber-500" />
+        <div className="w-20 h-20 bg-pink-100 rounded-3xl flex items-center justify-center mb-6 shadow-soft border-2 border-black">
+          <LogIn size={40} className="text-pink-500" />
         </div>
-        <h2 className="text-xl font-bold text-slate-800 mb-2">กรุณาเข้าใช้งานผ่าน LINE</h2>
-        <p className="text-sm text-slate-500">แอปพลิเคชันนี้ออกแบบมาเพื่อใช้งานร่วมกับ LINE Official Account ค่ะ</p>
+        <h2 className="text-xl font-black text-slate-800 mb-2 uppercase">กรุณาเข้าสู่ระบบผ่าน LINE</h2>
+        <p className="text-sm text-slate-500 font-medium">ระบบกำลังพาคุณไปหน้าเข้าสู่ระบบเพื่อความปลอดภัยและสิทธิประโยชน์ส่วนตัวค่ะ ✨</p>
       </div>
     );
   }

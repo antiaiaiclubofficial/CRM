@@ -13,10 +13,14 @@ export const useLiff = () => {
       try {
         await liff.init({ liffId: LIFF_ID });
         
-        if (liff.isLoggedIn()) {
-          const userProfile = await liff.getProfile();
-          setProfile(userProfile);
+        if (!liff.isLoggedIn()) {
+          // If accessed via web and not logged in, trigger LINE login redirect
+          liff.login();
+          return;
         }
+        
+        const userProfile = await liff.getProfile();
+        setProfile(userProfile);
       } catch (err) {
         console.error('Failed to initialize LIFF:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
