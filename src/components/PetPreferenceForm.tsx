@@ -71,7 +71,7 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={handleSave} // Clicking backdrop saves
             className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
           />
           <motion.div 
@@ -83,12 +83,12 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
             {/* Improved Sticky Header */}
             <div className="flex justify-between items-center sticky top-0 bg-white pt-8 pb-4 px-6 z-10 rounded-t-[3rem]">
               <h3 className="font-bold text-xl text-slate-800 flex-1 min-w-0 break-words pr-2">ความชอบส่วนตัวของน้อง{petName}</h3>
-              <button onClick={onClose} className="p-2 bg-slate-100 rounded-full text-slate-400 flex-shrink-0">
+              <button onClick={handleSave} className="p-2 bg-slate-100 rounded-full text-slate-400 flex-shrink-0">
                 <X size={20} />
               </button>
             </div>
 
-            <div className="space-y-5 px-6 pb-24"> {/* Increased bottom padding */}
+            <div className="space-y-5 px-6 pb-24">
               {preferences.length > 0 && (
                 <div className="space-y-4">
                   <h4 className="text-sm font-bold text-slate-600">รายการความชอบที่มีอยู่</h4>
