@@ -308,6 +308,17 @@ const Index = () => {
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleGoToMyCoupons = () => {
+    setActiveTab('promo');
+    // Wait for the tab content to render before scrolling
+    setTimeout(() => {
+      const element = document.getElementById('my-coupons-section');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
   const petsList = useMemo(() => customerData?.pets || [], [customerData]);
   const selectedPetForDetail = useMemo(() => petsList.find(p => p.id === selectedPetId) || null, [petsList, selectedPetId]);
 
@@ -413,9 +424,9 @@ const Index = () => {
             <motion.div key="home" className="space-y-6">
               <MembershipCard totalAccumulatedPoints={customerData?.membership?.points || 0} redeemablePoints={customerData?.membership?.points || 0} ownerProfile={ownerProfile as any} onShowQR={() => setIsQRCodeOpen(true)} />
               <UpcomingAppointments />
-              <HomeQuickActions onCouponsClick={() => setActiveTab('promo')} onAppointmentClick={() => toast.info('เร็วๆ นี้')} />
+              <HomeQuickActions onCouponsClick={handleGoToMyCoupons} onAppointmentClick={() => toast.info('เร็วๆ นี้')} />
               <PetList pets={petsList as any} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
-              <MyCouponsHomePreview coupons={userInventory.filter(c => !c.is_used) as any} onViewAll={() => setActiveTab('promo')} />
+              <MyCouponsHomePreview coupons={userInventory.filter(c => !c.is_used) as any} onViewAll={handleGoToMyCoupons} />
             </motion.div>
           )}
 
