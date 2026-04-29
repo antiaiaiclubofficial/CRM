@@ -310,18 +310,18 @@ const Index = () => {
 
   const handleGoToMyCoupons = () => {
     setActiveTab('promo');
-    // More robust scroll logic using the main container ref
+    // Adjusted offset and delay for better visibility
     setTimeout(() => {
       const element = document.getElementById('my-coupons-section');
       const container = mainScrollRef.current;
       if (element && container) {
-        const top = element.offsetTop - 20;
+        // Reduced scroll amount by increasing the negative offset
+        const top = element.offsetTop - 80; 
         container.scrollTo({ top, behavior: 'smooth' });
       } else if (element) {
-        // Fallback
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 400); // Higher delay to accommodate transitions
+    }, 500);
   };
 
   const petsList = useMemo(() => customerData?.pets || [], [customerData]);
