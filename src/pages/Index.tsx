@@ -310,13 +310,18 @@ const Index = () => {
 
   const handleGoToMyCoupons = () => {
     setActiveTab('promo');
-    // Wait for the tab content to render before scrolling
+    // More robust scroll logic using the main container ref
     setTimeout(() => {
       const element = document.getElementById('my-coupons-section');
-      if (element) {
+      const container = mainScrollRef.current;
+      if (element && container) {
+        const top = element.offsetTop - 20;
+        container.scrollTo({ top, behavior: 'smooth' });
+      } else if (element) {
+        // Fallback
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 100);
+    }, 400); // Higher delay to accommodate transitions
   };
 
   const petsList = useMemo(() => customerData?.pets || [], [customerData]);
