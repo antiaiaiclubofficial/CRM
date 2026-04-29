@@ -281,7 +281,27 @@ const Index = () => {
   const updateProfileMutation = useMutation({
     mutationFn: async (profileData: any) => {
       if (!customerData?.profile?.id) throw new Error("Missing customer ID");
-      const { error } = await supabase.from('customers').update(profileData).eq('id', customerData.profile.id);
+      
+      // Map the camelCase field names from the UI to snake_case field names for the database
+      const dbData = {
+        first_name: profileData.firstName,
+        last_name: profileData.lastName,
+        gender: profileData.gender,
+        age: profileData.age,
+        phone: profileData.phone,
+        address: profileData.address,
+        sub_district: profileData.subDistrict,
+        district: profileData.district,
+        province: profileData.province,
+        postal_code: profileData.postalCode,
+        email: profileData.email,
+      };
+
+      const { error } = await supabase
+        .from('customers')
+        .update(dbData)
+        .eq('id', customerData.profile.id);
+        
       if (error) throw error;
     },
     onSuccess: () => {
