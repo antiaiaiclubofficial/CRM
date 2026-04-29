@@ -411,14 +411,12 @@ const Index = () => {
     email: customerData?.profile?.email || '',
   };
 
-  const displayName = customerData?.profile?.first_name || lineProfile?.displayName;
-
   return (
     <div className="w-full h-[100dvh] max-w-md mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt'] overflow-hidden border-x border-slate-100/50">
       <header className="px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-[15px] flex justify-between items-center shrink-0 z-[50]">
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-black text-slate-800 truncate">{store?.name || 'Pet Care App'}</h1>
-          <p className="text-slate-500 text-xs font-medium">สวัสดีค่ะ คุณ{displayName} ✨</p>
+          <p className="text-slate-500 text-xs font-medium">สวัสดีค่ะ, คุณ {lineProfile?.displayName} ✨</p>
         </div>
         <motion.div whileTap={{ scale: 0.9 }} onClick={() => setIsProfileEditing(true)} className="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden bg-pink-100 cursor-pointer">
           <img src={customerData?.profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
