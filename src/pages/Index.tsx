@@ -68,38 +68,6 @@ const Index = () => {
     }
   });
 
-  // Get Available Coupon Templates
-  const { data: couponTemplates } = useQuery({
-    queryKey: ['coupon_templates', store?.id],
-    queryFn: async () => {
-      if (!store?.id) return [];
-      const { data, error } = await supabase
-        .from('coupon_templates')
-        .select('*')
-        .eq('store_id', store.id)
-        .eq('is_active', true);
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!store?.id
-  });
-
-  // Get Available Deal Templates
-  const { data: dealTemplates } = useQuery({
-    queryKey: ['deal_templates', store?.id],
-    queryFn: async () => {
-      if (!store?.id) return [];
-      const { data, error } = await supabase
-        .from('deal_templates')
-        .select('*')
-        .eq('store_id', store.id)
-        .eq('is_active', true);
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!store?.id
-  });
-
   // Main Customer Data Fetch
   const { data: customerData, isLoading: profileLoading } = useQuery({
     queryKey: ['customer_profile', lineProfile?.userId, store?.id],
@@ -165,124 +133,87 @@ const Index = () => {
     enabled: !!lineProfile?.userId && !!store?.id,
   });
 
-  // Mutation for Redeeming Coupon
-  const redeemCouponMutation = useMutation({
-    mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
-      if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
-      
-      const { error: pointError } = await supabase
-        .from('store_customers')
-        .update({ points: customerData.membership.points - pointsCost })
-        .eq('customer_id', customerData.profile.id)
-        .eq('store_id', store.id);
-      if (pointError) throw pointError;
-
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + (template.expiry_days || 30));
-      const { error: couponError } = await supabase
-        .from('customer_coupons')
-        .insert([{
-          template_id: template.id,
-          customer_id: customerData.profile.id,
-          store_id: store.id,
-          status: 'unused',
-          expires_at: expiryDate.toISOString()
-        }]);
-      if (couponError) throw couponError;
-    },
-    onSuccess: () => {
-      toast.success('แลกคูปองเรียบร้อยแล้วค่ะ! 🎫');
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-    }
-  });
-
-  // Mutation for Buying Deal
-  const buyDealMutation = useMutation({
-    mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
-      if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
-      
-      const { error: pointError } = await supabase
-        .from('store_customers')
-        .update({ points: customerData.membership.points - pointsCost })
-        .eq('customer_id', customerData.profile.id)
-        .eq('store_id', store.id);
-      if (pointError) throw pointError;
-
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + (template.expiry_days || 7));
-      const { error: dealError } = await supabase
-        .from('customers_deals')
-        .insert([{
-          template_id: template.id,
-          customer_id: customerData.profile.id,
-          store_id: store.id,
-          status: 'unused',
-          expires_at: expiryDate.toISOString()
-        }]);
-      if (dealError) throw dealError;
-    },
-    onSuccess: () => {
-      toast.success('ซื้อดีลพิเศษเรียบร้อยแล้วค่ะ! ✨');
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-    }
-  });
-
-  // Mutation for Using Coupon/Deal
-  const confirmUseMutation = useMutation({
-    mutationFn: async (item: any) => {
-      const table = item.is_deal ? 'customers_deals' : 'customer_coupons';
-      const { error } = await supabase
-        .from(table)
-        .update({ status: 'used', used_at: new Date().toISOString() })
-        .eq('id', item.id);
+  // Get Available Templates
+  const { data: couponTemplates } = useQuery({
+    queryKey: ['coupon_templates', store?.id],
+    queryFn: async () => {
+      if (!store?.id) return [];
+      const { data, error } = await supabase
+        .from('coupon_templates')
+        .select('*')
+        .eq('store_id', store.id)
+        .eq('is_active', true);
       if (error) throw error;
+      return data;
     },
-    onSuccess: () => {
-      toast.success('ใช้งานเรียบร้อยแล้วค่ะ ✨');
-      setIsCouponUseModalOpen(false);
-      setSelectedCouponToUse(null);
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-    }
+    enabled: !!store?.id
   });
 
-  // Mutation for adding/updating pets
-  const petMutation = useMutation({
-    mutationFn: async (pet: any) => {
-      if (!customerData?.profile?.id) throw new Error("Missing customer ID");
-      const { id, ...petData } = pet;
-      if (id) {
-        const { error } = await supabase.from('pets').update(petData).eq('id', id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('pets').insert([{ ...petData, customer_id: customerData.profile.id }]);
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      toast.success('บันทึกข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ 🐾');
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-    }
-  });
-
-  // Mutation for deleting pets
-  const deletePetMutation = useMutation({
-    mutationFn: async (petId: string | number) => {
-      const { error } = await supabase.from('pets').delete().eq('id', petId);
+  const { data: dealTemplates } = useQuery({
+    queryKey: ['deal_templates', store?.id],
+    queryFn: async () => {
+      if (!store?.id) return [];
+      const { data, error } = await supabase
+        .from('deal_templates')
+        .select('*')
+        .eq('store_id', store.id)
+        .eq('is_active', true);
       if (error) throw error;
+      return data;
+    },
+    enabled: !!store?.id
+  });
+
+  // Registration Mutation
+  const registerMutation = useMutation({
+    mutationFn: async (regData: any) => {
+      if (!lineProfile?.userId || !store?.id) throw new Error("Missing LINE profile or store context");
+      
+      const { data: newCustomer, error: custError } = await supabase
+        .from('customers')
+        .insert([{
+          line_user_id: lineProfile.userId,
+          display_name: lineProfile.displayName,
+          avatar_url: lineProfile.pictureUrl,
+          first_name: regData.firstName,
+          last_name: regData.lastName,
+          phone: regData.phone,
+          email: regData.email,
+          gender: regData.gender,
+          age: regData.age,
+          address: regData.address,
+          sub_district: regData.subDistrict,
+          district: regData.district,
+          province: regData.province,
+          postal_code: regData.postalCode
+        }])
+        .select()
+        .single();
+        
+      if (custError) throw custError;
+
+      const { error: memberError } = await supabase
+        .from('store_customers')
+        .insert([{
+          customer_id: newCustomer.id,
+          store_id: store.id,
+          points: 0,
+          tier: 'bronze'
+        }]);
+        
+      if (memberError) throw memberError;
     },
     onSuccess: () => {
-      toast.success('ลบข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ');
-      setSelectedPetId(null);
+      toast.success('ลงทะเบียนเรียบร้อยแล้วค่ะ ยินดีต้อนรับนะคะ! ✨');
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
     }
   });
 
-  // Mutation for updating profile
+  // Update Profile Mutation
   const updateProfileMutation = useMutation({
     mutationFn: async (profileData: any) => {
       if (!customerData?.profile?.id) throw new Error("Missing customer ID");
       
-      // Map the camelCase field names from the UI to snake_case field names for the database
       const dbData = {
         first_name: profileData.firstName,
         last_name: profileData.lastName,
@@ -310,17 +241,71 @@ const Index = () => {
     }
   });
 
-  // Mutation for saving pet preferences
+  // Coupons/Deals Mutations
+  const redeemCouponMutation = useMutation({
+    mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
+      if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
+      const { error: ptErr } = await supabase.from('store_customers').update({ points: customerData.membership.points - pointsCost }).eq('customer_id', customerData.profile.id).eq('store_id', store.id);
+      if (ptErr) throw ptErr;
+      const expiry = new Date(); expiry.setDate(expiry.getDate() + (template.expiry_days || 30));
+      const { error: cpErr } = await supabase.from('customer_coupons').insert([{ template_id: template.id, customer_id: customerData.profile.id, store_id: store.id, status: 'unused', expires_at: expiry.toISOString() }]);
+      if (cpErr) throw cpErr;
+    },
+    onSuccess: () => { toast.success('แลกคูปองเรียบร้อยแล้วค่ะ! 🎫'); queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); }
+  });
+
+  const buyDealMutation = useMutation({
+    mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
+      if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
+      const { error: ptErr } = await supabase.from('store_customers').update({ points: customerData.membership.points - pointsCost }).eq('customer_id', customerData.profile.id).eq('store_id', store.id);
+      if (ptErr) throw ptErr;
+      const expiry = new Date(); expiry.setDate(expiry.getDate() + (template.expiry_days || 7));
+      const { error: dlErr } = await supabase.from('customers_deals').insert([{ template_id: template.id, customer_id: customerData.profile.id, store_id: store.id, status: 'unused', expires_at: expiry.toISOString() }]);
+      if (dlErr) throw dlErr;
+    },
+    onSuccess: () => { toast.success('ซื้อดีลพิเศษเรียบร้อยแล้วค่ะ! ✨'); queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); }
+  });
+
+  const confirmUseMutation = useMutation({
+    mutationFn: async (item: any) => {
+      const table = item.is_deal ? 'customers_deals' : 'customer_coupons';
+      const { error } = await supabase.from(table).update({ status: 'used', used_at: new Date().toISOString() }).eq('id', item.id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success('ใช้งานเรียบร้อยแล้วค่ะ ✨'); setIsCouponUseModalOpen(false); setSelectedCouponToUse(null); queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); }
+  });
+
+  // Pet Mutations
+  const petMutation = useMutation({
+    mutationFn: async (pet: any) => {
+      if (!customerData?.profile?.id) throw new Error("Missing customer ID");
+      const { id, ...petData } = pet;
+      if (id) {
+        const { error } = await supabase.from('pets').update(petData).eq('id', id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('pets').insert([{ ...petData, customer_id: customerData.profile.id }]);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => { toast.success('บันทึกข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ 🐾'); queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); }
+  });
+
+  const deletePetMutation = useMutation({
+    mutationFn: async (petId: string | number) => {
+      const { error } = await supabase.from('pets').delete().eq('id', petId);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success('ลบข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ'); setSelectedPetId(null); queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); }
+  });
+
   const savePreferencesMutation = useMutation({
     mutationFn: async (preferences: any) => {
       if (!selectedPetId) throw new Error("No pet selected");
       const { error } = await supabase.from('pets').update({ custom_preferences: preferences }).eq('id', selectedPetId);
       if (error) throw error;
     },
-    onSuccess: () => {
-      toast.success('บันทึกความชอบส่วนตัวเรียบร้อยแล้วค่ะ 🦴');
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-    }
+    onSuccess: () => { toast.success('บันทึกความชอบส่วนตัวเรียบร้อยแล้วค่ะ 🦴'); queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); }
   });
 
   const handleNavClick = (tab: string) => {
@@ -330,16 +315,12 @@ const Index = () => {
 
   const handleGoToMyCoupons = () => {
     setActiveTab('promo');
-    // Adjusted offset and delay for better visibility
     setTimeout(() => {
       const element = document.getElementById('my-coupons-section');
       const container = mainScrollRef.current;
       if (element && container) {
-        // Reduced scroll amount by increasing the negative offset
         const top = element.offsetTop - 80; 
         container.scrollTo({ top, behavior: 'smooth' });
-      } else if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }, 500);
   };
@@ -359,54 +340,13 @@ const Index = () => {
   })), [customerData]);
 
   const userInventory = useMemo(() => {
-    const coupons = (customerData?.coupons || []).map(c => ({
-      id: c.id,
-      template_id: c.template_id,
-      title: c.coupon_templates?.title || 'คูปอง',
-      description: c.coupon_templates?.description || `หมดอายุ ${formatDateThai(c.expires_at)}`,
-      expiry: formatDateThai(c.expires_at),
-      iconName: c.coupon_templates?.icon_name || 'Ticket',
-      bg: c.coupon_templates?.bg_color || 'bg-pink-50',
-      is_used: c.status === 'used',
-      is_deal: false,
-      priority: 2
-    }));
-
-    const deals = (customerData?.deals || []).map(d => ({
-      id: d.id,
-      template_id: d.template_id,
-      title: d.deal_templates?.title || 'ดีลพิเศษ',
-      description: d.deal_templates?.description || `หมดอายุ ${formatDateThai(d.expires_at)}`,
-      expiry: formatDateThai(d.expires_at),
-      iconName: d.deal_templates?.icon_name || 'Zap',
-      bg: d.deal_templates?.bg_color || 'bg-amber-50',
-      is_used: d.status === 'used',
-      is_deal: true,
-      priority: 1 // Highest priority for deals
-    }));
-
+    const coupons = (customerData?.coupons || []).map(c => ({ id: c.id, template_id: c.template_id, title: c.coupon_templates?.title || 'คูปอง', description: c.coupon_templates?.description || `หมดอายุ ${formatDateThai(c.expires_at)}`, expiry: formatDateThai(c.expires_at), iconName: c.coupon_templates?.icon_name || 'Ticket', bg: c.coupon_templates?.bg_color || 'bg-pink-50', is_used: c.status === 'used', is_deal: false, priority: 2 }));
+    const deals = (customerData?.deals || []).map(d => ({ id: d.id, template_id: d.template_id, title: d.deal_templates?.title || 'ดีลพิเศษ', description: d.deal_templates?.description || `หมดอายุ ${formatDateThai(d.expires_at)}`, expiry: formatDateThai(d.expires_at), iconName: d.deal_templates?.icon_name || 'Zap', bg: d.deal_templates?.bg_color || 'bg-amber-50', is_used: d.status === 'used', is_deal: true, priority: 1 }));
     return [...deals, ...coupons].sort((a, b) => a.priority - b.priority);
   }, [customerData]);
 
-  const availableRedeemables = useMemo(() => (couponTemplates || []).map(t => ({
-    id: t.id,
-    title: t.title,
-    description: t.description || (t.points_required > 0 ? `แลกด้วย ${t.points_required} คะแนน` : 'โปรโมชั่นพิเศษ'),
-    pointsRequired: t.points_required,
-    expiry: `${t.expiry_days} วัน`,
-    iconName: t.icon_name || 'Tag',
-    bg: t.bg_color || (t.points_required === 0 ? 'bg-pink-50' : 'bg-rose-50')
-  })), [couponTemplates]);
-
-  const availableDeals = useMemo(() => (dealTemplates || []).map(t => ({
-    id: t.id,
-    title: t.title,
-    description: t.description,
-    pointsRequired: t.points_required,
-    expiry: `${t.expiry_days} วัน`,
-    iconName: t.icon_name || 'Zap',
-    bg: t.bg_color || 'bg-blue-50'
-  })), [dealTemplates]);
+  const availableRedeemables = useMemo(() => (couponTemplates || []).map(t => ({ id: t.id, title: t.title, description: t.description || (t.points_required > 0 ? `แลกด้วย ${t.points_required} คะแนน` : 'โปรโมชั่นพิเศษ'), pointsRequired: t.points_required, expiry: `${t.expiry_days} วัน`, iconName: t.icon_name || 'Tag', bg: t.bg_color || (t.points_required === 0 ? 'bg-pink-50' : 'bg-rose-50') })), [couponTemplates]);
+  const availableDeals = useMemo(() => (dealTemplates || []).map(t => ({ id: t.id, title: t.title, description: t.description, pointsRequired: t.points_required, expiry: `${t.expiry_days} วัน`, iconName: t.icon_name || 'Zap', bg: t.bg_color || 'bg-blue-50' })), [dealTemplates]);
 
   if (liffLoading || storeLoading || (lineProfile && profileLoading)) {
     return (
@@ -415,6 +355,11 @@ const Index = () => {
         <p className="mt-6 font-black text-slate-800 text-lg">กำลังเตรียมข้อมูล... 🐾</p>
       </div>
     );
+  }
+
+  // If user is logged in with LINE but has no customer record in database
+  if (lineProfile && !customerData?.profile && !profileLoading) {
+    return <Register lineProfile={lineProfile} onSuccess={() => {}} onSave={async (data) => { await registerMutation.mutateAsync(data); }} />;
   }
 
   const ownerProfile = {
@@ -457,16 +402,7 @@ const Index = () => {
 
           {activeTab === 'promo' && (
             <motion.div key="promo-tab">
-               <Promotions 
-                userPoints={customerData?.membership?.points || 0} 
-                collectedCoupons={userInventory.filter(c => !c.is_used) as any} 
-                usedOrExpiredCoupons={userInventory.filter(c => c.is_used) as any} 
-                redeemableTemplates={availableRedeemables}
-                dealTemplates={availableDeals}
-                onRedeemCoupon={(c, cost) => redeemCouponMutation.mutate({ template: c, pointsCost: cost })} 
-                onBuyDeal={(d, cost) => buyDealMutation.mutate({ template: d, pointsCost: cost })}
-                onUseCoupon={(item) => { setSelectedCouponToUse(item); setIsCouponUseModalOpen(true); }} 
-               />
+               <Promotions userPoints={customerData?.membership?.points || 0} collectedCoupons={userInventory.filter(c => !c.is_used) as any} usedOrExpiredCoupons={userInventory.filter(c => c.is_used) as any} redeemableTemplates={availableRedeemables} dealTemplates={availableDeals} onRedeemCoupon={(c, cost) => redeemCouponMutation.mutate({ template: c, pointsCost: cost })} onBuyDeal={(d, cost) => buyDealMutation.mutate({ template: d, pointsCost: cost })} onUseCoupon={(item) => { setSelectedCouponToUse(item); setIsCouponUseModalOpen(true); }} />
             </motion.div>
           )}
 
