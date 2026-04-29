@@ -209,7 +209,7 @@ const Index = () => {
     }
   });
 
-  // Update Profile Mutation
+  // Update Profile Mutation with Cache Update for instant UI change
   const updateProfileMutation = useMutation({
     mutationFn: async (profileData: any) => {
       if (!customerData?.profile?.id) throw new Error("Missing customer ID");
@@ -234,9 +234,22 @@ const Index = () => {
         .eq('id', customerData.profile.id);
         
       if (error) throw error;
+      return dbData;
     },
-    onSuccess: () => {
+    onSuccess: (updatedData) => {
+      // Manually update the cache for instant UI feedback
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          profile: {
+            ...oldData.profile,
+            ...updatedData
+          }
+        };
+      });
       toast.success('อัปเดตโปรไฟล์เรียบร้อยแล้วค่ะ ✨');
+      // Still invalidate to ensure sync with server
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
     }
   });
@@ -251,7 +264,10 @@ const Index = () => {
       const { error: cpErr } = await supabase.from('customer_coupons').insert([{ template_id: template.id, customer_id: customerData.profile.id, store_id: store.id, status: 'unused', expires_at: expiry.toISOString() }]);
       if (cpErr) throw cpErr;
     },
-    onSuccess: () => { toast.success('แลกคูปองเรียบร้อยแล้วค่ะ! 🎫'); queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); }
+    onSuccess: () => { 
+      toast.success('แลกคูปองเรียบร้อยแล้วค่ะ! 🎫'); 
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); 
+    }
   });
 
   const buyDealMutation = useMutation({
@@ -263,7 +279,10 @@ const Index = () => {
       const { error: dlErr } = await supabase.from('customers_deals').insert([{ template_id: template.id, customer_id: customerData.profile.id, store_id: store.id, status: 'unused', expires_at: expiry.toISOString() }]);
       if (dlErr) throw dlErr;
     },
-    onSuccess: () => { toast.success('ซื้อดีลพิเศษเรียบร้อยแล้วค่ะ! ✨'); queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); }
+    onSuccess: () => { 
+      toast.success('ซื้อดีลพิเศษเรียบร้อยแล้วค่ะ! ✨'); 
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); 
+    }
   });
 
   const confirmUseMutation = useMutation({
@@ -272,10 +291,15 @@ const Index = () => {
       const { error } = await supabase.from(table).update({ status: 'used', used_at: new Date().toISOString() }).eq('id', item.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success('ใช้งานเรียบร้อยแล้วค่ะ ✨'); setIsCouponUseModalOpen(false); setSelectedCouponToUse(null); queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); }
+    onSuccess: () => { 
+      toast.success('ใช้งานเรียบร้อยแล้วค่ะ ✨'); 
+      setIsCouponUseModalOpen(false); 
+      setSelectedCouponToUse(null); 
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); 
+    }
   });
 
-  // Pet Mutations
+  // Pet Mutations with Cache Updates
   const petMutation = useMutation({
     mutationFn: async (pet: any) => {
       if (!customerData?.profile?.id) throw new Error("Missing customer ID");
@@ -283,12 +307,17 @@ const Index = () => {
       if (id) {
         const { error } = await supabase.from('pets').update(petData).eq('id', id);
         if (error) throw error;
+        return { ...petData, id };
       } else {
-        const { error } = await supabase.from('pets').insert([{ ...petData, customer_id: customerData.profile.id }]);
+        const { data, error } = await supabase.from('pets').insert([{ ...petData, customer_id: customerData.profile.id }]).select().single();
         if (error) throw error;
+        return data;
       }
     },
-    onSuccess: () => { toast.success('บันทึกข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ 🐾'); queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); }
+    onSuccess: () => { 
+      toast.success('บันทึกข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ 🐾'); 
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); 
+    }
   });
 
   const deletePetMutation = useMutation({
@@ -296,7 +325,11 @@ const Index = () => {
       const { error } = await supabase.from('pets').delete().eq('id', petId);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success('ลบข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ'); setSelectedPetId(null); queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); }
+    onSuccess: () => { 
+      toast.success('ลบข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ'); 
+      setSelectedPetId(null); 
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); 
+    }
   });
 
   const savePreferencesMutation = useMutation({
@@ -304,8 +337,20 @@ const Index = () => {
       if (!selectedPetId) throw new Error("No pet selected");
       const { error } = await supabase.from('pets').update({ custom_preferences: preferences }).eq('id', selectedPetId);
       if (error) throw error;
+      return preferences;
     },
-    onSuccess: () => { toast.success('บันทึกความชอบส่วนตัวเรียบร้อยแล้วค่ะ 🦴'); queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); }
+    onSuccess: (newPrefs) => {
+      // Instant cache update for pet preferences
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          pets: oldData.pets.map((p: any) => p.id === selectedPetId ? { ...p, custom_preferences: newPrefs } : p)
+        };
+      });
+      toast.success('บันทึกความชอบส่วนตัวเรียบร้อยแล้วค่ะ 🦴');
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    }
   });
 
   const handleNavClick = (tab: string) => {
@@ -376,12 +421,15 @@ const Index = () => {
     email: customerData?.profile?.email || '',
   };
 
+  // Determine the display name for the greeting: use registered first name or fallback to LINE display name
+  const greetingName = customerData?.profile?.first_name || lineProfile?.displayName;
+
   return (
     <div className="w-full h-[100dvh] max-w-md mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt'] overflow-hidden border-x border-slate-100/50">
       <header className="px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-[15px] flex justify-between items-center shrink-0 z-[50]">
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-black text-slate-800 truncate">{store?.name || 'Pet Care App'}</h1>
-          <p className="text-slate-500 text-xs font-medium">สวัสดีค่ะ, คุณ {lineProfile?.displayName} ✨</p>
+          <p className="text-slate-500 text-xs font-medium">สวัสดีค่ะ, คุณ {greetingName} ✨</p>
         </div>
         <motion.div whileTap={{ scale: 0.9 }} onClick={() => setIsProfileEditing(true)} className="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden bg-pink-100 cursor-pointer">
           <img src={customerData?.profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
