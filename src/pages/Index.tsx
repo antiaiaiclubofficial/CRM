@@ -20,6 +20,7 @@ import QRCodeModal from '@/components/QRCodeModal';
 import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
 import CouponUseModal from '@/components/CouponUseModal';
 import HomeQuickActions from '@/components/HomeQuickActions';
+import AppointmentList from '@/components/AppointmentList';
 import Register from './Register';
 import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles, PlusCircle, LogIn, FlaskConical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -116,6 +117,12 @@ const Index = () => {
         .eq('store_id', store.id)
         .order('created_at', { ascending: false });
 
+      const { data: appointments, error: aptError } = await supabase
+        .from('appointments')
+        .select('*, pets(*)')
+        .eq('customer_id', customer.id)
+        .order('start_time', { ascending: true });
+
       return {
         profile: customer,
         membership: membership,
@@ -127,7 +134,8 @@ const Index = () => {
         })),
         coupons: coupons || [],
         deals: deals || [],
-        history: history || []
+        history: history || [],
+        appointments: appointments || []
       };
     },
     enabled: !!lineProfile?.userId && !!store?.id,
@@ -384,6 +392,14 @@ const Index = () => {
     description: h.note,
   })), [customerData]);
 
+  const appointmentHistory = useMemo(() => (customerData?.appointments || []).map(a => ({
+    id: a.id,
+    petName: a.pets?.name || 'ไม่ระบุ',
+    service: 'รับบริการนัดหมาย',
+    startTime: a.start_time,
+    status: a.status
+  })), [customerData]);
+
   const userInventory = useMemo(() => {
     const coupons = (customerData?.coupons || []).map(c => ({ id: c.id, template_id: c.template_id, title: c.coupon_templates?.title || 'คูปอง', description: c.coupon_templates?.description || `หมดอายุ ${formatDateThai(c.expires_at)}`, expiry: formatDateThai(c.expires_at), iconName: c.coupon_templates?.icon_name || 'Ticket', bg: c.coupon_templates?.bg_color || 'bg-pink-50', is_used: c.status === 'used', is_deal: false, priority: 2 }));
     const deals = (customerData?.deals || []).map(d => ({ id: d.id, template_id: d.template_id, title: d.deal_templates?.title || 'ดีลพิเศษ', description: d.deal_templates?.description || `หมดอายุ ${formatDateThai(d.expires_at)}`, expiry: formatDateThai(d.expires_at), iconName: d.deal_templates?.icon_name || 'Zap', bg: d.deal_templates?.bg_color || 'bg-amber-50', is_used: d.status === 'used', is_deal: true, priority: 1 }));
@@ -442,9 +458,15 @@ const Index = () => {
             <motion.div key="home" className="space-y-6">
               <MembershipCard totalAccumulatedPoints={customerData?.membership?.points || 0} redeemablePoints={customerData?.membership?.points || 0} ownerProfile={ownerProfile as any} onShowQR={() => setIsQRCodeOpen(true)} />
               <UpcomingAppointments />
-              <HomeQuickActions onCouponsClick={handleGoToMyCoupons} onAppointmentClick={() => toast.info('เร็วๆ นี้')} />
+              <HomeQuickActions onCouponsClick={handleGoToMyCoupons} onAppointmentClick={() => handleNavClick('appointments')} />
               <PetList pets={petsList as any} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
               <MyCouponsHomePreview coupons={userInventory.filter(c => !c.is_used) as any} onViewAll={handleGoToMyCoupons} />
+            </motion.div>
+          )}
+
+          {activeTab === 'appointments' && (
+            <motion.div key="appointments-tab">
+               <AppointmentList appointments={appointmentHistory as any} onAddClick={() => toast.info('ฟีเจอร์การจองนัดหมายจะเปิดให้บริการเร็วๆ นี้ค่ะ 📅')} />
             </motion.div>
           )}
 
@@ -486,6 +508,7 @@ const Index = () => {
 
       <nav className="fixed bottom-[10px] left-6 right-6 max-w-[calc(theme(maxWidth.md)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-[40] border border-white/60">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
+        <NavButton active={activeTab === 'appointments'} icon={<Calendar size={22} />} onClick={() => handleNavClick('appointments')} />
         <NavButton active={activeTab === 'level'} icon={<Award size={22} />} onClick={() => handleNavClick('level')} />
         <NavButton active={activeTab === 'pets'} icon={<PawPrint size={22} />} onClick={() => handleNavClick('pets')} />
         <NavButton active={activeTab === 'promo'} icon={<Megaphone size={22} />} onClick={() => handleNavClick('promo')} />
@@ -496,7 +519,7 @@ const Index = () => {
 };
 
 const NavButton = ({ active, icon, onClick }: { active: boolean; icon: any; onClick: () => void }) => (
-  <button onClick={onClick} className="relative flex items-center justify-center w-12 h-12">
+  <button onClick={onClick} className="relative flex items-center justify-center w-10 h-10">
     {active && <motion.div layoutId="activeNavBg" className="absolute inset-0 bg-gradient-to-b from-[#FFA14A] to-[#FF4B91] rounded-full shadow-lg" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />}
     <div className={`relative z-10 ${active ? 'text-white' : 'text-slate-600'}`}>{icon}</div>
   </button>
