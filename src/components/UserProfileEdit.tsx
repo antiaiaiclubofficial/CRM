@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Phone, MapPin, Mail, Calendar, Check } from 'lucide-react';
+import { X, User, Phone, MapPin, Mail, Calendar, Check, Home } from 'lucide-react';
 
 interface OwnerProfile {
   firstName: string;
@@ -26,17 +26,61 @@ interface UserProfileEditProps {
 }
 
 const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditProps) => {
+  // Local state for split address fields
+  const [addressParts, setAddressParts] = React.useState({
+    houseNo: '',
+    moo: '',
+    soi: '',
+    road: ''
+  });
+  
   const [formData, setFormData] = React.useState(profile);
+
+  // Helper to parse the address string into parts
+  const parseAddress = (addressStr: string) => {
+    const parts = { houseNo: '', moo: '', soi: '', road: '' };
+    if (!addressStr) return parts;
+
+    // Simple parsing logic based on labels used in Register.tsx
+    const houseMatch = addressStr.match(/เลขที่\s*([^หมู่ซอยถนน]+)/);
+    const mooMatch = addressStr.match(/หมู่\s*([^ซอยถนน]+)/);
+    const soiMatch = addressStr.match(/ซอย\s*([^ถนน]+)/);
+    const roadMatch = addressStr.match(/ถนน\s*(.+)/);
+
+    if (houseMatch) parts.houseNo = houseMatch[1].trim();
+    if (mooMatch) parts.moo = mooMatch[1].trim();
+    if (soiMatch) parts.soi = soiMatch[1].trim();
+    if (roadMatch) parts.road = roadMatch[1].trim();
+
+    // Fallback: if no labels found, put everything in houseNo
+    if (!houseMatch && !mooMatch && !soiMatch && !roadMatch) {
+      parts.houseNo = addressStr;
+    }
+
+    return parts;
+  };
 
   // Sync with prop when it opens
   React.useEffect(() => {
     if (isOpen) {
       setFormData(profile);
+      setAddressParts(parseAddress(profile.address));
     }
   }, [isOpen, profile]);
 
   const handleSave = () => {
-    onSave(formData);
+    // Reconstruct the address string
+    const fullAddress = [
+      addressParts.houseNo ? `เลขที่ ${addressParts.houseNo}` : '',
+      addressParts.moo ? `หมู่ ${addressParts.moo}` : '',
+      addressParts.soi ? `ซอย ${addressParts.soi}` : '',
+      addressParts.road ? `ถนน ${addressParts.road}` : ''
+    ].filter(Boolean).join(' ');
+
+    onSave({
+      ...formData,
+      address: fullAddress
+    });
     onClose();
   };
 
@@ -137,17 +181,58 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                 />
               </div>
 
-              {/* Separated Address Fields */}
+              {/* Split Address Section */}
               <div className="space-y-4 pt-2 border-t border-slate-50">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1"><MapPin size={12}/> ที่อยู่</label>
-                  <input 
-                    type="text" 
-                    value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
-                    placeholder="เลขที่บ้าน, หมู่, ซอย, ถนน"
-                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
-                  />
+                <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1">
+                  <MapPin size={12} className="text-pink-500" /> ข้อมูลที่อยู่
+                </label>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-400 px-2 flex items-center gap-1">
+                      <Home size={10} /> เลขที่บ้าน
+                    </label>
+                    <input 
+                      type="text" 
+                      value={addressParts.houseNo}
+                      onChange={(e) => setAddressParts({...addressParts, houseNo: e.target.value})}
+                      placeholder="เช่น 123/4"
+                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-400 px-2">หมู่ที่</label>
+                    <input 
+                      type="text" 
+                      value={addressParts.moo}
+                      onChange={(e) => setAddressParts({...addressParts, moo: e.target.value})}
+                      placeholder="เช่น 5"
+                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-400 px-2">ซอย</label>
+                    <input 
+                      type="text" 
+                      value={addressParts.soi}
+                      onChange={(e) => setAddressParts({...addressParts, soi: e.target.value})}
+                      placeholder="เช่น สุขุมวิท 1"
+                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-400 px-2">ถนน</label>
+                    <input 
+                      type="text" 
+                      value={addressParts.road}
+                      onChange={(e) => setAddressParts({...addressParts, road: e.target.value})}
+                      placeholder="เช่น รามคำแหง"
+                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -158,7 +243,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       value={formData.subDistrict}
                       onChange={(e) => setFormData({...formData, subDistrict: e.target.value})}
                       placeholder="ตำบล"
-                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
                     />
                   </div>
                   <div className="space-y-1">
@@ -168,7 +253,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       value={formData.district}
                       onChange={(e) => setFormData({...formData, district: e.target.value})}
                       placeholder="อำเภอ"
-                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
                     />
                   </div>
                 </div>
@@ -181,7 +266,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       value={formData.province}
                       onChange={(e) => setFormData({...formData, province: e.target.value})}
                       placeholder="จังหวัด"
-                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
                     />
                   </div>
                   <div className="space-y-1">
@@ -191,7 +276,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       value={formData.postalCode}
                       onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
                       placeholder="10XXX"
-                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
                     />
                   </div>
                 </div>
