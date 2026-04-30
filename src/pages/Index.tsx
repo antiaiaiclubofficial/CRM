@@ -318,7 +318,7 @@ const Index = () => {
   const buyDealMutation = useMutation({
     mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
       if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
-      const { error: ptErr } = await supabase.from('store_customers').update({ points: customerData.membership.points - pointsCost }).eq('customer_id', customerData.profile.id).eq('store_id', store.id);
+      const { error: ptErr = null } = await supabase.from('store_customers').update({ points: customerData.membership.points - pointsCost }).eq('customer_id', customerData.profile.id).eq('store_id', store.id);
       if (ptErr) throw ptErr;
       const expiry = new Date(); expiry.setDate(expiry.getDate() + (template.expiry_days || 7));
       const { error: dlErr } = await supabase.from('customers_deals').insert([{ template_id: template.id, customer_id: customerData.profile.id, store_id: store.id, status: 'unused', expires_at: expiry.toISOString() }]);
@@ -494,7 +494,7 @@ const Index = () => {
           {activeTab === 'home' && (
             <motion.div key="home" className="space-y-6">
               <MembershipCard totalAccumulatedPoints={customerData?.membership?.points || 0} redeemablePoints={customerData?.membership?.points || 0} ownerProfile={ownerProfile as any} onShowQR={() => setIsQRCodeOpen(true)} />
-              <UpcomingAppointments />
+              <UpcomingAppointments appointments={appointmentHistory as any} onViewAll={() => handleNavClick('appointments')} />
               <HomeQuickActions onCouponsClick={handleGoToMyCoupons} onAppointmentClick={() => handleNavClick('appointments')} />
               <PetList pets={petsList as any} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
               <MyCouponsHomePreview coupons={userInventory.filter(c => !c.is_used) as any} onViewAll={handleGoToMyCoupons} />
