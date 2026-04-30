@@ -92,10 +92,10 @@ const BookingForm = ({ isOpen, onClose, pets, services, onConfirm }: BookingForm
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl flex flex-col"
+            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] h-[85vh] overflow-hidden shadow-2xl flex flex-col"
           >
             {/* Header */}
-            <div className="flex justify-between items-center sticky top-0 bg-white pt-8 pb-4 px-8 z-10 rounded-t-[3rem] border-b border-slate-50">
+            <div className="flex justify-between items-center shrink-0 bg-white pt-8 pb-4 px-8 z-10 rounded-t-[3rem] border-b border-slate-50">
               <div className="flex items-center gap-3">
                  {step > 1 && (
                    <button onClick={handleBack} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
@@ -110,14 +110,14 @@ const BookingForm = ({ isOpen, onClose, pets, services, onConfirm }: BookingForm
             </div>
 
             {/* Step Content */}
-            <div className="flex-1 px-8 py-6">
+            <div className="flex-1 px-8 py-6 overflow-y-auto no-scrollbar">
               {step === 1 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
                   <div className="flex items-center gap-2 mb-2">
                     <PawPrint size={18} className="text-pink-500" />
                     <h4 className="font-bold text-slate-700">เลือกสัตว์เลี้ยง</h4>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 pb-4">
                     {pets.map(pet => (
                       <button
                         key={pet.id}
@@ -145,7 +145,7 @@ const BookingForm = ({ isOpen, onClose, pets, services, onConfirm }: BookingForm
                     <Scissors size={18} className="text-pink-500" />
                     <h4 className="font-bold text-slate-700">เลือกประเภทบริการ</h4>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-3 pb-4">
                     {services.map(service => (
                       <button
                         key={service.id}
@@ -182,7 +182,7 @@ const BookingForm = ({ isOpen, onClose, pets, services, onConfirm }: BookingForm
                     </div>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-3 pb-4">
                     <div className="flex items-center gap-2">
                       <Clock size={18} className="text-pink-500" />
                       <h4 className="font-bold text-slate-700">เลือกเวลา</h4>
@@ -203,7 +203,7 @@ const BookingForm = ({ isOpen, onClose, pets, services, onConfirm }: BookingForm
                   <button
                     disabled={!selectedDate || !selectedTime}
                     onClick={handleNext}
-                    className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black shadow-lg disabled:opacity-50 mt-4"
+                    className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black shadow-lg disabled:opacity-50 mt-4 mb-8"
                   >
                     ดูสรุปรายละเอียด
                   </button>
@@ -211,7 +211,7 @@ const BookingForm = ({ isOpen, onClose, pets, services, onConfirm }: BookingForm
               )}
 
               {step === 4 && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 pb-12">
                   <div className="bg-slate-50 p-6 rounded-[2.5rem] border-2 border-black shadow-soft space-y-4">
                     <h4 className="font-black text-center text-slate-800 border-b border-black/5 pb-2 uppercase tracking-widest text-xs">สรุปการจอง</h4>
                     <div className="space-y-3 text-sm">

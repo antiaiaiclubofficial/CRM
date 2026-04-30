@@ -99,17 +99,17 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
+            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] h-[85vh] overflow-hidden shadow-2xl flex flex-col"
           >
             {/* Header */}
-            <div className="flex justify-between items-center sticky top-0 bg-white pt-8 pb-4 px-8 z-10 rounded-t-[3rem]">
+            <div className="flex justify-between items-center shrink-0 bg-white pt-8 pb-4 px-8 z-10 rounded-t-[3rem]">
               <h3 className="font-bold text-xl text-slate-800">ข้อมูลส่วนตัว</h3>
               <button onClick={handleSave} className="p-2 bg-slate-100 rounded-full text-slate-400">
                 <X size={20} />
               </button>
             </div>
 
-            <div className="space-y-5 px-8 pb-24">
+            <div className="flex-1 space-y-5 px-8 pb-24 overflow-y-auto no-scrollbar pt-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
@@ -258,7 +258,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 pb-8">
                   <div className="space-y-1.5">
                     <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">จังหวัด</label>
                     <input 
@@ -284,7 +284,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
 
               <button 
                 onClick={handleSave}
-                className="w-full py-4 bg-pink-500 text-white rounded-2xl font-bold shadow-lg shadow-pink-200 mt-4 transition-all active:scale-95 flex items-center justify-center gap-2 border-2 border-black"
+                className="w-full py-4 bg-pink-500 text-white rounded-2xl font-bold shadow-lg shadow-pink-200 mt-4 transition-all active:scale-95 flex items-center justify-center gap-2 border-2 border-black mb-8"
               >
                 <Check size={20} strokeWidth={3} />
                 บันทึกการเปลี่ยนแปลง

@@ -120,18 +120,18 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
+            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] h-[85vh] overflow-hidden shadow-2xl flex flex-col"
           >
-            <div className="flex justify-between items-center sticky top-0 bg-white pt-8 pb-4 px-8 z-10 rounded-t-[3rem]">
+            <div className="flex justify-between items-center shrink-0 bg-white pt-8 pb-4 px-8 z-10 rounded-t-[3rem]">
               <h3 className="font-bold text-xl text-slate-800">{initialData ? 'แก้ไขข้อมูลสัตว์เลี้ยง' : 'เพิ่มสัตว์เลี้ยงใหม่'}</h3>
               <button onClick={executeSave} className="p-2 bg-slate-100 rounded-full text-slate-400">
                 <X size={20} />
               </button>
             </div>
 
-            <div className="space-y-6 px-8 pb-24">
+            <div className="flex-1 space-y-6 px-8 pb-24 overflow-y-auto no-scrollbar">
               {/* Image Upload */}
-              <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center gap-3 pt-4">
                 <div 
                   onClick={() => fileInputRef.current?.click()}
                   className="relative w-28 h-28 rounded-full border-4 border-dashed border-pink-200 bg-pink-50 flex items-center justify-center overflow-hidden cursor-pointer"
@@ -232,7 +232,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 pb-8">
                   <label className="text-xs font-bold text-slate-500 flex items-center gap-1">
                     <AlertCircle size={14} className="text-amber-500" /> ข้อควรระวัง / แพ้อาหาร
                   </label>
@@ -248,7 +248,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
 
               <button 
                 onClick={executeSave}
-                className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black mt-4 shadow-lg active:scale-95 transition-all border-2 border-black"
+                className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black mt-4 shadow-lg active:scale-95 transition-all border-2 border-black mb-8"
               >
                 บันทึกข้อมูล
               </button>
