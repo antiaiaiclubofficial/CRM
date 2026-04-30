@@ -21,6 +21,7 @@ import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
 import CouponUseModal from '@/components/CouponUseModal';
 import HomeQuickActions from '@/components/HomeQuickActions';
 import AppointmentList from '@/components/AppointmentList';
+import BookingForm from '@/components/BookingForm';
 import Register from './Register';
 import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles, PlusCircle, LogIn, FlaskConical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -47,6 +48,7 @@ const Index = () => {
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
   const [selectedCouponToUse, setSelectedCouponToUse] = useState<any | null>(null);
   const [isCouponUseModalOpen, setIsCouponUseModalOpen] = useState(false);
+  const [isBookingFormOpen, setIsBookingFormOpen] = useState(false);
   
   const mainScrollRef = useRef<HTMLElement>(null);
 
@@ -119,7 +121,7 @@ const Index = () => {
 
       const { data: appointments, error: aptError } = await supabase
         .from('appointments')
-        .select('*, pets(*)')
+        .select('*, pets(*), services(*)')
         .eq('customer_id', customer.id)
         .order('start_time', { ascending: true });
 
@@ -139,6 +141,21 @@ const Index = () => {
       };
     },
     enabled: !!lineProfile?.userId && !!store?.id,
+  });
+
+  // Get Store Services
+  const { data: storeServices } = useQuery({
+    queryKey: ['store_services', store?.id],
+    queryFn: async () => {
+      if (!store?.id) return [];
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .eq('store_id', store.id);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!store?.id
   });
 
   // Get Available Templates
@@ -262,6 +279,26 @@ const Index = () => {
     }
   });
 
+  // Booking Mutation
+  const bookAppointmentMutation = useMutation({
+    mutationFn: async (bookingData: any) => {
+      if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
+      const { error } = await supabase
+        .from('appointments')
+        .insert([{
+          ...bookingData,
+          customer_id: customerData.profile.id,
+          store_id: store.id,
+          status: 'pending'
+        }]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('ส่งคำขอจองนัดหมายเรียบร้อยแล้วค่ะ กรุณารอการยืนยันจากทางร้านนะคะ ✨');
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    }
+  });
+
   // Coupons/Deals Mutations
   const redeemCouponMutation = useMutation({
     mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
@@ -269,7 +306,7 @@ const Index = () => {
       const { error: ptErr } = await supabase.from('store_customers').update({ points: customerData.membership.points - pointsCost }).eq('customer_id', customerData.profile.id).eq('store_id', store.id);
       if (ptErr) throw ptErr;
       const expiry = new Date(); expiry.setDate(expiry.getDate() + (template.expiry_days || 30));
-      const { error: cpErr } = await supabase.from('customer_coupons').insert([{ template_id: template.id, customer_id: customerData.profile.id, store_id: store.id, status: 'unused', expires_at: expiry.toISOString() }]);
+      const { error: cpErr = null } = await supabase.from('customer_coupons').insert([{ template_id: template.id, customer_id: customerData.profile.id, store_id: store.id, status: 'unused', expires_at: expiry.toISOString() }]);
       if (cpErr) throw cpErr;
     },
     onSuccess: () => { 
@@ -395,7 +432,7 @@ const Index = () => {
   const appointmentHistory = useMemo(() => (customerData?.appointments || []).map(a => ({
     id: a.id,
     petName: a.pets?.name || 'ไม่ระบุ',
-    service: 'รับบริการนัดหมาย',
+    service: a.services?.name || 'รับบริการนัดหมาย',
     startTime: a.start_time,
     status: a.status
   })), [customerData]);
@@ -466,7 +503,7 @@ const Index = () => {
 
           {activeTab === 'appointments' && (
             <motion.div key="appointments-tab">
-               <AppointmentList appointments={appointmentHistory as any} onAddClick={() => toast.info('ฟีเจอร์การจองนัดหมายจะเปิดให้บริการเร็วๆ นี้ค่ะ 📅')} />
+               <AppointmentList appointments={appointmentHistory as any} onAddClick={() => setIsBookingFormOpen(true)} />
             </motion.div>
           )}
 
@@ -505,6 +542,7 @@ const Index = () => {
       <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={ownerProfile as any} onSave={(data) => updateProfileMutation.mutate(data)} />
       <PetPreferenceForm isOpen={isPreferenceFormOpen} onClose={() => setIsPreferenceFormOpen(false)} onSave={(prefs) => savePreferencesMutation.mutate(prefs)} initialData={selectedPetForDetail?.custom_preferences} petName={selectedPetForDetail?.name || ''} />
       <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => confirmUseMutation.mutate(selectedCouponToUse)} />
+      <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={petsList as any} services={storeServices || []} onConfirm={async (data) => { await bookAppointmentMutation.mutateAsync(data); }} />
 
       <nav className="fixed bottom-[10px] left-6 right-6 max-w-[calc(theme(maxWidth.md)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-[40] border border-white/60">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
