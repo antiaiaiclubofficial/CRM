@@ -111,172 +111,172 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
 
             <div className="space-y-5 px-8 pb-24">
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 h-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
                     <User size={12}/> ชื่อ
                   </label>
                   <input 
                     type="text" 
                     value={formData.firstName}
                     onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                    className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                   />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 h-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
                     <span className="w-3" /> นามสกุล
                   </label>
                   <input 
                     type="text" 
                     value={formData.lastName}
                     onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                    className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 h-4"><User size={12}/> เพศ</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5"><User size={12}/> เพศ</label>
                   <select 
                     value={formData.gender}
                     onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base appearance-none"
+                    className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold appearance-none"
                   >
                     <option value="หญิง">หญิง</option>
                     <option value="ชาย">ชาย</option>
                     <option value="ไม่ระบุ">ไม่ระบุ</option>
                   </select>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1 h-4"><Calendar size={12}/> อายุ</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5"><Calendar size={12}/> อายุ</label>
                   <input 
                     type="number" 
                     value={formData.age}
                     onChange={(e) => setFormData({...formData, age: e.target.value})}
-                    className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                    className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                   />
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1"><Phone size={12}/> เบอร์โทรศัพท์</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5"><Phone size={12}/> เบอร์โทรศัพท์</label>
                 <input 
                   type="tel" 
                   value={formData.phone}
                   onChange={(e) => setFormData({...formData, phone: e.target.value})}
                   placeholder="08X-XXX-XXXX"
-                  className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1"><Mail size={12}/> Email</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5"><Mail size={12}/> Email</label>
                 <input 
                   type="email" 
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                   placeholder="example@mail.com"
-                  className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                 />
               </div>
 
               {/* Split Address Section */}
               <div className="space-y-4 pt-2 border-t border-slate-50">
-                <label className="text-xs font-bold text-slate-500 px-2 flex items-center gap-1">
+                <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
                   <MapPin size={12} className="text-pink-500" /> ข้อมูลที่อยู่
                 </label>
                 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-slate-400 px-2 flex items-center gap-1">
-                      <Home size={10} /> เลขที่บ้าน
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
+                      <Home size={12} /> เลขที่บ้าน
                     </label>
                     <input 
                       type="text" 
                       value={addressParts.houseNo}
                       onChange={(e) => setAddressParts({...addressParts, houseNo: e.target.value})}
                       placeholder="เช่น 123/4"
-                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                      className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-slate-400 px-2">หมู่ที่</label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">หมู่ที่</label>
                     <input 
                       type="text" 
                       value={addressParts.moo}
                       onChange={(e) => setAddressParts({...addressParts, moo: e.target.value})}
                       placeholder="เช่น 5"
-                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                      className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-slate-400 px-2">ซอย</label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">ซอย</label>
                     <input 
                       type="text" 
                       value={addressParts.soi}
                       onChange={(e) => setAddressParts({...addressParts, soi: e.target.value})}
                       placeholder="เช่น สุขุมวิท 1"
-                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                      className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-slate-400 px-2">ถนน</label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">ถนน</label>
                     <input 
                       type="text" 
                       value={addressParts.road}
                       onChange={(e) => setAddressParts({...addressParts, road: e.target.value})}
                       placeholder="เช่น รามคำแหง"
-                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                      className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 px-2">แขวง / ตำบล</label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">แขวง / ตำบล</label>
                     <input 
                       type="text" 
                       value={formData.subDistrict}
                       onChange={(e) => setFormData({...formData, subDistrict: e.target.value})}
                       placeholder="ตำบล"
-                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                      className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 px-2">เขต / อำเภอ</label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">เขต / อำเภอ</label>
                     <input 
                       type="text" 
                       value={formData.district}
                       onChange={(e) => setFormData({...formData, district: e.target.value})}
                       placeholder="อำเภอ"
-                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                      className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 px-2">จังหวัด</label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">จังหวัด</label>
                     <input 
                       type="text" 
                       value={formData.province}
                       onChange={(e) => setFormData({...formData, province: e.target.value})}
                       placeholder="จังหวัด"
-                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                      className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 px-2">รหัสไปรษณีย์</label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">รหัสไปรษณีย์</label>
                     <input 
                       type="text" 
                       value={formData.postalCode}
                       onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
                       placeholder="10XXX"
-                      className="w-full p-3.5 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm"
+                      className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                     />
                   </div>
                 </div>
@@ -284,9 +284,9 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
 
               <button 
                 onClick={handleSave}
-                className="w-full py-4 bg-pink-500 text-white rounded-2xl font-bold shadow-lg shadow-pink-200 mt-4 transition-all active:scale-95 flex items-center justify-center gap-2"
+                className="w-full py-4 bg-pink-500 text-white rounded-2xl font-bold shadow-lg shadow-pink-200 mt-4 transition-all active:scale-95 flex items-center justify-center gap-2 border-2 border-black"
               >
-                <Check size={20} />
+                <Check size={20} strokeWidth={3} />
                 บันทึกการเปลี่ยนแปลง
               </button>
             </div>

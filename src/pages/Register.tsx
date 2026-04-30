@@ -82,7 +82,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
           {/* Name Section */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1">ชื่อ</label>
+              <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">ชื่อ</label>
               <input 
                 required
                 type="text" 
@@ -93,7 +93,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1">นามสกุล</label>
+              <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">นามสกุล</label>
               <input 
                 required
                 type="text" 
@@ -108,7 +108,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
           {/* Gender and Age Section (Moved up) */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1">เพศ</label>
+              <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">เพศ</label>
               <select 
                 value={formData.gender}
                 onChange={(e) => setFormData({...formData, gender: e.target.value})}
@@ -120,7 +120,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1">อายุ</label>
+              <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">อายุ</label>
               <input 
                 type="number" 
                 value={formData.age}
@@ -134,7 +134,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
           {/* Contact Section */}
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1">
+              <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
                 <Phone size={12} className="text-pink-500" /> เบอร์โทรศัพท์
               </label>
               <input 
@@ -148,7 +148,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1">
+              <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
                 <Mail size={12} className="text-pink-500" /> อีเมล (ถ้ามี)
               </label>
               <input 
@@ -163,98 +163,100 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
 
           {/* Split Address Section */}
           <div className="space-y-4 pt-2 border-t border-slate-50">
-            <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1">
+            <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
               <MapPin size={12} className="text-pink-500" /> ข้อมูลที่อยู่
             </label>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 px-1">เลขที่บ้าน</label>
+                <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
+                   <Home size={12} /> เลขที่บ้าน
+                </label>
                 <input 
                   type="text" 
                   value={formData.houseNo}
                   onChange={(e) => setFormData({...formData, houseNo: e.target.value})}
                   placeholder="เช่น 123/4"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 px-1">หมู่ที่</label>
+                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">หมู่ที่</label>
                 <input 
                   type="text" 
                   value={formData.moo}
                   onChange={(e) => setFormData({...formData, moo: e.target.value})}
                   placeholder="เช่น 5"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 px-1">ซอย</label>
+                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">ซอย</label>
                 <input 
                   type="text" 
                   value={formData.soi}
                   onChange={(e) => setFormData({...formData, soi: e.target.value})}
                   placeholder="เช่น สุขุมวิท 1"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 px-1">ถนน</label>
+                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">ถนน</label>
                 <input 
                   type="text" 
                   value={formData.road}
                   onChange={(e) => setFormData({...formData, road: e.target.value})}
                   placeholder="เช่น รามคำแหง"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 px-1">แขวง / ตำบล</label>
+                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">แขวง / ตำบล</label>
                 <input 
                   type="text" 
                   value={formData.subDistrict}
                   onChange={(e) => setFormData({...formData, subDistrict: e.target.value})}
                   placeholder="ตำบล"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 px-1">เขต / อำเภอ</label>
+                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">เขต / อำเภอ</label>
                 <input 
                   type="text" 
                   value={formData.district}
                   onChange={(e) => setFormData({...formData, district: e.target.value})}
                   placeholder="อำเภอ"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 px-1">จังหวัด</label>
+                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">จังหวัด</label>
                 <input 
                   type="text" 
                   value={formData.province}
                   onChange={(e) => setFormData({...formData, province: e.target.value})}
                   placeholder="จังหวัด"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 px-1">รหัสไปรษณีย์</label>
+                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">รหัสไปรษณีย์</label>
                 <input 
                   type="text" 
                   value={formData.postalCode}
                   onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
                   placeholder="10XXX"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
                 />
               </div>
             </div>
@@ -267,7 +269,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
           >
             {isSubmitting ? "กำลังบันทึก..." : (
               <>
-                เริ่มใช้งานเลย <ArrowRight size={20} />
+                เริ่มใช้งานเลย <ArrowRight size={20} strokeWidth={3} />
               </>
             )}
           </button>
