@@ -70,16 +70,16 @@ const Promotions = ({
                     key={deal.id}
                     layout
                     whileTap={{ scale: isCollected ? 1 : 0.98 }}
-                    className={`relative flex-shrink-0 w-[280px] h-40 ${deal.bg || 'bg-blue-50'} rounded-[2.5rem] p-6 overflow-hidden border-2 border-black shadow-soft ${isCollected ? 'grayscale opacity-40 pointer-events-none' : ''}`}
+                    className={`relative flex-shrink-0 w-[280px] h-40 ${deal.bg || 'bg-blue-50'} rounded-[2.5rem] p-6 overflow-hidden border-2 border-slate-800 shadow-soft ${isCollected ? 'grayscale opacity-40 pointer-events-none' : ''}`}
                   >
-                    <Zap className="absolute -right-6 -bottom-6 w-32 h-32 text-black/5 rotate-12" />
+                    <Zap className="absolute -right-6 -bottom-6 w-32 h-32 text-slate-800/5 rotate-12" />
                     <div className="relative z-10 flex flex-col justify-between h-full">
                       <div>
                         <div className="flex justify-between items-start">
-                          <span className="text-[9px] font-black text-white bg-amber-500 border border-black px-2 py-0.5 rounded-full mb-2 inline-block">
+                          <span className="text-[9px] font-black text-white bg-amber-500 border border-slate-800 px-2 py-0.5 rounded-full mb-2 inline-block">
                             HOT DEAL
                           </span>
-                          <div className="flex items-center gap-1 bg-white/80 px-2 py-0.5 rounded-full border border-black/10">
+                          <div className="flex items-center gap-1 bg-white/80 px-2 py-0.5 rounded-full border border-slate-800/10">
                             <Crown size={10} className="text-amber-500" />
                             <span className="text-[10px] font-black text-slate-800">{deal.pointsRequired} pts</span>
                           </div>
@@ -99,7 +99,7 @@ const Promotions = ({
                               ? 'bg-slate-200 text-slate-500 border border-slate-300'
                               : userPoints < deal.pointsRequired
                               ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-                              : 'bg-white text-slate-800 border-2 border-black active:translate-y-0.5 active:shadow-none'
+                              : 'bg-white text-slate-800 border-2 border-slate-800 active:translate-y-0.5 active:shadow-none'
                           }`}
                         >
                           {isCollected ? 'ซื้อแล้ว' : userPoints < deal.pointsRequired ? 'คะแนนไม่พอ' : 'ซื้อดีลนี้'}
@@ -128,12 +128,12 @@ const Promotions = ({
                     key={promo.id}
                     layout
                     whileTap={{ scale: isCollected ? 1 : 0.98 }}
-                    className={`relative flex-shrink-0 w-[280px] h-36 ${promo.bg || 'bg-[#FFD8E4]'} rounded-[2rem] p-5 overflow-hidden border-2 border-black shadow-soft ${isCollected ? 'grayscale opacity-40 pointer-events-none' : ''}`}
+                    className={`relative flex-shrink-0 w-[280px] h-36 ${promo.bg || 'bg-[#FFD8E4]'} rounded-[2rem] p-5 overflow-hidden border-2 border-slate-800 shadow-soft ${isCollected ? 'grayscale opacity-40 pointer-events-none' : ''}`}
                   >
-                    <PawPrint className={`absolute -right-4 -bottom-4 w-24 h-24 text-black/5 opacity-50 rotate-12`} />
+                    <PawPrint className={`absolute -right-4 -bottom-4 w-24 h-24 text-slate-800/5 opacity-50 rotate-12`} />
                     <div className="relative z-10 flex flex-col justify-between h-full">
                       <div>
-                        <span className={`text-[9px] font-black text-slate-800 bg-white border border-black px-2 py-0.5 rounded-full mb-2 inline-block`}>
+                        <span className={`text-[9px] font-black text-slate-800 bg-white border border-slate-800 px-2 py-0.5 rounded-full mb-2 inline-block`}>
                           PROMO
                         </span>
                         <h3 className={`text-lg font-black text-slate-800 flex items-center gap-1`}>
@@ -149,7 +149,7 @@ const Promotions = ({
                           className={`text-[10px] font-black px-4 py-1.5 rounded-xl transition-all shadow-sm ${
                             isCollected
                               ? 'bg-slate-200 text-slate-500 border border-slate-300'
-                              : `bg-white text-slate-800 border-2 border-black active:translate-y-0.5 active:shadow-none`
+                              : `bg-white text-slate-800 border-2 border-slate-800 active:translate-y-0.5 active:shadow-none`
                           }`}
                         >
                           {isCollected ? 'เก็บแล้ว' : 'เก็บโปรโมชั่น'}
@@ -181,9 +181,9 @@ const Promotions = ({
                     key={coupon.id}
                     layout
                     whileTap={{ scale: isDisabled ? 1 : 0.98 }}
-                    className={`bg-white p-4 rounded-[2rem] border-2 border-black shadow-soft flex items-center gap-4 group ${isDisabled && !isAlreadyCollected ? 'opacity-40 grayscale' : ''}`}
+                    className={`bg-white p-4 rounded-[2rem] border-2 border-slate-800 shadow-soft flex items-center gap-4 group ${isDisabled && !isAlreadyCollected ? 'opacity-40 grayscale' : ''}`}
                   >
-                    <div className={`w-12 h-12 ${coupon.bg || 'bg-amber-50'} border-2 border-black rounded-2xl flex items-center justify-center text-xl shadow-sm`}>
+                    <div className={`w-12 h-12 ${coupon.bg || 'bg-amber-50'} border-2 border-slate-800 rounded-2xl flex items-center justify-center text-xl shadow-sm`}>
                       {getIconComponent(coupon.iconName, 22)}
                     </div>
                     <div className="flex-1">
@@ -196,7 +196,7 @@ const Promotions = ({
                     <button
                       onClick={() => onRedeemCoupon(coupon, coupon.pointsRequired)}
                       disabled={isDisabled}
-                      className={`px-4 py-2 rounded-xl text-[10px] font-black border-2 border-black shadow-sm transition-all ${
+                      className={`px-4 py-2 rounded-xl text-[10px] font-black border-2 border-slate-800 shadow-sm transition-all ${
                         isAlreadyCollected
                           ? 'bg-slate-100 text-slate-400 border-slate-300 shadow-none'
                           : !canRedeem
@@ -232,9 +232,9 @@ const Promotions = ({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className={`bg-white p-4 rounded-[2rem] border-2 border-black shadow-soft flex items-center gap-4 ${coupon.is_deal ? 'ring-2 ring-amber-400 ring-offset-2' : ''}`}
+                  className={`bg-white p-4 rounded-[2rem] border-2 border-slate-800 shadow-soft flex items-center gap-4 ${coupon.is_deal ? 'ring-2 ring-amber-400 ring-offset-2' : ''}`}
                 >
-                  <div className={`w-10 h-10 ${coupon.bg || 'bg-pink-50'} border-2 border-black rounded-xl flex items-center justify-center text-xl shadow-sm`}>
+                  <div className={`w-10 h-10 ${coupon.bg || 'bg-pink-50'} border-2 border-slate-800 rounded-xl flex items-center justify-center text-xl shadow-sm`}>
                     {getIconComponent(coupon.iconName || (coupon.is_deal ? 'Zap' : 'Ticket'), 20)}
                   </div>
                   <div className="flex-1">
@@ -251,7 +251,7 @@ const Promotions = ({
                   </div>
                   <button
                     onClick={() => onUseCoupon(coupon)}
-                    className="bg-pink-100 text-pink-700 text-[10px] font-black px-4 py-2 rounded-xl border-2 border-black shadow-sm active:translate-y-0.5 active:shadow-none transition-all"
+                    className="bg-pink-100 text-pink-700 text-[10px] font-black px-4 py-2 rounded-xl border-2 border-slate-800 shadow-sm active:translate-y-0.5 active:shadow-none transition-all"
                   >
                     ใช้เลย
                   </button>
@@ -262,36 +262,6 @@ const Promotions = ({
             )}
           </div>
         </div>
-
-        {/* Used/Expired Section */}
-        {usedOrExpiredCoupons.length > 0 && (
-          <div className="mt-8">
-            <div className="flex items-center gap-2 mb-4 px-1">
-              <History size={18} className="text-slate-500" />
-              <h2 className="text-xl font-bold text-slate-800 uppercase tracking-tight opacity-50">ประวัติคูปอง</h2>
-            </div>
-            <div className="space-y-3">
-              {usedOrExpiredCoupons.map((coupon, index) => (
-                <motion.div
-                  key={coupon.id}
-                  layout
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="bg-slate-50 p-4 rounded-[2rem] border-2 border-slate-200 flex items-center gap-4 opacity-40 grayscale pointer-events-none"
-                >
-                  <div className={`w-10 h-10 bg-white border-2 border-slate-200 rounded-xl flex items-center justify-center shadow-none`}>
-                    {getIconComponent(coupon.iconName, 20)}
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-slate-400 text-sm line-through">{coupon.title}</h4>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase">ใช้งานแล้วเมื่อ {coupon.expiry}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        )}
       </LayoutGroup>
     </div>
   );

@@ -74,7 +74,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         </div>
       </div>
 
-      <div className="relative bg-white rounded-[2rem] p-6 mx-6 -mt-8 shadow-xl z-10 border-2 border-black shadow-soft">
+      <div className="relative bg-white rounded-[2rem] p-6 mx-6 -mt-8 shadow-xl z-10 border-2 border-slate-800 shadow-soft">
         <div className="flex justify-between items-start mb-4">
           <div className="min-w-0 flex-1 pr-2">
             <h2 className="text-2xl font-black text-slate-800 truncate">{pet.name}</h2>
@@ -206,9 +206,9 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="relative w-full max-w-xs bg-white rounded-[2.5rem] border-[3px] border-black shadow-soft p-8 text-center overflow-hidden"
+              className="relative w-full max-w-xs bg-white rounded-[2.5rem] border-[3px] border-slate-800 shadow-soft p-8 text-center overflow-hidden"
             >
-               <div className="w-20 h-20 bg-red-100 border-2 border-black rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+               <div className="w-20 h-20 bg-red-100 border-2 border-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
                   <AlertTriangle size={40} className="text-red-600" />
                </div>
                <h3 className="text-2xl font-black text-slate-800 mb-3">ยืนยันการลบ?</h3>
@@ -221,13 +221,13 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
                       onDeletePet(pet.id);
                       setShowDeleteConfirm(false);
                     }}
-                    className="w-full py-4 bg-red-500 text-white rounded-2xl font-black border-2 border-black shadow-[4px_4px_0px_0px_#000] active:translate-y-1 active:shadow-none transition-all"
+                    className="w-full py-4 bg-red-500 text-white rounded-2xl font-black border-2 border-slate-800 shadow-[4px_4px_0px_0px_#000] active:translate-y-1 active:shadow-none transition-all"
                   >
                     ยืนยันการลบข้อมูล
                   </button>
                   <button 
                     onClick={() => setShowDeleteConfirm(false)}
-                    className="w-full py-4 bg-white text-slate-800 rounded-2xl font-black border-2 border-black shadow-[4px_4px_0px_0px_#E2E8F0] active:translate-y-1 active:shadow-none transition-all"
+                    className="w-full py-4 bg-white text-slate-800 rounded-2xl font-black border-2 border-slate-800 shadow-[4px_4px_0px_0px_#E2E8F0] active:translate-y-1 active:shadow-none transition-all"
                   >
                     ยกเลิก
                   </button>

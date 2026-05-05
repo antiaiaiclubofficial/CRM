@@ -42,7 +42,7 @@ const AppointmentList = ({ appointments, onAddClick }: AppointmentListProps) => 
         <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">นัดหมายของฉัน</h2>
         <button 
           onClick={onAddClick}
-          className="bg-pink-500 text-white text-xs font-black px-5 py-2.5 rounded-2xl border-2 border-black shadow-soft active:translate-y-0.5 active:shadow-none transition-all"
+          className="bg-pink-500 text-white text-xs font-black px-5 py-2.5 rounded-2xl border-2 border-slate-800 shadow-soft active:translate-y-0.5 active:shadow-none transition-all"
         >
           จองนัดหมาย
         </button>
@@ -58,15 +58,15 @@ const AppointmentList = ({ appointments, onAddClick }: AppointmentListProps) => 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white p-5 rounded-[2.5rem] border-2 border-black shadow-soft relative overflow-hidden"
+                className="bg-white p-5 rounded-[2.5rem] border-2 border-slate-800 shadow-soft relative overflow-hidden"
               >
                 <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 bg-slate-50 border-2 border-black rounded-2xl flex items-center justify-center text-xl shrink-0`}>
+                  <div className={`w-14 h-14 bg-slate-50 border-2 border-slate-800 rounded-2xl flex items-center justify-center text-xl shrink-0`}>
                     <Calendar className="text-slate-400" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start mb-1">
-                      <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-black/10 flex items-center gap-1 ${config.bg} ${config.color}`}>
+                      <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-slate-800/10 flex items-center gap-1 ${config.bg} ${config.color}`}>
                         {config.icon} {config.label}
                       </span>
                     </div>
@@ -75,7 +75,7 @@ const AppointmentList = ({ appointments, onAddClick }: AppointmentListProps) => 
                       <Clock size={10} /> {formatDate(apt.startTime)}
                     </p>
                   </div>
-                  <div className="p-2 border-2 border-black rounded-xl shrink-0">
+                  <div className="p-2 border-2 border-slate-800 rounded-xl shrink-0">
                     <ChevronRight size={16} strokeWidth={3} />
                   </div>
                 </div>
