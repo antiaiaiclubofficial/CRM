@@ -336,10 +336,43 @@ const Index = () => {
       const { error } = await supabase.from(table).update({ status: 'used', used_at: new Date().toISOString() }).eq('id', item.id);
       if (error) throw error;
     },
+    onMutate: async (usedItem) => {
+      // Snapshot the previous value
+      await queryClient.cancelQueries({ queryKey: ['customer_profile', lineProfile?.userId, store?.id] });
+      const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
+      
+      // Optimistically update to the new value
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => {
+        if (!old) return old;
+        if (usedItem.is_deal) {
+          return {
+            ...old,
+            deals: old.deals.map((d: any) => d.id === usedItem.id ? { ...d, status: 'used' } : d)
+          };
+        } else {
+          return {
+            ...old,
+            coupons: old.coupons.map((c: any) => c.id === usedItem.id ? { ...c, status: 'used' } : c)
+          };
+        }
+      });
+      
+      return { previousData };
+    },
+    onError: (err, usedItem, context: any) => {
+      // Rollback on error
+      if (context?.previousData) {
+        queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousData);
+      }
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ');
+    },
     onSuccess: () => { 
       toast.success('ใช้งานเรียบร้อยแล้วค่ะ ✨'); 
       setIsCouponUseModalOpen(false); 
       setSelectedCouponToUse(null); 
+    },
+    onSettled: () => {
+      // Always sync with server at the end
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); 
     }
   });
