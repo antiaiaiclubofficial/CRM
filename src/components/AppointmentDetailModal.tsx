@@ -87,7 +87,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className={`absolute -bottom-0 -right-1 p-1.5 rounded-full border-2 border-white shadow-sm ${config.bg} ${config.color}`}>
+                  <div className={`absolute -bottom-1 -right-1 p-1.5 rounded-full border-2 border-white shadow-sm ${config.bg} ${config.color}`}>
                     {appointment.status === 'confirmed' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
                   </div>
                 </div>
