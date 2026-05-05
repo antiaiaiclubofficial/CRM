@@ -309,8 +309,42 @@ const Index = () => {
       const { error: cpErr = null } = await supabase.from('customer_coupons').insert([{ template_id: template.id, customer_id: customerData.profile.id, store_id: store.id, status: 'unused', expires_at: expiry.toISOString() }]);
       if (cpErr) throw cpErr;
     },
+    onMutate: async ({ template, pointsCost }) => {
+      await queryClient.cancelQueries({ queryKey: ['customer_profile', lineProfile?.userId, store?.id] });
+      const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
+      
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => {
+        if (!old) return old;
+        const tempId = 'temp-' + Math.random();
+        const expiry = new Date(); expiry.setDate(expiry.getDate() + (template.expiry_days || 30));
+        
+        return {
+          ...old,
+          membership: { ...old.membership, points: old.membership.points - pointsCost },
+          coupons: [
+            ...old.coupons,
+            { 
+              id: tempId, 
+              template_id: template.id, 
+              status: 'unused', 
+              expires_at: expiry.toISOString(),
+              coupon_templates: template 
+            }
+          ]
+        };
+      });
+      return { previousData };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousData);
+      }
+      toast.error('เกิดข้อผิดพลาดในการแลกคูปองค่ะ');
+    },
     onSuccess: () => { 
       toast.success('แลกคูปองเรียบร้อยแล้วค่ะ! 🎫'); 
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); 
     }
   });
@@ -324,8 +358,42 @@ const Index = () => {
       const { error: dlErr } = await supabase.from('customers_deals').insert([{ template_id: template.id, customer_id: customerData.profile.id, store_id: store.id, status: 'unused', expires_at: expiry.toISOString() }]);
       if (dlErr) throw dlErr;
     },
+    onMutate: async ({ template, pointsCost }) => {
+      await queryClient.cancelQueries({ queryKey: ['customer_profile', lineProfile?.userId, store?.id] });
+      const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
+      
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => {
+        if (!old) return old;
+        const tempId = 'temp-' + Math.random();
+        const expiry = new Date(); expiry.setDate(expiry.getDate() + (template.expiry_days || 7));
+        
+        return {
+          ...old,
+          membership: { ...old.membership, points: old.membership.points - pointsCost },
+          deals: [
+            ...old.deals,
+            { 
+              id: tempId, 
+              template_id: template.id, 
+              status: 'unused', 
+              expires_at: expiry.toISOString(),
+              deal_templates: template 
+            }
+          ]
+        };
+      });
+      return { previousData };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousData);
+      }
+      toast.error('เกิดข้อผิดพลาดในการซื้อดีลค่ะ');
+    },
     onSuccess: () => { 
       toast.success('ซื้อดีลพิเศษเรียบร้อยแล้วค่ะ! ✨'); 
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); 
     }
   });
