@@ -295,7 +295,7 @@ const Index = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('ส่งคำขอจองนัดหมายเรียบร้อยแล้วค่ะ กรุณารอการยืนยันจากทางร้านนะคะ ✨');
+      toast.success('ส่งคำขอจองนัดหมายเรียบร้อยแล้วค่ะ กรุณาลองใหม่อีกครั้งนะคะ ✨');
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
     }
   });
@@ -403,20 +403,21 @@ const Index = () => {
 
   const confirmUseMutation = useMutation({
     mutationFn: async (item: any) => {
+      // ป้องกันการใช้ ID ชั่วคราว (Optimistic ID)
+      if (item.id.toString().startsWith('temp-')) {
+        throw new Error("ระบบกำลังซิงค์ข้อมูลคูปอง กรุณารอสักครู่แล้วลองใหม่นะคะ");
+      }
       const table = item.is_deal ? 'customers_deals' : 'customer_coupons';
       const { error } = await supabase.from(table).update({ status: 'used', used_at: new Date().toISOString() }).eq('id', item.id);
       if (error) throw error;
     },
     onMutate: async (usedItem) => {
-      // ปิดหน้าต่างทันทีเพื่อความรวดเร็ว
       setIsCouponUseModalOpen(false);
       setSelectedCouponToUse(null);
 
-      // Snapshot ข้อมูลเก่าไว้ก่อนเผื่อมี Error
       await queryClient.cancelQueries({ queryKey: ['customer_profile', lineProfile?.userId, store?.id] });
       const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
       
-      // อัปเดตข้อมูลใน Cache ทันที (Optimistic Update)
       queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => {
         if (!old) return old;
         if (usedItem.is_deal) {
@@ -434,18 +435,16 @@ const Index = () => {
       
       return { previousData };
     },
-    onError: (err, usedItem, context: any) => {
-      // ถ้า Error ให้ย้อนกลับเป็นข้อมูลเดิม
+    onError: (err: any, usedItem, context: any) => {
       if (context?.previousData) {
         queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousData);
       }
-      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ');
+      toast.error(err.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ');
     },
     onSuccess: () => { 
       toast.success('ใช้งานเรียบร้อยแล้วค่ะ ✨'); 
     },
     onSettled: () => {
-      // อัปเดตจากเซิร์ฟเวอร์อีกครั้งเพื่อให้ข้อมูลตรงกัน 100%
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); 
     }
   });
@@ -491,7 +490,6 @@ const Index = () => {
       return preferences;
     },
     onSuccess: (newPrefs) => {
-      // Instant cache update for pet preferences
       queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (oldData: any) => {
         if (!oldData) return oldData;
         return {
@@ -561,7 +559,6 @@ const Index = () => {
     );
   }
 
-  // If user is logged in with LINE but has no customer record in database
   if (lineProfile && !customerData?.profile && !profileLoading) {
     return <Register lineProfile={lineProfile} onSuccess={() => {}} onSave={async (data) => { await registerMutation.mutateAsync(data); }} />;
   }
@@ -580,7 +577,6 @@ const Index = () => {
     email: customerData?.profile?.email || '',
   };
 
-  // Determine the display name for the greeting: use registered first name or fallback to LINE display name
   const greetingName = customerData?.profile?.first_name || lineProfile?.displayName;
 
   return (
