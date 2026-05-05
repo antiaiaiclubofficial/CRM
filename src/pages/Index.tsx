@@ -223,6 +223,7 @@ const Index = () => {
           customer_id: newCustomer.id,
           store_id: store.id,
           points: 0,
+          total_points: 0,
           tier: 'bronze'
         }]);
         
@@ -303,6 +304,7 @@ const Index = () => {
   const redeemCouponMutation = useMutation({
     mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
       if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
+      // หักเฉพาะคะแนนที่แลกได้ (points) แต่ไม่หักคะแนนสะสมรวม (total_points)
       const { error: ptErr } = await supabase.from('store_customers').update({ points: customerData.membership.points - pointsCost }).eq('customer_id', customerData.profile.id).eq('store_id', store.id);
       if (ptErr) throw ptErr;
       const expiry = new Date(); expiry.setDate(expiry.getDate() + (template.expiry_days || 30));
@@ -352,6 +354,7 @@ const Index = () => {
   const buyDealMutation = useMutation({
     mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
       if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
+      // หักเฉพาะคะแนนที่แลกได้ (points) แต่ไม่หักคะแนนสะสมรวม (total_points)
       const { error: ptErr = null } = await supabase.from('store_customers').update({ points: customerData.membership.points - pointsCost }).eq('customer_id', customerData.profile.id).eq('store_id', store.id);
       if (ptErr) throw ptErr;
       const expiry = new Date(); expiry.setDate(expiry.getDate() + (template.expiry_days || 7));
@@ -596,7 +599,7 @@ const Index = () => {
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div key="home" className="space-y-6">
-              <MembershipCard totalAccumulatedPoints={customerData?.membership?.points || 0} redeemablePoints={customerData?.membership?.points || 0} ownerProfile={ownerProfile as any} onShowQR={() => setIsQRCodeOpen(true)} />
+              <MembershipCard totalAccumulatedPoints={customerData?.membership?.total_points || 0} redeemablePoints={customerData?.membership?.points || 0} ownerProfile={ownerProfile as any} onShowQR={() => setIsQRCodeOpen(true)} />
               <UpcomingAppointments appointments={appointmentHistory as any} onViewAll={() => handleNavClick('appointments')} />
               <HomeQuickActions onCouponsClick={handleGoToMyCoupons} onAppointmentClick={() => handleNavClick('appointments')} />
               <PetList pets={petsList as any} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
@@ -634,7 +637,7 @@ const Index = () => {
           
           {activeTab === 'level' && (
             <motion.div key="level-tab">
-              <MembershipLevels totalAccumulatedPoints={customerData?.membership?.points || 0} redeemablePoints={customerData?.membership?.points || 0} />
+              <MembershipLevels totalAccumulatedPoints={customerData?.membership?.total_points || 0} redeemablePoints={customerData?.membership?.points || 0} />
             </motion.div>
           )}
         </AnimatePresence>
