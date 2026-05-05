@@ -2,14 +2,17 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Clock, Scissors, QrCode, Trash2, AlertCircle, MapPin, CheckCircle2 } from 'lucide-react';
+import { X, Calendar, Clock, Scissors, QrCode, Trash2, AlertCircle, CheckCircle2, DollarSign, PawPrint } from 'lucide-react';
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
 
 interface Appointment {
   id: string;
   petName: string;
+  petImage?: string;
+  petBreed?: string;
   service: string;
+  servicePrice?: number;
   startTime: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   notes?: string;
@@ -55,68 +58,112 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
           >
             {/* Header */}
             <div className="pt-8 pb-4 px-8 flex justify-between items-center sticky top-0 bg-white z-10 rounded-t-[3.5rem]">
-              <h3 className="font-black text-xl text-slate-800">รายละเอียดนัดหมาย</h3>
+              <h3 className="font-black text-xl text-slate-800 uppercase tracking-tight">รายละเอียดการจอง</h3>
               <button 
                 onClick={onClose} 
-                className="p-2 bg-slate-100 rounded-full text-slate-400 active:scale-90 transition-transform"
+                className="p-2 bg-slate-100 rounded-full text-slate-400 active:scale-90 transition-transform border border-slate-200"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="px-8 pb-12 space-y-8">
-              {/* Status Banner */}
-              <div className={`flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border-2 border-slate-800 ${config.bg} ${config.color} font-black text-sm uppercase`}>
-                {appointment.status === 'confirmed' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
-                {config.label}
-              </div>
-
-              {/* QR Code Section */}
-              <div className="flex flex-col items-center">
-                <div className="relative p-6 bg-white rounded-[2.5rem] border-2 border-slate-800 shadow-soft mb-4">
-                  <div className="w-40 h-40 flex items-center justify-center bg-slate-50 rounded-xl overflow-hidden opacity-80">
-                    <QrCode size={120} className="text-slate-800" />
+            <div className="px-8 pb-12 space-y-6">
+              {/* Pet & Status Section */}
+              <div className="flex flex-col items-center gap-4 py-2">
+                <div className="relative">
+                  <div className="w-24 h-24 rounded-full border-[4px] border-white shadow-lg overflow-hidden bg-slate-100">
+                    <img 
+                      src={appointment.petImage || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'} 
+                      alt={appointment.petName} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className={`absolute -bottom-1 -right-1 p-1.5 rounded-full border-2 border-white shadow-sm ${config.bg} ${config.color}`}>
+                    {appointment.status === 'confirmed' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
                   </div>
                 </div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">แสดง QR Code เพื่อเช็คอินที่หน้าร้าน</p>
+                
+                <div className="text-center">
+                  <h4 className="text-xl font-black text-slate-800">น้อง{appointment.petName}</h4>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-tight">{appointment.petBreed || 'ไม่ระบุสายพันธุ์'}</p>
+                </div>
+
+                <div className={`px-4 py-1.5 rounded-full border-2 border-slate-800/10 ${config.bg} ${config.color} font-black text-[10px] uppercase tracking-widest`}>
+                  {config.label}
+                </div>
               </div>
 
-              {/* Info Cards */}
-              <div className="space-y-4">
-                <div className="bg-slate-50 p-5 rounded-3xl border-2 border-slate-800">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-white border-2 border-slate-800 rounded-2xl flex items-center justify-center text-pink-500">
-                      <Scissors size={24} />
+              {/* QR Code Section (Smaller) */}
+              <div className="bg-slate-50 rounded-[2.5rem] p-6 border-2 border-slate-800 shadow-soft flex flex-col items-center">
+                <div className="bg-white p-4 rounded-2xl border-2 border-slate-800/10 shadow-sm mb-3">
+                  <QrCode size={80} className="text-slate-800" />
+                </div>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Booking ID: {appointment.id.split('-')[0].toUpperCase()}</p>
+              </div>
+
+              {/* Full Details List */}
+              <div className="space-y-3">
+                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">ข้อมูลนัดหมาย</h5>
+                
+                <div className="bg-white rounded-[2rem] border-2 border-slate-800 shadow-sm overflow-hidden">
+                  <div className="p-4 flex items-center gap-4 border-b border-slate-100">
+                    <div className="w-10 h-10 bg-pink-50 rounded-xl flex items-center justify-center text-pink-500 shrink-0">
+                      <Scissors size={20} />
                     </div>
                     <div>
-                      <h4 className="font-black text-slate-800">{appointment.service}</h4>
-                      <p className="text-xs font-bold text-slate-500">น้อง{appointment.petName}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase">บริการที่เลือก</p>
+                      <p className="text-sm font-black text-slate-800">{appointment.service}</p>
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 border-t border-slate-200 pt-4">
-                    <div className="flex items-center gap-2">
-                      <Calendar size={16} className="text-pink-500" />
-                      <span className="text-xs font-black text-slate-800">{format(date, 'd MMM yy', { locale: th })}</span>
+
+                  <div className="p-4 flex items-center gap-4 border-b border-slate-100">
+                    <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 shrink-0">
+                      <Calendar size={20} />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Clock size={16} className="text-pink-500" />
-                      <span className="text-xs font-black text-slate-800">{format(date, 'HH:mm')} น.</span>
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase">วันที่นัดหมาย</p>
+                      <p className="text-sm font-black text-slate-800">{format(date, 'd MMMM yyyy', { locale: th })}</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 flex items-center gap-4 border-b border-slate-100">
+                    <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500 shrink-0">
+                      <Clock size={20} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase">เวลาที่จองไว้</p>
+                      <p className="text-sm font-black text-slate-800">{format(date, 'HH:mm')} น.</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 flex items-center gap-4">
+                    <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 shrink-0">
+                      <DollarSign size={20} />
+                    </div>
+                    <div className="flex-1 flex justify-between items-center">
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">ราคาประเมิน</p>
+                        <p className="text-sm font-black text-slate-800">฿{appointment.servicePrice || 0}</p>
+                      </div>
+                      <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 uppercase">จ่ายที่ร้าน</span>
                     </div>
                   </div>
                 </div>
-
-                {appointment.notes && (
-                  <div className="bg-white p-4 rounded-2xl border-2 border-slate-800 shadow-sm">
-                    <h5 className="text-[10px] font-black text-slate-400 uppercase mb-1">หมายเหตุ:</h5>
-                    <p className="text-xs font-bold text-slate-700">{appointment.notes}</p>
-                  </div>
-                )}
               </div>
 
-              {/* Actions */}
-              <div className="pt-4 space-y-4">
-                {appointment.status !== 'completed' && appointment.status !== 'cancelled' && (
+              {/* Notes */}
+              {appointment.notes && (
+                <div className="space-y-2">
+                  <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">หมายเหตุเพิ่มเติม</h5>
+                  <div className="bg-white p-5 rounded-3xl border-2 border-slate-800 shadow-sm italic">
+                    <p className="text-xs font-bold text-slate-600 leading-relaxed">"{appointment.notes}"</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Danger Zone */}
+              {appointment.status !== 'completed' && appointment.status !== 'cancelled' && (
+                <div className="pt-4">
                   <button 
                     onClick={() => {
                       if (window.confirm(`ยืนยันการยกเลิกนัดหมายของน้อง${appointment.petName} ใช่หรือไม่?`)) {
@@ -124,20 +171,16 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
                         onClose();
                       }
                     }}
-                    className="w-full py-4 flex items-center justify-center gap-2 bg-red-50 text-red-500 font-black rounded-2xl border-2 border-slate-800 shadow-soft active:translate-y-1 active:shadow-none transition-all"
+                    className="w-full py-4 flex items-center justify-center gap-2 bg-white text-red-500 font-black rounded-2xl border-2 border-red-500/20 active:translate-y-1 transition-all text-sm"
                   >
-                    <Trash2 size={20} />
-                    ยกเลิกการจอง
+                    <Trash2 size={18} />
+                    ยกเลิกการจองนี้
                   </button>
-                )}
-                
-                <button 
-                  onClick={onClose}
-                  className="w-full py-4 bg-slate-100 text-slate-800 font-black rounded-2xl border-2 border-slate-800 active:translate-y-1 transition-all"
-                >
-                  ปิดหน้าต่าง
-                </button>
-              </div>
+                  <p className="text-[9px] text-center text-slate-400 font-bold mt-3 uppercase tracking-tight">
+                    * กรุณายกเลิกก่อนเวลานัดหมายอย่างน้อย 2 ชม.
+                  </p>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>

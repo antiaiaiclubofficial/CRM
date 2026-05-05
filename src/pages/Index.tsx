@@ -548,7 +548,10 @@ const Index = () => {
   const appointmentHistory = useMemo(() => (customerData?.appointments || []).map(a => ({
     id: a.id,
     petName: a.pets?.name || 'ไม่ระบุ',
+    petImage: a.pets?.image_url,
+    petBreed: a.pets?.breed,
     service: a.services?.name || 'รับบริการนัดหมาย',
+    servicePrice: a.services?.price,
     startTime: a.start_time,
     status: a.status,
     notes: a.notes
