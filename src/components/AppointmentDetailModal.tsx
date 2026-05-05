@@ -68,10 +68,19 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
             </div>
 
             <div className="px-8 pb-12 space-y-6">
-              {/* Pet & Status Section */}
-              <div className="flex flex-col items-center gap-4 py-2">
+              {/* 1. QR Code Section (Now First) */}
+              <div className="flex flex-col items-center py-2">
+                <div className="p-3 bg-white rounded-2xl border-2 border-slate-100 mb-2">
+                  <QrCode size={110} className="text-slate-800" />
+                </div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Booking ID: {appointment.id.split('-')[0].toUpperCase()}</p>
+                <p className="text-[9px] font-bold text-pink-500 mt-1">แสดง QR เพื่อเช็คอินรับบริการ</p>
+              </div>
+
+              {/* 2. Pet & Status Section */}
+              <div className="flex flex-col items-center gap-3 py-2 border-t border-slate-50">
                 <div className="relative">
-                  <div className="w-24 h-24 rounded-full border-[4px] border-white shadow-lg overflow-hidden bg-slate-100">
+                  <div className="w-20 h-20 rounded-full border-[4px] border-white shadow-lg overflow-hidden bg-slate-100">
                     <img 
                       src={appointment.petImage || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'} 
                       alt={appointment.petName} 
@@ -79,13 +88,13 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
                     />
                   </div>
                   <div className={`absolute -bottom-1 -right-1 p-1.5 rounded-full border-2 border-white shadow-sm ${config.bg} ${config.color}`}>
-                    {appointment.status === 'confirmed' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                    {appointment.status === 'confirmed' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
                   </div>
                 </div>
                 
                 <div className="text-center">
-                  <h4 className="text-xl font-black text-slate-800">น้อง{appointment.petName}</h4>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-tight">{appointment.petBreed || 'ไม่ระบุสายพันธุ์'}</p>
+                  <h4 className="text-lg font-black text-slate-800">น้อง{appointment.petName}</h4>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">{appointment.petBreed || 'ไม่ระบุสายพันธุ์'}</p>
                 </div>
 
                 <div className={`px-4 py-1.5 rounded-full border-2 border-slate-800/10 ${config.bg} ${config.color} font-black text-[10px] uppercase tracking-widest`}>
@@ -93,17 +102,9 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
                 </div>
               </div>
 
-              {/* QR Code Section (No Container) */}
-              <div className="flex flex-col items-center py-4">
-                <div className="p-3 bg-white rounded-2xl border-2 border-slate-100 mb-2">
-                  <QrCode size={100} className="text-slate-800" />
-                </div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Booking ID: {appointment.id.split('-')[0].toUpperCase()}</p>
-              </div>
-
-              {/* Full Details List */}
+              {/* 3. Full Details List */}
               <div className="space-y-3">
-                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">ข้อมูลนัดหมาย</h5>
+                <h5 className="text-sm font-black text-slate-900 uppercase px-1">ข้อมูลนัดหมาย</h5>
                 
                 <div className="bg-white rounded-[2rem] border-2 border-slate-800 shadow-sm overflow-hidden">
                   <div className="p-4 flex items-center gap-4 border-b border-slate-100">
@@ -154,7 +155,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
               {/* Notes */}
               {appointment.notes && (
                 <div className="space-y-2">
-                  <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">หมายเหตุเพิ่มเติม</h5>
+                  <h5 className="text-sm font-black text-slate-900 uppercase px-1">หมายเหตุเพิ่มเติม</h5>
                   <div className="bg-white p-5 rounded-3xl border-2 border-slate-800 shadow-sm italic">
                     <p className="text-xs font-bold text-slate-600 leading-relaxed">"{appointment.notes}"</p>
                   </div>
@@ -171,12 +172,12 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
                         onClose();
                       }
                     }}
-                    className="w-full py-4 flex items-center justify-center gap-2 bg-white text-red-500 font-black rounded-2xl border-2 border-red-500/20 active:translate-y-1 transition-all text-sm"
+                    className="w-full py-4 bg-white text-red-500 font-black rounded-2xl border-2 border-red-500/20 active:translate-y-1 transition-all text-sm"
                   >
                     <Trash2 size={18} />
                     ยกเลิกการจองนี้
                   </button>
-                  <p className="text-[9px] text-center text-slate-400 font-bold mt-3 uppercase tracking-tight">
+                  <p className="text-xs text-center text-slate-900 font-bold mt-4 leading-tight">
                     * กรุณายกเลิกก่อนเวลานัดหมายอย่างน้อย 2 ชม.
                   </p>
                 </div>
