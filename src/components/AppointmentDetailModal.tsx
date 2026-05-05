@@ -68,7 +68,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
             </div>
 
             <div className="px-8 pb-12 space-y-6">
-              {/* 1. QR Code Section (Now First) */}
+              {/* 1. QR Code Section */}
               <div className="flex flex-col items-center py-2">
                 <div className="p-3 bg-white rounded-2xl border-2 border-slate-100 mb-2">
                   <QrCode size={110} className="text-slate-800" />
@@ -102,11 +102,11 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
                 </div>
               </div>
 
-              {/* 3. Full Details List */}
+              {/* 3. Full Details List with Shadow Soft */}
               <div className="space-y-3">
-                <h5 className="text-base font-black text-slate-900 uppercase px-1">ข้อมูลนัดหมาย</h5>
+                <h5 className="text-sm font-black text-slate-900 uppercase px-1">ข้อมูลนัดหมาย</h5>
                 
-                <div className="bg-white rounded-[2rem] border-2 border-slate-800 shadow-sm overflow-hidden">
+                <div className="bg-white rounded-[2rem] border-2 border-slate-800 shadow-soft overflow-hidden">
                   <div className="p-4 flex items-center gap-4 border-b border-slate-100">
                     <div className="w-10 h-10 bg-pink-50 rounded-xl flex items-center justify-center text-pink-500 shrink-0">
                       <Scissors size={20} />
@@ -152,11 +152,11 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
                 </div>
               </div>
 
-              {/* Notes */}
+              {/* Notes with Shadow Soft */}
               {appointment.notes && (
                 <div className="space-y-2">
                   <h5 className="text-sm font-black text-slate-900 uppercase px-1">หมายเหตุเพิ่มเติม</h5>
-                  <div className="bg-white p-5 rounded-3xl border-2 border-slate-800 shadow-sm italic">
+                  <div className="bg-white p-5 rounded-3xl border-2 border-slate-800 shadow-soft italic">
                     <p className="text-xs font-bold text-slate-600 leading-relaxed">"{appointment.notes}"</p>
                   </div>
                 </div>
@@ -172,10 +172,10 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
                         onClose();
                       }
                     }}
-                    className="w-full py-4 bg-white text-red-500 font-black rounded-2xl border-2 border-red-500/20 active:translate-y-1 transition-all text-sm"
+                    className="w-full py-4 flex items-center justify-center gap-2 bg-white text-red-500 font-black rounded-2xl border-2 border-slate-800 shadow-soft active:translate-y-0.5 active:shadow-none transition-all text-sm"
                   >
-                    <Trash2 size={18} />
-                    ยกเลิกการจองนี้
+                    <Trash2 size={18} strokeWidth={3} />
+                    ยกเลิกการจองนัดหมายนี้
                   </button>
                   <p className="text-xs text-center text-slate-900 font-bold mt-4 leading-tight">
                     * กรุณายกเลิกก่อนเวลานัดหมายอย่างน้อย 2 ชม.
