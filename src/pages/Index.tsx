@@ -337,11 +337,15 @@ const Index = () => {
       if (error) throw error;
     },
     onMutate: async (usedItem) => {
-      // Snapshot the previous value
+      // ปิดหน้าต่างทันทีเพื่อความรวดเร็ว
+      setIsCouponUseModalOpen(false);
+      setSelectedCouponToUse(null);
+
+      // Snapshot ข้อมูลเก่าไว้ก่อนเผื่อมี Error
       await queryClient.cancelQueries({ queryKey: ['customer_profile', lineProfile?.userId, store?.id] });
       const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
       
-      // Optimistically update to the new value
+      // อัปเดตข้อมูลใน Cache ทันที (Optimistic Update)
       queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => {
         if (!old) return old;
         if (usedItem.is_deal) {
@@ -360,7 +364,7 @@ const Index = () => {
       return { previousData };
     },
     onError: (err, usedItem, context: any) => {
-      // Rollback on error
+      // ถ้า Error ให้ย้อนกลับเป็นข้อมูลเดิม
       if (context?.previousData) {
         queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousData);
       }
@@ -368,11 +372,9 @@ const Index = () => {
     },
     onSuccess: () => { 
       toast.success('ใช้งานเรียบร้อยแล้วค่ะ ✨'); 
-      setIsCouponUseModalOpen(false); 
-      setSelectedCouponToUse(null); 
     },
     onSettled: () => {
-      // Always sync with server at the end
+      // อัปเดตจากเซิร์ฟเวอร์อีกครั้งเพื่อให้ข้อมูลตรงกัน 100%
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); 
     }
   });
