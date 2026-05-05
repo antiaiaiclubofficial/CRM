@@ -103,7 +103,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
               </div>
 
               {/* 3. Full Details List with Shadow Soft */}
-              <div className="space-y-3">
+              <div className="space-y-">
                 <h5 className="text-lg font-black text-slate-900 uppercase px-1">ข้อมูลนัดหมาย</h5>
                 
                 <div className="bg-white rounded-[2rem] border-2 border-slate-800 shadow-soft overflow-hidden">
