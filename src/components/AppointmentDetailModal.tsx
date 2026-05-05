@@ -104,7 +104,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
 
               {/* 3. Full Details List */}
               <div className="space-y-3">
-                <h5 className="text-sm font-black text-slate-900 uppercase px-1">ข้อมูลนัดหมาย</h5>
+                <h5 className="text-m font-black text-slate-900 uppercase px-1">ข้อมูลนัดหมาย</h5>
                 
                 <div className="bg-white rounded-[2rem] border-2 border-slate-800 shadow-sm overflow-hidden">
                   <div className="p-4 flex items-center gap-4 border-b border-slate-100">
