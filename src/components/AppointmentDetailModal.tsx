@@ -80,7 +80,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
               {/* 2. Pet & Status Section */}
               <div className="flex flex-col items-center py-0 gap-3  border-t border-slate-50">
                 <div className="relative">
-                  <div className="w-22 h-22 rounded-full border-[4px] border-white shadow-lg overflow-hidden bg-slate-100">
+                  <div className="w-30 h-30 rounded-full border-[4px] border-white shadow-lg overflow-hidden bg-slate-100">
                     <img 
                       src={appointment.petImage || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'} 
                       alt={appointment.petName} 
