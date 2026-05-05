@@ -295,7 +295,7 @@ const Index = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('ส่งคำขอจองนัดหมายเรียบร้อยแล้วค่ะ กรุณาลองใหม่อีกครั้งนะคะ ✨');
+      toast.success('ส่งคำขอจองนัดหมายเรียบร้อยแล้วค่ะ กรุณารอการยืนยันจากทางร้านนะคะ ✨');
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
     }
   });
@@ -304,8 +304,7 @@ const Index = () => {
   const redeemCouponMutation = useMutation({
     mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
       if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
-      // หักเฉพาะคะแนนที่แลกได้ (points) แต่ไม่หักคะแนนสะสมรวม (total_points)
-      const { error: ptErr } = await supabase.from('store_customers').update({ points: customerData.membership.points - pointsCost }).eq('customer_id', customerData.profile.id).eq('store_id', store.id);
+      const { error: ptErr = null } = await supabase.from('store_customers').update({ points: customerData.membership.points - pointsCost }).eq('customer_id', customerData.profile.id).eq('store_id', store.id);
       if (ptErr) throw ptErr;
       const expiry = new Date(); expiry.setDate(expiry.getDate() + (template.expiry_days || 30));
       const { error: cpErr = null } = await supabase.from('customer_coupons').insert([{ template_id: template.id, customer_id: customerData.profile.id, store_id: store.id, status: 'unused', expires_at: expiry.toISOString() }]);
@@ -354,7 +353,6 @@ const Index = () => {
   const buyDealMutation = useMutation({
     mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
       if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
-      // หักเฉพาะคะแนนที่แลกได้ (points) แต่ไม่หักคะแนนสะสมรวม (total_points)
       const { error: ptErr = null } = await supabase.from('store_customers').update({ points: customerData.membership.points - pointsCost }).eq('customer_id', customerData.profile.id).eq('store_id', store.id);
       if (ptErr) throw ptErr;
       const expiry = new Date(); expiry.setDate(expiry.getDate() + (template.expiry_days || 7));
@@ -542,13 +540,13 @@ const Index = () => {
   })), [customerData]);
 
   const userInventory = useMemo(() => {
-    const coupons = (customerData?.coupons || []).map(c => ({ id: c.id, template_id: c.template_id, title: c.coupon_templates?.title || 'คูปอง', description: c.coupon_templates?.description || `หมดอายุ ${formatDateThai(c.expires_at)}`, expiry: formatDateThai(c.expires_at), iconName: c.coupon_templates?.icon_name || 'Ticket', bg: c.coupon_templates?.bg_color || 'bg-pink-50', is_used: c.status === 'used', is_deal: false, priority: 2 }));
-    const deals = (customerData?.deals || []).map(d => ({ id: d.id, template_id: d.template_id, title: d.deal_templates?.title || 'ดีลพิเศษ', description: d.deal_templates?.description || `หมดอายุ ${formatDateThai(d.expires_at)}`, expiry: formatDateThai(d.expires_at), iconName: d.deal_templates?.icon_name || 'Zap', bg: d.deal_templates?.bg_color || 'bg-amber-50', is_used: d.status === 'used', is_deal: true, priority: 1 }));
+    const coupons = (customerData?.coupons || []).map(c => ({ id: c.id, template_id: c.template_id, title: c.coupon_templates?.title || 'คูปอง', description: c.coupon_templates?.description || `ดีลสุดพิเศษ`, expiry: formatDateThai(c.expires_at), raw_expiry: c.expires_at, iconName: c.coupon_templates?.icon_name || 'Ticket', bg: c.coupon_templates?.bg_color || 'bg-pink-50', is_used: c.status === 'used', is_deal: false, priority: 2 }));
+    const deals = (customerData?.deals || []).map(d => ({ id: d.id, template_id: d.template_id, title: d.deal_templates?.title || 'ดีลพิเศษ', description: d.deal_templates?.description || `โปรโมชั่นเฉพาะคุณ`, expiry: formatDateThai(d.expires_at), raw_expiry: d.expires_at, iconName: d.deal_templates?.icon_name || 'Zap', bg: d.deal_templates?.bg_color || 'bg-amber-50', is_used: d.status === 'used', is_deal: true, priority: 1 }));
     return [...deals, ...coupons].sort((a, b) => a.priority - b.priority);
   }, [customerData]);
 
-  const availableRedeemables = useMemo(() => (couponTemplates || []).map(t => ({ id: t.id, title: t.title, description: t.description || (t.points_required > 0 ? `แลกด้วย ${t.points_required} คะแนน` : 'โปรโมชั่นพิเศษ'), pointsRequired: t.points_required, expiry: `${t.expiry_days} วัน`, iconName: t.icon_name || 'Tag', bg: t.bg_color || (t.points_required === 0 ? 'bg-pink-50' : 'bg-rose-50') })), [couponTemplates]);
-  const availableDeals = useMemo(() => (dealTemplates || []).map(t => ({ id: t.id, title: t.title, description: t.description, pointsRequired: t.points_required, expiry: `${t.expiry_days} วัน`, iconName: t.icon_name || 'Zap', bg: t.bg_color || 'bg-blue-50' })), [dealTemplates]);
+  const availableRedeemables = useMemo(() => (couponTemplates || []).map(t => ({ id: t.id, title: t.title, description: t.description || (t.points_required > 0 ? `แลกด้วย ${t.points_required} คะแนน` : 'โปรโมชั่นพิเศษ'), pointsRequired: t.points_required, expiry_days: t.expiry_days, expiry: `${t.expiry_days} วัน`, iconName: t.icon_name || 'Tag', bg: t.bg_color || (t.points_required === 0 ? 'bg-pink-50' : 'bg-rose-50') })), [couponTemplates]);
+  const availableDeals = useMemo(() => (dealTemplates || []).map(t => ({ id: t.id, title: t.title, description: t.description, pointsRequired: t.points_required, expiry_days: t.expiry_days, expiry: `${t.expiry_days} วัน`, iconName: t.icon_name || 'Zap', bg: t.bg_color || 'bg-blue-50' })), [dealTemplates]);
 
   if (liffLoading || storeLoading || (lineProfile && profileLoading)) {
     return (

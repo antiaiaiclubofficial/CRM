@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, LayoutGroup } from 'framer-motion';
-import { Ticket, Gift, Scissors, Sparkles, ShowerHead, Leaf, Hand, Tag, Heart, PawPrint, Crown, History, Award, LucideIcon, Zap } from 'lucide-react';
+import { Ticket, Gift, Scissors, Sparkles, ShowerHead, Leaf, Hand, Tag, Heart, PawPrint, Crown, History, Award, LucideIcon, Zap, Clock } from 'lucide-react';
 
 interface Coupon {
   id: string | number;
@@ -244,7 +244,10 @@ const Promotions = ({
                         <span className="bg-amber-400 text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase">DEAL</span>
                       )}
                     </div>
-                    <p className="text-[10px] font-bold text-slate-500">{coupon.description}</p>
+                    <div className="flex items-center gap-1 text-[9px] font-black text-pink-500 mt-0.5 uppercase tracking-tight">
+                       <Clock size={10} strokeWidth={3} />
+                       หมดอายุ: {coupon.expiry}
+                    </div>
                   </div>
                   <button
                     onClick={() => onUseCoupon(coupon)}
@@ -282,7 +285,7 @@ const Promotions = ({
                   </div>
                   <div className="flex-1">
                     <h4 className="font-bold text-slate-400 text-sm line-through">{coupon.title}</h4>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase">ใช้งานแล้ว</p>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase">ใช้งานแล้วเมื่อ {coupon.expiry}</p>
                   </div>
                 </motion.div>
               ))}
