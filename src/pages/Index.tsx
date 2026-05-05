@@ -21,6 +21,7 @@ import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
 import CouponUseModal from '@/components/CouponUseModal';
 import HomeQuickActions from '@/components/HomeQuickActions';
 import AppointmentList from '@/components/AppointmentList';
+import AppointmentDetailModal from '@/components/AppointmentDetailModal';
 import BookingForm from '@/components/BookingForm';
 import Register from './Register';
 import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, Sparkles, PlusCircle, LogIn, FlaskConical } from 'lucide-react';
@@ -42,6 +43,7 @@ const Index = () => {
   
   const [selectedPetId, setSelectedPetId] = useState<string | number | null>(null);
   const [selectedServiceId, setSelectedServiceId] = useState<string | number | null>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<any | null>(null);
   
   const [isPetFormOpen, setIsPetFormOpen] = useState(false);
   const [petToEditId, setPetToEditId] = useState<string | number | null>(null);
@@ -49,6 +51,7 @@ const Index = () => {
   const [selectedCouponToUse, setSelectedCouponToUse] = useState<any | null>(null);
   const [isCouponUseModalOpen, setIsCouponUseModalOpen] = useState(false);
   const [isBookingFormOpen, setIsBookingFormOpen] = useState(false);
+  const [isAppointmentDetailOpen, setIsAppointmentDetailOpen] = useState(false);
   
   const mainScrollRef = useRef<HTMLElement>(null);
 
@@ -189,7 +192,18 @@ const Index = () => {
     enabled: !!store?.id
   });
 
-  // Registration Mutation
+  // Mutations
+  const deleteAppointmentMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('appointments').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('ยกเลิกการนัดหมายเรียบร้อยแล้วค่ะ');
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    }
+  });
+
   const registerMutation = useMutation({
     mutationFn: async (regData: any) => {
       if (!lineProfile?.userId || !store?.id) throw new Error("Missing LINE profile or store context");
@@ -235,7 +249,6 @@ const Index = () => {
     }
   });
 
-  // Update Profile Mutation with Cache Update for instant UI change
   const updateProfileMutation = useMutation({
     mutationFn: async (profileData: any) => {
       if (!customerData?.profile?.id) throw new Error("Missing customer ID");
@@ -263,7 +276,6 @@ const Index = () => {
       return dbData;
     },
     onSuccess: (updatedData) => {
-      // Manually update the cache for instant UI feedback
       queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (oldData: any) => {
         if (!oldData) return oldData;
         return {
@@ -275,12 +287,10 @@ const Index = () => {
         };
       });
       toast.success('อัปเดตโปรไฟล์เรียบร้อยแล้วค่ะ ✨');
-      // Still invalidate to ensure sync with server
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
     }
   });
 
-  // Booking Mutation
   const bookAppointmentMutation = useMutation({
     mutationFn: async (bookingData: any) => {
       if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
@@ -300,7 +310,6 @@ const Index = () => {
     }
   });
 
-  // Coupons/Deals Mutations
   const redeemCouponMutation = useMutation({
     mutationFn: async ({ template, pointsCost }: { template: any, pointsCost: number }) => {
       if (!customerData?.profile?.id || !store?.id) throw new Error("Missing data");
@@ -401,7 +410,6 @@ const Index = () => {
 
   const confirmUseMutation = useMutation({
     mutationFn: async (item: any) => {
-      // ป้องกันการใช้ ID ชั่วคราว (Optimistic ID)
       if (item.id.toString().startsWith('temp-')) {
         throw new Error("ระบบกำลังซิงค์ข้อมูลคูปอง กรุณารอสักครู่แล้วลองใหม่นะคะ");
       }
@@ -447,7 +455,6 @@ const Index = () => {
     }
   });
 
-  // Pet Mutations with Cache Updates
   const petMutation = useMutation({
     mutationFn: async (pet: any) => {
       if (!customerData?.profile?.id) throw new Error("Missing customer ID");
@@ -500,6 +507,7 @@ const Index = () => {
     }
   });
 
+  // Handlers
   const handleNavClick = (tab: string) => {
     setActiveTab(tab);
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -517,6 +525,12 @@ const Index = () => {
     }, 500);
   };
 
+  const handleAppointmentClick = (apt: any) => {
+    setSelectedAppointment(apt);
+    setIsAppointmentDetailOpen(true);
+  };
+
+  // Memos
   const petsList = useMemo(() => customerData?.pets || [], [customerData]);
   const selectedPetForDetail = useMemo(() => petsList.find(p => p.id === selectedPetId) || null, [petsList, selectedPetId]);
 
@@ -536,7 +550,8 @@ const Index = () => {
     petName: a.pets?.name || 'ไม่ระบุ',
     service: a.services?.name || 'รับบริการนัดหมาย',
     startTime: a.start_time,
-    status: a.status
+    status: a.status,
+    notes: a.notes
   })), [customerData]);
 
   const userInventory = useMemo(() => {
@@ -609,7 +624,11 @@ const Index = () => {
 
           {activeTab === 'appointments' && (
             <motion.div key="appointments-tab">
-               <AppointmentList appointments={appointmentHistory as any} onAddClick={() => setIsBookingFormOpen(true)} />
+               <AppointmentList 
+                 appointments={appointmentHistory as any} 
+                 onAddClick={() => setIsBookingFormOpen(true)}
+                 onAppointmentClick={handleAppointmentClick}
+               />
             </motion.div>
           )}
 
@@ -649,6 +668,7 @@ const Index = () => {
       <PetPreferenceForm isOpen={isPreferenceFormOpen} onClose={() => setIsPreferenceFormOpen(false)} onSave={(prefs) => savePreferencesMutation.mutate(prefs)} initialData={selectedPetForDetail?.custom_preferences} petName={selectedPetForDetail?.name || ''} />
       <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => confirmUseMutation.mutate(selectedCouponToUse)} />
       <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={petsList as any} services={storeServices || []} onConfirm={async (data) => { await bookAppointmentMutation.mutateAsync(data); }} />
+      <AppointmentDetailModal isOpen={isAppointmentDetailOpen} onClose={() => setIsAppointmentDetailOpen(false)} appointment={selectedAppointment} onDelete={(id) => deleteAppointmentMutation.mutate(id)} />
 
       <nav className="fixed bottom-[10px] left-6 right-6 max-w-[calc(theme(maxWidth.md)-3rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-[40] border border-white/60">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />

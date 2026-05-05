@@ -10,11 +10,13 @@ interface Appointment {
   service: string;
   startTime: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  notes?: string;
 }
 
 interface AppointmentListProps {
   appointments: Appointment[];
   onAddClick: () => void;
+  onAppointmentClick: (appointment: Appointment) => void;
 }
 
 const statusConfig = {
@@ -24,7 +26,7 @@ const statusConfig = {
   cancelled: { label: 'ยกเลิก', icon: <XCircle size={12} />, color: 'text-red-500', bg: 'bg-red-50' },
 };
 
-const AppointmentList = ({ appointments, onAddClick }: AppointmentListProps) => {
+const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: AppointmentListProps) => {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('th-TH', { 
@@ -58,7 +60,8 @@ const AppointmentList = ({ appointments, onAddClick }: AppointmentListProps) => 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white p-5 rounded-[2.5rem] border-2 border-slate-800 shadow-soft relative overflow-hidden"
+                onClick={() => onAppointmentClick(apt)}
+                className="bg-white p-5 rounded-[2.5rem] border-2 border-slate-800 shadow-soft relative overflow-hidden active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-14 h-14 bg-slate-50 border-2 border-slate-800 rounded-2xl flex items-center justify-center text-xl shrink-0`}>
