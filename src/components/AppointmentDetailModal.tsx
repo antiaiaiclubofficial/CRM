@@ -78,7 +78,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
               </div>
 
               {/* 2. Pet & Status Section */}
-              <div className="flex flex-col items-center gap-3  border-t border-slate-50">
+              <div className="flex flex-col items-center py-2 gap-3  border-t border-slate-50">
                 <div className="relative">
                   <div className="w-20 h-20 rounded-full border-[4px] border-white shadow-lg overflow-hidden bg-slate-100">
                     <img 
