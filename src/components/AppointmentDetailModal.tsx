@@ -172,7 +172,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
                         onClose();
                       }
                     }}
-                    className="w-full py-4 flex items-center justify-center gap-2 bg-white text-red-500 font-black rounded-2xl border-2 border-slate-800 shadow-soft active:translate-y-0.5 active:shadow-none transition-all text-sm"
+                    className="w-full py-4 flex items-center justify-center gap-2 bg-red-50 text-red-500 font-black rounded-2xl border-2 border-slate-800 shadow-soft active:translate-y-0.5 active:shadow-none transition-all text-sm"
                   >
                     <Trash2 size={18} strokeWidth={3} />
                     ยกเลิกการจองนัดหมายนี้
