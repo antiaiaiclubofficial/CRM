@@ -93,7 +93,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
                 </div>
                 
                 <div className="text-center">
-                  <h4 className="text-lg font-black text-slate-800">น้อง{appointment.petName}</h6>
+                  <h4 className="text-lg font-black text-slate-800">น้อง{appointment.petName}</h4>
                   <p className="text-[12px] font-bold text-slate-500 uppercase tracking-tight">{appointment.petBreed || 'ไม่ระบุสายพันธุ์'}</p>
                 </div>
 
