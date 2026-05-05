@@ -67,7 +67,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
               </button>
             </div>
 
-            <div className="px-8 pb-12 space-y-6">
+            <div className="px-8 pb-12 space-y-4">
               {/* 1. QR Code Section */}
               <div className="flex flex-col items-center py-2">
                 <div className="p-3 bg-white rounded-2xl border-2 border-slate-100 mb-2">
