@@ -93,12 +93,12 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
                 </div>
               </div>
 
-              {/* QR Code Section (Smaller) */}
-              <div className="bg-slate-50 rounded-[2.5rem] p-6 border-2 border-slate-800 shadow-soft flex flex-col items-center">
-                <div className="bg-white p-4 rounded-2xl border-2 border-slate-800/10 shadow-sm mb-3">
-                  <QrCode size={80} className="text-slate-800" />
+              {/* QR Code Section (No Container) */}
+              <div className="flex flex-col items-center py-4">
+                <div className="p-3 bg-white rounded-2xl border-2 border-slate-100 mb-2">
+                  <QrCode size={100} className="text-slate-800" />
                 </div>
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Booking ID: {appointment.id.split('-')[0].toUpperCase()}</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Booking ID: {appointment.id.split('-')[0].toUpperCase()}</p>
               </div>
 
               {/* Full Details List */}
