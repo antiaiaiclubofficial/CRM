@@ -595,7 +595,13 @@ const Index = () => {
             <motion.div key="home" className="space-y-6">
               <MembershipCard totalAccumulatedPoints={customerData?.membership?.total_points || 0} redeemablePoints={customerData?.membership?.points || 0} ownerProfile={ownerProfile as any} onShowQR={() => setIsQRCodeOpen(true)} />
               <UpcomingAppointments appointments={appointmentHistory as any} onViewAll={() => handleNavClick('appointments')} />
-              <HomeQuickActions onCouponsClick={handleGoToMyCoupons} onAppointmentClick={() => handleNavClick('appointments')} />
+              <HomeQuickActions 
+                onCouponsClick={handleGoToMyCoupons} 
+                onAppointmentClick={() => {
+                  setActiveTab('appointments');
+                  setIsBookingFormOpen(true);
+                }} 
+              />
               <PetList pets={petsList as any} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
               <MyCouponsHomePreview coupons={userInventory.filter(c => !c.is_used) as any} onViewAll={handleGoToMyCoupons} />
             </motion.div>
