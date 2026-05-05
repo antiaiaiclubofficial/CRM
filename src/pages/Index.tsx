@@ -437,7 +437,7 @@ const Index = () => {
       if (context?.previousData) {
         queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousData);
       }
-      toast.error(err.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ');
+      toast.error(err.message || 'เกิดข้อผิดพลาด กรุณาลองใหมีกรั้งค่ะ');
     },
     onSuccess: () => { 
       toast.success('ใช้งานเรียบร้อยแล้วค่ะ ✨'); 
