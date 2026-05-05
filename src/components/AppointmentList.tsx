@@ -42,7 +42,7 @@ const AppointmentList = ({ appointments, onAddClick }: AppointmentListProps) => 
         <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">นัดหมายของฉัน</h2>
         <button 
           onClick={onAddClick}
-          className="bg-pink-500 text-white text-xs font-black px-5 py-2.5 rounded-2xl border-2 border-black shadow-[4px_4px_0px_0px_#000] active:translate-y-0.5 active:shadow-none transition-all"
+          className="bg-pink-500 text-white text-xs font-black px-5 py-2.5 rounded-2xl border-2 border-black shadow-soft active:translate-y-0.5 active:shadow-none transition-all"
         >
           จองนัดหมาย
         </button>

@@ -203,7 +203,7 @@ const BookingForm = ({ isOpen, onClose, pets, services, onConfirm }: BookingForm
                   <button
                     disabled={!selectedDate || !selectedTime}
                     onClick={handleNext}
-                    className="w-full py-4 bg-pink-500 text-white rounded-2xl font-black shadow-lg shadow-pink-100 border-2 border-black active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 mt-4 mb-8 text-base"
+                    className="w-full py-4 bg-pink-500 text-white rounded-2xl font-black shadow-soft active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 mt-4 mb-8 text-base"
                   >
                     ดูสรุปรายละเอียด
                   </button>
@@ -270,7 +270,7 @@ const BookingForm = ({ isOpen, onClose, pets, services, onConfirm }: BookingForm
                   <button
                     disabled={!agreed || isSubmitting}
                     onClick={handleSubmit}
-                    className="w-full py-4 bg-pink-500 text-white rounded-2xl font-black shadow-lg shadow-pink-100 border-2 border-black active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-base"
+                    className="w-full py-4 bg-pink-500 text-white rounded-2xl font-black shadow-soft active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-base"
                   >
                     {isSubmitting ? 'กำลังส่งข้อมูล...' : <><Check size={20} /> ยืนยันการจอง</>}
                   </button>
