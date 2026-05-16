@@ -26,14 +26,20 @@ const getServiceIcon = (serviceName: string) => {
   return { icon: <CalendarDays size={18} className="text-slate-500" />, bg: 'bg-slate-50' };
 };
 
-const formatAppointmentDate = (dateStr: string) => {
+const formatAppointmentDateTime = (dateStr: string) => {
   const date = new Date(dateStr);
-  let prefix = '';
+  let datePart = '';
   
-  if (isToday(date)) prefix = 'วันนี้, ';
-  else if (isTomorrow(date)) prefix = 'พรุ่งนี้, ';
+  if (isToday(date)) {
+    datePart = 'วันนี้, ';
+  } else if (isTomorrow(date)) {
+    datePart = 'พรุ่งนี้, ';
+  }
   
-  return prefix + format(date, 'd มิ.ย.', { locale: th });
+  datePart += format(date, 'd MMM yy', { locale: th }); // Correct month and year
+  const timePart = format(date, 'HH:mm');
+  
+  return `${datePart} • ${timePart} น.`;
 };
 
 const UpcomingAppointments = ({ appointments, onViewAll }: UpcomingAppointmentsProps) => {
@@ -72,11 +78,7 @@ const UpcomingAppointments = ({ appointments, onViewAll }: UpcomingAppointmentsP
                   <div className="flex items-center gap-3 mt-1.5">
                     <div className="flex items-center gap-1 text-[11px] font-medium text-slate-500">
                       <Calendar size={12} className="text-slate-400" />
-                      {formatAppointmentDate(apt.startTime)}
-                    </div>
-                    <div className="flex items-center gap-1 text-[11px] font-medium text-slate-500">
-                      <Clock size={12} className="text-slate-400" />
-                      {format(new Date(apt.startTime), 'HH:mm')} น.
+                      {formatAppointmentDateTime(apt.startTime)}
                     </div>
                   </div>
                 </div>
