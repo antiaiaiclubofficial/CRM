@@ -119,19 +119,19 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           <div className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 space-y-4">
             <div className="flex items-baseline gap-1">
               <span className="font-bold text-slate-400 text-xs tracking-tight shrink-0">ความยาวขน :</span>
-              <span className="font-black text-slate-800 text-sm tracking-tight">{pet.fur_length || '-'}</span>
+              <span className="font-black text-slate-800 text-[13px] tracking-tight">{pet.fur_length || '-'}</span>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="font-bold text-slate-400 text-xs tracking-tight shrink-0">วันเกิด :</span>
-              <span className="font-black text-slate-800 text-sm tracking-tight">{pet.birth_date || '-'}</span>
+              <span className="font-black text-slate-800 text-[13px] tracking-tight">{pet.birth_date || '-'}</span>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="font-bold text-slate-400 text-xs tracking-tight shrink-0">โรคประจำตัว :</span>
-              <span className="font-black text-slate-800 text-sm tracking-tight">{pet.medical_condition || '-'}</span>
+              <span className="font-black text-slate-800 text-[13px] tracking-tight">{pet.medical_condition || '-'}</span>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="font-bold text-slate-400 text-xs tracking-tight shrink-0">ข้อควรระวัง :</span>
-              <span className="font-black text-slate-800 text-sm tracking-tight">{pet.precautions || '-'}</span>
+              <span className="font-black text-slate-800 text-[13px] tracking-tight">{pet.precautions || '-'}</span>
             </div>
           </div>
         </div>
