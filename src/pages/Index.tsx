@@ -132,7 +132,7 @@ const Index = () => {
         pets: (pets || []).map(p => ({
           ...p,
           imageUrl: p.image_url,
-          cardBgColor: '#FFD8E4',
+          cardBgColor: p.card_bg_color || '#FFD8E4',
           custom_preferences: p.custom_preferences || []
         })),
         coupons: coupons || [],

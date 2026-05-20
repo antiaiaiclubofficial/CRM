@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, HeartPulse, Calendar, Info, Check, Feather, Camera, AlertCircle } from 'lucide-react';
+import { X, HeartPulse, Calendar, Info, Check, Feather, Camera, AlertCircle, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Pet {
@@ -18,6 +18,7 @@ interface Pet {
   precautions: string;
   fur_length: string;
   image_url: string;
+  card_bg_color?: string;
 }
 
 interface PetFormProps {
@@ -29,6 +30,14 @@ interface PetFormProps {
 
 const petIcons: Record<string, string> = { 'สุนัข': '🐶', 'แมว': '🐱', 'กระต่าย': '🐰', 'หนูแฮมสเตอร์': '🐹', 'นก': '🦜' };
 const furLengths = ['ขนสั้น', 'ขนปานกลาง', 'ขนยาว', 'ขนยาวพิเศษ'];
+const themeColors = [
+  { name: 'Pink', value: '#FFD8E4' },
+  { name: 'Peach', value: '#FFE3BC' },
+  { name: 'Mint', value: '#B2F2BB' },
+  { name: 'Blue', value: '#BBDEFB' },
+  { name: 'Lavender', value: '#E1BEE7' },
+  { name: 'Cream', value: '#FFF9F0' },
+];
 
 const calculateAgeString = (birthDate: string) => {
   if (!birthDate) return "";
@@ -69,6 +78,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     precautions: '',
     fur_length: 'ขนสั้น',
     image_url: '',
+    card_bg_color: '#FFD8E4',
   });
 
   useEffect(() => {
@@ -87,6 +97,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
           precautions: initialData.precautions || '',
           fur_length: initialData.fur_length || 'ขนสั้น',
           image_url: initialData.image_url || '',
+          card_bg_color: initialData.card_bg_color || '#FFD8E4',
         });
       } else {
         setFormData({
@@ -101,6 +112,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
           precautions: '',
           fur_length: 'ขนสั้น',
           image_url: '',
+          card_bg_color: '#FFD8E4',
         });
       }
     }
@@ -166,21 +178,47 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
             </div>
 
             <div className="flex-1 space-y-6 px-8 pb-24 overflow-y-auto no-scrollbar">
-              <div className="flex flex-col items-center gap-3 pt-4">
+              {/* Image & Color Selection */}
+              <div className="flex flex-col items-center gap-6 pt-4">
                 <div 
                   onClick={() => fileInputRef.current?.click()}
-                  className="relative w-28 h-28 rounded-full border-4 border-dashed border-pink-200 bg-pink-50 flex items-center justify-center overflow-hidden cursor-pointer"
+                  className="relative w-28 h-28 rounded-full border-4 border-slate-800 bg-slate-50 flex items-center justify-center overflow-hidden cursor-pointer shadow-soft"
                 >
                   {formData.image_url ? (
                     <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="flex flex-col items-center text-pink-300">
+                    <div className="flex flex-col items-center text-slate-300">
                       <Camera size={32} />
-                      <span className="text-[10px] font-bold mt-1">อัปโหลดรูป</span>
+                      <span className="text-[10px] font-bold mt-1 uppercase">Photo</span>
                     </div>
                   )}
+                  <div className="absolute inset-0 bg-black/5 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                    <Camera size={20} className="text-white" />
+                  </div>
                 </div>
                 <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
+
+                <div className="w-full space-y-3">
+                  <label className="text-xs font-black text-slate-500 flex items-center gap-2 px-1 uppercase tracking-wider">
+                    <Palette size={14} className="text-pink-500" /> เลือกสีพื้นหลังบัตร
+                  </label>
+                  <div className="flex justify-between items-center gap-2 p-3 bg-slate-50 rounded-3xl border-2 border-slate-100">
+                    {themeColors.map((color) => (
+                      <button
+                        key={color.value}
+                        onClick={() => setFormData({ ...formData, card_bg_color: color.value })}
+                        className={`w-8 h-8 rounded-full border-2 transition-all ${
+                          formData.card_bg_color === color.value 
+                            ? 'border-slate-800 scale-110 shadow-sm' 
+                            : 'border-transparent'
+                        }`}
+                        style={{ backgroundColor: color.value }}
+                      >
+                        {formData.card_bg_color === color.value && <Check size={14} className="mx-auto text-slate-800" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

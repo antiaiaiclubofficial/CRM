@@ -55,14 +55,11 @@ const PetCategoryCard = ({ pet, onClick, onToggleFavorite }: PetCategoryCardProp
             
             <button
               onClick={(e) => onToggleFavorite?.(e, pet.id, !!pet.is_favorite)}
-              className={`p-1.5 transition-all active:scale-125 ${
-                pet.is_favorite 
-                  ? 'text-pink-500' 
-                  : 'text-slate-300'
-              }`}
+              className="p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm border border-slate-200 transition-all active:scale-110 shrink-0"
             >
               <Heart 
-                size={22} 
+                size={16} 
+                className={pet.is_favorite ? 'text-pink-500' : 'text-slate-300'}
                 fill={pet.is_favorite ? "currentColor" : "none"} 
                 strokeWidth={pet.is_favorite ? 2 : 2.5} 
               />
