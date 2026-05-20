@@ -690,7 +690,13 @@ const Index = () => {
                   onToggleFavorite={() => toggleFavoriteMutation.mutate({ petId: selectedPetForDetail.id, currentFav: !!selectedPetForDetail.is_favorite })} 
                 />
               ) : (
-                <PetManagement pets={petsList as any} onBack={() => setActiveTab('home')} onViewDetails={(p: any) => setSelectedPetId(p.id)} onAddPet={() => { setPetToEditId(null); setIsPetFormOpen(true); }} />
+                <PetManagement 
+                  pets={petsList as any} 
+                  onBack={() => setActiveTab('home')} 
+                  onViewDetails={(p: any) => setSelectedPetId(p.id)} 
+                  onAddPet={() => { setPetToEditId(null); setIsPetFormOpen(true); }} 
+                  onToggleFavorite={(petId, currentFav) => toggleFavoriteMutation.mutate({ petId, currentFav })}
+                />
               )}
             </motion.div>
           )}

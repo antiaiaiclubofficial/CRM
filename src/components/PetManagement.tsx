@@ -29,11 +29,17 @@ interface PetManagementProps {
   onBack: () => void;
   onViewDetails: (pet: Pet) => void;
   onAddPet: () => void;
+  onToggleFavorite?: (petId: number, currentFav: boolean) => void;
 }
 
-const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) => {
+const PetManagement = ({ pets, onViewDetails, onAddPet, onToggleFavorite }: PetManagementProps) => {
   const leftColumnPets = pets.filter((_, index) => index % 2 === 0);
   const rightColumnPets = pets.filter((_, index) => index % 2 !== 0);
+
+  const handleToggleFav = (e: React.MouseEvent, petId: number, currentFav: boolean) => {
+    e.stopPropagation(); // กันไม่ให้กดแล้วไปหน้า Detail
+    onToggleFavorite?.(petId, currentFav);
+  };
 
   return (
     <motion.div
@@ -71,6 +77,7 @@ const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) =>
                   isFavorite: pet.isFavorite
                 }}
                 onClick={() => onViewDetails(pet)}
+                onToggleFavorite={handleToggleFav}
               />
             ))}
           </div>
@@ -91,6 +98,7 @@ const PetManagement = ({ pets, onViewDetails, onAddPet }: PetManagementProps) =>
                   isFavorite: pet.isFavorite
                 }}
                 onClick={() => onViewDetails(pet)}
+                onToggleFavorite={handleToggleFav}
               />
             ))}
           </div>
