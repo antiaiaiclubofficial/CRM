@@ -553,7 +553,17 @@ const Index = () => {
     setIsAppointmentDetailOpen(true);
   };
 
-  const petsList = useMemo(() => customerData?.pets || [], [customerData]);
+  const petsList = useMemo(() => {
+    const rawPets = customerData?.pets || [];
+    // Sort favorites to the top
+    return [...rawPets].sort((a, b) => {
+      if (a.is_favorite === b.is_favorite) {
+        return a.name.localeCompare(b.name);
+      }
+      return a.is_favorite ? -1 : 1;
+    });
+  }, [customerData]);
+
   const selectedPetForDetail = useMemo(() => petsList.find(p => p.id === selectedPetId) || null, [petsList, selectedPetId]);
 
   const serviceHistory = useMemo(() => (customerData?.history || []).map(h => ({
