@@ -502,6 +502,35 @@ const Index = () => {
     }
   });
 
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: async ({ petId, currentFav }: { petId: string | number, currentFav: boolean }) => {
+      const { error } = await supabase.from('pets').update({ is_favorite: !currentFav }).eq('id', petId);
+      if (error) throw error;
+      return !currentFav;
+    },
+    onMutate: async ({ petId, currentFav }) => {
+      await queryClient.cancelQueries({ queryKey: ['customer_profile', lineProfile?.userId, store?.id] });
+      const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pets: old.pets.map((p: any) => p.id === petId ? { ...p, is_favorite: !currentFav } : p)
+        };
+      });
+      return { previousData };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousData);
+      }
+      toast.error('ไม่สามารถบันทึกรายการโปรดได้ค่ะ');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    }
+  });
+
   const handleNavClick = (tab: string) => {
     setActiveTab(tab);
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -637,7 +666,16 @@ const Index = () => {
           {activeTab === 'pets' && (
             <motion.div key="pets-tab">
               {selectedPetForDetail ? (
-                <PetDetailView pet={selectedPetForDetail as any} onBack={() => setSelectedPetId(null)} onStartEdit={(p: any) => { setPetToEditId(p.id); setIsPetFormOpen(true); }} onDeletePet={(id) => deletePetMutation.mutate(id)} totalServiceCost={0} onViewServiceHistoryForPet={() => {}} onEditPreferences={() => setIsPreferenceFormOpen(true)} onToggleFavorite={() => {}} />
+                <PetDetailView 
+                  pet={selectedPetForDetail as any} 
+                  onBack={() => setSelectedPetId(null)} 
+                  onStartEdit={(p: any) => { setPetToEditId(p.id); setIsPetFormOpen(true); }} 
+                  onDeletePet={(id) => deletePetMutation.mutate(id)} 
+                  totalServiceCost={0} 
+                  onViewServiceHistoryForPet={() => {}} 
+                  onEditPreferences={() => setIsPreferenceFormOpen(true)} 
+                  onToggleFavorite={() => toggleFavoriteMutation.mutate({ petId: selectedPetForDetail.id, currentFav: !!selectedPetForDetail.is_favorite })} 
+                />
               ) : (
                 <PetManagement pets={petsList as any} onBack={() => setActiveTab('home')} onViewDetails={(p: any) => setSelectedPetId(p.id)} onAddPet={() => { setPetToEditId(null); setIsPetFormOpen(true); }} />
               )}
