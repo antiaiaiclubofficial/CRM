@@ -555,12 +555,15 @@ const Index = () => {
 
   const petsList = useMemo(() => {
     const rawPets = customerData?.pets || [];
-    // Sort favorites to the top
+    // Priority 1: is_favorite, Priority 2: created_at (oldest first)
     return [...rawPets].sort((a, b) => {
-      if (a.is_favorite === b.is_favorite) {
-        return a.name.localeCompare(b.name);
+      if (a.is_favorite !== b.is_favorite) {
+        return a.is_favorite ? -1 : 1;
       }
-      return a.is_favorite ? -1 : 1;
+      // If favorite status is same, sort by created_at date
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return dateA - dateB;
     });
   }, [customerData]);
 
