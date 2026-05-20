@@ -14,7 +14,7 @@ interface PetCategoryCardProps {
     weight: string;
     gender: string;
     cardBgColor: string;
-    isFavorite?: boolean;
+    is_favorite?: boolean;
   };
   onClick: (petId: number) => void;
   onToggleFavorite?: (e: React.MouseEvent, petId: number, currentFav: boolean) => void;
@@ -54,14 +54,18 @@ const PetCategoryCard = ({ pet, onClick, onToggleFavorite }: PetCategoryCardProp
             </div>
             
             <button
-              onClick={(e) => onToggleFavorite?.(e, pet.id, !!pet.isFavorite)}
-              className={`p-2.5 rounded-2xl border-2 transition-all active:scale-90 ${
-                pet.isFavorite 
-                  ? 'bg-pink-100 border-pink-500 text-pink-500 shadow-sm' 
-                  : 'bg-white border-slate-200 text-slate-300'
+              onClick={(e) => onToggleFavorite?.(e, pet.id, !!pet.is_favorite)}
+              className={`p-1.5 transition-all active:scale-125 ${
+                pet.is_favorite 
+                  ? 'text-pink-500' 
+                  : 'text-slate-300'
               }`}
             >
-              <Heart size={18} fill={pet.isFavorite ? "currentColor" : "none"} strokeWidth={pet.isFavorite ? 2 : 2.5} />
+              <Heart 
+                size={22} 
+                fill={pet.is_favorite ? "currentColor" : "none"} 
+                strokeWidth={pet.is_favorite ? 2 : 2.5} 
+              />
             </button>
           </div>
         </div>

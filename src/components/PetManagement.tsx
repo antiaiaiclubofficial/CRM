@@ -21,7 +21,7 @@ interface Pet {
   customPreferences?: { id: string; label: string; value: string; }[];
   imageUrl: string;
   cardBgColor: string;
-  isFavorite?: boolean;
+  is_favorite?: boolean;
 }
 
 interface PetManagementProps {
@@ -37,7 +37,7 @@ const PetManagement = ({ pets, onViewDetails, onAddPet, onToggleFavorite }: PetM
   const rightColumnPets = pets.filter((_, index) => index % 2 !== 0);
 
   const handleToggleFav = (e: React.MouseEvent, petId: number, currentFav: boolean) => {
-    e.stopPropagation(); // กันไม่ให้กดแล้วไปหน้า Detail
+    e.stopPropagation(); 
     onToggleFavorite?.(petId, currentFav);
   };
 
@@ -48,7 +48,6 @@ const PetManagement = ({ pets, onViewDetails, onAddPet, onToggleFavorite }: PetM
       exit={{ opacity: 0, x: -20 }}
       className="space-y-6 pb-20"
     >
-      {/* Header */}
       <div className="flex justify-between items-center mb-4 px-1">
         <h2 className="text-xl font-bold text-slate-800">สัตว์เลี้ยงของฉัน</h2>
         <button 
@@ -61,7 +60,6 @@ const PetManagement = ({ pets, onViewDetails, onAddPet, onToggleFavorite }: PetM
 
       {pets.length > 0 ? (
         <div className="flex gap-4 items-start">
-          {/* Left Column */}
           <div className="flex-1 space-y-4">
             {leftColumnPets.map((pet) => (
               <PetCategoryCard
@@ -74,7 +72,7 @@ const PetManagement = ({ pets, onViewDetails, onAddPet, onToggleFavorite }: PetM
                   weight: pet.weight,
                   gender: pet.gender,
                   cardBgColor: pet.cardBgColor,
-                  isFavorite: pet.isFavorite
+                  is_favorite: pet.is_favorite
                 }}
                 onClick={() => onViewDetails(pet)}
                 onToggleFavorite={handleToggleFav}
@@ -82,7 +80,6 @@ const PetManagement = ({ pets, onViewDetails, onAddPet, onToggleFavorite }: PetM
             ))}
           </div>
 
-          {/* Right Column */}
           <div className="flex-1 space-y-4">
             {rightColumnPets.map((pet) => (
               <PetCategoryCard
@@ -95,7 +92,7 @@ const PetManagement = ({ pets, onViewDetails, onAddPet, onToggleFavorite }: PetM
                   weight: pet.weight,
                   gender: pet.gender,
                   cardBgColor: pet.cardBgColor,
-                  isFavorite: pet.isFavorite
+                  is_favorite: pet.is_favorite
                 }}
                 onClick={() => onViewDetails(pet)}
                 onToggleFavorite={handleToggleFav}
