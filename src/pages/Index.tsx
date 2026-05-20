@@ -55,7 +55,6 @@ const Index = () => {
   
   const mainScrollRef = useRef<HTMLElement>(null);
 
-  // Get Store Info
   const { data: store, isLoading: storeLoading } = useQuery({
     queryKey: ['current_store'],
     queryFn: async () => {
@@ -74,7 +73,6 @@ const Index = () => {
     }
   });
 
-  // Main Customer Data Fetch
   const { data: customerData, isLoading: profileLoading } = useQuery({
     queryKey: ['customer_profile', lineProfile?.userId, store?.id],
     queryFn: async () => {
@@ -146,7 +144,6 @@ const Index = () => {
     enabled: !!lineProfile?.userId && !!store?.id,
   });
 
-  // Get Store Services
   const { data: storeServices } = useQuery({
     queryKey: ['store_services', store?.id],
     queryFn: async () => {
@@ -161,7 +158,6 @@ const Index = () => {
     enabled: !!store?.id
   });
 
-  // Get Available Templates
   const { data: couponTemplates } = useQuery({
     queryKey: ['coupon_templates', store?.id],
     queryFn: async () => {
@@ -192,7 +188,6 @@ const Index = () => {
     enabled: !!store?.id
   });
 
-  // Mutations
   const deleteAppointmentMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from('appointments').delete().eq('id', id);
@@ -507,7 +502,6 @@ const Index = () => {
     }
   });
 
-  // Handlers
   const handleNavClick = (tab: string) => {
     setActiveTab(tab);
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -530,7 +524,6 @@ const Index = () => {
     setIsAppointmentDetailOpen(true);
   };
 
-  // Memos
   const petsList = useMemo(() => customerData?.pets || [], [customerData]);
   const selectedPetForDetail = useMemo(() => petsList.find(p => p.id === selectedPetId) || null, [petsList, selectedPetId]);
 

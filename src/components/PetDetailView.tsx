@@ -12,6 +12,7 @@ interface Pet {
   type: string;
   breed: string;
   age: string;
+  birth_date?: string;
   gender: string;
   weight: string;
   medical_condition: string;
@@ -47,7 +48,6 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       exit={{ opacity: 0 }}
       className="relative bg-[#FFF9F0] pb-24"
     >
-      {/* Header Buttons */}
       <div className="absolute top-2 left-2 right-2 flex justify-between items-center z-[60]">
         <button 
           onClick={(e) => {
@@ -92,13 +92,9 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           </motion.button>
         </div>
 
-        {/* Metrics Grid */}
         <div className="grid grid-cols-3 gap-2 mb-6">
           <div className="bg-slate-50 py-4 px-2 rounded-2xl text-center border border-slate-100 flex flex-col justify-center">
-            <div className="flex items-baseline justify-center gap-0.5 mb-1">
-              <span className="text-2xl font-black text-slate-800">{pet.age}</span>
-              <span className="text-xs font-bold text-slate-800">ปี</span>
-            </div>
+            <p className="text-sm font-black text-slate-800 mb-1 leading-tight">{pet.age || '-'}</p>
             <p className="text-[11px] font-black text-slate-400 uppercase tracking-wider">อายุ</p>
           </div>
           <div className="bg-slate-50 py-4 px-1 rounded-2xl text-center border border-slate-100 flex flex-col justify-center min-w-0">
@@ -124,6 +120,10 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
             <div className="flex items-baseline gap-1">
               <span className="font-bold text-slate-400 text-xs tracking-tight shrink-0">ความยาวขน :</span>
               <span className="font-black text-slate-800 text-sm tracking-tight">{pet.fur_length || '-'}</span>
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="font-bold text-slate-400 text-xs tracking-tight shrink-0">วันเกิด :</span>
+              <span className="font-black text-slate-800 text-sm tracking-tight">{pet.birth_date || '-'}</span>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="font-bold text-slate-400 text-xs tracking-tight shrink-0">โรคประจำตัว :</span>
@@ -181,7 +181,6 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           </div>
         </div>
 
-        {/* Delete Button */}
         <button 
           onClick={() => setShowDeleteConfirm(true)}
           className="w-full py-4 flex items-center justify-center gap-2 bg-red-50 text-red-500 font-bold rounded-2xl border-2 border-red-100 hover:bg-red-100 transition-colors active:scale-95"
@@ -191,7 +190,6 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         </button>
       </div>
 
-      {/* Delete Confirmation Modal */}
       <AnimatePresence>
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">

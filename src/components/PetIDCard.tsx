@@ -11,6 +11,7 @@ interface Pet {
   type: string;
   breed: string;
   age: string;
+  birth_date?: string;
   gender: string;
   weight: string;
   medicalCondition: string;
@@ -32,12 +33,10 @@ const PetIDCard = ({ pet }: PetIDCardProps) => {
       animate={{ opacity: 1, y: 0 }}
       className="relative overflow-hidden p-6 rounded-[2rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-xl shadow-pink-100/50 text-slate-800"
     >
-      {/* Background Paw Prints */}
       <PawPrint className="absolute -right-4 -top-4 w-32 h-32 text-white/20 rotate-12" />
       <PawPrint className="absolute -left-8 -bottom-8 w-24 h-24 text-white/10 -rotate-12" />
 
       <div className="relative z-10 space-y-5">
-        {/* Header: Icon and Name */}
         <div className="flex items-center gap-4">
           <div className={`w-20 h-20 ${pet.color} rounded-full flex items-center justify-center text-4xl shadow-inner border-2 border-white`}>
             {pet.icon}
@@ -48,7 +47,6 @@ const PetIDCard = ({ pet }: PetIDCardProps) => {
           </div>
         </div>
 
-        {/* Basic Info Grid */}
         <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
           <div className="flex items-center gap-2">
             <User size={16} className="text-pink-500" />
@@ -56,7 +54,7 @@ const PetIDCard = ({ pet }: PetIDCardProps) => {
           </div>
           <div className="flex items-center gap-2">
             <Calendar size={16} className="text-blue-500" />
-            <span className="font-medium">อายุ: <span className="font-bold">{pet.age || '-'} ปี</span></span>
+            <span className="font-medium">อายุ: <span className="font-bold">{pet.age || '-'}</span></span>
           </div>
           <div className="flex items-center gap-2">
             <AnalogScaleIcon size={16} className="text-amber-500" />
@@ -68,7 +66,6 @@ const PetIDCard = ({ pet }: PetIDCardProps) => {
           </div>
         </div>
 
-        {/* Medical & Precautions */}
         {(pet.medicalCondition || pet.precautions) && (
           <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 space-y-3 border border-white/80 shadow-inner">
             {pet.medicalCondition && (

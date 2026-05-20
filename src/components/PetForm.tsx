@@ -11,6 +11,7 @@ interface Pet {
   type: string;
   breed: string;
   age: string;
+  birth_date?: string;
   gender: string;
   weight: string;
   medical_condition: string;
@@ -29,6 +30,31 @@ interface PetFormProps {
 const petIcons: Record<string, string> = { 'สุนัข': '🐶', 'แมว': '🐱', 'กระต่าย': '🐰', 'หนูแฮมสเตอร์': '🐹', 'นก': '🦜' };
 const furLengths = ['ขนสั้น', 'ขนปานกลาง', 'ขนยาว', 'ขนยาวพิเศษ'];
 
+const calculateAgeString = (birthDate: string) => {
+  if (!birthDate) return "";
+  const today = new Date();
+  const birth = new Date(birthDate);
+  
+  let years = today.getFullYear() - birth.getFullYear();
+  let months = today.getMonth() - birth.getMonth();
+  
+  if (months < 0 || (months === 0 && today.getDate() < birth.getDate())) {
+    years--;
+    months += 12;
+  }
+  
+  if (today.getDate() < birth.getDate()) {
+    months--;
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+  }
+
+  if (years < 0) return "0 ปี 0 เดือน";
+  return `${years} ปี ${months} เดือน`;
+};
+
 const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<Pet>({
@@ -36,6 +62,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     type: 'สุนัข',
     breed: '',
     age: '',
+    birth_date: '',
     gender: 'ผู้',
     weight: '',
     medical_condition: '',
@@ -53,6 +80,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
           type: initialData.type || 'สุนัข',
           breed: initialData.breed || '',
           age: initialData.age || '',
+          birth_date: initialData.birth_date || '',
           gender: initialData.gender || 'ผู้',
           weight: initialData.weight || '',
           medical_condition: initialData.medical_condition || '',
@@ -66,6 +94,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
           type: 'สุนัข',
           breed: '',
           age: '',
+          birth_date: '',
           gender: 'ผู้',
           weight: '',
           medical_condition: '',
@@ -88,14 +117,21 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     }
   };
 
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = e.target.value;
+    setFormData(prev => ({ 
+      ...prev, 
+      birth_date: date,
+      age: calculateAgeString(date)
+    }));
+  };
+
   const executeSave = () => {
-    // If it's a new pet and name is empty, we just close without saving
     if (!initialData && !formData.name.trim()) {
       onClose();
       return;
     }
     
-    // If it's an edit and name is empty, we warn them
     if (initialData && !formData.name.trim()) {
       toast.error('กรุณาระบุชื่อสัตว์เลี้ยงด้วยค่ะ');
       return;
@@ -113,7 +149,7 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={executeSave} // Clicking backdrop saves
+            onClick={executeSave}
             className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
           />
           <motion.div 
@@ -130,7 +166,6 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
             </div>
 
             <div className="flex-1 space-y-6 px-8 pb-24 overflow-y-auto no-scrollbar">
-              {/* Image Upload */}
               <div className="flex flex-col items-center gap-3 pt-4">
                 <div 
                   onClick={() => fileInputRef.current?.click()}
@@ -148,7 +183,6 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                 <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
               </div>
 
-              {/* Basic Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-500">ชื่อสัตว์เลี้ยง</label>
@@ -183,12 +217,25 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                 />
               </div>
 
-              {/* Metrics */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 text-center block">อายุ (ปี)</label>
-                  <input type="number" value={formData.age} onChange={(e) => setFormData({...formData, age: e.target.value})} className="w-full p-4 bg-slate-50 rounded-2xl text-center outline-none font-bold" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500">วันเกิด</label>
+                  <input 
+                    type="date" 
+                    value={formData.birth_date}
+                    onChange={handleDateChange}
+                    className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold"
+                  />
                 </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500">อายุปัจจุบัน</label>
+                  <div className="w-full p-4 bg-slate-100 rounded-2xl font-bold text-slate-500 text-sm flex items-center h-[56px]">
+                    {formData.age || '-'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 text-center block">เพศ</label>
                   <select value={formData.gender} onChange={(e) => setFormData({...formData, gender: e.target.value})} className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold">
@@ -202,7 +249,6 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                 </div>
               </div>
 
-              {/* Health Info Section */}
               <div className="space-y-4 pt-4 border-t border-slate-50">
                 <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight">ข้อมูลสุขภาพ</h4>
                 
