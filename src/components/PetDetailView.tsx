@@ -75,14 +75,14 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         </div>
 
         {/* Profile Header - Spaced 2px below the back button */}
-        <div 
-          onClick={() => onStartEdit(pet)}
-          className="mt-[2px] mb-6 flex items-center gap-4 cursor-pointer active:opacity-70 transition-opacity"
-        >
-          <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shrink-0 shadow-md">
+        <div className="mt-[2px] mb-4 flex items-center gap-4">
+          <div 
+            onClick={() => onStartEdit(pet)}
+            className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shrink-0 shadow-md cursor-pointer active:opacity-70 transition-opacity"
+          >
             <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0" onClick={() => onStartEdit(pet)}>
             <h2 className="text-2xl font-black text-slate-800 leading-tight">{pet.name}</h2>
             <p className="text-sm font-bold text-slate-400 mt-0.5">
               {pet.type} • {pet.breed}
@@ -91,16 +91,31 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               {pet.age || '-'} • {pet.weight || '-'} กก.
             </p>
           </div>
-          <div className="text-slate-400 pr-3">
-            <div className="p-2 bg-white rounded-full border border-slate-100 shadow-sm">
+          
+          {/* Action Column: Edit & Favorite */}
+          <div className="flex flex-col gap-2 pr-3">
+            <button 
+              onClick={() => onStartEdit(pet)}
+              className="p-2 bg-white rounded-full border border-slate-100 shadow-sm text-slate-400 active:scale-90 transition-transform"
+            >
               <Pencil size={18} strokeWidth={2.5} />
-            </div>
+            </button>
+            <button 
+              onClick={onToggleFavorite}
+              className={`p-2 rounded-full border shadow-sm active:scale-90 transition-all ${
+                pet.is_favorite 
+                  ? 'bg-pink-50 border-pink-100 text-pink-500' 
+                  : 'bg-white border-slate-100 text-slate-400'
+              }`}
+            >
+              <Heart size={18} fill={pet.is_favorite ? "currentColor" : "none"} strokeWidth={2.5} />
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Tab Navigation - px-[2px] for edge spacing */}
-      <div className="px-[2px] mb-8">
+      {/* Tab Navigation - Reduced margin */}
+      <div className="px-[2px] mb-4">
         <div className="bg-white p-1 rounded-2xl flex gap-0.5 shadow-sm border border-slate-50 overflow-x-auto no-scrollbar">
           <TabButton 
             active={activeTab === 'overview'} 
@@ -143,20 +158,6 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
                   lastUpdate="วันนี้"
                   onActionClick={(type) => setActiveTab('health')}
                 />
-              </div>
-              
-              <div className="flex justify-center">
-                 <button 
-                  onClick={onToggleFavorite} 
-                  className={`flex items-center gap-2 px-6 py-2 rounded-full border-2 transition-all ${
-                    pet.is_favorite 
-                      ? 'bg-pink-50 text-pink-500 border-pink-100' 
-                      : 'bg-white text-slate-400 border-slate-100'
-                  }`}
-                >
-                  <Heart size={18} fill={pet.is_favorite ? "currentColor" : "none"} />
-                  <span className="text-xs font-black uppercase">รายการโปรด</span>
-                </button>
               </div>
             </motion.div>
           )}

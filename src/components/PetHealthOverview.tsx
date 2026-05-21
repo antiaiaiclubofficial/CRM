@@ -23,35 +23,35 @@ const PetHealthOverview = ({ score, statusText, subStatusText, lastUpdate, onAct
   const circleColor = score >= 80 ? '#059669' : score >= 50 ? '#f59e0b' : '#ef4444';
 
   return (
-    <div className="bg-white rounded-[2.5rem] p-8 border-2 border-slate-100 shadow-sm space-y-8">
+    <div className="bg-white rounded-[2.5rem] p-6 border-2 border-slate-100 shadow-sm space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-xl font-black text-slate-800">ภาพรวมสุขภาพ</h3>
+        <h3 className="text-lg font-black text-slate-800">ภาพรวมสุขภาพ</h3>
       </div>
 
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center">
-            <Heart size={28} className="text-amber-600 fill-amber-600" />
+          <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+            <Heart size={24} className="text-amber-600 fill-amber-600" />
           </div>
           <div>
-            <h4 className="text-lg font-black text-slate-800">{statusText}</h4>
-            <p className="text-xs font-bold text-slate-500">{subStatusText}</p>
+            <h4 className="text-base font-black text-slate-800">{statusText}</h4>
+            <p className="text-[10px] font-bold text-slate-500">{subStatusText}</p>
           </div>
         </div>
 
         {/* Health Score Circle */}
-        <div className="relative w-24 h-24 flex items-center justify-center">
-          <svg className="w-full h-full -rotate-90">
+        <div className="relative w-20 h-20 flex items-center justify-center">
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
             <circle
-              cx="48" cy="48" r="40"
+              cx="50" cy="50" r="40"
               stroke="#F1F5F9"
-              strokeWidth="8"
+              strokeWidth="10"
               fill="transparent"
             />
             <motion.circle
-              cx="48" cy="48" r="40"
+              cx="50" cy="50" r="40"
               stroke={circleColor}
-              strokeWidth="8"
+              strokeWidth="10"
               fill="transparent"
               strokeDasharray={251.2}
               initial={{ strokeDashoffset: 251.2 }}
@@ -61,22 +61,22 @@ const PetHealthOverview = ({ score, statusText, subStatusText, lastUpdate, onAct
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-black text-slate-800 leading-none">{score}</span>
-            <span className="text-[10px] font-bold text-slate-400">/100</span>
+            <span className="text-2xl font-black text-slate-800 leading-none">{score}</span>
+            <span className="text-[8px] font-bold text-slate-400">/100</span>
           </div>
         </div>
       </div>
 
-      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+      <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
         อัปเดตล่าสุด {lastUpdate}
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-4 gap-2 pt-2">
-        <HealthActionButton icon={<Syringe size={20} />} label="วัคซีน" onClick={() => onActionClick('vaccine')} color="bg-emerald-50 text-emerald-600" />
-        <HealthActionButton icon={<Pill size={20} />} label="ยา" onClick={() => onActionClick('medicine')} color="bg-rose-50 text-rose-600" />
-        <HealthActionButton icon={<Activity size={20} />} label="น้ำหนัก" onClick={() => onActionClick('weight')} color="bg-blue-50 text-blue-600" />
-        <HealthActionButton icon={<Stethoscope size={20} />} label="ตรวจสุขภาพ" onClick={() => onActionClick('checkup')} color="bg-slate-50 text-slate-600" />
+      <div className="grid grid-cols-4 gap-2 pt-1">
+        <HealthActionButton icon={<Syringe size={18} />} label="วัคซีน" onClick={() => onActionClick('vaccine')} color="bg-emerald-50 text-emerald-600" />
+        <HealthActionButton icon={<Pill size={18} />} label="ยา" onClick={() => onActionClick('medicine')} color="bg-rose-50 text-rose-600" />
+        <HealthActionButton icon={<Activity size={18} />} label="น้ำหนัก" onClick={() => onActionClick('weight')} color="bg-blue-50 text-blue-600" />
+        <HealthActionButton icon={<Stethoscope size={18} />} label="ตรวจสุขภาพ" onClick={() => onActionClick('checkup')} color="bg-slate-50 text-slate-600" />
       </div>
     </div>
   );
@@ -85,12 +85,12 @@ const PetHealthOverview = ({ score, statusText, subStatusText, lastUpdate, onAct
 const HealthActionButton = ({ icon, label, onClick, color }: { icon: any, label: string, onClick: () => void, color: string }) => (
   <button 
     onClick={onClick}
-    className="flex flex-col items-center gap-2 group"
+    className="flex flex-col items-center gap-1.5 group"
   >
-    <div className={`w-14 h-14 ${color} rounded-full flex items-center justify-center shadow-sm border border-black/5 group-active:scale-90 transition-all`}>
+    <div className={`w-12 h-12 ${color} rounded-full flex items-center justify-center shadow-sm border border-black/5 group-active:scale-90 transition-all`}>
       {icon}
     </div>
-    <span className="text-[10px] font-black text-slate-500 uppercase tracking-tight">{label}</span>
+    <span className="text-[9px] font-black text-slate-500 uppercase tracking-tight">{label}</span>
   </button>
 );
 
