@@ -36,7 +36,7 @@ const MyCouponsHomePreview = ({ coupons, onViewAll }: MyCouponsHomePreviewProps)
         </h3>
         <button 
           onClick={onViewAll} 
-          className="text-sm text-[#FF4B91] font-black flex items-center gap-0.5 hover:opacity-80 transition-opacity"
+          className="text-sm text-[#EAFD69] font-black flex items-center gap-0.5 hover:opacity-80 transition-opacity"
         >
           ดูทั้งหมด <ChevronRight size={16} strokeWidth={3} />
         </button>
