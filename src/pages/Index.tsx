@@ -65,8 +65,25 @@ const Index = () => {
       if (!customer) return null;
 
       const { data: membership } = await supabase.from('store_customers').select('*').eq('customer_id', customer.id).eq('store_id', store.id).maybeSingle();
-      const { data: pets } = await supabase.from('pets').select('*').eq('customer_id', customer.id).order('created_at', { ascending: true });
+      const { data: petsData } = await supabase.from('pets').select('*').eq('customer_id', customer.id).order('created_at', { ascending: true });
       
+      // Fetch weight history for all pets
+      const petIds = (petsData || []).map(p => p.id);
+      const { data: weightHistory } = await supabase.from('pet_weight_history').select('*').in('pet_id', petIds).order('date', { ascending: true });
+
+      const pets = (petsData || []).map(p => ({
+        ...p,
+        imageUrl: p.image_url,
+        cardBgColor: p.card_bg_color || '#FFFFFF',
+        custom_preferences: p.custom_preferences || [],
+        weight_history: (weightHistory || [])
+          .filter(wh => wh.pet_id === p.id)
+          .map(wh => ({
+            date: new Date(wh.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }),
+            weight: parseFloat(wh.weight)
+          }))
+      }));
+
       // Fetch Coupons & Deals
       const { data: coupons } = await supabase.from('customer_coupons').select('*, coupon_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).eq('status', 'unused');
       const { data: deals } = await supabase.from('customers_deals').select('*, deal_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).eq('status', 'unused');
@@ -100,7 +117,7 @@ const Index = () => {
       return {
         profile: customer,
         membership: membership,
-        pets: (pets || []).map(p => ({ ...p, imageUrl: p.image_url, cardBgColor: p.card_bg_color || '#FFFFFF', custom_preferences: p.custom_preferences || [] })),
+        pets,
         myCoupons,
         appointments: (appointmentsData || []).map(apt => ({
           id: apt.id,

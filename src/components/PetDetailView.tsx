@@ -4,9 +4,10 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Pencil, Heart, PawPrint, Tag, Plus, HeartPulse, Trash2, AlertTriangle, X,
-  LayoutGrid, Activity, History, FileText, Stethoscope, Syringe, ChevronRight
+  LayoutGrid, Activity, History, FileText, Stethoscope, Syringe, ChevronRight, Scale
 } from 'lucide-react';
 import PetHealthOverview from './PetHealthOverview';
+import PetWeightChart from './PetWeightChart';
 
 interface Pet {
   id: string | number;
@@ -25,6 +26,7 @@ interface Pet {
   custom_preferences?: { id: string; label: string; value: string; }[];
   image_url: string;
   is_favorite?: boolean;
+  weight_history?: { date: string; weight: number; }[];
 }
 
 interface PetDetailViewProps {
@@ -41,6 +43,7 @@ interface PetDetailViewProps {
 const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreferences, onToggleFavorite }: PetDetailViewProps) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showWeightDetail, setShowWeightDetail] = useState(false);
 
   const healthData = useMemo(() => {
     let score = 70;
@@ -58,6 +61,21 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
     return { score, status, subStatus };
   }, [pet]);
 
+  // Mock weight history if none provided for better UX
+  const weightHistory = pet.weight_history || [
+    { date: '1 ม.ค.', weight: parseFloat(pet.weight) - 0.5 || 4.5 },
+    { date: '15 ก.พ.', weight: parseFloat(pet.weight) - 0.2 || 4.8 },
+    { date: '10 มี.ค.', weight: parseFloat(pet.weight) || 5.0 },
+  ];
+
+  const handleHealthAction = (type: string) => {
+    if (type === 'weight') {
+      setShowWeightDetail(true);
+    } else {
+      setActiveTab('health');
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -65,165 +83,159 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       exit={{ opacity: 0 }}
       className="relative bg-[#FFF9F0] pb-24"
     >
-      {/* Top Section with 2px horizontal padding */}
+      {/* Top Section */}
       <div className="px-[2px] pt-0 flex flex-col">
-        {/* Back button area - Tight padding */}
         <div className="flex items-center">
-          <button onClick={onBack} className="p-1 text-slate-400 hover:text-slate-600 transition-colors">
+          <button 
+            onClick={showWeightDetail ? () => setShowWeightDetail(false) : onBack} 
+            className="p-1 text-slate-400 hover:text-slate-600 transition-colors"
+          >
             <ArrowLeft size={30} strokeWidth={2.5} />
           </button>
         </div>
 
-        {/* Profile Header - Spaced 2px below the back button */}
-        <div className="mt-[2px] mb-4 flex items-center gap-4">
-          <div 
-            onClick={() => onStartEdit(pet)}
-            className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shrink-0 shadow-md cursor-pointer active:opacity-70 transition-opacity"
-          >
-            <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
-          </div>
-          <div className="flex-1 min-w-0" onClick={() => onStartEdit(pet)}>
-            <h2 className="text-2xl font-black text-slate-800 leading-tight">{pet.name}</h2>
-            <p className="text-sm font-bold text-slate-400 mt-0.5">
-              {pet.type} • {pet.breed}
-            </p>
-            <p className="text-sm font-bold text-slate-400">
-              {pet.age || '-'} • {pet.weight || '-'} กก.
-            </p>
-          </div>
-          
-          {/* Action Column: Edit & Favorite */}
-          <div className="flex flex-col gap-2 pr-3">
-            <button 
+        {!showWeightDetail && (
+          <div className="mt-[2px] mb-4 flex items-center gap-4">
+            <div 
               onClick={() => onStartEdit(pet)}
-              className="p-2 bg-white rounded-full border border-slate-100 shadow-sm text-slate-400 active:scale-90 transition-transform"
+              className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shrink-0 shadow-md cursor-pointer active:opacity-70 transition-opacity"
             >
-              <Pencil size={18} strokeWidth={2.5} />
-            </button>
-            <button 
-              onClick={onToggleFavorite}
-              className={`p-2 rounded-full border shadow-sm active:scale-90 transition-all ${
-                pet.is_favorite 
-                  ? 'bg-pink-50 border-pink-100 text-pink-500' 
-                  : 'bg-white border-slate-100 text-slate-400'
-              }`}
-            >
-              <Heart size={18} fill={pet.is_favorite ? "currentColor" : "none"} strokeWidth={2.5} />
-            </button>
+              <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
+            </div>
+            <div className="flex-1 min-w-0" onClick={() => onStartEdit(pet)}>
+              <h2 className="text-2xl font-black text-slate-800 leading-tight">{pet.name}</h2>
+              <p className="text-sm font-bold text-slate-400 mt-0.5">
+                {pet.type} • {pet.breed}
+              </p>
+              <p className="text-sm font-bold text-slate-400">
+                {pet.age || '-'} • {pet.weight || '-'} กก.
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-2 pr-3">
+              <button 
+                onClick={() => onStartEdit(pet)}
+                className="p-2 bg-white rounded-full border border-slate-100 shadow-sm text-slate-400 active:scale-90 transition-transform"
+              >
+                <Pencil size={18} strokeWidth={2.5} />
+              </button>
+              <button 
+                onClick={onToggleFavorite}
+                className={`p-2 rounded-full border shadow-sm active:scale-90 transition-all ${
+                  pet.is_favorite 
+                    ? 'bg-pink-50 border-pink-100 text-pink-500' 
+                    : 'bg-white border-slate-100 text-slate-400'
+                }`}
+              >
+                <Heart size={18} fill={pet.is_favorite ? "currentColor" : "none"} strokeWidth={2.5} />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Tab Navigation - Reduced margin */}
-      <div className="px-[2px] mb-4">
-        <div className="bg-white p-1 rounded-2xl flex gap-0.5 shadow-sm border border-slate-50 overflow-x-auto no-scrollbar">
-          <TabButton 
-            active={activeTab === 'overview'} 
-            onClick={() => setActiveTab('overview')} 
-            label="ภาพรวม" 
-          />
-          <TabButton 
-            active={activeTab === 'health'} 
-            onClick={() => setActiveTab('health')} 
-            label="สุขภาพ" 
-          />
-          <TabButton 
-            active={activeTab === 'history'} 
-            onClick={() => setActiveTab('history')} 
-            label="ประวัติ" 
-          />
-          <TabButton 
-            active={activeTab === 'notes'} 
-            onClick={() => setActiveTab('notes')} 
-            label="โน้ต" 
-          />
+      {showWeightDetail ? (
+        <div className="px-[2px] pt-4">
+           <div className="flex items-center gap-2 mb-6 px-1">
+              <div className="p-2 bg-blue-100 rounded-2xl text-blue-600">
+                <Scale size={20} />
+              </div>
+              <h3 className="text-2xl font-black text-slate-800">ประวัติน้ำหนัก: น้อง{pet.name}</h3>
+           </div>
+           <PetWeightChart data={weightHistory} petName={pet.name} />
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Tab Navigation */}
+          <div className="px-[2px] mb-4">
+            <div className="bg-white p-1 rounded-2xl flex gap-0.5 shadow-sm border border-slate-50 overflow-x-auto no-scrollbar">
+              <TabButton active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} label="ภาพรวม" />
+              <TabButton active={activeTab === 'health'} onClick={() => setActiveTab('health')} label="สุขภาพ" />
+              <TabButton active={activeTab === 'history'} onClick={() => setActiveTab('history')} label="ประวัติ" />
+              <TabButton active={activeTab === 'notes'} onClick={() => setActiveTab('notes')} label="โน้ต" />
+            </div>
+          </div>
 
-      <div className="px-[2px] space-y-6">
-        <AnimatePresence mode="wait">
-          {activeTab === 'overview' && (
-            <motion.div 
-              key="overview"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="space-y-6"
-            >
-              <div className="px-1">
-                <PetHealthOverview 
-                  score={healthData.score}
-                  statusText={healthData.status}
-                  subStatusText={healthData.subStatus}
-                  lastUpdate="วันนี้"
-                  onActionClick={(type) => setActiveTab('health')}
-                />
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'health' && (
-            <motion.div key="health" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 px-1">
-              <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-50">
-                <h3 className="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
-                  <HeartPulse size={20} className="text-pink-500" /> รายละเอียดสุขภาพ
-                </h3>
-                <div className="space-y-4">
-                  <HealthItem label="โรคประจำตัว" value={pet.medical_condition || 'ไม่มี'} />
-                  <HealthItem label="ข้อควรระวัง" value={pet.precautions || 'ไม่มี'} />
-                  <HealthItem label="ความยาวขน" value={pet.fur_length || '-'} />
-                </div>
-              </div>
-              
-              <div className="space-y-4 px-2">
-                <h3 className="text-lg font-black text-slate-800">ไทม์ไลน์สุขภาพ</h3>
-                <div className="relative pl-8 space-y-8 before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
-                   <TimelineItem title="รับบริการอาบน้ำตัดขน" date="15 พ.ค. 2569" type="grooming" />
-                   <TimelineItem title="ฉีดวัคซีนรวม (รายปี)" date="10 พ.ค. 2569" type="vaccine" />
-                   <TimelineItem title="ตรวจสุขภาพประจำเดือน" date="1 พ.ค. 2569" type="checkup" />
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'history' && (
-            <motion.div key="history" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 px-1">
-               <History size={48} className="mx-auto text-slate-200 mb-4" />
-               <p className="text-slate-400 font-bold">ยังไม่มีข้อมูลประวัติการรักษา</p>
-            </motion.div>
-          )}
-
-          {activeTab === 'notes' && (
-            <motion.div key="notes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 px-1">
-               <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
-                  <div className="flex justify-between items-center mb-4">
-                    <h4 className="text-lg font-black text-slate-800">ความชอบส่วนตัว</h4>
-                    <button onClick={onEditPreferences} className="p-1.5 bg-slate-100 rounded-full text-slate-500">
-                      <Pencil size={16} />
-                    </button>
+          <div className="px-[2px] space-y-6">
+            <AnimatePresence mode="wait">
+              {activeTab === 'overview' && (
+                <motion.div key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
+                  <div className="px-1">
+                    <PetHealthOverview 
+                      score={healthData.score}
+                      statusText={healthData.status}
+                      subStatusText={healthData.subStatus}
+                      lastUpdate="วันนี้"
+                      onActionClick={handleHealthAction}
+                    />
                   </div>
-                  <div className="space-y-3">
-                    {pet.custom_preferences?.map((pref, i) => (
-                      <div key={i} className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <Tag size={16} className="text-pink-500" />
-                        <span className="text-sm font-bold text-slate-700">{pref.label}: {pref.value}</span>
+                </motion.div>
+              )}
+
+              {activeTab === 'health' && (
+                <motion.div key="health" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 px-1">
+                  <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-50">
+                    <h3 className="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
+                      <HeartPulse size={20} className="text-pink-500" /> รายละเอียดสุขภาพ
+                    </h3>
+                    <div className="space-y-4">
+                      <HealthItem label="โรคประจำตัว" value={pet.medical_condition || 'ไม่มี'} />
+                      <HealthItem label="ข้อควรระวัง" value={pet.precautions || 'ไม่มี'} />
+                      <HealthItem label="ความยาวขน" value={pet.fur_length || '-'} />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4 px-2">
+                    <h3 className="text-lg font-black text-slate-800">ไทม์ไลน์สุขภาพ</h3>
+                    <div className="relative pl-8 space-y-8 before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+                       <TimelineItem title="รับบริการอาบน้ำตัดขน" date="15 พ.ค. 2569" type="grooming" />
+                       <TimelineItem title="ฉีดวัคซีนรวม (รายปี)" date="10 พ.ค. 2569" type="vaccine" />
+                       <TimelineItem title="ตรวจสุขภาพประจำเดือน" date="1 พ.ค. 2569" type="checkup" />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === 'history' && (
+                <motion.div key="history" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 px-1">
+                   <History size={48} className="mx-auto text-slate-200 mb-4" />
+                   <p className="text-slate-400 font-bold">ยังไม่มีข้อมูลประวัติการรักษา</p>
+                </motion.div>
+              )}
+
+              {activeTab === 'notes' && (
+                <motion.div key="notes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 px-1">
+                   <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="text-lg font-black text-slate-800">ความชอบส่วนตัว</h4>
+                        <button onClick={onEditPreferences} className="p-1.5 bg-slate-100 rounded-full text-slate-500">
+                          <Pencil size={16} />
+                        </button>
                       </div>
-                    ))}
-                  </div>
-               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                      <div className="space-y-3">
+                        {pet.custom_preferences?.map((pref, i) => (
+                          <div key={i} className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <Tag size={16} className="text-pink-500" />
+                            <span className="text-sm font-bold text-slate-700">{pref.label}: {pref.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                   </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-        <div className="pt-8 flex flex-col items-center gap-4 px-1">
-          <button 
-            onClick={() => setShowDeleteConfirm(true)}
-            className="text-red-400 text-xs font-bold underline underline-offset-4 active:text-red-600 transition-colors"
-          >
-            ลบข้อมูลน้อง {pet.name}
-          </button>
-        </div>
-      </div>
+            <div className="pt-8 flex flex-col items-center gap-4 px-1">
+              <button 
+                onClick={() => setShowDeleteConfirm(true)}
+                className="text-red-400 text-xs font-bold underline underline-offset-4 active:text-red-600 transition-colors"
+              >
+                ลบข้อมูลน้อง {pet.name}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       <AnimatePresence>
         {showDeleteConfirm && (
