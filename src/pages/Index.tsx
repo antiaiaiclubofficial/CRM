@@ -319,7 +319,13 @@ const Index = () => {
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div key="home" className="space-y-8" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <MembershipCard totalAccumulatedPoints={customerData?.membership?.total_points || 0} redeemablePoints={customerData?.membership?.points || 0} ownerProfile={customerData?.profile as any} onShowQR={() => setIsQRCodeOpen(true)} />
+              <MembershipCard 
+                totalAccumulatedPoints={customerData?.membership?.total_points || 0} 
+                redeemablePoints={customerData?.membership?.points || 0} 
+                ownerProfile={customerData?.profile as any} 
+                onShowQR={() => setIsQRCodeOpen(true)}
+                onTierClick={() => handleNavClick('level')}
+              />
               <UpcomingAppointments appointments={customerData?.appointments || []} onViewAll={() => handleNavClick('appointments')} />
               <HomeQuickActions 
                 onCouponsClick={() => setActiveTab('promo')} 
@@ -387,7 +393,6 @@ const Index = () => {
       <nav className="fixed bottom-[20px] left-4 right-4 max-w-[calc(theme(maxWidth.md)-2rem)] mx-auto glass-effect px-6 py-4 flex justify-between items-center rounded-3xl shadow-ambient z-[40] border border-white/40">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
         <NavButton active={activeTab === 'appointments'} icon={<Calendar size={22} />} onClick={() => handleNavClick('appointments')} />
-        <NavButton active={activeTab === 'level'} icon={<Award size={22} />} onClick={() => handleNavClick('level')} />
         <NavButton active={activeTab === 'pets'} icon={<PawPrint size={22} />} onClick={() => handleNavClick('pets')} />
         <NavButton active={activeTab === 'promo'} icon={<Megaphone size={22} />} onClick={() => handleNavClick('promo')} />
         <NavButton active={activeTab === 'history'} icon={<History size={22} />} onClick={() => handleNavClick('history')} />

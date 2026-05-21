@@ -9,6 +9,7 @@ interface MembershipCardProps {
   redeemablePoints: number;
   ownerProfile: any;
   onShowQR: () => void;
+  onTierClick?: () => void;
 }
 
 const tiers = [
@@ -19,7 +20,7 @@ const tiers = [
   { id: 'vip', name: 'VIP Tier', minPoints: 2000, icon: <Diamond size={12} /> },
 ];
 
-const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile, onShowQR }: MembershipCardProps) => {
+const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile, onShowQR, onTierClick }: MembershipCardProps) => {
   // Calculate current tier based on lifetime accumulated points
   const currentTier = [...tiers].reverse().find(t => totalAccumulatedPoints >= t.minPoints) || tiers[0];
   
@@ -49,8 +50,11 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
       <div className="relative z-10 flex flex-col h-full justify-between">
         {/* Top Section */}
         <div className="flex justify-between items-start">
-          {/* Left Side: Membership Status */}
-          <div className="space-y-1">
+          {/* Left Side: Membership Status - Clickable */}
+          <div 
+            className="space-y-1 cursor-pointer active:scale-95 transition-transform" 
+            onClick={onTierClick}
+          >
             <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Membership Status</p>
             <span className="bg-tertiary text-primary text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block">
               {currentTier.name.toUpperCase()}
@@ -88,7 +92,10 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                 <span className="text-[8px] font-black uppercase tracking-widest">My QR</span>
               </motion.button>
               
-              <div className="flex items-center gap-1 justify-end text-tertiary mb-0.5">
+              <div 
+                className="flex items-center gap-1 justify-end text-tertiary mb-0.5 cursor-pointer active:scale-95 transition-transform"
+                onClick={onTierClick}
+              >
                 {React.cloneElement(currentTier.icon as React.ReactElement, { fill: "currentColor" })}
                 <span className="text-[9px] font-black uppercase tracking-widest">คะแนนสะสมทั้งหมด</span>
               </div>
