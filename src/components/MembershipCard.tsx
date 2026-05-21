@@ -32,9 +32,8 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
   
   if (nextTier) {
     pointsNeeded = nextTier.minPoints - totalAccumulatedPoints;
-    const range = nextTier.minPoints - currentTier.minPoints;
-    const progressInCurrentRange = totalAccumulatedPoints - currentTier.minPoints;
-    progressPercentage = Math.min(100, Math.max(0, (progressInCurrentRange / range) * 100));
+    // Calculate progress as actual absolute ratio of current points to next goal
+    progressPercentage = Math.min(100, Math.max(0, (totalAccumulatedPoints / nextTier.minPoints) * 100));
   }
 
   return (
