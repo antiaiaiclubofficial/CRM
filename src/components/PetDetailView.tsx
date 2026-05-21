@@ -63,17 +63,19 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="relative bg-[#FFF9F0] pb-24 pt-4"
+      className="relative bg-[#FFF9F0] pb-24 pt-2"
     >
-      <div className="px-4 mb-4 flex items-center">
-        <button onClick={onBack} className="p-1 text-slate-400 hover:text-slate-600">
-          <ArrowLeft size={24} />
+      {/* Back button - Moved up and further left */}
+      <div className="px-2 mb-4 flex items-center">
+        <button onClick={onBack} className="p-1 text-slate-400 hover:text-slate-600 transition-colors">
+          <ArrowLeft size={28} />
         </button>
       </div>
 
+      {/* Main Info Card - Reduced padding and increased width */}
       <div 
         onClick={() => onStartEdit(pet)}
-        className="px-4 mb-6 flex items-center gap-4 cursor-pointer active:opacity-70 transition-opacity"
+        className="px-3 mb-6 flex items-center gap-4 cursor-pointer active:opacity-70 transition-opacity"
       >
         <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shrink-0 shadow-sm">
           <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
@@ -92,7 +94,8 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         </div>
       </div>
 
-      <div className="px-4 mb-8">
+      {/* Tab Navigation - Tighter padding */}
+      <div className="px-2 mb-8">
         <div className="bg-white p-1.5 rounded-2xl flex gap-1 shadow-sm border border-slate-50">
           <TabButton 
             active={activeTab === 'overview'} 
@@ -117,7 +120,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         </div>
       </div>
 
-      <div className="px-4 space-y-6">
+      <div className="px-2 space-y-6">
         <AnimatePresence mode="wait">
           {activeTab === 'overview' && (
             <motion.div 
@@ -127,13 +130,15 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               exit={{ opacity: 0, y: -10 }}
               className="space-y-6"
             >
-              <PetHealthOverview 
-                score={healthData.score}
-                statusText={healthData.status}
-                subStatusText={healthData.subStatus}
-                lastUpdate="วันนี้"
-                onActionClick={(type) => setActiveTab('health')}
-              />
+              <div className="px-1">
+                <PetHealthOverview 
+                  score={healthData.score}
+                  statusText={healthData.status}
+                  subStatusText={healthData.subStatus}
+                  lastUpdate="วันนี้"
+                  onActionClick={(type) => setActiveTab('health')}
+                />
+              </div>
               
               <div className="flex justify-center">
                  <button 
@@ -152,7 +157,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           )}
 
           {activeTab === 'health' && (
-            <motion.div key="health" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            <motion.div key="health" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 px-1">
               <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-50">
                 <h3 className="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
                   <HeartPulse size={20} className="text-pink-500" /> รายละเอียดสุขภาพ
@@ -176,14 +181,14 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           )}
 
           {activeTab === 'history' && (
-            <motion.div key="history" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12">
+            <motion.div key="history" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 px-1">
                <History size={48} className="mx-auto text-slate-200 mb-4" />
                <p className="text-slate-400 font-bold">ยังไม่มีข้อมูลประวัติการรักษา</p>
             </motion.div>
           )}
 
           {activeTab === 'notes' && (
-            <motion.div key="notes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            <motion.div key="notes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 px-1">
                <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
                   <div className="flex justify-between items-center mb-4">
                     <h4 className="text-lg font-black text-slate-800">ความชอบส่วนตัว</h4>
@@ -204,7 +209,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           )}
         </AnimatePresence>
 
-        <div className="pt-8 flex flex-col items-center gap-4">
+        <div className="pt-8 flex flex-col items-center gap-4 px-1">
           <button 
             onClick={() => setShowDeleteConfirm(true)}
             className="text-red-400 text-xs font-bold underline underline-offset-4 active:text-red-600 transition-colors"
