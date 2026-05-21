@@ -247,13 +247,21 @@ const Index = () => {
       if (savedPetId && weight) {
         const weightNum = parseFloat(weight);
         if (!isNaN(weightNum)) {
-          // Check if we already have a record for today to avoid duplicates if saving multiple times
-          const today = new Date().toISOString().split('T')[0];
-          await supabase.from('pet_weight_history').insert([{
-            pet_id: savedPetId,
-            weight: weightNum,
-            date: new Date().toISOString()
-          }]);
+          // Check if today's record already exists to avoid redundant data
+          const { data: existing } = await supabase
+            .from('pet_weight_history')
+            .select('*')
+            .eq('pet_id', savedPetId)
+            .eq('date', new Date().toISOString().split('T')[0])
+            .maybeSingle();
+
+          if (!existing) {
+            await supabase.from('pet_weight_history').insert([{
+              pet_id: savedPetId,
+              weight: weightNum,
+              date: new Date().toISOString()
+            }]);
+          }
         }
       }
 
