@@ -63,32 +63,28 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="relative bg-[#FFF9F0] pb-24"
+      className="relative bg-[#FFF9F0] pb-24 pt-16"
     >
-      <div className="absolute top-2 left-2 right-2 flex justify-between items-center z-[60]">
+      {/* Top Header Controls */}
+      <div className="absolute top-4 left-6 right-6 flex justify-between items-center z-[60]">
         <button 
           onClick={onBack} 
-          className="p-2.5 bg-emerald-400 text-white rounded-xl shadow-lg active:scale-95 transition-transform"
+          className="p-2.5 bg-white/80 backdrop-blur-md text-slate-800 rounded-2xl shadow-sm active:scale-95 transition-all border border-slate-100"
         >
           <ArrowLeft size={24} />
         </button>
         
         <button 
           onClick={() => onStartEdit(pet)} 
-          className="p-2.5 bg-slate-900 text-white rounded-xl shadow-lg active:scale-95 transition-transform flex items-center gap-1 px-3"
+          className="p-2.5 bg-slate-900 text-white rounded-2xl shadow-lg active:scale-95 transition-transform flex items-center gap-1.5 px-4"
         >
           <Pencil size={18} />
-          <span className="text-xs font-bold">แก้ไข</span>
+          <span className="text-sm font-bold">แก้ไขข้อมูล</span>
         </button>
       </div>
 
-      <div className="relative w-full h-64 flex items-center justify-center pt-16 pb-8 z-20">
-        <div className="relative w-48 h-48 rounded-full border-[6px] border-amber-400 flex items-center justify-center overflow-hidden shadow-lg">
-          <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
-        </div>
-      </div>
-
-      <div className="px-6 mb-6">
+      {/* Tab Navigation */}
+      <div className="px-6 mb-6 mt-4">
         <div className="bg-white/50 backdrop-blur-sm p-1.5 rounded-full flex gap-1 border border-black/5 shadow-sm">
           <TabButton active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} label="ภาพรวม" icon={<LayoutGrid size={14} />} />
           <TabButton active={activeTab === 'health'} onClick={() => setActiveTab('health')} label="สุขภาพ" icon={<Activity size={14} />} />
@@ -107,6 +103,45 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               exit={{ opacity: 0, y: -10 }}
               className="space-y-6"
             >
+              {/* Refactored Pet Main Info Card */}
+              <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-50 flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+                {/* Image Section - Now on the left */}
+                <div className="relative shrink-0">
+                  <div className="w-32 h-32 rounded-[2.5rem] overflow-hidden border-4 border-amber-400 shadow-md">
+                    <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
+                  </div>
+                </div>
+
+                {/* Info Section - Now on the right */}
+                <div className="flex-1 min-w-0 w-full">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="min-w-0 pr-2">
+                      <h2 className="text-3xl font-black text-slate-800 truncate leading-tight">{pet.name}</h2>
+                      <p className="text-sm text-slate-500 font-bold flex items-center gap-1.5 mt-1">
+                        <PawPrint size={14} className="text-slate-400" />
+                        <span className="truncate">{pet.breed}</span>
+                      </p>
+                    </div>
+                    <button 
+                      onClick={onToggleFavorite} 
+                      className={`p-3 rounded-full transition-all ${
+                        pet.is_favorite 
+                          ? 'bg-pink-50 text-pink-500' 
+                          : 'bg-slate-50 text-slate-300'
+                      }`}
+                    >
+                      <Heart size={24} fill={pet.is_favorite ? "currentColor" : "none"} strokeWidth={pet.is_favorite ? 2 : 2.5} />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                     <InfoBox value={pet.age || '-'} label="อายุ" />
+                     <InfoBox value={pet.gender} label="เพศ" />
+                     <InfoBox value={`${pet.weight} Kg`} label="น้ำหนัก" />
+                  </div>
+                </div>
+              </div>
+
               <PetHealthOverview 
                 score={healthData.score}
                 statusText={healthData.status}
@@ -114,33 +149,12 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
                 lastUpdate="วันนี้"
                 onActionClick={(type) => setActiveTab('health')}
               />
-
-              <div className="bg-white rounded-[2.5rem] p-6 border-2 border-slate-800 shadow-soft">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="min-w-0 flex-1 pr-2">
-                    <h2 className="text-2xl font-black text-slate-800 truncate">{pet.name}</h2>
-                    <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-1">
-                      <PawPrint size={14} className="text-slate-400" />
-                      <span className="truncate">{pet.breed}</span>
-                    </p>
-                  </div>
-                  <button onClick={onToggleFavorite} className={`p-2 rounded-full border-2 ${pet.is_favorite ? 'bg-pink-100 text-pink-500 border-pink-200' : 'bg-slate-50 text-slate-400 border-slate-100'}`}>
-                    <Heart size={20} fill={pet.is_favorite ? "currentColor" : "none"} />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-                   <InfoBox value={pet.age || '-'} label="อายุ" />
-                   <InfoBox value={pet.gender} label="เพศ" />
-                   <InfoBox value={`${pet.weight} Kg`} label="น้ำหนัก" />
-                </div>
-              </div>
             </motion.div>
           )}
 
           {activeTab === 'health' && (
             <motion.div key="health" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-              <div className="bg-white rounded-[2rem] p-6 border-2 border-slate-800 shadow-soft">
+              <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-50">
                 <h3 className="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
                   <HeartPulse size={20} className="text-pink-500" /> รายละเอียดสุขภาพ
                 </h3>
@@ -171,17 +185,17 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
 
           {activeTab === 'notes' && (
             <motion.div key="notes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-               <div className="bg-[#fff6ed] p-6 rounded-[2.5rem] border-2 border-[#c28856] shadow-soft">
+               <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
                   <div className="flex justify-between items-center mb-4">
-                    <h4 className="text-lg font-black text-[#4A2C0F]">ความชอบส่วนตัว</h4>
-                    <button onClick={onEditPreferences} className="p-1.5 bg-white/50 rounded-full text-[#4A2C0F] border border-black/5">
+                    <h4 className="text-lg font-black text-slate-800">ความชอบส่วนตัว</h4>
+                    <button onClick={onEditPreferences} className="p-1.5 bg-slate-100 rounded-full text-slate-500">
                       <Pencil size={16} />
                     </button>
                   </div>
                   <div className="space-y-3">
                     {pet.custom_preferences?.map((pref, i) => (
-                      <div key={i} className="flex items-center gap-3 bg-white/80 p-3 rounded-xl border border-[#D4B89A]">
-                        <Tag size={16} className="text-[#c28856]" />
+                      <div key={i} className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <Tag size={16} className="text-pink-500" />
                         <span className="text-sm font-bold text-slate-700">{pref.label}: {pref.value}</span>
                       </div>
                     ))}
@@ -193,7 +207,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
 
         <button 
           onClick={() => setShowDeleteConfirm(true)}
-          className="w-full py-4 flex items-center justify-center gap-2 bg-red-50 text-red-500 font-bold rounded-2xl border-2 border-red-100 mt-8"
+          className="w-full py-4 flex items-center justify-center gap-2 bg-red-50 text-red-500 font-bold rounded-2xl border border-red-100 mt-8 active:scale-95 transition-transform"
         >
           <Trash2 size={20} />
           ลบข้อมูลสัตว์เลี้ยง
@@ -204,15 +218,15 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowDeleteConfirm(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
-            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} className="relative w-full max-w-xs bg-white rounded-[2.5rem] border-[3px] border-slate-800 shadow-soft p-8 text-center">
-               <div className="w-20 h-20 bg-red-100 border-2 border-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} className="relative w-full max-w-xs bg-white rounded-[2.5rem] shadow-2xl p-8 text-center border border-slate-100">
+               <div className="w-20 h-20 bg-red-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
                   <AlertTriangle size={40} className="text-red-600" />
                </div>
                <h3 className="text-2xl font-black text-slate-800 mb-2">ยืนยันการลบ?</h3>
                <p className="text-sm text-slate-500 mb-8">ข้อมูลของน้อง {pet.name} จะหายไปอย่างถาวร</p>
                <div className="space-y-3">
-                  <button onClick={() => { onDeletePet(pet.id); setShowDeleteConfirm(false); }} className="w-full py-4 bg-red-500 text-white rounded-2xl font-black border-2 border-slate-800 shadow-[4px_4px_0px_0px_#000]">ยืนยันการลบ</button>
-                  <button onClick={() => setShowDeleteConfirm(false)} className="w-full py-4 bg-white text-slate-800 rounded-2xl font-black border-2 border-slate-800">ยกเลิก</button>
+                  <button onClick={() => { onDeletePet(pet.id); setShowDeleteConfirm(false); }} className="w-full py-4 bg-red-500 text-white rounded-2xl font-black shadow-lg shadow-red-100 active:translate-y-1 transition-all">ยืนยันการลบ</button>
+                  <button onClick={() => setShowDeleteConfirm(false)} className="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-black active:translate-y-1 transition-all">ยกเลิก</button>
                </div>
             </motion.div>
           </div>
@@ -235,9 +249,9 @@ const TabButton = ({ active, onClick, label, icon }: { active: boolean, onClick:
 );
 
 const InfoBox = ({ value, label }: { value: string, label: string }) => (
-  <div className="bg-slate-50/50 py-3 rounded-2xl text-center border border-slate-100">
-    <p className="text-base font-black text-slate-800 leading-none mb-1">{value}</p>
-    <p className="text-[10px] font-bold text-slate-400 uppercase">{label}</p>
+  <div className="bg-slate-50/50 py-3 px-1 rounded-2xl text-center border border-slate-50">
+    <p className="text-sm font-black text-slate-800 leading-tight mb-1 whitespace-pre-line">{value}</p>
+    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{label}</p>
   </div>
 );
 
