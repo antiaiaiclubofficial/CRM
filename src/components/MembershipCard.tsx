@@ -52,7 +52,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
         <div className="flex justify-between items-start">
           <div className="space-y-1">
             <span className="bg-tertiary text-primary text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm">
-              PREMIUM MEMBER
+              {currentTier.name.toUpperCase()}
             </span>
             <h2 className="text-lg font-black text-white mt-1.5 drop-shadow-md">
               {ownerProfile?.first_name} {ownerProfile?.last_name}
@@ -79,9 +79,9 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           <div className="text-right">
             <div className="flex items-center gap-1 justify-end text-tertiary mb-0.5">
               {React.cloneElement(currentTier.icon as React.ReactElement, { fill: "currentColor" })}
-              <span className="text-[9px] font-black uppercase tracking-widest">{currentTier.name}</span>
+              <span className="text-[9px] font-black uppercase tracking-widest">คะแนนสะสมทั้งหมด</span>
             </div>
-            <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest">สะสมทั้งหมด: {totalAccumulatedPoints.toLocaleString()}</p>
+            <p className="text-xl font-black text-white leading-none tracking-tighter">{totalAccumulatedPoints.toLocaleString()}</p>
           </div>
         </div>
 
