@@ -1,197 +1,77 @@
 "use client";
 
 import React from 'react';
-import { Crown, PawPrint, QrCode, Clock } from 'lucide-react';
+import { Crown, PawPrint, QrCode, Clock, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-interface OwnerProfile {
-  firstName: string;
-  lastName: string;
-  gender: string;
-  age: string;
-  phone: string;
-  address: string;
-  email: string;
-  pointsExpiry?: string;
-  rawPointsExpiry?: string;
-  pointsLedger?: { amount: number; earned_at: string }[];
-}
 
 interface MembershipCardProps {
   totalAccumulatedPoints: number;
   redeemablePoints: number;
-  ownerProfile: OwnerProfile;
+  ownerProfile: any;
   onShowQR: () => void;
 }
 
-const membershipTiers = [
-  { id: 'bronze', name: 'Bronze Member', minPoints: 0 },
-  { id: 'silver', name: 'Silver Member', minPoints: 300 },
-  { id: 'gold', name: 'Gold Member', minPoints: 700 },
-  { id: 'platinum', name: 'Platinum Member', minPoints: 1000 },
-  { id: 'vip', name: 'VIP Member', minPoints: 2000 },
-];
-
 const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile, onShowQR }: MembershipCardProps) => {
-  const sortedTiers = [...membershipTiers].sort((a, b) => a.minPoints - b.minPoints);
-
-  let currentLevel = sortedTiers[0];
-  let nextLevel: typeof membershipTiers[0] | null = null;
-
-  for (let i = 0; i < sortedTiers.length; i++) {
-    if (totalAccumulatedPoints >= sortedTiers[i].minPoints) {
-      currentLevel = sortedTiers[i];
-    } else {
-      nextLevel = sortedTiers[i];
-      break;
-    }
-  }
-
-  const pointsToNextLevel = nextLevel ? nextLevel.minPoints - totalAccumulatedPoints : 0;
-  
-  let progressPercentage = 0;
-  if (nextLevel) {
-    progressPercentage = (totalAccumulatedPoints / nextLevel.minPoints) * 100;
-  } else {
-    progressPercentage = 100;
-  }
-  progressPercentage = Math.min(100, Math.max(0, progressPercentage));
-
-  // Logic to calculate points expiring within 30 days (based on 2-year tenure)
-  const getExpiringPointsInfo = () => {
-    if (!ownerProfile.pointsLedger || ownerProfile.pointsLedger.length === 0) return null;
-    
-    const now = new Date();
-    const thirtyDaysFromNow = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
-    
-    let totalExpiring = 0;
-    let earliestExpiryDate: Date | null = null;
-
-    ownerProfile.pointsLedger.forEach(entry => {
-      const earnedDate = new Date(entry.earned_at);
-      // Expiry is 2 years after earned date
-      const expiryDate = new Date(earnedDate);
-      expiryDate.setFullYear(expiryDate.getFullYear() + 2);
-      
-      // If expiry is within the next 30 days and hasn't passed yet
-      if (expiryDate > now && expiryDate <= thirtyDaysFromNow) {
-        totalExpiring += entry.amount;
-        if (!earliestExpiryDate || expiryDate < earliestExpiryDate) {
-          earliestExpiryDate = expiryDate;
-        }
-      }
-    });
-
-    if (totalExpiring > 0 && earliestExpiryDate) {
-      const daysRemaining = Math.ceil((earliestExpiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      return {
-        points: totalExpiring,
-        daysRemaining: daysRemaining
-      };
-    }
-    
-    return null;
-  };
-
-  const expiringInfo = getExpiringPointsInfo();
+  const progressPercentage = Math.min(100, (totalAccumulatedPoints / 2000) * 100);
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative w-full aspect-[1.58/1] overflow-hidden p-5 rounded-[1.5rem] bg-gradient-to-br from-[#FFD8E4] via-[#FFE3BC] to-[#B2F2BB] shadow-[0_15px_30px_-5px_rgba(255,161,191,0.4)] border-[3px] border-white/30 flex flex-col justify-between"
+      className="relative w-full aspect-[1.6/1] overflow-hidden p-8 rounded-3xl bg-liquid-primary shadow-ambient border-none flex flex-col justify-between"
     >
-      {/* Background Decorative Elements */}
-      <PawPrint className="absolute -right-4 -top-4 w-28 h-28 text-white/20 rotate-12" />
-      <PawPrint className="absolute -left-8 -bottom-8 w-20 h-20 text-white/10 -rotate-12" />
+      {/* Liquid Elements */}
+      <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-tertiary/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-[-20%] left-[-10%] w-48 h-48 bg-white/5 rounded-full blur-2xl" />
 
       <div className="relative z-10 flex flex-col h-full justify-between">
-        {/* Top Header Row */}
-        <div className="flex justify-between items-start gap-2">
-          <div className="space-y-1 min-w-0 flex-1">
-            <h2 className="text-[9px] font-black text-slate-500 uppercase tracking-widest truncate">Membership Status</h2>
-            <div className="flex items-center mt-0.5">
-              <span className="bg-white/60 px-2.5 py-0.5 rounded-full text-[9px] font-black text-slate-800 flex items-center gap-1.5 whitespace-nowrap">
-                <Crown size={10} className="text-amber-500" fill="currentColor" />
-                {currentLevel.name.toUpperCase()}
-              </span>
-            </div>
+        <div className="flex justify-between items-start">
+          <div className="space-y-1">
+            <span className="bg-tertiary text-primary text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
+              PREMIUM MEMBER
+            </span>
+            <h2 className="text-xl font-black text-white mt-2 drop-shadow-md">
+              {ownerProfile?.first_name} {ownerProfile?.last_name}
+            </h2>
           </div>
-          <div className="flex flex-col items-end text-right min-w-0 flex-1">
-            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5 whitespace-nowrap">
-              ID: {ownerProfile.phone || '0XX-XXX-XXXX'}
-            </p>
-            <p className="font-black text-slate-800 text-lg leading-tight drop-shadow-sm truncate w-full">
-              {ownerProfile.firstName} {ownerProfile.lastName}
-            </p>
-          </div>
+          <motion.button 
+            whileTap={{ scale: 0.9 }}
+            onClick={onShowQR}
+            className="w-14 h-14 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 flex items-center justify-center text-white"
+          >
+            <QrCode size={28} />
+          </motion.button>
         </div>
 
-        {/* Points & QR Section */}
         <div className="flex justify-between items-end">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-tight">คะแนนสะสมปัจจุบัน</p>
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-black text-slate-800 leading-none">{redeemablePoints.toLocaleString()}</span>
-              <span className="text-[10px] font-black text-slate-600 uppercase">Pts</span>
-            </div>
-            
-            {/* EXPIRY WARNING LOGIC */}
-            <div className="mt-1">
-              {expiringInfo ? (
-                <div className="flex items-center gap-1 text-red-600 font-black animate-pulse">
-                   <Clock size={10} strokeWidth={3} />
-                   <span className="text-[8px] uppercase tracking-tight">
-                     อีก {expiringInfo.points.toLocaleString()} คะแนน จะหมดอายุใน {expiringInfo.daysRemaining} วัน
-                   </span>
-                </div>
-              ) : ownerProfile.pointsExpiry && (
-                <div className="flex items-center gap-1 text-pink-600">
-                  <Clock size={10} strokeWidth={3} />
-                  <span className="text-[8px] font-black uppercase tracking-tight">
-                    หมดอายุ: {ownerProfile.pointsExpiry}
-                  </span>
-                </div>
-              )}
+            <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Available Points</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-5xl font-black text-tertiary leading-none tracking-tighter">{redeemablePoints.toLocaleString()}</span>
+              <span className="text-xs font-black text-white/70 uppercase">pts</span>
             </div>
           </div>
-
-          <div className="flex flex-col items-end gap-2">
-            <motion.button 
-              whileTap={{ scale: 0.9 }}
-              onClick={onShowQR}
-              className="bg-white py-1.5 px-3 rounded-xl shadow-sm border border-white/50 transition-all text-slate-800 flex items-center gap-1"
-            >
-              <QrCode size={13} />
-              <span className="text-[9px] font-black uppercase whitespace-nowrap">My QR</span>
-            </motion.button>
-            <div className="text-right">
-              <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">Total Points</p>
-              <p className="text-[11px] font-black text-slate-800 whitespace-nowrap">
-                {totalAccumulatedPoints.toLocaleString()} <span className="text-[9px] text-slate-400">/ {nextLevel ? nextLevel.minPoints.toLocaleString() : 'MAX'}</span>
-              </p>
+          <div className="text-right">
+            <div className="flex items-center gap-1 justify-end text-tertiary mb-1">
+              <Zap size={14} fill="currentColor" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Platinum Tier</span>
             </div>
+            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Total Earned: {totalAccumulatedPoints.toLocaleString()}</p>
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="mt-2 space-y-1.5">
-          <div className="w-full bg-black/5 h-4 rounded-full overflow-hidden p-0.5 border border-white/30">
+        <div className="mt-4 space-y-2">
+          <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden p-[2px]">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="bg-white h-full rounded-full shadow-sm"
+              transition={{ duration: 1.5, ease: "easeOut" }}
+              className="bg-tertiary h-full rounded-full shadow-[0_0_15px_rgba(234,253,105,0.5)]"
             />
           </div>
-          <div className="flex justify-center items-center px-0.5 translate-y-[2px]">
-            <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tight text-center">
-              {nextLevel ? (
-                <>สะสมอีก <span className="text-black font-black underline">{pointsToNextLevel.toLocaleString()}</span> คะแนน เพื่อเลื่อนระดับเป็น <span className="text-black font-black">{nextLevel.name}</span></>
-              ) : (
-                <span className="text-emerald-600 font-black">คุณอยู่ในระดับสูงสุดแล้ว! ✨</span>
-              )}
-            </p>
+          <div className="flex justify-between items-center text-[10px] font-black text-white/50 uppercase tracking-tighter">
+            <span>Progress to Next Tier</span>
+            <span className="text-tertiary">{Math.round(progressPercentage)}% Complete</span>
           </div>
         </div>
       </div>

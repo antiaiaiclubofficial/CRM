@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&family=Nunito:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,34 +6,39 @@
 
 @layer base {
   :root {
-    --background: 40 100% 98%; /* Creamy White */
-    --foreground: 222.2 84% 4.9%;
-    --primary: 158 58% 82%; /* Mint */
-    --secondary: 340 82% 93%; /* Soft Pink */
-    --accent: 36 100% 86%; /* Peach */
-    --radius: 1.5rem;
+    --background: 0 0% 98%; /* #F9F9F9 */
+    --foreground: 228 51% 18%; /* #18234A */
+    --primary: 228 51% 18%;
+    --primary-foreground: 0 0% 100%;
+    --radius: 1rem;
   }
 }
 
 html, body {
   margin: 0;
   padding: 0;
-  background-color: #FFF9F0;
+  background-color: #F9F9F9;
   -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
   overflow-x: hidden;
   height: auto;
   min-height: 100%;
 }
 
 body {
-  font-family: 'Prompt', 'Nunito', sans-serif;
-  @apply text-slate-800;
+  font-family: 'Inter', sans-serif;
+  @apply text-surface-variant;
 }
 
-/* Force Toaster to always be on top */
-[data-sonner-toaster] {
-  z-index: 99999 !important;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  @apply text-primary font-extrabold;
+}
+
+/* Glassmorphism utility */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -49,7 +54,4 @@ body {
 }
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
-}
-.mb-safe {
-  margin-bottom: env(safe-area-inset-bottom);
 }

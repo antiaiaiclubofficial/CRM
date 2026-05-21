@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Ticket } from 'lucide-react';
+import { Calendar, Ticket, PlusCircle, Sparkles } from 'lucide-react';
 
 interface HomeQuickActionsProps {
   onCouponsClick: () => void;
@@ -11,27 +11,29 @@ interface HomeQuickActionsProps {
 
 const HomeQuickActions = ({ onCouponsClick, onAppointmentClick }: HomeQuickActionsProps) => {
   return (
-    <div className="grid grid-cols-2 gap-4 mt-4">
+    <div className="grid grid-cols-2 gap-5 mt-6">
       <motion.button
         whileTap={{ scale: 0.95 }}
         onClick={onAppointmentClick}
-        className="flex items-center justify-center gap-3 p-4 bg-white rounded-[2rem] border border-slate-100 shadow-sm active:bg-slate-50 transition-all"
+        className="flex flex-col items-center justify-center gap-3 p-8 bg-tertiary rounded-3xl shadow-ambient border-none transition-all relative overflow-hidden group"
       >
-        <div className="w-10 h-10 bg-green-100 rounded-2xl flex items-center justify-center text-green-500">
-          <Calendar size={20} />
+        <div className="absolute top-[-10%] right-[-10%] w-20 h-20 bg-white/20 rounded-full blur-xl group-hover:scale-150 transition-transform" />
+        <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center text-tertiary shadow-lg">
+          <Calendar size={28} strokeWidth={2.5} />
         </div>
-        <span className="font-bold text-slate-700">นัดหมาย</span>
+        <span className="font-black text-primary text-sm uppercase tracking-widest">Book Now</span>
       </motion.button>
 
       <motion.button
         whileTap={{ scale: 0.95 }}
         onClick={onCouponsClick}
-        className="flex items-center justify-center gap-3 p-4 bg-white rounded-[2rem] border border-slate-100 shadow-sm active:bg-slate-50 transition-all"
+        className="flex flex-col items-center justify-center gap-3 p-8 bg-surface-lowest rounded-3xl shadow-ambient border-none transition-all relative overflow-hidden group"
       >
-        <div className="w-10 h-10 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600">
-          <Ticket size={20} />
+        <div className="absolute top-[-10%] right-[-10%] w-20 h-20 bg-primary/5 rounded-full blur-xl group-hover:scale-150 transition-transform" />
+        <div className="w-14 h-14 bg-surface-low rounded-2xl flex items-center justify-center text-primary shadow-sm">
+          <Ticket size={28} strokeWidth={2.5} />
         </div>
-        <span className="font-bold text-slate-700">คูปองของฉัน</span>
+        <span className="font-black text-primary text-sm uppercase tracking-widest">My Deals</span>
       </motion.button>
     </div>
   );
