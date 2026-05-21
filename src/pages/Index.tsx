@@ -27,12 +27,6 @@ import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, LogOut }
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
-const formatDateThai = (dateString?: string) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
-};
-
 const Index = () => {
   const queryClient = useQueryClient();
   const { profile: lineProfile, loading: liffLoading } = useLiff();
@@ -58,10 +52,6 @@ const Index = () => {
     queryFn: async () => {
       const targetStoreId = 'b0f3c613-f742-4c86-951a-eaa65c8b1667';
       const { data } = await supabase.from('stores').select('*').eq('id', targetStoreId).maybeSingle();
-      if (!data) {
-        const { data: fallback } = await supabase.from('stores').select('*').limit(1).maybeSingle();
-        return fallback;
-      }
       return data;
     }
   });
@@ -76,18 +66,40 @@ const Index = () => {
 
       const { data: membership } = await supabase.from('store_customers').select('*').eq('customer_id', customer.id).eq('store_id', store.id).maybeSingle();
       const { data: pets } = await supabase.from('pets').select('*').eq('customer_id', customer.id).order('created_at', { ascending: true });
-      const { data: coupons } = await supabase.from('customer_coupons').select('*, coupon_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id);
-      const { data: deals } = await supabase.from('customers_deals').select('*, deal_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id);
-      const { data: history } = await supabase.from('service_history').select('*, pets(*)').eq('customer_id', customer.id).eq('store_id', store.id).order('created_at', { ascending: false });
+      
+      // Fetch Coupons & Deals
+      const { data: coupons } = await supabase.from('customer_coupons').select('*, coupon_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).eq('status', 'unused');
+      const { data: deals } = await supabase.from('customers_deals').select('*, deal_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).eq('status', 'unused');
+      
       const { data: appointmentsData } = await supabase.from('appointments').select('*, pets(name, image_url, breed), services(name, price)').eq('customer_id', customer.id).order('start_time', { ascending: true });
+
+      // Combine and format coupons/deals for the UI
+      const myCoupons = [
+        ...(coupons || []).map(c => ({
+          ...c,
+          title: c.coupon_templates?.title,
+          description: c.coupon_templates?.description,
+          iconName: c.coupon_templates?.icon_name,
+          bg: c.coupon_templates?.bg_color,
+          expiry: new Date(c.expires_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
+          is_deal: false
+        })),
+        ...(deals || []).map(d => ({
+          ...d,
+          title: d.deal_templates?.title,
+          description: d.deal_templates?.description,
+          iconName: d.deal_templates?.icon_name,
+          bg: d.deal_templates?.bg_color,
+          expiry: new Date(d.expires_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
+          is_deal: true
+        }))
+      ];
 
       return {
         profile: customer,
         membership: membership,
         pets: (pets || []).map(p => ({ ...p, imageUrl: p.image_url, cardBgColor: p.card_bg_color || '#FFFFFF', custom_preferences: p.custom_preferences || [] })),
-        coupons: coupons || [],
-        deals: deals || [],
-        history: history || [],
+        myCoupons,
         appointments: (appointmentsData || []).map(apt => ({
           id: apt.id,
           petName: apt.pets?.name || 'Unknown',
@@ -104,37 +116,17 @@ const Index = () => {
     enabled: !!lineProfile?.userId && !!store?.id,
   });
 
-  // Sort pets: Favorites first, then by creation date (ascending - added first comes first)
-  const sortedPets = useMemo(() => {
-    if (!customerData?.pets) return [];
-    return [...customerData.pets].sort((a, b) => {
-      // Primary sort: is_favorite (true first)
-      if (a.is_favorite && !b.is_favorite) return -1;
-      if (!a.is_favorite && b.is_favorite) return 1;
-      
-      // Secondary sort: created_at (ascending - older first)
-      const dateA = new Date(a.created_at || 0).getTime();
-      const dateB = new Date(b.created_at || 0).getTime();
-      return dateA - dateB;
-    });
-  }, [customerData?.pets]);
-
-  const { data: storeServices } = useQuery({
-    queryKey: ['store_services', store?.id],
-    queryFn: async () => {
-      if (!store?.id) return [];
-      const { data } = await supabase.from('services').select('*').eq('store_id', store.id);
-      return data || [];
-    },
-    enabled: !!store?.id
-  });
-
   const { data: couponTemplates } = useQuery({
     queryKey: ['coupon_templates', store?.id],
     queryFn: async () => {
       if (!store?.id) return [];
       const { data } = await supabase.from('coupon_templates').select('*').eq('store_id', store.id).eq('is_active', true);
-      return data || [];
+      return (data || []).map(t => ({
+        ...t,
+        iconName: t.icon_name,
+        bg: t.bg_color,
+        expiry: `${t.expiry_days} วัน`
+      }));
     },
     enabled: !!store?.id
   });
@@ -144,9 +136,63 @@ const Index = () => {
     queryFn: async () => {
       if (!store?.id) return [];
       const { data } = await supabase.from('deal_templates').select('*').eq('store_id', store.id).eq('is_active', true);
-      return data || [];
+      return (data || []).map(t => ({
+        ...t,
+        iconName: t.icon_name,
+        bg: t.bg_color,
+        expiry: `${t.expiry_days} วัน`
+      }));
     },
     enabled: !!store?.id
+  });
+
+  const redeemMutation = useMutation({
+    mutationFn: async ({ template, points, type }: { template: any, points: number, type: 'coupon' | 'deal' }) => {
+      const customerId = customerData?.profile?.id;
+      const storeId = store?.id;
+      if (!customerId || !storeId) throw new Error("Missing context");
+
+      // Check points
+      const currentPoints = customerData?.membership?.points || 0;
+      if (currentPoints < points) throw new Error("คะแนนไม่เพียงพอค่ะ");
+
+      // 1. Deduct points
+      const { error: pointsError } = await supabase
+        .from('store_customers')
+        .update({ points: currentPoints - points })
+        .eq('customer_id', customerId)
+        .eq('store_id', storeId);
+      if (pointsError) throw pointsError;
+
+      // 2. Insert coupon/deal
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + (template.expiry_days || 30));
+
+      if (type === 'coupon') {
+        await supabase.from('customer_coupons').insert([{
+          template_id: template.id,
+          customer_id: customerId,
+          store_id: storeId,
+          expires_at: expiresAt.toISOString(),
+          status: 'unused'
+        }]);
+      } else {
+        await supabase.from('customers_deals').insert([{
+          template_id: template.id,
+          customer_id: customerId,
+          store_id: storeId,
+          expires_at: expiresAt.toISOString(),
+          status: 'unused'
+        }]);
+      }
+    },
+    onSuccess: () => {
+      toast.success('แลกรับเรียบร้อยแล้วค่ะ! ดูได้ที่เมนู "คูปองของฉัน" นะคะ 🎫');
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ');
+    }
   });
 
   const registerMutation = useMutation({
@@ -166,117 +212,13 @@ const Index = () => {
     mutationFn: async (pet: any) => {
       const { id, ...petData } = pet;
       if (id) {
-        const { data, error } = await supabase.from('pets').update(petData).eq('id', id).select().single();
-        if (error) throw error;
-        return data;
+        return await supabase.from('pets').update(petData).eq('id', id).select().single();
       } else {
-        const { data, error } = await supabase.from('pets').insert([{ ...petData, customer_id: customerData?.profile?.id }]).select().single();
-        if (error) throw error;
-        return data;
+        return await supabase.from('pets').insert([{ ...petData, customer_id: customerData?.profile?.id }]).select().single();
       }
-    },
-    onMutate: async (newPet) => {
-      await queryClient.cancelQueries({ queryKey: ['customer_profile'] });
-      const previousProfile = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
-
-      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => {
-        if (!old) return old;
-        const pets = [...old.pets];
-        if (newPet.id) {
-          const index = pets.findIndex(p => p.id === newPet.id);
-          if (index !== -1) pets[index] = { ...pets[index], ...newPet };
-        } else {
-          const tempPet = { 
-            ...newPet, 
-            id: 'temp-' + Date.now(), 
-            created_at: new Date().toISOString(),
-            imageUrl: newPet.image_url,
-            cardBgColor: newPet.card_bg_color || '#FFFFFF',
-            custom_preferences: []
-          };
-          pets.push(tempPet);
-        }
-        return { ...old, pets };
-      });
-
-      return { previousProfile };
-    },
-    onError: (err, variables, context: any) => {
-      if (context?.previousProfile) {
-        queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousProfile);
-      }
-      toast.error('ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้งค่ะ');
-    },
-    onSuccess: () => { 
-      toast.success('บันทึกข้อมูลเรียบร้อยค่ะ 🐾'); 
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); 
-    }
-  });
-
-  const deletePetMutation = useMutation({
-    mutationFn: async (petId: string | number) => {
-      const { error } = await supabase.from('pets').delete().eq('id', petId);
-      if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('ลบข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ');
-      setSelectedPetId(null);
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-    },
-    onError: () => {
-      toast.error('ไม่สามารถลบข้อมูลได้ในขณะนี้ กรุณาลองใหม่อีกครั้งค่ะ');
-    }
-  });
-
-  const toggleFavoriteMutation = useMutation({
-    mutationFn: async ({ petId, isFavorite }: { petId: string | number, isFavorite: boolean }) => {
-      const { error } = await supabase.from('pets').update({ is_favorite: isFavorite }).eq('id', petId);
-      if (error) throw error;
-      return { petId, isFavorite };
-    },
-    onMutate: async ({ petId, isFavorite }) => {
-      await queryClient.cancelQueries({ queryKey: ['customer_profile'] });
-      const previousProfile = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
-
-      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => {
-        if (!old) return old;
-        return {
-          ...old,
-          pets: old.pets.map((p: any) => 
-            p.id === petId ? { ...p, is_favorite: isFavorite } : p
-          )
-        };
-      });
-
-      return { previousProfile };
-    },
-    onError: (err, variables, context: any) => {
-      if (context?.previousProfile) {
-        queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousProfile);
-      }
-      toast.error('ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่อีกครั้งค่ะ');
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
-    }
-  });
-
-  const bookAppointmentMutation = useMutation({
-    mutationFn: async (appointmentData: any) => {
-      if (!customerData?.profile?.id || !store?.id) throw new Error("Missing profile or store info");
-      const { data, error } = await supabase.from('appointments').insert([{
-        ...appointmentData,
-        customer_id: customerData.profile.id,
-        store_id: store.id,
-        status: 'pending'
-      }]);
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      toast.success('จองนัดหมายเรียบร้อยแล้วค่ะ กรุณารอการยืนยันจากทางร้านนะคะ');
+      toast.success('บันทึกข้อมูลเรียบร้อยค่ะ 🐾');
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
     }
   });
@@ -300,7 +242,7 @@ const Index = () => {
   }
 
   return (
-    <div className="w-full h-[100dvh] max-w-md mx-auto bg-surface relative flex flex-col font-['Inter'] overflow-hidden">
+    <div className="w-full h-[100dvh] max-md:max-w-md mx-auto bg-surface relative flex flex-col font-['Inter'] overflow-hidden">
       <header className="px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-2 flex justify-between items-center shrink-0 z-[50]">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-black text-primary truncate leading-tight tracking-tight">{store?.name || 'Pet Care'}</h1>
@@ -331,8 +273,8 @@ const Index = () => {
                 onCouponsClick={() => setActiveTab('promo')} 
                 onAppointmentClick={() => { setActiveTab('appointments'); setIsBookingFormOpen(true); }} 
               />
-              <PetList pets={sortedPets} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
-              <MyCouponsHomePreview coupons={[]} onViewAll={() => setActiveTab('promo')} />
+              <PetList pets={customerData?.pets || []} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
+              <MyCouponsHomePreview coupons={customerData?.myCoupons?.slice(0, 5) || []} onViewAll={() => { setActiveTab('promo'); setTimeout(() => { document.getElementById('my-coupons-section')?.scrollIntoView({ behavior: 'smooth' }); }, 100); }} />
             </motion.div>
           )}
 
@@ -344,41 +286,26 @@ const Index = () => {
 
           {activeTab === 'promo' && (
             <motion.div key="promo-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-               <Promotions userPoints={customerData?.membership?.points || 0} collectedCoupons={[]} usedOrExpiredCoupons={[]} redeemableTemplates={couponTemplates || []} dealTemplates={dealTemplates || []} onRedeemCoupon={() => {}} onBuyDeal={() => {}} onUseCoupon={() => {}} />
+               <Promotions 
+                 userPoints={customerData?.membership?.points || 0} 
+                 collectedCoupons={customerData?.myCoupons || []} 
+                 usedOrExpiredCoupons={[]} 
+                 redeemableTemplates={couponTemplates || []} 
+                 dealTemplates={dealTemplates || []} 
+                 onRedeemCoupon={(t, p) => redeemMutation.mutate({ template: t, points: p, type: 'coupon' })} 
+                 onBuyDeal={(t, p) => redeemMutation.mutate({ template: t, points: p, type: 'deal' })} 
+                 onUseCoupon={(c) => { setSelectedCouponToUse(c); setIsCouponUseModalOpen(true); }} 
+               />
             </motion.div>
           )}
 
           {activeTab === 'pets' && (
             <motion.div key="pets-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               {selectedPetId ? (
-                <PetDetailView 
-                  pet={sortedPets.find(p => p.id === selectedPetId)} 
-                  onBack={() => setSelectedPetId(null)} 
-                  onStartEdit={(p: any) => { setPetToEditId(p.id); setIsPetFormOpen(true); }} 
-                  onDeletePet={(id) => deletePetMutation.mutate(id)} 
-                  totalServiceCost={0} 
-                  onViewServiceHistoryForPet={() => {}} 
-                  onEditPreferences={() => setIsPreferenceFormOpen(true)} 
-                  onToggleFavorite={() => {
-                    const pet = sortedPets.find(p => p.id === selectedPetId);
-                    if (pet) toggleFavoriteMutation.mutate({ petId: pet.id, isFavorite: !pet.is_favorite });
-                  }} 
-                />
+                <PetDetailView pet={customerData?.pets?.find(p => p.id === selectedPetId)} onBack={() => setSelectedPetId(null)} onStartEdit={() => setIsPetFormOpen(true)} onDeletePet={() => {}} totalServiceCost={0} onViewServiceHistoryForPet={() => {}} onEditPreferences={() => {}} onToggleFavorite={() => {}} />
               ) : (
-                <PetManagement 
-                  pets={sortedPets} 
-                  onBack={() => setActiveTab('home')} 
-                  onViewDetails={(p: any) => setSelectedPetId(p.id)} 
-                  onAddPet={() => { setPetToEditId(null); setIsPetFormOpen(true); }} 
-                  onToggleFavorite={(petId, currentFav) => toggleFavoriteMutation.mutate({ petId, isFavorite: !currentFav })}
-                />
+                <PetManagement pets={customerData?.pets || []} onBack={() => setActiveTab('home')} onViewDetails={(p: any) => setSelectedPetId(p.id)} onAddPet={() => setIsPetFormOpen(true)} />
               )}
-            </motion.div>
-          )}
-
-          {activeTab === 'history' && (
-            <motion.div key="history-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <ServiceHistory historyData={[]} onServiceClick={() => {}} />
             </motion.div>
           )}
           
@@ -399,9 +326,9 @@ const Index = () => {
       </nav>
 
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.phone || ''} />
-      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={sortedPets.find(p => p.id === petToEditId)} />
-      <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={sortedPets} services={storeServices || []} onConfirm={async (d) => { await bookAppointmentMutation.mutateAsync(d); }} />
-      <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={customerData?.profile as any} onSave={() => {}} />
+      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={null} />
+      <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={customerData?.pets || []} services={[]} onConfirm={async () => {}} />
+      <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => {}} />
     </div>
   );
 };
