@@ -200,7 +200,7 @@ const Index = () => {
 
   return (
     <div className="w-full h-[100dvh] max-w-md mx-auto bg-surface relative flex flex-col font-['Inter'] overflow-hidden">
-      <header className="px-6 pt-[calc(16px+env(safe-area-inset-top))] pb-6 flex justify-between items-center shrink-0 z-[50]">
+      <header className="px-2 pt-[calc(16px+env(safe-area-inset-top))] pb-6 flex justify-between items-center shrink-0 z-[50]">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-black text-primary truncate leading-tight tracking-tight">{store?.name || 'Pet Care'}</h1>
           <p className="text-surface-variant text-xs font-semibold uppercase tracking-widest opacity-60">Hello, {customerData?.profile?.first_name || lineProfile?.displayName} 🐾</p>
