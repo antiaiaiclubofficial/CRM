@@ -38,7 +38,7 @@ const Index = () => {
   const [selectedAppointment, setSelectedAppointment] = useState<any | null>(null);
   
   const [isPetFormOpen, setIsPetFormOpen] = useState(false);
-  const [petToEditId, setPetToEditId] = useState<string | number | null>(null);
+  const [petToEdit, setPetToEdit] = useState<any | null>(null);
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
   const [selectedCouponToUse, setSelectedCouponToUse] = useState<any | null>(null);
   const [isCouponUseModalOpen, setIsCouponUseModalOpen] = useState(false);
@@ -240,6 +240,8 @@ const Index = () => {
     },
     onSuccess: () => {
       toast.success('บันทึกข้อมูลเรียบร้อยค่ะ 🐾');
+      setPetToEdit(null);
+      setIsPetFormOpen(false);
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
     }
   });
@@ -247,6 +249,16 @@ const Index = () => {
   const handleNavClick = (tab: string) => {
     setActiveTab(tab);
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleStartEditPet = (pet: any) => {
+    setPetToEdit(pet);
+    setIsPetFormOpen(true);
+  };
+
+  const handleAddPetClick = () => {
+    setPetToEdit(null);
+    setIsPetFormOpen(true);
   };
 
   if (liffLoading || storeLoading || (lineProfile && profileLoading)) {
@@ -323,9 +335,18 @@ const Index = () => {
           {activeTab === 'pets' && (
             <motion.div key="pets-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               {selectedPetId ? (
-                <PetDetailView pet={customerData?.pets?.find(p => p.id === selectedPetId)} onBack={() => setSelectedPetId(null)} onStartEdit={() => setIsPetFormOpen(true)} onDeletePet={() => {}} totalServiceCost={0} onViewServiceHistoryForPet={() => {}} onEditPreferences={() => {}} onToggleFavorite={() => {}} />
+                <PetDetailView 
+                  pet={customerData?.pets?.find(p => p.id === selectedPetId)} 
+                  onBack={() => setSelectedPetId(null)} 
+                  onStartEdit={(pet) => handleStartEditPet(pet)} 
+                  onDeletePet={() => {}} 
+                  totalServiceCost={0} 
+                  onViewServiceHistoryForPet={() => {}} 
+                  onEditPreferences={() => {}} 
+                  onToggleFavorite={() => {}} 
+                />
               ) : (
-                <PetManagement pets={customerData?.pets || []} onBack={() => setActiveTab('home')} onViewDetails={(p: any) => setSelectedPetId(p.id)} onAddPet={() => setIsPetFormOpen(true)} />
+                <PetManagement pets={customerData?.pets || []} onBack={() => setActiveTab('home')} onViewDetails={(p: any) => setSelectedPetId(p.id)} onAddPet={handleAddPetClick} />
               )}
             </motion.div>
           )}
@@ -347,7 +368,7 @@ const Index = () => {
       </nav>
 
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.phone || ''} />
-      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={null} />
+      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={petToEdit} />
       <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={customerData?.pets || []} services={[]} onConfirm={async () => {}} />
       <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => {}} />
     </div>
