@@ -632,7 +632,7 @@ const Index = () => {
 
   return (
     <div className="w-full h-[100dvh] max-w-md mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt'] overflow-hidden border-x border-slate-100/50">
-      <header className="px-4 pt-[calc(8px+env(safe-area-inset-top))] pb-0 flex justify-between items-center shrink-0 z-[50]">
+      <header className="px-4 pt-[calc(8px+env(safe-area-inset-top))] pb-3 flex justify-between items-center shrink-0 z-[50]">
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-black text-slate-800 truncate">{store?.name || 'Pet Care App'}</h1>
           <p className="text-slate-500 text-xs font-medium">สวัสดีค่ะ, คุณ {greetingName} ✨</p>
