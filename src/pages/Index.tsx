@@ -81,6 +81,7 @@ const Index = () => {
           description: c.coupon_templates?.description,
           iconName: c.coupon_templates?.icon_name,
           bg: c.coupon_templates?.bg_color,
+          pointsRequired: c.coupon_templates?.points_required,
           expiry: new Date(c.expires_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
           is_deal: false
         })),
@@ -90,6 +91,7 @@ const Index = () => {
           description: d.deal_templates?.description,
           iconName: d.deal_templates?.icon_name,
           bg: d.deal_templates?.bg_color,
+          pointsRequired: d.deal_templates?.points_required,
           expiry: new Date(d.expires_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
           is_deal: true
         }))
@@ -125,6 +127,7 @@ const Index = () => {
         ...t,
         iconName: t.icon_name,
         bg: t.bg_color,
+        pointsRequired: t.points_required,
         expiry: `${t.expiry_days} วัน`
       }));
     },
@@ -140,6 +143,7 @@ const Index = () => {
         ...t,
         iconName: t.icon_name,
         bg: t.bg_color,
+        pointsRequired: t.points_required,
         expiry: `${t.expiry_days} วัน`
       }));
     },
