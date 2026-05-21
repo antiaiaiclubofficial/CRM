@@ -104,6 +104,21 @@ const Index = () => {
     enabled: !!lineProfile?.userId && !!store?.id,
   });
 
+  // Sort pets: Favorites first, then by creation date (newest first)
+  const sortedPets = useMemo(() => {
+    if (!customerData?.pets) return [];
+    return [...customerData.pets].sort((a, b) => {
+      // Primary sort: is_favorite (true first)
+      if (a.is_favorite && !b.is_favorite) return -1;
+      if (!a.is_favorite && b.is_favorite) return 1;
+      
+      // Secondary sort: created_at (descending)
+      const dateA = new Date(a.created_at || 0).getTime();
+      const dateB = new Date(b.created_at || 0).getTime();
+      return dateB - dateA;
+    });
+  }, [customerData?.pets]);
+
   const { data: storeServices } = useQuery({
     queryKey: ['store_services', store?.id],
     queryFn: async () => {
@@ -181,8 +196,37 @@ const Index = () => {
     mutationFn: async ({ petId, isFavorite }: { petId: string | number, isFavorite: boolean }) => {
       const { error } = await supabase.from('pets').update({ is_favorite: isFavorite }).eq('id', petId);
       if (error) throw error;
+      return { petId, isFavorite };
     },
-    onSuccess: () => {
+    onMutate: async ({ petId, isFavorite }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['customer_profile'] });
+
+      // Snapshot the previous value
+      const previousProfile = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pets: old.pets.map((p: any) => 
+            p.id === petId ? { ...p, is_favorite: isFavorite } : p
+          )
+        };
+      });
+
+      return { previousProfile };
+    },
+    onError: (err, variables, context: any) => {
+      // Rollback to previous value on error
+      if (context?.previousProfile) {
+        queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousProfile);
+      }
+      toast.error('ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่อีกครั้งค่ะ');
+    },
+    onSettled: () => {
+      // Sync with server after mutation finishes
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
     }
   });
@@ -249,7 +293,7 @@ const Index = () => {
                 onCouponsClick={() => setActiveTab('promo')} 
                 onAppointmentClick={() => { setActiveTab('appointments'); setIsBookingFormOpen(true); }} 
               />
-              <PetList pets={customerData?.pets || []} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
+              <PetList pets={sortedPets} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
               <MyCouponsHomePreview coupons={[]} onViewAll={() => setActiveTab('promo')} />
             </motion.div>
           )}
@@ -270,7 +314,7 @@ const Index = () => {
             <motion.div key="pets-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               {selectedPetId ? (
                 <PetDetailView 
-                  pet={customerData?.pets.find(p => p.id === selectedPetId)} 
+                  pet={sortedPets.find(p => p.id === selectedPetId)} 
                   onBack={() => setSelectedPetId(null)} 
                   onStartEdit={(p: any) => { setPetToEditId(p.id); setIsPetFormOpen(true); }} 
                   onDeletePet={(id) => deletePetMutation.mutate(id)} 
@@ -278,13 +322,13 @@ const Index = () => {
                   onViewServiceHistoryForPet={() => {}} 
                   onEditPreferences={() => setIsPreferenceFormOpen(true)} 
                   onToggleFavorite={() => {
-                    const pet = customerData?.pets.find(p => p.id === selectedPetId);
+                    const pet = sortedPets.find(p => p.id === selectedPetId);
                     if (pet) toggleFavoriteMutation.mutate({ petId: pet.id, isFavorite: !pet.is_favorite });
                   }} 
                 />
               ) : (
                 <PetManagement 
-                  pets={customerData?.pets || []} 
+                  pets={sortedPets} 
                   onBack={() => setActiveTab('home')} 
                   onViewDetails={(p: any) => setSelectedPetId(p.id)} 
                   onAddPet={() => { setPetToEditId(null); setIsPetFormOpen(true); }} 
@@ -318,8 +362,8 @@ const Index = () => {
       </nav>
 
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.phone || ''} />
-      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={customerData?.pets.find(p => p.id === petToEditId)} />
-      <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={customerData?.pets || []} services={storeServices || []} onConfirm={async (d) => { await bookAppointmentMutation.mutateAsync(d); }} />
+      <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={sortedPets.find(p => p.id === petToEditId)} />
+      <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={sortedPets} services={storeServices || []} onConfirm={async (d) => { await bookAppointmentMutation.mutateAsync(d); }} />
       <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={customerData?.profile as any} onSave={() => {}} />
     </div>
   );
