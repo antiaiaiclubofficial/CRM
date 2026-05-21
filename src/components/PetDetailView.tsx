@@ -150,7 +150,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               <h4 className="text-lg font-black text-[#4A2C0F]">ความชอบส่วนตัว</h4>
               <button 
                 onClick={onEditPreferences} 
-                className="p-1.5 bg-[#D4B89A] rounded-full text-[#4A2C0F] hover:bg-[#E0C7A9] transition-colors border border-black/10"
+                className="p-1.5 bg-[#FFFFF] rounded-full text-[#4A2C0F] hover:bg-[#E0C7A9] transition-colors border border-black/10"
               >
                 <Pencil size={16} />
               </button>
