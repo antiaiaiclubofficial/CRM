@@ -91,8 +91,10 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               {pet.age || '-'} • {pet.weight || '-'} กก.
             </p>
           </div>
-          <div className="text-slate-300 pr-2">
-            <ChevronRight size={24} strokeWidth={3} />
+          <div className="text-slate-400 pr-3">
+            <div className="p-2 bg-white rounded-full border border-slate-100 shadow-sm">
+              <Pencil size={18} strokeWidth={2.5} />
+            </div>
           </div>
         </div>
       </div>
