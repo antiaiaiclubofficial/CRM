@@ -34,11 +34,11 @@ h1, h2, h3, h4, h5, h6 {
   @apply text-primary font-extrabold;
 }
 
-/* Glassmorphism utility */
+/* Glassmorphism utility - Adjusted for more transparency */
 .glass-effect {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.45); /* Changed from 0.7 to 0.45 */
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
 .no-scrollbar::-webkit-scrollbar {

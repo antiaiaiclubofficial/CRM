@@ -66,15 +66,15 @@ const MyCouponsHomePreview = ({ coupons, onViewAll }: MyCouponsHomePreviewProps)
           })}
         </div>
       ) : (
-        /* Empty State matching the provided image exactly */
+        /* Empty State with Navy (Primary) Theme */
         <motion.div 
           whileTap={{ scale: 0.98 }}
           onClick={onViewAll}
-          className="bg-[#FFE3BC]/20 p-8 rounded-3xl border-2 border-dashed border-[#FFE3BC]/60 flex items-center gap-6 cursor-pointer relative overflow-hidden group shadow-sm"
+          className="bg-primary/5 p-8 rounded-3xl border-2 border-dashed border-primary/20 flex items-center gap-6 cursor-pointer relative overflow-hidden group shadow-sm"
         >
           {/* Tonal Vessel for Icon */}
           <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-ambient shrink-0 transition-transform group-hover:scale-110 duration-500">
-            <Ticket className="text-amber-500" size={32} />
+            <Ticket className="text-primary/40" size={32} />
           </div>
           
           <div className="space-y-1">
@@ -83,7 +83,7 @@ const MyCouponsHomePreview = ({ coupons, onViewAll }: MyCouponsHomePreviewProps)
           </div>
           
           {/* Subtle Liquid Glow */}
-          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-tertiary/5 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
         </motion.div>
       )}
     </div>
