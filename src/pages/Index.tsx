@@ -75,7 +75,7 @@ const Index = () => {
       if (!customer) return null;
 
       const { data: membership } = await supabase.from('store_customers').select('*').eq('customer_id', customer.id).eq('store_id', store.id).maybeSingle();
-      const { data: pets } = await supabase.from('pets').select('*').eq('customer_id', customer.id).order('created_at', { ascending: false });
+      const { data: pets } = await supabase.from('pets').select('*').eq('customer_id', customer.id).order('created_at', { ascending: true });
       const { data: coupons } = await supabase.from('customer_coupons').select('*, coupon_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id);
       const { data: deals } = await supabase.from('customers_deals').select('*, deal_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id);
       const { data: history } = await supabase.from('service_history').select('*, pets(*)').eq('customer_id', customer.id).eq('store_id', store.id).order('created_at', { ascending: false });
@@ -104,7 +104,7 @@ const Index = () => {
     enabled: !!lineProfile?.userId && !!store?.id,
   });
 
-  // Sort pets: Favorites first, then by creation date (newest first)
+  // Sort pets: Favorites first, then by creation date (ascending - added first comes first)
   const sortedPets = useMemo(() => {
     if (!customerData?.pets) return [];
     return [...customerData.pets].sort((a, b) => {
@@ -112,10 +112,10 @@ const Index = () => {
       if (a.is_favorite && !b.is_favorite) return -1;
       if (!a.is_favorite && b.is_favorite) return 1;
       
-      // Secondary sort: created_at (descending)
+      // Secondary sort: created_at (ascending - older first)
       const dateA = new Date(a.created_at || 0).getTime();
       const dateB = new Date(b.created_at || 0).getTime();
-      return dateB - dateA;
+      return dateA - dateB;
     });
   }, [customerData?.pets]);
 
@@ -166,13 +166,51 @@ const Index = () => {
     mutationFn: async (pet: any) => {
       const { id, ...petData } = pet;
       if (id) {
-        await supabase.from('pets').update(petData).eq('id', id);
+        const { data, error } = await supabase.from('pets').update(petData).eq('id', id).select().single();
+        if (error) throw error;
+        return data;
       } else {
-        await supabase.from('pets').insert([{ ...petData, customer_id: customerData?.profile?.id }]);
+        const { data, error } = await supabase.from('pets').insert([{ ...petData, customer_id: customerData?.profile?.id }]).select().single();
+        if (error) throw error;
+        return data;
       }
+    },
+    onMutate: async (newPet) => {
+      await queryClient.cancelQueries({ queryKey: ['customer_profile'] });
+      const previousProfile = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
+
+      queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => {
+        if (!old) return old;
+        const pets = [...old.pets];
+        if (newPet.id) {
+          const index = pets.findIndex(p => p.id === newPet.id);
+          if (index !== -1) pets[index] = { ...pets[index], ...newPet };
+        } else {
+          const tempPet = { 
+            ...newPet, 
+            id: 'temp-' + Date.now(), 
+            created_at: new Date().toISOString(),
+            imageUrl: newPet.image_url,
+            cardBgColor: newPet.card_bg_color || '#FFFFFF',
+            custom_preferences: []
+          };
+          pets.push(tempPet);
+        }
+        return { ...old, pets };
+      });
+
+      return { previousProfile };
+    },
+    onError: (err, variables, context: any) => {
+      if (context?.previousProfile) {
+        queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousProfile);
+      }
+      toast.error('ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้งค่ะ');
     },
     onSuccess: () => { 
       toast.success('บันทึกข้อมูลเรียบร้อยค่ะ 🐾'); 
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] }); 
     }
   });
@@ -199,13 +237,9 @@ const Index = () => {
       return { petId, isFavorite };
     },
     onMutate: async ({ petId, isFavorite }) => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['customer_profile'] });
-
-      // Snapshot the previous value
       const previousProfile = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
 
-      // Optimistically update to the new value
       queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => {
         if (!old) return old;
         return {
@@ -219,14 +253,12 @@ const Index = () => {
       return { previousProfile };
     },
     onError: (err, variables, context: any) => {
-      // Rollback to previous value on error
       if (context?.previousProfile) {
         queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousProfile);
       }
       toast.error('ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่อีกครั้งค่ะ');
     },
     onSettled: () => {
-      // Sync with server after mutation finishes
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
     }
   });
