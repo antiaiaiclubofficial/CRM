@@ -65,32 +65,35 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       exit={{ opacity: 0 }}
       className="relative bg-[#FFF9F0] pb-24"
     >
-      {/* Back button - Absolute position at the very top corner */}
-      <div className="absolute top-0 left-1 z-20">
-        <button onClick={onBack} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
-          <ArrowLeft size={30} strokeWidth={2.5} />
-        </button>
-      </div>
+      {/* Top Section with 2px horizontal padding */}
+      <div className="px-[2px] pt-2 flex flex-col">
+        {/* Back button area */}
+        <div className="flex items-center">
+          <button onClick={onBack} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
+            <ArrowLeft size={30} strokeWidth={2.5} />
+          </button>
+        </div>
 
-      {/* Main Info Card - Profile Header: Moved down (pt-20) and 2px side margins */}
-      <div 
-        onClick={() => onStartEdit(pet)}
-        className="px-[2px] pt-20 mb-6 flex items-center gap-4 cursor-pointer active:opacity-70 transition-opacity"
-      >
-        <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shrink-0 shadow-md">
-          <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-black text-slate-800 leading-tight">{pet.name}</h2>
-          <p className="text-sm font-bold text-slate-400 mt-0.5">
-            {pet.type} • {pet.breed}
-          </p>
-          <p className="text-sm font-bold text-slate-400">
-            {pet.age || '-'} • {pet.weight || '-'} กก.
-          </p>
-        </div>
-        <div className="text-slate-300 pr-2">
-          <ChevronRight size={24} strokeWidth={3} />
+        {/* Profile Header - Spaced 2px below the back button */}
+        <div 
+          onClick={() => onStartEdit(pet)}
+          className="mt-[2px] mb-6 flex items-center gap-4 cursor-pointer active:opacity-70 transition-opacity"
+        >
+          <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shrink-0 shadow-md">
+            <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-2xl font-black text-slate-800 leading-tight">{pet.name}</h2>
+            <p className="text-sm font-bold text-slate-400 mt-0.5">
+              {pet.type} • {pet.breed}
+            </p>
+            <p className="text-sm font-bold text-slate-400">
+              {pet.age || '-'} • {pet.weight || '-'} กก.
+            </p>
+          </div>
+          <div className="text-slate-300 pr-2">
+            <ChevronRight size={24} strokeWidth={3} />
+          </div>
         </div>
       </div>
 
