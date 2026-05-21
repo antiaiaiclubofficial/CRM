@@ -81,18 +81,18 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               {React.cloneElement(currentTier.icon as React.ReactElement, { fill: "currentColor" })}
               <span className="text-[9px] font-black uppercase tracking-widest">คะแนนสะสมทั้งหมด</span>
             </div>
-            <p className="text-xs font-bold text-white leading-none tracking-tighter">{totalAccumulatedPoints.toLocaleString()}</p>
+            <p className="text-xl font-black text-white leading-none tracking-tighter">{totalAccumulatedPoints.toLocaleString()}</p>
           </div>
         </div>
 
         {/* Progress Section */}
         <div className="mt-3 space-y-2">
-          <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden p-[1.5px]">
+          <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden p-[2px]">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
               transition={{ duration: 1.5, ease: "easeOut" }}
-              className="bg-tertiary h-full rounded-full shadow-[0_0_10px_rgba(234,253,105,0.4)]"
+              className="bg-[#EAFD69] h-full rounded-full shadow-[0_0_12px_rgba(234,253,105,0.6)]"
             />
           </div>
           <div className="flex justify-center items-center text-center">
