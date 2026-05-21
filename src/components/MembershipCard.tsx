@@ -67,7 +67,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
         </div>
 
         {/* Bottom Group: Points & Progress */}
-        <div className="flex flex-col space-y-[4px]">
+        <div className="flex flex-col space-y-2">
           {/* Points & Tier Display */}
           <div className="flex justify-between items-end">
             <div className="space-y-0.5">
