@@ -98,7 +98,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
 
           {/* Progress Section */}
           <div className="space-y-2">
-            <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden p-[2px]">
+            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercentage}%` }}
