@@ -63,21 +63,21 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="relative bg-[#FFF9F0] pb-24 pt-2"
+      className="relative bg-[#FFF9F0] pb-24"
     >
-      {/* Back button - Moved up and further left */}
-      <div className="px-2 mb-4 flex items-center">
-        <button onClick={onBack} className="p-1 text-slate-400 hover:text-slate-600 transition-colors">
-          <ArrowLeft size={28} />
+      {/* Back button - Absolute position at the very top corner */}
+      <div className="absolute top-2 left-0 z-20">
+        <button onClick={onBack} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
+          <ArrowLeft size={30} strokeWidth={2.5} />
         </button>
       </div>
 
-      {/* Main Info Card - Reduced padding and increased width */}
+      {/* Main Info Card - Minimal side padding to feel edge-to-edge */}
       <div 
         onClick={() => onStartEdit(pet)}
-        className="px-3 mb-6 flex items-center gap-4 cursor-pointer active:opacity-70 transition-opacity"
+        className="px-2 pt-12 mb-6 flex items-center gap-4 cursor-pointer active:opacity-70 transition-opacity"
       >
-        <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shrink-0 shadow-sm">
+        <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shrink-0 shadow-md">
           <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
         </div>
         <div className="flex-1 min-w-0">
@@ -89,14 +89,14 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
             {pet.age || '-'} • {pet.weight || '-'} กก.
           </p>
         </div>
-        <div className="text-slate-300">
+        <div className="text-slate-300 pr-2">
           <ChevronRight size={24} strokeWidth={3} />
         </div>
       </div>
 
-      {/* Tab Navigation - Tighter padding */}
-      <div className="px-2 mb-8">
-        <div className="bg-white p-1.5 rounded-2xl flex gap-1 shadow-sm border border-slate-50">
+      {/* Tab Navigation - Edge-to-edge feeling with px-1 */}
+      <div className="px-1 mb-8">
+        <div className="bg-white p-1 rounded-2xl flex gap-0.5 shadow-sm border border-slate-50 overflow-x-auto no-scrollbar">
           <TabButton 
             active={activeTab === 'overview'} 
             onClick={() => setActiveTab('overview')} 
@@ -120,7 +120,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         </div>
       </div>
 
-      <div className="px-2 space-y-6">
+      <div className="px-1 space-y-6">
         <AnimatePresence mode="wait">
           {activeTab === 'overview' && (
             <motion.div 
@@ -169,8 +169,8 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
                 </div>
               </div>
               
-              <div className="space-y-4">
-                <h3 className="text-lg font-black text-slate-800 px-2">ไทม์ไลน์สุขภาพ</h3>
+              <div className="space-y-4 px-2">
+                <h3 className="text-lg font-black text-slate-800">ไทม์ไลน์สุขภาพ</h3>
                 <div className="relative pl-8 space-y-8 before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
                    <TimelineItem title="รับบริการอาบน้ำตัดขน" date="15 พ.ค. 2569" type="grooming" />
                    <TimelineItem title="ฉีดวัคซีนรวม (รายปี)" date="10 พ.ค. 2569" type="vaccine" />
@@ -221,7 +221,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
 
       <AnimatePresence>
         {showDeleteConfirm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center px-2">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowDeleteConfirm(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
             <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} className="relative w-full max-w-xs bg-white rounded-[2.5rem] shadow-2xl p-8 text-center border border-slate-100">
                <div className="w-20 h-20 bg-red-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
@@ -244,11 +244,11 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
 const TabButton = ({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) => (
   <button 
     onClick={onClick}
-    className={`flex-1 py-3 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+    className={`flex-1 py-3 px-2 rounded-xl flex items-center justify-center gap-1 transition-all ${
       active ? 'bg-[#2D4A3E] text-white shadow-sm' : 'text-slate-400 font-bold hover:bg-slate-50'
     }`}
   >
-    <span className="text-sm font-black">{label}</span>
+    <span className="text-xs sm:text-sm font-black whitespace-nowrap">{label}</span>
   </button>
 );
 

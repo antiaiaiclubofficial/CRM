@@ -216,10 +216,10 @@ const Index = () => {
           gender: regData.gender,
           age: regData.age,
           address: regData.address,
-          sub_district: regData.subDistrict,
+          sub_district: regData.sub_district,
           district: regData.district,
           province: regData.province,
-          postal_code: regData.postalCode
+          postal_code: regData.postal_code
         }])
         .select()
         .single();
@@ -632,7 +632,7 @@ const Index = () => {
 
   return (
     <div className="w-full h-[100dvh] max-w-md mx-auto bg-[#FFF9F0] relative shadow-2xl flex flex-col font-['Prompt'] overflow-hidden border-x border-slate-100/50">
-      <header className="px-4 pt-[calc(8px+env(safe-area-inset-top))] pb-[15px] flex justify-between items-center shrink-0 z-[50]">
+      <header className="px-2 pt-[calc(8px+env(safe-area-inset-top))] pb-[15px] flex justify-between items-center shrink-0 z-[50]">
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-black text-slate-800 truncate">{store?.name || 'Pet Care App'}</h1>
           <p className="text-slate-500 text-xs font-medium">สวัสดีค่ะ, คุณ {greetingName} ✨</p>
@@ -642,7 +642,7 @@ const Index = () => {
         </motion.div>
       </header>
 
-      <main ref={mainScrollRef} className="px-4 flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))] overflow-y-scroll no-scrollbar touch-pan-y">
+      <main ref={mainScrollRef} className="px-2 flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))] overflow-y-scroll no-scrollbar touch-pan-y">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div key="home" className="space-y-6">
@@ -723,7 +723,7 @@ const Index = () => {
       <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={petsList as any} services={storeServices || []} onConfirm={async (data) => { await bookAppointmentMutation.mutateAsync(data); }} />
       <AppointmentDetailModal isOpen={isAppointmentDetailOpen} onClose={() => setIsAppointmentDetailOpen(false)} appointment={selectedAppointment} onDelete={(id) => deleteAppointmentMutation.mutate(id)} />
 
-      <nav className="fixed bottom-[10px] left-4 right-4 max-w-[calc(theme(maxWidth.md)-2rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-[40] border border-white/60">
+      <nav className="fixed bottom-[10px] left-2 right-2 max-w-[calc(theme(maxWidth.md)-1rem)] mx-auto bg-white/40 backdrop-blur-xl px-4 py-3 flex justify-between items-center rounded-full shadow-lg z-[40] border border-white/60">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
         <NavButton active={activeTab === 'appointments'} icon={<Calendar size={22} />} onClick={() => handleNavClick('appointments')} />
         <NavButton active={activeTab === 'level'} icon={<Award size={22} />} onClick={() => handleNavClick('level')} />
