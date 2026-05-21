@@ -18,7 +18,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative w-full aspect-[1.6/1] overflow-hidden p-8 rounded-3xl bg-liquid-primary shadow-ambient border-none flex flex-col justify-between"
+      className="relative w-full aspect-[1.6/1] overflow-hidden p-6 rounded-3xl bg-liquid-primary shadow-ambient border-none flex flex-col justify-between"
     >
       {/* Liquid Elements */}
       <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-tertiary/10 rounded-full blur-3xl" />
@@ -27,51 +27,51 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
       <div className="relative z-10 flex flex-col h-full justify-between">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <span className="bg-tertiary text-primary text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
+            <span className="bg-tertiary text-primary text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm">
               PREMIUM MEMBER
             </span>
-            <h2 className="text-xl font-black text-white mt-2 drop-shadow-md">
+            <h2 className="text-lg font-black text-white mt-1.5 drop-shadow-md">
               {ownerProfile?.first_name} {ownerProfile?.last_name}
             </h2>
           </div>
           <motion.button 
             whileTap={{ scale: 0.9 }}
             onClick={onShowQR}
-            className="w-14 h-14 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 flex items-center justify-center text-white"
+            className="w-12 h-12 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 flex items-center justify-center text-white"
           >
-            <QrCode size={28} />
+            <QrCode size={24} />
           </motion.button>
         </div>
 
         <div className="flex justify-between items-end">
-          <div className="space-y-1">
-            <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Available Points</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-5xl font-black text-tertiary leading-none tracking-tighter">{redeemablePoints.toLocaleString()}</span>
-              <span className="text-xs font-black text-white/70 uppercase">pts</span>
+          <div className="space-y-0.5">
+            <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Available Points</p>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-4xl font-black text-tertiary leading-none tracking-tighter">{redeemablePoints.toLocaleString()}</span>
+              <span className="text-[10px] font-black text-white/70 uppercase">pts</span>
             </div>
           </div>
           <div className="text-right">
-            <div className="flex items-center gap-1 justify-end text-tertiary mb-1">
-              <Zap size={14} fill="currentColor" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Platinum Tier</span>
+            <div className="flex items-center gap-1 justify-end text-tertiary mb-0.5">
+              <Zap size={12} fill="currentColor" />
+              <span className="text-[9px] font-black uppercase tracking-widest">Platinum Tier</span>
             </div>
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Total Earned: {totalAccumulatedPoints.toLocaleString()}</p>
+            <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Total Earned: {totalAccumulatedPoints.toLocaleString()}</p>
           </div>
         </div>
 
-        <div className="mt-4 space-y-2">
-          <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden p-[2px]">
+        <div className="mt-3 space-y-1.5">
+          <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden p-[1.5px]">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
               transition={{ duration: 1.5, ease: "easeOut" }}
-              className="bg-tertiary h-full rounded-full shadow-[0_0_15px_rgba(234,253,105,0.5)]"
+              className="bg-tertiary h-full rounded-full shadow-[0_0_10px_rgba(234,253,105,0.4)]"
             />
           </div>
-          <div className="flex justify-between items-center text-[10px] font-black text-white/50 uppercase tracking-tighter">
-            <span>Progress to Next Tier</span>
-            <span className="text-tertiary">{Math.round(progressPercentage)}% Complete</span>
+          <div className="flex justify-between items-center text-[9px] font-black text-white/50 uppercase tracking-tighter">
+            <span>Next Tier Progress</span>
+            <span className="text-tertiary">{Math.round(progressPercentage)}%</span>
           </div>
         </div>
       </div>

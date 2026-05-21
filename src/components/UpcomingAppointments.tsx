@@ -21,10 +21,10 @@ interface UpcomingAppointmentsProps {
 
 const getServiceIcon = (serviceName: string = '') => {
   const name = serviceName || '';
-  if (name.includes('ตัดขน')) return { icon: <Scissors size={18} className="text-pink-500" />, bg: 'bg-pink-50' };
-  if (name.includes('อาบน้ำ')) return { icon: <Bath size={18} className="text-blue-500" />, bg: 'bg-blue-50' };
-  if (name.includes('สปา')) return { icon: <Sparkles size={18} className="text-amber-500" />, bg: 'bg-amber-50' };
-  return { icon: <CalendarDays size={18} className="text-slate-500" />, bg: 'bg-slate-50' };
+  if (name.includes('ตัดขน')) return { icon: <Scissors size={16} className="text-pink-500" />, bg: 'bg-pink-50' };
+  if (name.includes('อาบน้ำ')) return { icon: <Bath size={16} className="text-blue-500" />, bg: 'bg-blue-50' };
+  if (name.includes('สปา')) return { icon: <Sparkles size={16} className="text-amber-500" />, bg: 'bg-amber-50' };
+  return { icon: <CalendarDays size={16} className="text-slate-500" />, bg: 'bg-slate-50' };
 };
 
 const formatAppointmentDateTime = (dateStr: string) => {
@@ -44,7 +44,6 @@ const formatAppointmentDateTime = (dateStr: string) => {
 };
 
 const UpcomingAppointments = ({ appointments, onViewAll }: UpcomingAppointmentsProps) => {
-  // Only show pending or confirmed appointments that are in the future
   const upcoming = appointments
     .filter(apt => apt.status === 'confirmed' || apt.status === 'pending')
     .slice(0, 5);
@@ -52,10 +51,10 @@ const UpcomingAppointments = ({ appointments, onViewAll }: UpcomingAppointmentsP
   return (
     <div className="mt-6">
       <div className="flex justify-between items-center mb-3 px-1">
-        <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
-          นัดหมายของฉัน <span className="text-base">📅</span>
+        <h3 className="font-extrabold text-base text-primary tracking-tight flex items-center gap-2">
+          Scheduled <span className="text-sm">📅</span>
         </h3>
-        <button onClick={onViewAll} className="text-xs text-pink-500 font-medium">ดูทั้งหมด</button>
+        <button onClick={onViewAll} className="text-[10px] text-primary font-black uppercase tracking-widest opacity-50">View All</button>
       </div>
 
       <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 px-1">
@@ -67,18 +66,18 @@ const UpcomingAppointments = ({ appointments, onViewAll }: UpcomingAppointmentsP
                 key={apt.id}
                 whileTap={{ scale: 0.98 }}
                 onClick={onViewAll}
-                className="flex-shrink-0 w-[280px] bg-white p-4 rounded-[2rem] border border-slate-50 shadow-sm flex items-center gap-4 cursor-pointer"
+                className="flex-shrink-0 w-[240px] bg-white p-4 rounded-[2rem] border-none shadow-ambient flex items-center gap-3 cursor-pointer"
               >
-                <div className={`w-14 h-14 ${bg} rounded-2xl flex items-center justify-center shrink-0`}>
+                <div className={`w-12 h-12 ${bg} rounded-2xl flex items-center justify-center shrink-0`}>
                   {icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-sm text-slate-800 truncate">
-                    {apt.service} - น้อง{apt.petName}
+                  <h4 className="font-black text-[13px] text-primary truncate leading-tight">
+                    {apt.service} - {apt.petName}
                   </h4>
-                  <div className="flex items-center gap-3 mt-1.5">
-                    <div className="flex items-center gap-1 text-[11px] font-medium text-slate-500">
-                      <Calendar size={12} className="text-slate-400" />
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-surface-variant opacity-60">
+                      <Calendar size={10} />
                       {formatAppointmentDateTime(apt.startTime)}
                     </div>
                   </div>
@@ -90,10 +89,9 @@ const UpcomingAppointments = ({ appointments, onViewAll }: UpcomingAppointmentsP
           <motion.div 
             whileTap={{ scale: 0.98 }}
             onClick={onViewAll}
-            className="w-full py-6 text-center bg-white/40 rounded-[2rem] border-2 border-dashed border-slate-200 cursor-pointer"
+            className="w-full py-5 text-center bg-surface-low rounded-[2rem] cursor-pointer"
           >
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">ไม่มีรายการนัดหมายเร็วๆ นี้ 🐾</p>
-            <p className="text-[10px] text-pink-500 font-bold mt-1">จองคิวรับบริการได้ที่นี่!</p>
+            <p className="text-[10px] font-black text-primary opacity-30 uppercase tracking-widest">No active bookings 🐾</p>
           </motion.div>
         )}
       </div>
