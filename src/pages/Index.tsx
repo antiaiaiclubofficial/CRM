@@ -75,7 +75,7 @@ const Index = () => {
       if (!customer) return null;
 
       const { data: membership } = await supabase.from('store_customers').select('*').eq('customer_id', customer.id).eq('store_id', store.id).maybeSingle();
-      const { data: pets } = await supabase.from('pets').select('*').eq('customer_id', customer.id);
+      const { data: pets } = await supabase.from('pets').select('*').eq('customer_id', customer.id).order('created_at', { ascending: false });
       const { data: coupons } = await supabase.from('customer_coupons').select('*, coupon_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id);
       const { data: deals } = await supabase.from('customers_deals').select('*, deal_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id);
       const { data: history } = await supabase.from('service_history').select('*, pets(*)').eq('customer_id', customer.id).eq('store_id', store.id).order('created_at', { ascending: false });
@@ -162,6 +162,31 @@ const Index = () => {
     }
   });
 
+  const deletePetMutation = useMutation({
+    mutationFn: async (petId: string | number) => {
+      const { error } = await supabase.from('pets').delete().eq('id', petId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('ลบข้อมูลสัตว์เลี้ยงเรียบร้อยแล้วค่ะ');
+      setSelectedPetId(null);
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    },
+    onError: () => {
+      toast.error('ไม่สามารถลบข้อมูลได้ในขณะนี้ กรุณาลองใหม่อีกครั้งค่ะ');
+    }
+  });
+
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: async ({ petId, isFavorite }: { petId: string | number, isFavorite: boolean }) => {
+      const { error } = await supabase.from('pets').update({ is_favorite: isFavorite }).eq('id', petId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    }
+  });
+
   const bookAppointmentMutation = useMutation({
     mutationFn: async (appointmentData: any) => {
       if (!customerData?.profile?.id || !store?.id) throw new Error("Missing profile or store info");
@@ -244,9 +269,27 @@ const Index = () => {
           {activeTab === 'pets' && (
             <motion.div key="pets-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               {selectedPetId ? (
-                <PetDetailView pet={customerData?.pets.find(p => p.id === selectedPetId)} onBack={() => setSelectedPetId(null)} onStartEdit={(p: any) => { setPetToEditId(p.id); setIsPetFormOpen(true); }} onDeletePet={() => {}} totalServiceCost={0} onViewServiceHistoryForPet={() => {}} onEditPreferences={() => setIsPreferenceFormOpen(true)} onToggleFavorite={() => {}} />
+                <PetDetailView 
+                  pet={customerData?.pets.find(p => p.id === selectedPetId)} 
+                  onBack={() => setSelectedPetId(null)} 
+                  onStartEdit={(p: any) => { setPetToEditId(p.id); setIsPetFormOpen(true); }} 
+                  onDeletePet={(id) => deletePetMutation.mutate(id)} 
+                  totalServiceCost={0} 
+                  onViewServiceHistoryForPet={() => {}} 
+                  onEditPreferences={() => setIsPreferenceFormOpen(true)} 
+                  onToggleFavorite={() => {
+                    const pet = customerData?.pets.find(p => p.id === selectedPetId);
+                    if (pet) toggleFavoriteMutation.mutate({ petId: pet.id, isFavorite: !pet.is_favorite });
+                  }} 
+                />
               ) : (
-                <PetManagement pets={customerData?.pets || []} onBack={() => setActiveTab('home')} onViewDetails={(p: any) => setSelectedPetId(p.id)} onAddPet={() => { setPetToEditId(null); setIsPetFormOpen(true); }} />
+                <PetManagement 
+                  pets={customerData?.pets || []} 
+                  onBack={() => setActiveTab('home')} 
+                  onViewDetails={(p: any) => setSelectedPetId(p.id)} 
+                  onAddPet={() => { setPetToEditId(null); setIsPetFormOpen(true); }} 
+                  onToggleFavorite={(petId, currentFav) => toggleFavoriteMutation.mutate({ petId, isFavorite: !currentFav })}
+                />
               )}
             </motion.div>
           )}
