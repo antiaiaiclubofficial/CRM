@@ -86,7 +86,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
         </div>
 
         {/* Progress Section */}
-        <div className="mt-3 space-y-1.5">
+        <div className="mt-3 space-y-2">
           <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden p-[1.5px]">
             <motion.div 
               initial={{ width: 0 }}
@@ -95,12 +95,12 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               className="bg-tertiary h-full rounded-full shadow-[0_0_10px_rgba(234,253,105,0.4)]"
             />
           </div>
-          <div className="flex justify-between items-center text-[9px] font-black text-white/50 tracking-tighter">
-            <span>
+          <div className="flex justify-center items-center text-center">
+            <p className="text-[11px] font-black text-white/70 uppercase tracking-tight">
               {nextTier 
-                ? `สะสมอีก ${pointsNeeded.toLocaleString()} คะแนนเพื่อเลื่อนสถานะเป็น ${nextTier.name}`
-                : 'คุณอยู่ในระดับสูงสุดแล้ว ✨'}
-            </span>
+                ? `สะสมอีก ${pointsNeeded.toLocaleString()} คะแนนเพื่อเลื่อนเป็น ${nextTier.name}`
+                : 'ยินดีด้วย! คุณอยู่ในระดับสูงสุดแล้ว ✨'}
+            </p>
           </div>
         </div>
       </div>
