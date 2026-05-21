@@ -65,17 +65,15 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       exit={{ opacity: 0 }}
       className="relative bg-[#FFF9F0] pb-24 pt-4"
     >
-      {/* Invisible Back Trigger or keeping existing for UX */}
-      <div className="px-6 mb-4 flex items-center">
+      <div className="px-4 mb-4 flex items-center">
         <button onClick={onBack} className="p-1 text-slate-400 hover:text-slate-600">
           <ArrowLeft size={24} />
         </button>
       </div>
 
-      {/* Main Info Card - Matching the image exactly */}
       <div 
         onClick={() => onStartEdit(pet)}
-        className="px-6 mb-6 flex items-center gap-5 cursor-pointer active:opacity-70 transition-opacity"
+        className="px-4 mb-6 flex items-center gap-4 cursor-pointer active:opacity-70 transition-opacity"
       >
         <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shrink-0 shadow-sm">
           <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
@@ -94,8 +92,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         </div>
       </div>
 
-      {/* Tab Navigation - Matching the image colors and style */}
-      <div className="px-6 mb-8">
+      <div className="px-4 mb-8">
         <div className="bg-white p-1.5 rounded-2xl flex gap-1 shadow-sm border border-slate-50">
           <TabButton 
             active={activeTab === 'overview'} 
@@ -120,7 +117,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         </div>
       </div>
 
-      <div className="px-6 space-y-6">
+      <div className="px-4 space-y-6">
         <AnimatePresence mode="wait">
           {activeTab === 'overview' && (
             <motion.div 
@@ -138,7 +135,6 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
                 onActionClick={(type) => setActiveTab('health')}
               />
               
-              {/* Optional actions or info */}
               <div className="flex justify-center">
                  <button 
                   onClick={onToggleFavorite} 
@@ -220,7 +216,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
 
       <AnimatePresence>
         {showDeleteConfirm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowDeleteConfirm(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
             <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} className="relative w-full max-w-xs bg-white rounded-[2.5rem] shadow-2xl p-8 text-center border border-slate-100">
                <div className="w-20 h-20 bg-red-100 rounded-3xl flex items-center justify-center mx-auto mb-6">

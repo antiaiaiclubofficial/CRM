@@ -64,11 +64,11 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF9F0] flex flex-col items-center justify-center p-6 pb-12">
+    <div className="min-h-screen bg-[#FFF9F0] flex flex-col items-center justify-center p-4 pb-12">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md space-y-8"
+        className="w-full max-w-md space-y-6"
       >
         <div className="text-center space-y-2">
           <div className="w-20 h-20 bg-pink-100 rounded-3xl flex items-center justify-center mx-auto mb-4 border-2 border-black shadow-soft">
@@ -78,7 +78,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
           <p className="text-slate-500 font-medium">กรุณาลงทะเบียนเพื่อเริ่มสะสมคะแนนนะคะ ✨</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white p-8 rounded-[3rem] border-2 border-black shadow-soft space-y-5">
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-[2.5rem] border-2 border-black shadow-soft space-y-5">
           {/* Name Section */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
@@ -105,7 +105,7 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
             </div>
           </div>
 
-          {/* Gender and Age Section (Moved up) */}
+          {/* Gender and Age Section */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">เพศ</label>
