@@ -79,7 +79,7 @@ const Index = () => {
       const { data: coupons } = await supabase.from('customer_coupons').select('*, coupon_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id);
       const { data: deals } = await supabase.from('customers_deals').select('*, deal_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id);
       const { data: history } = await supabase.from('service_history').select('*, pets(*)').eq('customer_id', customer.id).eq('store_id', store.id).order('created_at', { ascending: false });
-      const { data: appointments } = await supabase.from('appointments').select('*, pets(*), services(*)').eq('customer_id', customer.id).order('start_time', { ascending: true });
+      const { data: appointmentsData } = await supabase.from('appointments').select('*, pets(name, image_url, breed), services(name, price)').eq('customer_id', customer.id).order('start_time', { ascending: true });
 
       return {
         profile: customer,
@@ -88,7 +88,17 @@ const Index = () => {
         coupons: coupons || [],
         deals: deals || [],
         history: history || [],
-        appointments: appointments || []
+        appointments: (appointmentsData || []).map(apt => ({
+          id: apt.id,
+          petName: apt.pets?.name || 'Unknown',
+          petImage: apt.pets?.image_url,
+          petBreed: apt.pets?.breed,
+          service: apt.services?.name || 'General Service',
+          servicePrice: apt.services?.price,
+          startTime: apt.start_time,
+          status: apt.status,
+          notes: apt.notes
+        }))
       };
     },
     enabled: !!lineProfile?.userId && !!store?.id,
@@ -267,6 +277,7 @@ const Index = () => {
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.phone || ''} />
       <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={customerData?.pets.find(p => p.id === petToEditId)} />
       <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={customerData?.pets || []} services={storeServices || []} onConfirm={async (d) => { await bookAppointmentMutation.mutateAsync(d); }} />
+      <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={customerData?.profile as any} onSave={() => {}} />
     </div>
   );
 };

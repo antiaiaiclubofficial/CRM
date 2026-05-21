@@ -19,10 +19,11 @@ interface UpcomingAppointmentsProps {
   onViewAll: () => void;
 }
 
-const getServiceIcon = (serviceName: string) => {
-  if (serviceName.includes('ตัดขน')) return { icon: <Scissors size={18} className="text-pink-500" />, bg: 'bg-pink-50' };
-  if (serviceName.includes('อาบน้ำ')) return { icon: <Bath size={18} className="text-blue-500" />, bg: 'bg-blue-50' };
-  if (serviceName.includes('สปา')) return { icon: <Sparkles size={18} className="text-amber-500" />, bg: 'bg-amber-50' };
+const getServiceIcon = (serviceName: string = '') => {
+  const name = serviceName || '';
+  if (name.includes('ตัดขน')) return { icon: <Scissors size={18} className="text-pink-500" />, bg: 'bg-pink-50' };
+  if (name.includes('อาบน้ำ')) return { icon: <Bath size={18} className="text-blue-500" />, bg: 'bg-blue-50' };
+  if (name.includes('สปา')) return { icon: <Sparkles size={18} className="text-amber-500" />, bg: 'bg-amber-50' };
   return { icon: <CalendarDays size={18} className="text-slate-500" />, bg: 'bg-slate-50' };
 };
 
@@ -36,7 +37,7 @@ const formatAppointmentDateTime = (dateStr: string) => {
     datePart = 'พรุ่งนี้, ';
   }
   
-  datePart += format(date, 'd MMM yy', { locale: th }); // Correct month and year
+  datePart += format(date, 'd MMM yy', { locale: th });
   const timePart = format(date, 'HH:mm');
   
   return `${datePart} • ${timePart} น.`;
