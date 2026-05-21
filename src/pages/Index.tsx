@@ -231,12 +231,33 @@ const Index = () => {
 
   const petMutation = useMutation({
     mutationFn: async (pet: any) => {
-      const { id, ...petData } = pet;
+      const { id, weight, ...petData } = pet;
+      let result;
+      
+      // 1. Create or Update Pet
       if (id) {
-        return await supabase.from('pets').update(petData).eq('id', id).select().single();
+        result = await supabase.from('pets').update({ ...petData, weight }).eq('id', id).select().single();
       } else {
-        return await supabase.from('pets').insert([{ ...petData, customer_id: customerData?.profile?.id }]).select().single();
+        result = await supabase.from('pets').insert([{ ...petData, weight, customer_id: customerData?.profile?.id }]).select().single();
       }
+
+      const savedPetId = id || result.data?.id;
+
+      // 2. If weight is provided, also record in weight history automatically
+      if (savedPetId && weight) {
+        const weightNum = parseFloat(weight);
+        if (!isNaN(weightNum)) {
+          // Check if we already have a record for today to avoid duplicates if saving multiple times
+          const today = new Date().toISOString().split('T')[0];
+          await supabase.from('pet_weight_history').insert([{
+            pet_id: savedPetId,
+            weight: weightNum,
+            date: new Date().toISOString()
+          }]);
+        }
+      }
+
+      return result;
     },
     onSuccess: () => {
       toast.success('บันทึกข้อมูลเรียบร้อยค่ะ 🐾');
