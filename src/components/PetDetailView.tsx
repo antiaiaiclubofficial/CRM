@@ -66,16 +66,16 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       className="relative bg-[#FFF9F0] pb-24"
     >
       {/* Back button - Absolute position at the very top corner */}
-      <div className="absolute top-2 left-0 z-20">
+      <div className="absolute top-4 left-1 z-20">
         <button onClick={onBack} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
           <ArrowLeft size={30} strokeWidth={2.5} />
         </button>
       </div>
 
-      {/* Main Info Card - Minimal side padding to feel edge-to-edge */}
+      {/* Main Info Card - Profile Header: Moved down (pt-20) and 2px side margins */}
       <div 
         onClick={() => onStartEdit(pet)}
-        className="px-2 pt-12 mb-6 flex items-center gap-4 cursor-pointer active:opacity-70 transition-opacity"
+        className="px-[2px] pt-20 mb-6 flex items-center gap-4 cursor-pointer active:opacity-70 transition-opacity"
       >
         <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-200 shrink-0 shadow-md">
           <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
@@ -94,8 +94,8 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         </div>
       </div>
 
-      {/* Tab Navigation - Edge-to-edge feeling with px-1 */}
-      <div className="px-1 mb-8">
+      {/* Tab Navigation - px-[2px] for edge spacing */}
+      <div className="px-[2px] mb-8">
         <div className="bg-white p-1 rounded-2xl flex gap-0.5 shadow-sm border border-slate-50 overflow-x-auto no-scrollbar">
           <TabButton 
             active={activeTab === 'overview'} 
@@ -120,7 +120,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         </div>
       </div>
 
-      <div className="px-1 space-y-6">
+      <div className="px-[2px] space-y-6">
         <AnimatePresence mode="wait">
           {activeTab === 'overview' && (
             <motion.div 
