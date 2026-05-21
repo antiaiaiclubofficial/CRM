@@ -81,7 +81,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               {React.cloneElement(currentTier.icon as React.ReactElement, { fill: "currentColor" })}
               <span className="text-[9px] font-black uppercase tracking-widest">คะแนนสะสมทั้งหมด</span>
             </div>
-            <p className="text-sm font-black text-white leading-none tracking-tighter">{totalAccumulatedPoints.toLocaleString()}</p>
+            <p className="text-xs font-bold text-grey leading-none tracking-tighter">{totalAccumulatedPoints.toLocaleString()}</p>
           </div>
         </div>
 
