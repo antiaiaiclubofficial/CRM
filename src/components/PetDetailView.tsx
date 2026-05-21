@@ -70,7 +70,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         {/* Back button area */}
         <div className="flex items-center">
           <button onClick={onBack} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
-            <ArrowLeft size={30} strokeWidth={2.5} />
+            <ArrowLeft size={28} strokeWidth={2.0} />
           </button>
         </div>
 
