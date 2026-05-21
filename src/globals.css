@@ -37,7 +37,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Glassmorphism utility - Adjusted for more transparency */
 .glass-effect {
   background: rgba(255, 255, 255, 0.45); /* Changed from 0.7 to 0.45 */
-  backdrop-filter: blur(24px);
+  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(24px);
 }
 
