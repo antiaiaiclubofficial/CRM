@@ -66,7 +66,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       className="relative bg-[#FFF9F0] pb-24"
     >
       {/* Back button - Absolute position at the very top corner */}
-      <div className="absolute top-4 left-1 z-20">
+      <div className="absolute top-0 left-1 z-20">
         <button onClick={onBack} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
           <ArrowLeft size={30} strokeWidth={2.5} />
         </button>
