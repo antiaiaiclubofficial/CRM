@@ -67,9 +67,9 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
         </div>
 
         {/* Bottom Group: Points & Progress */}
-        <div className="flex flex-col">
+        <div className="flex flex-col space-y-[4px]">
           {/* Points & Tier Display */}
-          <div className="flex justify-between items-end mb-1">
+          <div className="flex justify-between items-end">
             <div className="space-y-0.5">
               <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">คะแนนที่ใช้ได้ (Balance)</p>
               <div className="flex items-baseline gap-1.5">
@@ -96,7 +96,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
             </div>
           </div>
 
-          {/* Progress Section (Distance ensured via mb-1 on div above) */}
+          {/* Progress Section */}
           <div className="space-y-2">
             <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
               <motion.div 
