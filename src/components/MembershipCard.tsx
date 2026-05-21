@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Crown, PawPrint, QrCode, Clock, Zap } from 'lucide-react';
+import { Crown, PawPrint, QrCode, Clock, Zap, Star, Gem, Diamond } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface MembershipCardProps {
@@ -11,8 +11,28 @@ interface MembershipCardProps {
   onShowQR: () => void;
 }
 
+const tiers = [
+  { id: 'bronze', name: 'Bronze Tier', minPoints: 0, icon: <PawPrint size={12} /> },
+  { id: 'silver', name: 'Silver Tier', minPoints: 300, icon: <Star size={12} /> },
+  { id: 'gold', name: 'Gold Tier', minPoints: 700, icon: <Crown size={12} /> },
+  { id: 'platinum', name: 'Platinum Tier', minPoints: 1000, icon: <Zap size={12} /> },
+  { id: 'vip', name: 'VIP Tier', minPoints: 2000, icon: <Diamond size={12} /> },
+];
+
 const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile, onShowQR }: MembershipCardProps) => {
-  const progressPercentage = Math.min(100, (totalAccumulatedPoints / 2000) * 100);
+  // Calculate current tier
+  const currentTier = [...tiers].reverse().find(t => totalAccumulatedPoints >= t.minPoints) || tiers[0];
+  
+  // Calculate next tier progress
+  const nextTierIndex = tiers.findIndex(t => t.id === currentTier.id) + 1;
+  const nextTier = tiers[nextTierIndex];
+  
+  let progressPercentage = 100;
+  if (nextTier) {
+    const range = nextTier.minPoints - currentTier.minPoints;
+    const progress = totalAccumulatedPoints - currentTier.minPoints;
+    progressPercentage = Math.min(100, Math.max(0, (progress / range) * 100));
+  }
 
   return (
     <motion.div 
@@ -53,8 +73,8 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           </div>
           <div className="text-right">
             <div className="flex items-center gap-1 justify-end text-tertiary mb-0.5">
-              <Zap size={12} fill="currentColor" />
-              <span className="text-[9px] font-black uppercase tracking-widest">Platinum Tier</span>
+              {React.cloneElement(currentTier.icon as React.ReactElement, { fill: "currentColor" })}
+              <span className="text-[9px] font-black uppercase tracking-widest">{currentTier.name}</span>
             </div>
             <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Total Earned: {totalAccumulatedPoints.toLocaleString()}</p>
           </div>
@@ -70,7 +90,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
             />
           </div>
           <div className="flex justify-between items-center text-[9px] font-black text-white/50 uppercase tracking-tighter">
-            <span>Next Tier Progress</span>
+            <span>{nextTier ? `Next: ${nextTier.name}` : 'Max Level Reached'}</span>
             <span className="text-tertiary">{Math.round(progressPercentage)}%</span>
           </div>
         </div>
