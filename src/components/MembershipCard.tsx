@@ -67,40 +67,43 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           </motion.button>
         </div>
 
-        {/* Points & Tier Display */}
-        <div className="flex justify-between items-end">
-          <div className="space-y-0.5">
-            <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">คะแนนที่ใช้ได้ (Balance)</p>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-4xl font-black text-tertiary leading-none tracking-tighter">{redeemablePoints.toLocaleString()}</span>
-              <span className="text-[10px] font-black text-white/70 uppercase">pts</span>
+        {/* Bottom Group: Points & Progress together */}
+        <div className="space-y-4">
+          {/* Points & Tier Display */}
+          <div className="flex justify-between items-end">
+            <div className="space-y-0.5">
+              <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">คะแนนที่ใช้ได้ (Balance)</p>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-4xl font-black text-tertiary leading-none tracking-tighter">{redeemablePoints.toLocaleString()}</span>
+                <span className="text-[10px] font-black text-white/70 uppercase">pts</span>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center gap-1 justify-end text-tertiary mb-0.5">
+                {React.cloneElement(currentTier.icon as React.ReactElement, { fill: "currentColor" })}
+                <span className="text-[9px] font-black uppercase tracking-widest">คะแนนสะสมทั้งหมด</span>
+              </div>
+              <p className="text-sm font-black text-white leading-none tracking-tighter">{totalAccumulatedPoints.toLocaleString()}</p>
             </div>
           </div>
-          <div className="text-right">
-            <div className="flex items-center gap-1 justify-end text-tertiary mb-0.5">
-              {React.cloneElement(currentTier.icon as React.ReactElement, { fill: "currentColor" })}
-              <span className="text-[9px] font-black uppercase tracking-widest">คะแนนสะสมทั้งหมด</span>
-            </div>
-            <p className="text-sm font-black text-white leading-none tracking-tighter">{totalAccumulatedPoints.toLocaleString()}</p>
-          </div>
-        </div>
 
-        {/* Progress Section */}
-        <div className="mt-3 space-y-2">
-          <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden p-[2px]">
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: `${progressPercentage}%` }}
-              transition={{ duration: 1.5, ease: "easeOut" }}
-              className="bg-[#EAFD69] h-full rounded-full shadow-[0_0_12px_rgba(234,253,105,0.6)]"
-            />
-          </div>
-          <div className="flex justify-center items-center text-center">
-            <p className="text-[11px] font-black text-white/70 uppercase tracking-tight">
-              {nextTier 
-                ? `สะสมอีก ${pointsNeeded.toLocaleString()} คะแนนเพื่อเลื่อนเป็น ${nextTier.name}`
-                : 'ยินดีด้วย! คุณอยู่ในระดับสูงสุดแล้ว ✨'}
-            </p>
+          {/* Progress Section */}
+          <div className="space-y-2">
+            <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden p-[2px]">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercentage}%` }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className="bg-[#EAFD69] h-full rounded-full shadow-[0_0_12px_rgba(234,253,105,0.6)]"
+              />
+            </div>
+            <div className="flex justify-center items-center text-center">
+              <p className="text-[11px] font-black text-white/70 uppercase tracking-tight">
+                {nextTier 
+                  ? `สะสมอีก ${pointsNeeded.toLocaleString()} คะแนนเพื่อเลื่อนเป็น ${nextTier.name}`
+                  : 'ยินดีด้วย! คุณอยู่ในระดับสูงสุดแล้ว ✨'}
+              </p>
+            </div>
           </div>
         </div>
       </div>
