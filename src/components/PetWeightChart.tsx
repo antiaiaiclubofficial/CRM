@@ -1,9 +1,10 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
-import { TrendingUp, Scale, Calendar } from 'lucide-react';
+import { TrendingUp, Scale, Calendar, Plus } from 'lucide-react';
+import AddWeightModal from './AddWeightModal';
 
 interface WeightEntry {
   date: string;
@@ -13,12 +14,15 @@ interface WeightEntry {
 interface PetWeightChartProps {
   data: WeightEntry[];
   petName: string;
+  onAddWeight: (weight: number) => Promise<void>;
 }
 
-const PetWeightChart = ({ data, petName }: PetWeightChartProps) => {
+const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const latestWeight = data.length > 0 ? data[data.length - 1].weight : 0;
-  const initialWeight = data.length > 0 ? data[0].weight : 0;
-  const weightDiff = (latestWeight - initialWeight).toFixed(1);
+  const previousWeight = data.length > 1 ? data[data.length - 2].weight : latestWeight;
+  const weightDiff = (latestWeight - previousWeight).toFixed(1);
   const isGain = parseFloat(weightDiff) >= 0;
 
   return (
@@ -42,7 +46,7 @@ const PetWeightChart = ({ data, petName }: PetWeightChartProps) => {
         <div className="bg-white p-4 rounded-[2rem] border-2 border-slate-100 shadow-sm">
           <div className="flex items-center gap-2 mb-1">
             <TrendingUp size={14} className={isGain ? "text-emerald-500" : "text-rose-500"} />
-            <span className="text-[10px] font-black text-slate-400 uppercase">การเปลี่ยนแปลง</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase">เทียบกับครั้งก่อน</span>
           </div>
           <div className="flex items-baseline gap-1">
             <span className={`text-2xl font-black ${isGain ? "text-emerald-600" : "text-rose-600"}`}>
@@ -56,10 +60,13 @@ const PetWeightChart = ({ data, petName }: PetWeightChartProps) => {
       {/* Chart Container */}
       <div className="bg-white p-6 rounded-[2.5rem] border-2 border-slate-100 shadow-sm relative overflow-hidden">
         <div className="flex justify-between items-center mb-6">
-          <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight">กราฟแสดงน้ำหนัก</h4>
-          <div className="bg-blue-50 px-3 py-1 rounded-full text-[9px] font-black text-blue-600 uppercase">
-            ประวัติ 6 เดือนล่าสุด
-          </div>
+          <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight">กราฟน้ำหนัก</h4>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-blue-600 text-white p-2 rounded-full shadow-md active:scale-90 transition-transform"
+          >
+            <Plus size={18} strokeWidth={3} />
+          </button>
         </div>
 
         <div className="h-64 w-full">
@@ -83,7 +90,7 @@ const PetWeightChart = ({ data, petName }: PetWeightChartProps) => {
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 10, fontWeight: 700, fill: '#94A3B8' }}
-                domain={['dataMin - 1', 'dataMax + 1']}
+                domain={['auto', 'auto']}
               />
               <Tooltip 
                 contentStyle={{ 
@@ -109,6 +116,13 @@ const PetWeightChart = ({ data, petName }: PetWeightChartProps) => {
         </div>
       </div>
 
+      <button 
+        onClick={() => setIsModalOpen(true)}
+        className="w-full py-4 bg-slate-50 text-blue-600 rounded-2xl font-black border-2 border-dashed border-blue-200 active:bg-blue-50 transition-all flex items-center justify-center gap-2"
+      >
+        <Plus size={20} /> บันทึกน้ำหนักวันนี้
+      </button>
+
       {/* History List */}
       <div className="space-y-3">
         <h4 className="text-sm font-black text-slate-800 px-1 uppercase tracking-tight">ประวัติการชั่งน้ำหนัก</h4>
@@ -126,6 +140,13 @@ const PetWeightChart = ({ data, petName }: PetWeightChartProps) => {
           ))}
         </div>
       </div>
+
+      <AddWeightModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        petName={petName} 
+        onSave={onAddWeight} 
+      />
     </motion.div>
   );
 };

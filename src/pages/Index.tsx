@@ -246,6 +246,19 @@ const Index = () => {
     }
   });
 
+  const weightMutation = useMutation({
+    mutationFn: async ({ petId, weight }: { petId: string | number, weight: number }) => {
+      // 1. Update weight in pet table
+      await supabase.from('pets').update({ weight: weight.toString() }).eq('id', petId);
+      // 2. Insert into weight history
+      return await supabase.from('pet_weight_history').insert([{ pet_id: petId, weight: weight, date: new Date().toISOString() }]);
+    },
+    onSuccess: () => {
+      toast.success('บันทึกน้ำหนักเรียบร้อยแล้วค่ะ ⚖️');
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    }
+  });
+
   const handleNavClick = (tab: string) => {
     setActiveTab(tab);
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -343,7 +356,8 @@ const Index = () => {
                   totalServiceCost={0} 
                   onViewServiceHistoryForPet={() => {}} 
                   onEditPreferences={() => {}} 
-                  onToggleFavorite={() => {}} 
+                  onToggleFavorite={() => {}}
+                  onAddWeight={async (id, w) => { await weightMutation.mutateAsync({ petId: id, weight: w }); }}
                 />
               ) : (
                 <PetManagement pets={customerData?.pets || []} onBack={() => setActiveTab('home')} onViewDetails={(p: any) => setSelectedPetId(p.id)} onAddPet={handleAddPetClick} />

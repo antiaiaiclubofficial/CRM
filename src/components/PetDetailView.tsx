@@ -38,9 +38,10 @@ interface PetDetailViewProps {
   onViewServiceHistoryForPet: (petName: string) => void;
   onEditPreferences: () => void;
   onToggleFavorite: () => void;
+  onAddWeight: (petId: string | number, weight: number) => Promise<void>;
 }
 
-const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreferences, onToggleFavorite }: PetDetailViewProps) => {
+const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreferences, onToggleFavorite, onAddWeight }: PetDetailViewProps) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showWeightDetail, setShowWeightDetail] = useState(false);
@@ -61,12 +62,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
     return { score, status, subStatus };
   }, [pet]);
 
-  // Mock weight history if none provided for better UX
-  const weightHistory = pet.weight_history || [
-    { date: '1 ม.ค.', weight: parseFloat(pet.weight) - 0.5 || 4.5 },
-    { date: '15 ก.พ.', weight: parseFloat(pet.weight) - 0.2 || 4.8 },
-    { date: '10 มี.ค.', weight: parseFloat(pet.weight) || 5.0 },
-  ];
+  const weightHistory = pet.weight_history || [];
 
   const handleHealthAction = (type: string) => {
     if (type === 'weight') {
@@ -142,7 +138,11 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               </div>
               <h3 className="text-2xl font-black text-slate-800">ประวัติน้ำหนัก: น้อง{pet.name}</h3>
            </div>
-           <PetWeightChart data={weightHistory} petName={pet.name} />
+           <PetWeightChart 
+              data={weightHistory} 
+              petName={pet.name} 
+              onAddWeight={(w) => onAddWeight(pet.id, w)} 
+            />
         </div>
       ) : (
         <>
