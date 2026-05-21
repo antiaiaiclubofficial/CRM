@@ -48,23 +48,23 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
       <div className="absolute bottom-[-20%] left-[-10%] w-48 h-48 bg-white/5 rounded-full blur-2xl" />
 
       <div className="relative z-10 flex flex-col h-full justify-between">
-        {/* Profile Info & QR */}
+        {/* Top Section */}
         <div className="flex justify-between items-start">
+          {/* Left Side: Membership Status */}
           <div className="space-y-1">
-            <span className="bg-tertiary text-primary text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm">
+            <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Membership Status</p>
+            <span className="bg-tertiary text-primary text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block">
               {currentTier.name.toUpperCase()}
             </span>
-            <h2 className="text-lg font-black text-white mt-1.5 drop-shadow-md">
+          </div>
+          
+          {/* Right Side: Member ID and Name */}
+          <div className="text-right space-y-0.5">
+            <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Member ID: {ownerProfile?.phone || 'N/A'}</p>
+            <h2 className="text-lg font-black text-white drop-shadow-md truncate max-w-[180px]">
               {ownerProfile?.first_name} {ownerProfile?.last_name}
             </h2>
           </div>
-          <motion.button 
-            whileTap={{ scale: 0.9 }}
-            onClick={onShowQR}
-            className="w-12 h-12 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 flex items-center justify-center text-white"
-          >
-            <QrCode size={24} />
-          </motion.button>
         </div>
 
         {/* Bottom Group: Points & Progress together */}
@@ -78,7 +78,17 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                 <span className="text-[10px] font-black text-white/70 uppercase">pts</span>
               </div>
             </div>
-            <div className="text-right">
+            <div className="text-right flex flex-col items-end">
+              {/* QR Capsule Button */}
+              <motion.button 
+                whileTap={{ scale: 0.95 }}
+                onClick={onShowQR}
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white mb-2 hover:bg-white/20 transition-colors"
+              >
+                <QrCode size={12} />
+                <span className="text-[8px] font-black uppercase tracking-widest">My QR</span>
+              </motion.button>
+              
               <div className="flex items-center gap-1 justify-end text-tertiary mb-0.5">
                 {React.cloneElement(currentTier.icon as React.ReactElement, { fill: "currentColor" })}
                 <span className="text-[9px] font-black uppercase tracking-widest">คะแนนสะสมทั้งหมด</span>
