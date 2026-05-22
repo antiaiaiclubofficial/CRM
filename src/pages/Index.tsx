@@ -359,7 +359,7 @@ const Index = () => {
 
   return (
     <div className="w-full h-[100dvh] max-md:max-w-md mx-auto bg-surface relative flex flex-col font-['Inter'] overflow-hidden">
-      <header className="sticky top-0 px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-3 flex justify-between items-center shrink-0 z-[50] glass-effect border-b border-white/40 shadow-ambient">
+      <header className="sticky top-0 px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-3 flex justify-between items-center shrink-0 z-[50] glass-effect border-b border-white/20 shadow-ambient">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-black text-primary truncate leading-tight tracking-tight">{store?.name || 'Pet Care'}</h1>
           <p className="text-surface-variant text-xs font-semibold uppercase tracking-widest opacity-60">Hello, {customerData?.profile?.first_name || lineProfile?.displayName} 🐾</p>
@@ -452,7 +452,7 @@ const Index = () => {
         </AnimatePresence>
       </main>
 
-      <nav className="fixed bottom-[20px] left-4 right-4 max-w-[calc(theme(maxWidth.md)-2rem)] mx-auto glass-effect px-6 py-4 flex justify-between items-center rounded-3xl shadow-ambient z-[40] border border-white/40">
+      <nav className="fixed bottom-[20px] left-4 right-4 max-w-[calc(theme(maxWidth.md)-2rem)] mx-auto glass-effect px-6 py-4 flex justify-between items-center rounded-3xl shadow-ambient z-[40] border border-white/20">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
         <NavButton active={activeTab === 'appointments'} icon={<Calendar size={22} />} onClick={() => handleNavClick('appointments')} />
         <NavButton active={activeTab === 'pets'} icon={<PawPrint size={22} />} onClick={() => handleNavClick('pets')} />
