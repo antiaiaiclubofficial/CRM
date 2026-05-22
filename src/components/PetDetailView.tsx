@@ -236,7 +236,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
             <div className="pt-12 flex flex-col items-center gap-4">
               <button 
                 onClick={() => setShowDeleteConfirm(true)}
-                className="text-error font-black uppercase tracking-widest text-[11px] underline underline-offset-8 decoration-error/20 hover:decoration-error transition-all"
+                className="text-error font-black uppercase tracking-widest text-red text-[12px] underline underline-offset-8 decoration-error/20 hover:decoration-error transition-all"
               >
                 ลบข้อมูลน้อง {pet.name}
               </button>
