@@ -236,7 +236,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
             <div className="pt-12 flex flex-col items-center gap-4">
               <button 
                 onClick={() => setShowDeleteConfirm(true)}
-                className="text-error font-black uppercase tracking-widest text-[12px] underline underline-offset-8 decoration-error/20 hover:decoration-error transition-all"
+                className="text-red-500 font-black uppercase tracking-widest text-[11px] underline underline-offset-8 decoration-red-500/20 hover:decoration-red-500 transition-all"
               >
                 ลบข้อมูลน้อง {pet.name}
               </button>
@@ -251,13 +251,13 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowDeleteConfirm(false)} className="absolute inset-0 bg-primary/60 backdrop-blur-md" />
             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="relative w-full max-w-sm bg-white rounded-xl shadow-ambient p-10 text-center border border-black/5">
-               <div className="w-24 h-24 bg-error-container rounded-full flex items-center justify-center mx-auto mb-8">
-                  <AlertTriangle size={48} className="text-error" />
+               <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-8">
+                  <AlertTriangle size={48} className="text-red-500" />
                </div>
                <h3 className="text-2xl font-black text-primary mb-3 tracking-tight">ยืนยันการลบ?</h3>
                <p className="text-sm font-medium text-surface-variant opacity-70 mb-10 leading-relaxed">ข้อมูลทั้งหมดของน้อง {pet.name} จะหายไปอย่างถาวรและไม่สามารถกู้คืนได้</p>
                <div className="space-y-4">
-                  <button onClick={() => { onDeletePet(pet.id); setShowDeleteConfirm(false); }} className="w-full py-5 bg-error text-white rounded-lg font-black uppercase tracking-widest shadow-lg shadow-error/10 active:scale-95 transition-all">ยืนยันการลบ</button>
+                  <button onClick={() => { onDeletePet(pet.id); setShowDeleteConfirm(false); }} className="w-full py-5 bg-red-500 text-white rounded-lg font-black uppercase tracking-widest shadow-lg shadow-red-500/10 active:scale-95 transition-all">ยืนยันการลบ</button>
                   <button onClick={() => setShowDeleteConfirm(false)} className="w-full py-5 bg-surface-container-low text-primary rounded-lg font-black uppercase tracking-widest active:scale-95 transition-all">ยกเลิก</button>
                </div>
             </motion.div>
