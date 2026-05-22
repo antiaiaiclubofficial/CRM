@@ -359,7 +359,7 @@ const Index = () => {
 
   return (
     <div className="w-full h-[100dvh] max-md:max-w-md mx-auto bg-surface relative flex flex-col font-['Inter'] overflow-hidden">
-      <header className="px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-2 flex justify-between items-center shrink-0 z-[50]">
+      <header className="sticky top-0 px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-3 flex justify-between items-center shrink-0 z-[50] glass-effect bg-white/40 border-b border-white/20 shadow-ambient">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-black text-primary truncate leading-tight tracking-tight">{store?.name || 'Pet Care'}</h1>
           <p className="text-surface-variant text-xs font-semibold uppercase tracking-widest opacity-60">Hello, {customerData?.profile?.first_name || lineProfile?.displayName} 🐾</p>
@@ -373,7 +373,7 @@ const Index = () => {
         </motion.div>
       </header>
 
-      <main ref={mainScrollRef} className="px-4 flex-1 pb-[calc(7.5rem+env(safe-area-inset-bottom))] overflow-y-scroll no-scrollbar touch-pan-y">
+      <main ref={mainScrollRef} className="px-4 flex-1 pb-[calc(7.5rem+env(safe-area-inset-bottom))] overflow-y-scroll no-scrollbar touch-pan-y pt-4">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div key="home" className="space-y-8" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
