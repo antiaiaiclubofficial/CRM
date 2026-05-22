@@ -52,7 +52,7 @@ const Index = () => {
   useEffect(() => {
     const handleScroll = () => {
       if (mainScrollRef.current) {
-        setIsScrolled(mainScrollRef.current.scrollTop > 10);
+        setIsScrolled(mainScrollRef.current.scrollTop > 5);
       }
     };
     const scrollContainer = mainScrollRef.current;
@@ -379,8 +379,8 @@ const Index = () => {
         className="h-full w-full overflow-y-scroll no-scrollbar touch-pan-y relative"
       >
         <header 
-          className={`sticky top-0 px-6 pt-[calc(12px+env(safe-area-inset-top))] pb-4 flex justify-between items-center shrink-0 z-[50] transition-all duration-300 ${
-            isScrolled ? 'glass-effect shadow-ambient py-3' : 'bg-transparent'
+          className={`sticky top-0 px-6 pt-[calc(10px+env(safe-area-inset-top))] pb-4 flex justify-between items-center shrink-0 z-[50] transition-all duration-300 ${
+            isScrolled ? 'glass-effect shadow-ambient py-3' : 'bg-[#F9F9F9]/80 backdrop-blur-md py-4'
           }`}
         >
           <div className="min-w-0 flex-1">
