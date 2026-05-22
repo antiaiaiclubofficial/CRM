@@ -379,8 +379,8 @@ const Index = () => {
         className="h-full w-full overflow-y-scroll no-scrollbar touch-pan-y relative"
       >
         <header 
-          className={`sticky top-0 px-6 pt-[calc(10px+env(safe-area-inset-top))] pb-4 flex justify-between items-center shrink-0 z-[50] transition-all duration-300 ${
-            isScrolled ? 'glass-effect shadow-ambient py-3' : 'bg-[#F9F9F9]/80 backdrop-blur-md py-4'
+          className={`sticky top-0 px-6 pt-[calc(10px+env(safe-area-inset-top))] pb-6 flex justify-between items-center shrink-0 z-[50] transition-all duration-500 rounded-b-[2.5rem] ${
+            isScrolled ? 'glass-effect shadow-ambient py-3' : 'bg-[#F9F9F9]/80 backdrop-blur-md py-5'
           }`}
         >
           <div className="min-w-0 flex-1">
@@ -396,7 +396,7 @@ const Index = () => {
           </motion.div>
         </header>
 
-        <main className="px-4 pb-[calc(8.5rem+env(safe-area-inset-bottom))] pt-2">
+        <main className="px-4 pb-[calc(8.5rem+env(safe-area-inset-bottom))] pt-6">
           <AnimatePresence mode="wait">
             {activeTab === 'home' && (
               <motion.div key="home" className="space-y-10" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
