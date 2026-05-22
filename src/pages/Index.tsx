@@ -173,19 +173,13 @@ const Index = () => {
       if (error) throw error;
     },
     onMutate: async ({ petId, isFavorite }) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({ queryKey: ['customer_profile'] });
-
-      // Snapshot the previous value
       const previousData = queryClient.getQueryData(['customer_profile', lineProfile?.userId, store?.id]);
-
-      // Optimistically update to the new value
       queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], (old: any) => {
         if (!old) return old;
         const updatedPets = old.pets.map((p: any) => 
           p.id === petId ? { ...p, is_favorite: !isFavorite } : p
         );
-        // Re-sort locally for immediate feedback
         const sortedPets = [...updatedPets].sort((a, b) => {
           if (a.is_favorite === b.is_favorite) {
             return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
@@ -194,19 +188,31 @@ const Index = () => {
         });
         return { ...old, pets: sortedPets };
       });
-
       return { previousData };
     },
     onError: (err, variables, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousData) {
         queryClient.setQueryData(['customer_profile', lineProfile?.userId, store?.id], context.previousData);
       }
       toast.error('ไม่สามารถเปลี่ยนสถานะรายการโปรดได้ค่ะ');
     },
     onSettled: () => {
-      // Always refetch after error or success to ensure we are in sync with the server
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    }
+  });
+
+  const deletePetMutation = useMutation({
+    mutationFn: async (petId: string | number) => {
+      const { error } = await supabase.from('pets').delete().eq('id', petId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('ลบข้อมูลเรียบร้อยแล้วค่ะ');
+      setSelectedPetId(null);
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    },
+    onError: () => {
+      toast.error('เกิดข้อผิดพลาดในการลบข้อมูลค่ะ');
     }
   });
 
@@ -416,7 +422,7 @@ const Index = () => {
                   pet={customerData?.pets?.find(p => p.id === selectedPetId)} 
                   onBack={() => setSelectedPetId(null)} 
                   onStartEdit={(pet) => handleStartEditPet(pet)} 
-                  onDeletePet={() => {}} 
+                  onDeletePet={(id) => deletePetMutation.mutate(id)} 
                   totalServiceCost={0} 
                   onViewServiceHistoryForPet={() => {}} 
                   onEditPreferences={() => {}} 
