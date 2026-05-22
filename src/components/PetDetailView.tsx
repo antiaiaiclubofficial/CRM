@@ -80,7 +80,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       className="relative bg-surface pb-24"
     >
       {/* Compact Header Section */}
-      <div className="px-1 pt-4">
+      <div className="px-1 pt-2">
         {showWeightDetail ? (
           <div className="flex items-center gap-3 mb-6 px-2">
             <button 
