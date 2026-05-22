@@ -186,7 +186,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
                   animate={slideVariants.animate} 
                   exit={slideVariants.exit} 
                   transition={slideVariants.transition}
-                  className="space-y-6"
+                  className="space-y-10"
                 >
                   <PetHealthOverview 
                     score={healthData.score}
@@ -195,6 +195,16 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
                     lastUpdate="วันนี้"
                     onActionClick={handleHealthAction}
                   />
+
+                  {/* Delete Button moved inside Overview tab */}
+                  <div className="pt-4 flex flex-col items-center gap-4">
+                    <button 
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="text-red-500 font-black uppercase tracking-widest text-[10px] underline underline-offset-8 decoration-red-500/20 hover:decoration-red-500 transition-all"
+                    >
+                      ลบสัตว์เลี้ยง น้อง{pet.name}
+                    </button>
+                  </div>
                 </motion.div>
               )}
 
@@ -278,15 +288,6 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
                 </motion.div>
               )}
             </AnimatePresence>
-
-            <div className="pt-8 flex flex-col items-center gap-4">
-              <button 
-                onClick={() => setShowDeleteConfirm(true)}
-                className="text-red-500 font-black uppercase tracking-widest text-[10px] underline underline-offset-8 decoration-red-500/20 hover:decoration-red-500 transition-all"
-              >
-                ลบข้อมูลน้อง {pet.name}
-              </button>
-            </div>
           </div>
         </>
       )}
