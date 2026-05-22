@@ -379,8 +379,8 @@ const Index = () => {
         className="h-full w-full overflow-y-scroll no-scrollbar touch-pan-y relative"
       >
         <header 
-          className={`sticky top-0 px-6 pt-[calc(10px+env(safe-area-inset-top))] pb-1 flex justify-between items-center shrink-0 z-[50] transition-all duration-500 rounded-b-[2.5rem] ${
-            isScrolled ? 'glass-effect shadow-ambient py-3' : 'bg-[#F9F9F9]/80 backdrop-blur-md py-4'
+          className={`sticky top-0 px-6 pt-[calc(10px+env(safe-area-inset-top))] pb-3 flex justify-between items-center shrink-0 z-[50] transition-all duration-500 rounded-b-[2.5rem] ${
+            isScrolled ? 'glass-effect shadow-ambient' : 'bg-[#F9F9F9]/80 backdrop-blur-md pt-4'
           }`}
         >
           <div className="min-w-0 flex-1">
