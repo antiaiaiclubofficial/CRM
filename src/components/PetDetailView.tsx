@@ -97,7 +97,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
             </div>
           </div>
         ) : (
-          <div className="flex items-start gap-4 px-2 mb-6">
+          <div className="flex items-start gap-2 pl-0 pr-2 mb-6">
             <button 
               onClick={onBack} 
               className="mt-1 p-1 text-primary/40 hover:text-primary transition-colors shrink-0"
@@ -105,7 +105,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               <ArrowLeft size={32} strokeWidth={2.5} />
             </button>
             
-            <div className="flex-1 flex items-center gap-4 min-w-0">
+            <div className="flex-1 flex items-center gap-3 min-w-0">
               <div className="relative shrink-0">
                 <div className="absolute inset-0 bg-tertiary/15 rounded-full blur-xl scale-125" />
                 <div 
@@ -260,7 +260,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowDeleteConfirm(false)} className="absolute inset-0 bg-primary/60 backdrop-blur-md" />
-            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="relative w-full max-w-sm bg-white rounded-xl shadow-ambient p-8 text-center border border-black/5">
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="relative w-full max-sm bg-white rounded-xl shadow-ambient p-8 text-center border border-black/5">
                <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
                   <AlertTriangle size={40} className="text-red-500" />
                </div>
