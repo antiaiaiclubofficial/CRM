@@ -476,7 +476,7 @@ const Index = () => {
         </main>
       </div>
 
-      <nav className="fixed bottom-[20px] left-4 right-4 max-w-[calc(theme(maxWidth.md)-1rem)] mx-auto glass-effect px-6 py-4 flex justify-between items-center rounded-3xl shadow-ambient z-[40] border border-white/20">
+      <nav className="fixed bottom-[20px] left-4 right-4 max-w-[calc(theme(maxWidth.md)-2rem)] mx-auto glass-effect px-6 py-4 flex justify-between items-center rounded-3xl shadow-ambient z-[40] border border-white/20">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
         <NavButton active={activeTab === 'appointments'} icon={<Calendar size={22} />} onClick={() => handleNavClick('appointments')} />
         <NavButton active={activeTab === 'pets'} icon={<PawPrint size={22} />} onClick={() => handleNavClick('pets')} />
