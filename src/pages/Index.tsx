@@ -396,7 +396,7 @@ const Index = () => {
           </motion.div>
         </header>
 
-        <main className="px-4 pb-[calc(8.5rem+env(safe-area-inset-bottom))] pt-6">
+        <main className="px-4 pb-[calc(8.5rem+env(safe-area-inset-bottom))] pt-4">
           <AnimatePresence mode="wait">
             {activeTab === 'home' && (
               <motion.div key="home" className="space-y-10" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
