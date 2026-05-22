@@ -65,9 +65,8 @@ const Index = () => {
       if (!customer) return null;
 
       const { data: membership } = await supabase.from('store_customers').select('*').eq('customer_id', customer.id).eq('store_id', store.id).maybeSingle();
-      const { data: petsData } = await supabase.from('pets').select('*').eq('customer_id', customer.id).order('created_at', { ascending: true });
+      const { data: petsData } = await supabase.from('pets').select('*').eq('customer_id', customer.id).order('is_favorite', { ascending: false }).order('created_at', { ascending: true });
       
-      // Fetch weight history for all pets
       const petIds = (petsData || []).map(p => p.id);
       const { data: weightHistory } = await supabase.from('pet_weight_history').select('*').in('pet_id', petIds).order('date', { ascending: true });
 
@@ -84,13 +83,11 @@ const Index = () => {
           }))
       }));
 
-      // Fetch Coupons & Deals
       const { data: coupons } = await supabase.from('customer_coupons').select('*, coupon_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).eq('status', 'unused');
       const { data: deals } = await supabase.from('customers_deals').select('*, deal_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).eq('status', 'unused');
       
       const { data: appointmentsData } = await supabase.from('appointments').select('*, pets(name, image_url, breed), services(name, price)').eq('customer_id', customer.id).order('start_time', { ascending: true });
 
-      // Combine and format coupons/deals for the UI
       const myCoupons = [
         ...(coupons || []).map(c => ({
           ...c,
@@ -167,17 +164,31 @@ const Index = () => {
     enabled: !!store?.id
   });
 
+  const favoriteMutation = useMutation({
+    mutationFn: async ({ petId, isFavorite }: { petId: string | number, isFavorite: boolean }) => {
+      const { error } = await supabase
+        .from('pets')
+        .update({ is_favorite: !isFavorite })
+        .eq('id', petId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    },
+    onError: () => {
+      toast.error('ไม่สามารถเปลี่ยนสถานะรายการโปรดได้ค่ะ');
+    }
+  });
+
   const redeemMutation = useMutation({
     mutationFn: async ({ template, points, type }: { template: any, points: number, type: 'coupon' | 'deal' }) => {
       const customerId = customerData?.profile?.id;
       const storeId = store?.id;
       if (!customerId || !storeId) throw new Error("Missing context");
 
-      // Check points
       const currentPoints = customerData?.membership?.points || 0;
       if (currentPoints < points) throw new Error("คะแนนไม่เพียงพอค่ะ");
 
-      // 1. Deduct points
       const { error: pointsError } = await supabase
         .from('store_customers')
         .update({ points: currentPoints - points })
@@ -185,7 +196,6 @@ const Index = () => {
         .eq('store_id', storeId);
       if (pointsError) throw pointsError;
 
-      // 2. Insert coupon/deal
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + (template.expiry_days || 30));
 
@@ -234,7 +244,6 @@ const Index = () => {
       const { id, weight, ...petData } = pet;
       let result;
       
-      // 1. Create or Update Pet
       if (id) {
         result = await supabase.from('pets').update({ ...petData, weight }).eq('id', id).select().single();
       } else {
@@ -243,11 +252,9 @@ const Index = () => {
 
       const savedPetId = id || result.data?.id;
 
-      // 2. If weight is provided, also record in weight history automatically
       if (savedPetId && weight) {
         const weightNum = parseFloat(weight);
         if (!isNaN(weightNum)) {
-          // Check if today's record already exists to avoid redundant data
           const { data: existing } = await supabase
             .from('pet_weight_history')
             .select('*')
@@ -277,9 +284,7 @@ const Index = () => {
 
   const weightMutation = useMutation({
     mutationFn: async ({ petId, weight }: { petId: string | number, weight: number }) => {
-      // 1. Update weight in pet table
       await supabase.from('pets').update({ weight: weight.toString() }).eq('id', petId);
-      // 2. Insert into weight history
       return await supabase.from('pet_weight_history').insert([{ pet_id: petId, weight: weight, date: new Date().toISOString() }]);
     },
     onSuccess: () => {
@@ -385,11 +390,20 @@ const Index = () => {
                   totalServiceCost={0} 
                   onViewServiceHistoryForPet={() => {}} 
                   onEditPreferences={() => {}} 
-                  onToggleFavorite={() => {}}
+                  onToggleFavorite={() => {
+                    const pet = customerData?.pets?.find(p => p.id === selectedPetId);
+                    if (pet) favoriteMutation.mutate({ petId: pet.id, isFavorite: !!pet.is_favorite });
+                  }}
                   onAddWeight={async (id, w) => { await weightMutation.mutateAsync({ petId: id, weight: w }); }}
                 />
               ) : (
-                <PetManagement pets={customerData?.pets || []} onBack={() => setActiveTab('home')} onViewDetails={(p: any) => setSelectedPetId(p.id)} onAddPet={handleAddPetClick} />
+                <PetManagement 
+                  pets={customerData?.pets || []} 
+                  onBack={() => setActiveTab('home')} 
+                  onViewDetails={(p: any) => setSelectedPetId(p.id)} 
+                  onAddPet={handleAddPetClick}
+                  onToggleFavorite={(id, fav) => favoriteMutation.mutate({ petId: id, isFavorite: fav })}
+                />
               )}
             </motion.div>
           )}
