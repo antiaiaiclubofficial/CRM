@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Syringe, Pill, Stethoscope, ChevronRight } from 'lucide-react';
+import { Heart, Syringe, Pill, Stethoscope } from 'lucide-react';
 import AnalogScaleIcon from './AnalogScaleIcon';
 
 interface PetHealthOverviewProps {
@@ -14,84 +14,99 @@ interface PetHealthOverviewProps {
 }
 
 const PetHealthOverview = ({ score, statusText, subStatusText, lastUpdate, onActionClick }: PetHealthOverviewProps) => {
-  // การคำนวณสีตามคะแนน
-  const getScoreColor = (s: number) => {
-    if (s >= 80) return 'text-emerald-600 stroke-emerald-600';
-    if (s >= 50) return 'text-amber-500 stroke-amber-500';
-    return 'text-red-500 stroke-red-500';
-  };
-
-  const circleColor = score >= 80 ? '#059669' : score >= 50 ? '#f59e0b' : '#ef4444';
-
   return (
-    <div className="bg-white rounded-[2.5rem] p-6 border-2 border-slate-100 shadow-sm space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-black text-slate-800">ภาพรวมสุขภาพ</h3>
+    <div className="bg-surface-container-lowest rounded-xl p-8 shadow-ambient space-y-8">
+      <div>
+        <h3 className="text-xl font-bold text-primary tracking-tight">ภาพรวมสุขภาพ</h3>
+        <p className="text-[12px] font-medium text-surface-variant opacity-60">อัปเดตล่าสุด {lastUpdate}</p>
       </div>
 
       <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
-            <Heart size={24} className="text-amber-600 fill-amber-600" />
+        {/* Status Box (Left) */}
+        <div className="flex-1 bg-tertiary/10 rounded-lg p-5 flex items-center gap-4 border border-tertiary/20">
+          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
+            <Heart size={24} className="text-[#FF9F0A] fill-[#FF9F0A]" />
           </div>
           <div>
-            <h4 className="text-base font-black text-slate-800">{statusText}</h4>
-            <p className="text-[10px] font-bold text-slate-500">{subStatusText}</p>
+            <h4 className="text-lg font-black text-primary leading-tight">{statusText}</h4>
+            <p className="text-[11px] font-bold text-surface-variant opacity-70">{subStatusText}</p>
           </div>
         </div>
 
-        {/* Health Score Circle */}
-        <div className="relative w-20 h-20 flex items-center justify-center">
-          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+        {/* Health Score Circle (Right) */}
+        <div className="relative w-28 h-28 flex items-center justify-center shrink-0">
+          <div className="absolute inset-0 bg-tertiary/20 rounded-full blur-xl scale-90" />
+          <svg className="w-full h-full -rotate-90 relative z-10" viewBox="0 0 100 100">
             <circle
-              cx="50" cy="50" r="40"
-              stroke="#F1F5F9"
+              cx="50" cy="50" r="42"
+              stroke="#F3F3F3"
               strokeWidth="10"
               fill="transparent"
             />
             <motion.circle
-              cx="50" cy="50" r="40"
-              stroke={circleColor}
+              cx="50" cy="50" r="42"
+              stroke="#EAFD69"
               strokeWidth="10"
               fill="transparent"
-              strokeDasharray={251.2}
-              initial={{ strokeDashoffset: 251.2 }}
-              animate={{ strokeDashoffset: 251.2 - (251.2 * score) / 100 }}
+              strokeDasharray={263.8}
+              initial={{ strokeDashoffset: 263.8 }}
+              animate={{ strokeDashoffset: 263.8 - (263.8 * score) / 100 }}
               transition={{ duration: 1.5, ease: "easeOut" }}
               strokeLinecap="round"
+              style={{ filter: 'drop-shadow(0 0 4px rgba(234, 253, 105, 0.8))' }}
             />
           </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl font-black text-slate-800 leading-none">{score}</span>
-            <span className="text-[8px] font-bold text-slate-400">/100</span>
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
+            <span className="text-3xl font-black text-primary leading-none tracking-tighter">{score}</span>
+            <span className="text-[10px] font-black text-surface-variant opacity-40 uppercase">/100</span>
           </div>
         </div>
       </div>
 
-      <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-        อัปเดตล่าสุด {lastUpdate}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-4 gap-2 pt-1">
-        <HealthActionButton icon={<Syringe size={18} />} label="วัคซีน" onClick={() => onActionClick('vaccine')} color="bg-emerald-50 text-emerald-600" />
-        <HealthActionButton icon={<Pill size={18} />} label="ยา" onClick={() => onActionClick('medicine')} color="bg-rose-50 text-rose-600" />
-        <HealthActionButton icon={<AnalogScaleIcon size={18} />} label="น้ำหนัก" onClick={() => onActionClick('weight')} color="bg-blue-50 text-blue-600" />
-        <HealthActionButton icon={<Stethoscope size={18} />} label="ตรวจสุขภาพ" onClick={() => onActionClick('checkup')} color="bg-slate-50 text-slate-600" />
+      {/* Quick Actions Grid (2x2) */}
+      <div className="grid grid-cols-2 gap-4">
+        <HealthActionCard 
+          icon={<Syringe size={20} />} 
+          label="วัคซีน" 
+          onClick={() => onActionClick('vaccine')} 
+          color="bg-[#E0F7F9]" 
+          iconColor="text-[#2BC0D3]"
+        />
+        <HealthActionCard 
+          icon={<Pill size={20} />} 
+          label="ยา" 
+          onClick={() => onActionClick('medicine')} 
+          color="bg-[#FFF0F3]" 
+          iconColor="text-[#FF5C8A]"
+        />
+        <HealthActionCard 
+          icon={<AnalogScaleIcon size={20} />} 
+          label="น้ำหนัก" 
+          onClick={() => onActionClick('weight')} 
+          color="bg-[#F0F2FF]" 
+          iconColor="text-[#5C7CFF]"
+        />
+        <HealthActionCard 
+          icon={<Stethoscope size={20} />} 
+          label="ตรวจสุขภาพ" 
+          onClick={() => onActionClick('checkup')} 
+          color="bg-[#F2F9F0]" 
+          iconColor="text-[#64C44F]"
+        />
       </div>
     </div>
   );
 };
 
-const HealthActionButton = ({ icon, label, onClick, color }: { icon: any, label: string, onClick: () => void, color: string }) => (
+const HealthActionCard = ({ icon, label, onClick, color, iconColor }: { icon: any, label: string, onClick: () => void, color: string, iconColor: string }) => (
   <button 
     onClick={onClick}
-    className="flex flex-col items-center gap-1.5 group"
+    className={`${color} rounded-lg p-5 flex flex-col items-center justify-center gap-2 group active:scale-95 transition-all shadow-sm border border-black/5 h-28`}
   >
-    <div className={`w-12 h-12 ${color} rounded-full flex items-center justify-center shadow-sm border border-black/5 group-active:scale-90 transition-all`}>
+    <div className={`w-12 h-12 bg-white rounded-full flex items-center justify-center ${iconColor} shadow-sm group-hover:scale-110 transition-transform`}>
       {icon}
     </div>
-    <span className="text-[9px] font-black text-slate-500 uppercase tracking-tight">{label}</span>
+    <span className="text-[13px] font-black text-primary uppercase tracking-tight">{label}</span>
   </button>
 );
 
