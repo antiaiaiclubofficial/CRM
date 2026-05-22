@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Syringe, Pill, Activity, Stethoscope, ChevronRight } from 'lucide-react';
+import { Heart, Syringe, Pill, Scale, Stethoscope, ChevronRight } from 'lucide-react';
 
 interface PetHealthOverviewProps {
   score: number;
@@ -75,7 +75,7 @@ const PetHealthOverview = ({ score, statusText, subStatusText, lastUpdate, onAct
       <div className="grid grid-cols-4 gap-2 pt-1">
         <HealthActionButton icon={<Syringe size={18} />} label="วัคซีน" onClick={() => onActionClick('vaccine')} color="bg-emerald-50 text-emerald-600" />
         <HealthActionButton icon={<Pill size={18} />} label="ยา" onClick={() => onActionClick('medicine')} color="bg-rose-50 text-rose-600" />
-        <HealthActionButton icon={<Activity size={18} />} label="น้ำหนัก" onClick={() => onActionClick('weight')} color="bg-blue-50 text-blue-600" />
+        <HealthActionButton icon={<Scale size={18} />} label="น้ำหนัก" onClick={() => onActionClick('weight')} color="bg-blue-50 text-blue-600" />
         <HealthActionButton icon={<Stethoscope size={18} />} label="ตรวจสุขภาพ" onClick={() => onActionClick('checkup')} color="bg-slate-50 text-slate-600" />
       </div>
     </div>
