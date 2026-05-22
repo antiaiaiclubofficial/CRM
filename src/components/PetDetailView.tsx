@@ -72,7 +72,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
     }
   };
 
-  // Define consistent slide animation
+  // Define consistent slide animation for content
   const slideVariants = {
     initial: { x: 20, opacity: 0 },
     animate: { x: 0, opacity: 1 },
@@ -169,7 +169,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
         <>
           {/* Tab Navigation */}
           <div className="px-1 mb-6">
-            <div className="bg-white p-1.5 rounded-full flex gap-1 shadow-ambient border border-black/5">
+            <div className="bg-white p-1 rounded-full flex gap-1 shadow-ambient border border-black/5 relative">
               <TabButton active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} label="ภาพรวม" />
               <TabButton active={activeTab === 'health'} onClick={() => setActiveTab('health')} label="สุขภาพ" />
               <TabButton active={activeTab === 'history'} onClick={() => setActiveTab('history')} label="ประวัติ" />
@@ -317,11 +317,20 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
 const TabButton = ({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) => (
   <button 
     onClick={onClick}
-    className={`flex-1 py-2.5 px-3 rounded-full flex items-center justify-center gap-1 transition-all duration-300 ${
-      active ? 'bg-primary text-white shadow-lg' : 'text-primary/40 font-black uppercase tracking-widest text-[10px] hover:bg-surface-container-low'
-    }`}
+    className="relative flex-1 py-2.5 px-3 flex items-center justify-center gap-1 transition-colors duration-300 z-10"
   >
-    <span className="whitespace-nowrap">{label}</span>
+    {active && (
+      <motion.div 
+        layoutId="activeTabBg"
+        className="absolute inset-0 bg-primary rounded-full shadow-lg"
+        transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+      />
+    )}
+    <span className={`relative z-10 whitespace-nowrap transition-colors duration-300 ${
+      active ? 'text-white font-bold' : 'text-primary/40 font-black uppercase tracking-widest text-[10px]'
+    }`}>
+      {label}
+    </span>
   </button>
 );
 
