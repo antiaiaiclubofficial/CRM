@@ -359,7 +359,7 @@ const Index = () => {
 
   return (
     <div className="w-full h-[100dvh] max-md:max-w-md mx-auto bg-surface relative flex flex-col font-['Inter'] overflow-hidden">
-      <header className="sticky top-0 px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-3 flex justify-between items-center shrink-0 z-[50] glass-effect bg-white/40 border-b border-white/20 shadow-ambient">
+      <header className="sticky top-0 px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-3 flex justify-between items-center shrink-0 z-[50] glass-effect border-b border-white/40 shadow-ambient">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-black text-primary truncate leading-tight tracking-tight">{store?.name || 'Pet Care'}</h1>
           <p className="text-surface-variant text-xs font-semibold uppercase tracking-widest opacity-60">Hello, {customerData?.profile?.first_name || lineProfile?.displayName} 🐾</p>
