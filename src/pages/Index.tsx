@@ -379,7 +379,7 @@ const Index = () => {
         className="h-full w-full overflow-y-scroll no-scrollbar touch-pan-y relative"
       >
         <header 
-          className={`sticky top-0 px-6 pt-[calc(10px+env(safe-area-inset-top))] pb-3 flex justify-between items-center shrink-0 z-[50] transition-all duration-500 rounded-b-[2.5rem] ${
+          className={`sticky top-0 px-6 pt-[calc(10px+env(safe-area-inset-top))] pb-1 flex justify-between items-center shrink-0 z-[50] transition-all duration-500 rounded-b-[2.5rem] ${
             isScrolled ? 'glass-effect shadow-ambient py-3' : 'bg-[#F9F9F9]/80 backdrop-blur-md py-4'
           }`}
         >
@@ -476,12 +476,12 @@ const Index = () => {
         </main>
       </div>
 
-      <nav className="fixed bottom-[20px] left-4 right-4 max-w-[calc(theme(maxWidth.md)-2rem)] mx-auto glass-effect px-6 py-4 flex justify-between items-center rounded-3xl shadow-ambient z-[40] border border-white/20">
-        <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
-        <NavButton active={activeTab === 'appointments'} icon={<Calendar size={22} />} onClick={() => handleNavClick('appointments')} />
-        <NavButton active={activeTab === 'pets'} icon={<PawPrint size={22} />} onClick={() => handleNavClick('pets')} />
-        <NavButton active={activeTab === 'promo'} icon={<Megaphone size={22} />} onClick={() => handleNavClick('promo')} />
-        <NavButton active={activeTab === 'history'} icon={<History size={22} />} onClick={() => handleNavClick('history')} />
+      <nav className="fixed bottom-[20px] left-5 right-5 max-w-[calc(theme(maxWidth.md)-2.5rem)] mx-auto glass-effect px-4 py-2 flex justify-between items-center rounded-3xl shadow-ambient z-[40] border border-white/20">
+        <NavButton active={activeTab === 'home'} icon={<Home size={18} />} onClick={() => handleNavClick('home')} />
+        <NavButton active={activeTab === 'appointments'} icon={<Calendar size={18} />} onClick={() => handleNavClick('appointments')} />
+        <NavButton active={activeTab === 'pets'} icon={<PawPrint size={18} />} onClick={() => handleNavClick('pets')} />
+        <NavButton active={activeTab === 'promo'} icon={<Megaphone size={18} />} onClick={() => handleNavClick('promo')} />
+        <NavButton active={activeTab === 'history'} icon={<History size={18} />} onClick={() => handleNavClick('history')} />
       </nav>
 
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.phone || ''} />
@@ -493,7 +493,7 @@ const Index = () => {
 };
 
 const NavButton = ({ active, icon, onClick }: { active: boolean; icon: any; onClick: () => void }) => (
-  <button onClick={onClick} className="relative flex items-center justify-center w-12 h-12">
+  <button onClick={onClick} className="relative flex items-center justify-center w-10 h-10">
     {active && <motion.div layoutId="activeNavBg" className="absolute inset-0 bg-primary rounded-2xl shadow-ambient" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />}
     <div className={`relative z-10 ${active ? 'text-tertiary' : 'text-primary/40'}`}>{icon}</div>
   </button>
