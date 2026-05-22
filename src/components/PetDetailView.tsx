@@ -72,6 +72,14 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
     }
   };
 
+  // Define consistent slide animation
+  const slideVariants = {
+    initial: { x: 20, opacity: 0 },
+    animate: { x: 0, opacity: 1 },
+    exit: { x: -20, opacity: 0 },
+    transition: { type: "spring", damping: 25, stiffness: 300 }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -80,7 +88,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       className="relative bg-surface pb-24"
     >
       {/* Compact Header Section */}
-      <div className="px-1 pt-2">
+      <div className="px-1 pt-4">
         {showWeightDetail ? (
           <div className="flex items-center gap-3 mb-6 px-2">
             <button 
@@ -172,7 +180,14 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
           <div className="px-1 space-y-6">
             <AnimatePresence mode="wait">
               {activeTab === 'overview' && (
-                <motion.div key="overview" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+                <motion.div 
+                  key="overview" 
+                  initial={slideVariants.initial} 
+                  animate={slideVariants.animate} 
+                  exit={slideVariants.exit} 
+                  transition={slideVariants.transition}
+                  className="space-y-6"
+                >
                   <PetHealthOverview 
                     score={healthData.score}
                     statusText={healthData.status}
@@ -184,7 +199,14 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               )}
 
               {activeTab === 'health' && (
-                <motion.div key="health" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                <motion.div 
+                  key="health" 
+                  initial={slideVariants.initial} 
+                  animate={slideVariants.animate} 
+                  exit={slideVariants.exit} 
+                  transition={slideVariants.transition}
+                  className="space-y-6"
+                >
                   <div className="bg-white rounded-xl p-6 shadow-ambient border border-black/5">
                     <h3 className="text-lg font-bold text-primary mb-4 flex items-center gap-2">
                       <HeartPulse size={20} className="text-pink-500" /> รายละเอียดสุขภาพ
@@ -209,7 +231,14 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               )}
 
               {activeTab === 'history' && (
-                <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-20 text-center">
+                <motion.div 
+                  key="history" 
+                  initial={slideVariants.initial} 
+                  animate={slideVariants.animate} 
+                  exit={slideVariants.exit} 
+                  transition={slideVariants.transition}
+                  className="py-20 text-center"
+                >
                    <div className="w-16 h-16 bg-surface-container-low rounded-full flex items-center justify-center mx-auto mb-4">
                      <History size={28} className="text-primary/10" />
                    </div>
@@ -218,7 +247,14 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               )}
 
               {activeTab === 'notes' && (
-                <motion.div key="notes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                <motion.div 
+                  key="notes" 
+                  initial={slideVariants.initial} 
+                  animate={slideVariants.animate} 
+                  exit={slideVariants.exit} 
+                  transition={slideVariants.transition}
+                  className="space-y-6"
+                >
                    <div className="bg-white p-6 rounded-xl shadow-ambient border border-black/5">
                       <div className="flex justify-between items-center mb-4">
                         <h4 className="text-lg font-bold text-primary tracking-tight">ความชอบส่วนตัว</h4>
