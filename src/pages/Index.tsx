@@ -33,6 +33,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [isProfileEditing, setIsProfileEditing] = useState(false);
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   
   const [selectedPetId, setSelectedPetId] = useState<string | number | null>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<any | null>(null);
@@ -46,6 +47,20 @@ const Index = () => {
   const [isAppointmentDetailOpen, setIsAppointmentDetailOpen] = useState(false);
   
   const mainScrollRef = useRef<HTMLDivElement>(null);
+
+  // Handle Scroll Effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (mainScrollRef.current) {
+        setIsScrolled(mainScrollRef.current.scrollTop > 10);
+      }
+    };
+    const scrollContainer = mainScrollRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll);
+    }
+    return () => scrollContainer?.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const { data: store, isLoading: storeLoading } = useQuery({
     queryKey: ['current_store'],
@@ -359,31 +374,32 @@ const Index = () => {
 
   return (
     <div className="w-full h-[100dvh] max-md:max-w-md mx-auto bg-surface relative font-['Inter'] overflow-hidden">
-      {/* Scrollable Container - Move scrolling here */}
       <div 
         ref={mainScrollRef} 
-        className="h-full w-full overflow-y-scroll no-scrollbar touch-pan-y"
+        className="h-full w-full overflow-y-scroll no-scrollbar touch-pan-y relative"
       >
-        {/* Header - Fixed inside scrollable container with top-0 */}
-        <header className="sticky top-0 px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-3 flex justify-between items-center shrink-0 z-[50] glass-effect border-b border-white/20 shadow-ambient">
+        <header 
+          className={`sticky top-0 px-6 pt-[calc(12px+env(safe-area-inset-top))] pb-4 flex justify-between items-center shrink-0 z-[50] transition-all duration-300 ${
+            isScrolled ? 'glass-effect shadow-ambient py-3' : 'bg-transparent'
+          }`}
+        >
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-black text-primary truncate leading-tight tracking-tight">{store?.name || 'Pet Care'}</h1>
-            <p className="text-surface-variant text-xs font-semibold uppercase tracking-widest opacity-60">Hello, {customerData?.profile?.first_name || lineProfile?.displayName} 🐾</p>
+            <h1 className="text-2xl font-black text-primary truncate leading-tight tracking-tight uppercase">{store?.name || 'Pet Care'}</h1>
+            <p className="text-surface-variant text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Hello, {customerData?.profile?.first_name || lineProfile?.displayName} ✨</p>
           </div>
           <motion.div 
             whileTap={{ scale: 0.9 }} 
             onClick={() => setIsProfileEditing(true)} 
-            className="w-14 h-14 rounded-2xl border-2 border-white shadow-ambient overflow-hidden bg-white cursor-pointer"
+            className="w-12 h-12 rounded-2xl border-2 border-white shadow-ambient overflow-hidden bg-white cursor-pointer"
           >
             <img src={customerData?.profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
           </motion.div>
         </header>
 
-        {/* Content - Removed overflow-y-scroll and h-full from main */}
-        <main className="px-4 pb-[calc(8.5rem+env(safe-area-inset-bottom))] pt-4">
+        <main className="px-4 pb-[calc(8.5rem+env(safe-area-inset-bottom))] pt-2">
           <AnimatePresence mode="wait">
             {activeTab === 'home' && (
-              <motion.div key="home" className="space-y-8" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <motion.div key="home" className="space-y-10" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                 <MembershipCard 
                   totalAccumulatedPoints={customerData?.membership?.total_points || 0} 
                   redeemablePoints={customerData?.membership?.points || 0} 
