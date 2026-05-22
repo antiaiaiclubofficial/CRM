@@ -45,7 +45,7 @@ const Index = () => {
   const [isBookingFormOpen, setIsBookingFormOpen] = useState(false);
   const [isAppointmentDetailOpen, setIsAppointmentDetailOpen] = useState(false);
   
-  const mainScrollRef = useRef<HTMLElement>(null);
+  const mainScrollRef = useRef<HTMLDivElement>(null);
 
   const { data: store, isLoading: storeLoading } = useQuery({
     queryKey: ['current_store'],
@@ -358,99 +358,107 @@ const Index = () => {
   }
 
   return (
-    <div className="w-full h-[100dvh] max-md:max-w-md mx-auto bg-surface relative flex flex-col font-['Inter'] overflow-hidden">
-      <header className="sticky top-0 px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-3 flex justify-between items-center shrink-0 z-[50] glass-effect border-b border-white/20 shadow-ambient">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-black text-primary truncate leading-tight tracking-tight">{store?.name || 'Pet Care'}</h1>
-          <p className="text-surface-variant text-xs font-semibold uppercase tracking-widest opacity-60">Hello, {customerData?.profile?.first_name || lineProfile?.displayName} 🐾</p>
-        </div>
-        <motion.div 
-          whileTap={{ scale: 0.9 }} 
-          onClick={() => setIsProfileEditing(true)} 
-          className="w-14 h-14 rounded-2xl border-2 border-white shadow-ambient overflow-hidden bg-white cursor-pointer"
-        >
-          <img src={customerData?.profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
-        </motion.div>
-      </header>
+    <div className="w-full h-[100dvh] max-md:max-w-md mx-auto bg-surface relative font-['Inter'] overflow-hidden">
+      {/* Scrollable Container - Move scrolling here */}
+      <div 
+        ref={mainScrollRef} 
+        className="h-full w-full overflow-y-scroll no-scrollbar touch-pan-y"
+      >
+        {/* Header - Fixed inside scrollable container with top-0 */}
+        <header className="sticky top-0 px-6 pt-[calc(8px+env(safe-area-inset-top))] pb-3 flex justify-between items-center shrink-0 z-[50] glass-effect border-b border-white/20 shadow-ambient">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-black text-primary truncate leading-tight tracking-tight">{store?.name || 'Pet Care'}</h1>
+            <p className="text-surface-variant text-xs font-semibold uppercase tracking-widest opacity-60">Hello, {customerData?.profile?.first_name || lineProfile?.displayName} 🐾</p>
+          </div>
+          <motion.div 
+            whileTap={{ scale: 0.9 }} 
+            onClick={() => setIsProfileEditing(true)} 
+            className="w-14 h-14 rounded-2xl border-2 border-white shadow-ambient overflow-hidden bg-white cursor-pointer"
+          >
+            <img src={customerData?.profile?.avatar_url || lineProfile?.pictureUrl} alt="Profile" className="w-full h-full object-cover"/>
+          </motion.div>
+        </header>
 
-      <main ref={mainScrollRef} className="px-4 flex-1 pb-[calc(7.5rem+env(safe-area-inset-bottom))] overflow-y-scroll no-scrollbar touch-pan-y pt-4">
-        <AnimatePresence mode="wait">
-          {activeTab === 'home' && (
-            <motion.div key="home" className="space-y-8" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <MembershipCard 
-                totalAccumulatedPoints={customerData?.membership?.total_points || 0} 
-                redeemablePoints={customerData?.membership?.points || 0} 
-                ownerProfile={customerData?.profile as any} 
-                onShowQR={() => setIsQRCodeOpen(true)}
-                onTierClick={() => handleNavClick('level')}
-              />
-              <UpcomingAppointments appointments={customerData?.appointments || []} onViewAll={() => handleNavClick('appointments')} />
-              <HomeQuickActions 
-                onCouponsClick={() => setActiveTab('promo')} 
-                onAppointmentClick={() => { setActiveTab('appointments'); setIsBookingFormOpen(true); }} 
-              />
-              <PetList pets={customerData?.pets || []} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
-              <MyCouponsHomePreview coupons={customerData?.myCoupons?.slice(0, 5) || []} onViewAll={() => { setActiveTab('promo'); setTimeout(() => { document.getElementById('my-coupons-section')?.scrollIntoView({ behavior: 'smooth' }); }, 100); }} />
-            </motion.div>
-          )}
-
-          {activeTab === 'appointments' && (
-            <motion.div key="appointments-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-               <AppointmentList appointments={customerData?.appointments || []} onAddClick={() => setIsBookingFormOpen(true)} onAppointmentClick={(apt) => { setSelectedAppointment(apt); setIsAppointmentDetailOpen(true); }} />
-            </motion.div>
-          )}
-
-          {activeTab === 'promo' && (
-            <motion.div key="promo-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-               <Promotions 
-                 userPoints={customerData?.membership?.points || 0} 
-                 collectedCoupons={customerData?.myCoupons || []} 
-                 usedOrExpiredCoupons={[]} 
-                 redeemableTemplates={couponTemplates || []} 
-                 dealTemplates={dealTemplates || []} 
-                 onRedeemCoupon={(t, p) => redeemMutation.mutate({ template: t, points: p, type: 'coupon' })} 
-                 onBuyDeal={(t, p) => redeemMutation.mutate({ template: t, points: p, type: 'deal' })} 
-                 onUseCoupon={(c) => { setSelectedCouponToUse(c); setIsCouponUseModalOpen(true); }} 
-               />
-            </motion.div>
-          )}
-
-          {activeTab === 'pets' && (
-            <motion.div key="pets-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              {selectedPetId ? (
-                <PetDetailView 
-                  pet={customerData?.pets?.find(p => p.id === selectedPetId)} 
-                  onBack={() => setSelectedPetId(null)} 
-                  onStartEdit={(pet) => handleStartEditPet(pet)} 
-                  onDeletePet={(id) => deletePetMutation.mutate(id)} 
-                  totalServiceCost={0} 
-                  onViewServiceHistoryForPet={() => {}} 
-                  onEditPreferences={() => {}} 
-                  onToggleFavorite={() => {
-                    const pet = customerData?.pets?.find(p => p.id === selectedPetId);
-                    if (pet) favoriteMutation.mutate({ petId: pet.id, isFavorite: !!pet.is_favorite });
-                  }}
-                  onAddWeight={async (id, w) => { await weightMutation.mutateAsync({ petId: id, weight: w }); }}
+        {/* Content - Removed overflow-y-scroll and h-full from main */}
+        <main className="px-4 pb-[calc(8.5rem+env(safe-area-inset-bottom))] pt-4">
+          <AnimatePresence mode="wait">
+            {activeTab === 'home' && (
+              <motion.div key="home" className="space-y-8" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <MembershipCard 
+                  totalAccumulatedPoints={customerData?.membership?.total_points || 0} 
+                  redeemablePoints={customerData?.membership?.points || 0} 
+                  ownerProfile={customerData?.profile as any} 
+                  onShowQR={() => setIsQRCodeOpen(true)}
+                  onTierClick={() => handleNavClick('level')}
                 />
-              ) : (
-                <PetManagement 
-                  pets={customerData?.pets || []} 
-                  onBack={() => setActiveTab('home')} 
-                  onViewDetails={(p: any) => setSelectedPetId(p.id)} 
-                  onAddPet={handleAddPetClick}
-                  onToggleFavorite={(id, fav) => favoriteMutation.mutate({ petId: id, isFavorite: fav })}
+                <UpcomingAppointments appointments={customerData?.appointments || []} onViewAll={() => handleNavClick('appointments')} />
+                <HomeQuickActions 
+                  onCouponsClick={() => setActiveTab('promo')} 
+                  onAppointmentClick={() => { setActiveTab('appointments'); setIsBookingFormOpen(true); }} 
                 />
-              )}
-            </motion.div>
-          )}
-          
-          {activeTab === 'level' && (
-            <motion.div key="level-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <MembershipLevels totalAccumulatedPoints={customerData?.membership?.total_points || 0} redeemablePoints={customerData?.membership?.points || 0} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
+                <PetList pets={customerData?.pets || []} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
+                <MyCouponsHomePreview coupons={customerData?.myCoupons?.slice(0, 5) || []} onViewAll={() => { setActiveTab('promo'); setTimeout(() => { document.getElementById('my-coupons-section')?.scrollIntoView({ behavior: 'smooth' }); }, 100); }} />
+              </motion.div>
+            )}
+
+            {activeTab === 'appointments' && (
+              <motion.div key="appointments-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                 <AppointmentList appointments={customerData?.appointments || []} onAddClick={() => setIsBookingFormOpen(true)} onAppointmentClick={(apt) => { setSelectedAppointment(apt); setIsAppointmentDetailOpen(true); }} />
+              </motion.div>
+            )}
+
+            {activeTab === 'promo' && (
+              <motion.div key="promo-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                 <Promotions 
+                   userPoints={customerData?.membership?.points || 0} 
+                   collectedCoupons={customerData?.myCoupons || []} 
+                   usedOrExpiredCoupons={[]} 
+                   redeemableTemplates={couponTemplates || []} 
+                   dealTemplates={dealTemplates || []} 
+                   onRedeemCoupon={(t, p) => redeemMutation.mutate({ template: t, points: p, type: 'coupon' })} 
+                   onBuyDeal={(t, p) => redeemMutation.mutate({ template: t, points: p, type: 'deal' })} 
+                   onUseCoupon={(c) => { setSelectedCouponToUse(c); setIsCouponUseModalOpen(true); }} 
+                 />
+              </motion.div>
+            )}
+
+            {activeTab === 'pets' && (
+              <motion.div key="pets-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                {selectedPetId ? (
+                  <PetDetailView 
+                    pet={customerData?.pets?.find(p => p.id === selectedPetId)} 
+                    onBack={() => setSelectedPetId(null)} 
+                    onStartEdit={(pet) => handleStartEditPet(pet)} 
+                    onDeletePet={(id) => deletePetMutation.mutate(id)} 
+                    totalServiceCost={0} 
+                    onViewServiceHistoryForPet={() => {}} 
+                    onEditPreferences={() => {}} 
+                    onToggleFavorite={() => {
+                      const pet = customerData?.pets?.find(p => p.id === selectedPetId);
+                      if (pet) favoriteMutation.mutate({ petId: pet.id, isFavorite: !!pet.is_favorite });
+                    }}
+                    onAddWeight={async (id, w) => { await weightMutation.mutateAsync({ petId: id, weight: w }); }}
+                  />
+                ) : (
+                  <PetManagement 
+                    pets={customerData?.pets || []} 
+                    onBack={() => setActiveTab('home')} 
+                    onViewDetails={(p: any) => setSelectedPetId(p.id)} 
+                    onAddPet={handleAddPetClick}
+                    onToggleFavorite={(id, fav) => favoriteMutation.mutate({ petId: id, isFavorite: fav })}
+                  />
+                )}
+              </motion.div>
+            )}
+            
+            {activeTab === 'level' && (
+              <motion.div key="level-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <MembershipLevels totalAccumulatedPoints={customerData?.membership?.total_points || 0} redeemablePoints={customerData?.membership?.points || 0} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </main>
+      </div>
 
       <nav className="fixed bottom-[20px] left-4 right-4 max-w-[calc(theme(maxWidth.md)-2rem)] mx-auto glass-effect px-6 py-4 flex justify-between items-center rounded-3xl shadow-ambient z-[40] border border-white/20">
         <NavButton active={activeTab === 'home'} icon={<Home size={22} />} onClick={() => handleNavClick('home')} />
