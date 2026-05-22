@@ -384,8 +384,8 @@ const Index = () => {
           }`}
         >
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-black text-primary truncate leading-tight tracking-tight uppercase">{store?.name || 'Pet Care'}</h1>
-            <p className="text-surface-variant text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Hello, {customerData?.profile?.first_name || lineProfile?.displayName} ✨</p>
+            <h1 className="text-xl font-black text-primary truncate leading-tight tracking-tight uppercase">{store?.name || 'Pet Care'}</h1>
+            <p className="text-surface-variant text-[12px] font-black uppercase tracking-[0.2em] opacity-60">Hello, {customerData?.profile?.first_name || lineProfile?.displayName} ✨</p>
           </div>
           <motion.div 
             whileTap={{ scale: 0.9 }} 
