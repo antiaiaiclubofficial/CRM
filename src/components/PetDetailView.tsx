@@ -105,7 +105,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               <ArrowLeft size={32} strokeWidth={2.5} />
             </button>
             
-            <div className="flex-1 flex items-center gap-3 min-w-0">
+            <div className="flex-1 flex items-center gap-2 min-w-0">
               <div className="relative shrink-0">
                 <div className="absolute inset-0 bg-tertiary/15 rounded-full blur-xl scale-125" />
                 <div 
