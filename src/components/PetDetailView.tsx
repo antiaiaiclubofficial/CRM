@@ -103,12 +103,12 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
             </div>
           </div>
         ) : (
-          <div className="flex items-start gap-2 pl-0 pr-2 mb-6">
+          <div className="flex items-center gap-4 pl-2 pr-2 mb-6">
             <button 
               onClick={onBack} 
-              className="mt-1 p-1 text-primary/40 hover:text-primary transition-colors shrink-0"
+              className="w-10 h-10 flex items-center justify-center text-primary/40 hover:text-primary hover:bg-slate-100 rounded-full active:scale-90 transition-all shrink-0"
             >
-              <ArrowLeft size={32} strokeWidth={2.5} />
+              <ArrowLeft size={28} strokeWidth={2.5} />
             </button>
             
             <div className="flex-1 flex items-center gap-3 min-w-0">
