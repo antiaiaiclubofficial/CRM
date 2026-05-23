@@ -69,7 +69,7 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
       <div className="bg-white p-8 rounded-xl shadow-ambient relative overflow-hidden">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h4 className="text-lg font-black text-primary tracking-tight">กราฟการเจริญเติบโต</h4>
+            <h4 className="text-lg font-black text-primary tracking-tight">กราฟน้ำหนัก</h4>
             <p className="text-[11px] font-bold text-surface-variant opacity-50 uppercase tracking-widest">Weight Distribution Timeline</p>
           </div>
           <button 
