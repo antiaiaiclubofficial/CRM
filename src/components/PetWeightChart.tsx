@@ -140,7 +140,7 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
       {/* History List - Nested Layout Grid */}
       <div className="space-y-4">
         <div className="flex justify-between items-center px-1">
-          <h4 className="text-sm font-black text-primary uppercase tracking-widest">บันทึกย้อนหลัง</h4>
+          <h4 className="text-sm font-black text-primary uppercase tracking-widest">ประวัติน้ำหนัก</h4>
           <span className="text-[10px] font-bold text-surface-variant opacity-40 uppercase">{data.length} รายการ</span>
         </div>
         
