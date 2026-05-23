@@ -82,7 +82,7 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
 
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{ left: -20, right: 10 }}>
+            <AreaChart data={data} margin={{ left: 0, right: 10, top: 10, bottom: 20 }}>
               <defs>
                 <linearGradient id="liquidGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#18234A" stopOpacity={0.15}/>
@@ -95,14 +95,14 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 10, fontWeight: 800, fill: '#45464E', opacity: 0.4 }}
-                dy={15}
+                dy={10}
               />
               <YAxis 
                 domain={['auto', 'auto']}
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 10, fontWeight: 800, fill: '#45464E', opacity: 0.4 }}
-                width={40}
+                width={30}
               />
               <Tooltip 
                 cursor={{ stroke: '#18234A', strokeWidth: 1, strokeDasharray: '5 5' }}
