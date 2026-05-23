@@ -65,7 +65,7 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
         </div>
       </div>
 
-      {/* Main Chart Card (The Glass Vessel) */}
+      {/* Main Chart Card */}
       <div className="bg-white p-8 rounded-xl shadow-ambient relative overflow-hidden">
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -82,7 +82,7 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
 
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data}>
+            <AreaChart data={data} margin={{ left: -20, right: 10 }}>
               <defs>
                 <linearGradient id="liquidGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#18234A" stopOpacity={0.15}/>
@@ -98,8 +98,11 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
                 dy={15}
               />
               <YAxis 
-                hide
                 domain={['auto', 'auto']}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 10, fontWeight: 800, fill: '#45464E', opacity: 0.4 }}
+                width={40}
               />
               <Tooltip 
                 cursor={{ stroke: '#18234A', strokeWidth: 1, strokeDasharray: '5 5' }}
@@ -129,7 +132,6 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
         </div>
       </div>
 
-      {/* Tonal CTA - Changed to Lime (Tertiary) */}
       <button 
         onClick={() => setIsModalOpen(true)}
         className="w-full py-5 bg-tertiary text-primary rounded-xl font-black uppercase tracking-widest text-[14px] shadow-lg shadow-tertiary/20 active:scale-95 active:shadow-none transition-all flex items-center justify-center gap-3"
@@ -137,7 +139,6 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
         <AnalogScaleIcon size={18} /> บันทึกน้ำหนักล่าสุด
       </button>
 
-      {/* History List - Nested Layout Grid */}
       <div className="space-y-4">
         <div className="flex justify-between items-center px-1">
           <h4 className="text-sm font-black text-primary uppercase tracking-widest">ประวัติน้ำหนัก</h4>
