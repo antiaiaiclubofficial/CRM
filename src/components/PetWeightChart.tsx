@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
-import { TrendingUp, Scale, Calendar, Plus, Weight } from 'lucide-react';
+import { TrendingUp, Calendar, Plus } from 'lucide-react';
 import AddWeightModal from './AddWeightModal';
+import AnalogScaleIcon from './AnalogScaleIcon';
 
 interface WeightEntry {
   date: string;
@@ -37,7 +38,7 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
           <div className="absolute -right-4 -top-4 w-16 h-16 bg-primary/5 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700" />
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 bg-surface-container-low rounded-xl flex items-center justify-center text-primary">
-               <Scale size={16} />
+               <AnalogScaleIcon size={16} />
             </div>
             <span className="text-[10px] font-black text-surface-variant opacity-60 uppercase tracking-widest">น้ำหนักปัจจุบัน</span>
           </div>
@@ -133,7 +134,7 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
         onClick={() => setIsModalOpen(true)}
         className="w-full py-5 bg-tertiary text-primary rounded-xl font-black uppercase tracking-widest text-[11px] shadow-lg shadow-tertiary/20 active:scale-95 active:shadow-none transition-all flex items-center justify-center gap-3"
       >
-        <Weight size={18} /> บันทึกน้ำหนักวันนี้
+        <AnalogScaleIcon size={18} /> บันทึกน้ำหนักวันนี้
       </button>
 
       {/* History List - Nested Layout Grid */}
