@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { motion } from 'framer-motion';
-import { TrendingUp, Calendar, Plus, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { TrendingUp, Calendar, Plus, Trash2, AlertTriangle, X } from 'lucide-react';
 import AddWeightModal from './AddWeightModal';
 import AnalogScaleIcon from './AnalogScaleIcon';
 
@@ -22,15 +22,17 @@ interface PetWeightChartProps {
 
 const PetWeightChart = ({ data, petName, onAddWeight, onDeleteWeight }: PetWeightChartProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | number | null>(null);
   
   const latestWeight = data.length > 0 ? data[data.length - 1].weight : 0;
   const previousWeight = data.length > 1 ? data[data.length - 2].weight : latestWeight;
   const weightDiff = (latestWeight - previousWeight).toFixed(1);
   const isGain = parseFloat(weightDiff) >= 0;
 
-  const handleDelete = async (id: string | number) => {
-    if (window.confirm('ยืนยันการลบประวัติน้ำหนักนี้ใช่หรือไม่?')) {
-      await onDeleteWeight(id);
+  const handleConfirmDelete = async () => {
+    if (deleteConfirmId) {
+      await onDeleteWeight(deleteConfirmId);
+      setDeleteConfirmId(null);
     }
   };
 
@@ -171,16 +173,17 @@ const PetWeightChart = ({ data, petName, onAddWeight, onDeleteWeight }: PetWeigh
                   <p className="text-[9px] font-bold text-surface-variant opacity-40 uppercase">Scheduled Check</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 mr-2">
                   <span className="text-lg font-black text-primary">{entry.weight}</span>
                   <span className="text-[10px] font-bold text-surface-variant opacity-40 uppercase">kg</span>
                 </div>
                 <button 
-                  onClick={() => handleDelete(entry.id)}
-                  className="p-2 text-red-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100 active:scale-90"
+                  onClick={() => setDeleteConfirmId(entry.id)}
+                  className="w-10 h-10 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all active:scale-90"
+                  title="ลบข้อมูล"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={18} />
                 </button>
               </div>
             </motion.div>
@@ -194,6 +197,52 @@ const PetWeightChart = ({ data, petName, onAddWeight, onDeleteWeight }: PetWeigh
         petName={petName} 
         onSave={onAddWeight} 
       />
+
+      {/* Custom Confirmation Modal for Deletion */}
+      <AnimatePresence>
+        {deleteConfirmId && (
+          <div className="fixed inset-0 z-[150] flex items-center justify-center px-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDeleteConfirmId(null)}
+              className="absolute inset-0 bg-primary/60 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative w-full max-w-[320px] bg-white rounded-xl shadow-ambient p-8 text-center"
+            >
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertTriangle size={32} className="text-red-500" />
+              </div>
+              <h3 className="text-xl font-black text-primary mb-2">ยืนยันการลบ?</h3>
+              <p className="text-xs font-medium text-surface-variant opacity-70 mb-8 leading-relaxed">
+                คุณต้องการลบข้อมูลน้ำหนักในวันที่ <br/>
+                <span className="font-black text-primary">
+                  {data.find(d => d.id === deleteConfirmId)?.date}
+                </span> ใช่หรือไม่?
+              </p>
+              <div className="space-y-3">
+                <button 
+                  onClick={handleConfirmDelete}
+                  className="w-full py-4 bg-red-500 text-white rounded-lg font-black uppercase tracking-widest text-xs active:scale-95 transition-all"
+                >
+                  ยืนยันการลบ
+                </button>
+                <button 
+                  onClick={() => setDeleteConfirmId(null)}
+                  className="w-full py-4 bg-surface-container-low text-primary rounded-lg font-black uppercase tracking-widest text-xs active:scale-95 transition-all"
+                >
+                  ยกเลิก
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
