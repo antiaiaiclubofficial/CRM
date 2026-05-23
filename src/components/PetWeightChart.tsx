@@ -151,20 +151,20 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="bg-white p-5 rounded-lg shadow-ambient flex justify-between items-center group hover:bg-primary transition-all duration-300"
+              className="bg-white p-5 rounded-lg shadow-ambient flex justify-between items-center"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-surface-container-low rounded-2xl flex items-center justify-center text-surface-variant group-hover:bg-white/10 group-hover:text-tertiary transition-colors">
+                <div className="w-10 h-10 bg-surface-container-low rounded-2xl flex items-center justify-center text-surface-variant">
                   <Calendar size={18} />
                 </div>
                 <div>
-                  <span className="text-sm font-black text-primary group-hover:text-white transition-colors">{entry.date}</span>
-                  <p className="text-[9px] font-bold text-surface-variant opacity-40 group-hover:text-white/40 uppercase transition-colors">Scheduled Check</p>
+                  <span className="text-sm font-black text-primary">{entry.date}</span>
+                  <p className="text-[9px] font-bold text-surface-variant opacity-40 uppercase">Scheduled Check</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-lg font-black text-primary group-hover:text-tertiary transition-colors">{entry.weight}</span>
-                <span className="text-[10px] font-bold text-surface-variant opacity-40 group-hover:text-white/40 uppercase transition-colors">kg</span>
+                <span className="text-lg font-black text-primary">{entry.weight}</span>
+                <span className="text-[10px] font-bold text-surface-variant opacity-40 uppercase">kg</span>
               </div>
             </motion.div>
           ))}
