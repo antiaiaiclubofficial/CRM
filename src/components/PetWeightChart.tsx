@@ -134,7 +134,7 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
         onClick={() => setIsModalOpen(true)}
         className="w-full py-5 bg-tertiary text-primary rounded-xl font-black uppercase tracking-widest text-[14px] shadow-lg shadow-tertiary/20 active:scale-95 active:shadow-none transition-all flex items-center justify-center gap-3"
       >
-        <AnalogScaleIcon size={18} /> บันทึกน้ำหนักวันนี้
+        <AnalogScaleIcon size={18} /> บันทึกน้ำหนักล่าสุด
       </button>
 
       {/* History List - Nested Layout Grid */}
