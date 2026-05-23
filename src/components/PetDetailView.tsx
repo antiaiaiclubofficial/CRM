@@ -26,7 +26,7 @@ interface Pet {
   custom_preferences?: { id: string; label: string; value: string; }[];
   image_url: string;
   is_favorite?: boolean;
-  weight_history?: { date: string; weight: number; }[];
+  weight_history?: { id: string | number; date: string; weight: number; }[];
 }
 
 interface PetDetailViewProps {
@@ -39,9 +39,10 @@ interface PetDetailViewProps {
   onEditPreferences: () => void;
   onToggleFavorite: () => void;
   onAddWeight: (petId: string | number, weight: number) => Promise<void>;
+  onDeleteWeight: (historyId: string | number) => Promise<void>;
 }
 
-const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreferences, onToggleFavorite, onAddWeight }: PetDetailViewProps) => {
+const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreferences, onToggleFavorite, onAddWeight, onDeleteWeight }: PetDetailViewProps) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showWeightDetail, setShowWeightDetail] = useState(false);
@@ -161,6 +162,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               data={weightHistory} 
               petName={pet.name} 
               onAddWeight={(w) => onAddWeight(pet.id, w)} 
+              onDeleteWeight={onDeleteWeight}
             />
         </div>
       ) : (

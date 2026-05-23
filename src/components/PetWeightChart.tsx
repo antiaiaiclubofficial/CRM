@@ -3,11 +3,12 @@
 import React, { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
-import { TrendingUp, Calendar, Plus } from 'lucide-react';
+import { TrendingUp, Calendar, Plus, Trash2 } from 'lucide-react';
 import AddWeightModal from './AddWeightModal';
 import AnalogScaleIcon from './AnalogScaleIcon';
 
 interface WeightEntry {
+  id: string | number;
   date: string;
   weight: number;
 }
@@ -16,15 +17,22 @@ interface PetWeightChartProps {
   data: WeightEntry[];
   petName: string;
   onAddWeight: (weight: number) => Promise<void>;
+  onDeleteWeight: (historyId: string | number) => Promise<void>;
 }
 
-const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => {
+const PetWeightChart = ({ data, petName, onAddWeight, onDeleteWeight }: PetWeightChartProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const latestWeight = data.length > 0 ? data[data.length - 1].weight : 0;
   const previousWeight = data.length > 1 ? data[data.length - 2].weight : latestWeight;
   const weightDiff = (latestWeight - previousWeight).toFixed(1);
   const isGain = parseFloat(weightDiff) >= 0;
+
+  const handleDelete = async (id: string | number) => {
+    if (window.confirm('ยืนยันการลบประวัติน้ำหนักนี้ใช่หรือไม่?')) {
+      await onDeleteWeight(id);
+    }
+  };
 
   return (
     <motion.div 
@@ -152,7 +160,7 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="bg-white p-5 rounded-lg shadow-ambient flex justify-between items-center"
+              className="bg-white p-5 rounded-lg shadow-ambient flex justify-between items-center group"
             >
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-surface-container-low rounded-2xl flex items-center justify-center text-surface-variant">
@@ -163,9 +171,17 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
                   <p className="text-[9px] font-bold text-surface-variant opacity-40 uppercase">Scheduled Check</p>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-lg font-black text-primary">{entry.weight}</span>
-                <span className="text-[10px] font-bold text-surface-variant opacity-40 uppercase">kg</span>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-lg font-black text-primary">{entry.weight}</span>
+                  <span className="text-[10px] font-bold text-surface-variant opacity-40 uppercase">kg</span>
+                </div>
+                <button 
+                  onClick={() => handleDelete(entry.id)}
+                  className="p-2 text-red-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100 active:scale-90"
+                >
+                  <Trash2 size={16} />
+                </button>
               </div>
             </motion.div>
           ))}

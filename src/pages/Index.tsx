@@ -93,6 +93,7 @@ const Index = () => {
         weight_history: (weightHistory || [])
           .filter(wh => wh.pet_id === p.id)
           .map(wh => ({
+            id: wh.id,
             date: new Date(wh.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }),
             weight: parseFloat(wh.weight)
           }))
@@ -370,6 +371,20 @@ const Index = () => {
     }
   });
 
+  const deleteWeightMutation = useMutation({
+    mutationFn: async (historyId: string | number) => {
+      const { error } = await supabase.from('pet_weight_history').delete().eq('id', historyId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('ลบประวัติน้ำหนักเรียบร้อยแล้วค่ะ');
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    },
+    onError: () => {
+      toast.error('เกิดข้อผิดพลาดในการลบข้อมูลค่ะ');
+    }
+  });
+
   const handleNavClick = (tab: string) => {
     setActiveTab(tab);
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -480,6 +495,7 @@ const Index = () => {
                       if (pet) favoriteMutation.mutate({ petId: pet.id, isFavorite: !!pet.is_favorite });
                     }}
                     onAddWeight={async (id, w) => { await weightMutation.mutateAsync({ petId: id, weight: w }); }}
+                    onDeleteWeight={async (historyId) => { await deleteWeightMutation.mutateAsync(historyId); }}
                   />
                 ) : (
                   <PetManagement 
