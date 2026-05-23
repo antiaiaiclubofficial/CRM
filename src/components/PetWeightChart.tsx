@@ -128,10 +128,10 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
         </div>
       </div>
 
-      {/* Tonal CTA */}
+      {/* Tonal CTA - Changed to Lime (Tertiary) */}
       <button 
         onClick={() => setIsModalOpen(true)}
-        className="w-full py-5 bg-surface-container-low text-primary rounded-xl font-black uppercase tracking-widest text-[11px] active:bg-surface-container-high transition-all flex items-center justify-center gap-3"
+        className="w-full py-5 bg-tertiary text-primary rounded-xl font-black uppercase tracking-widest text-[11px] shadow-lg shadow-tertiary/20 active:scale-95 active:shadow-none transition-all flex items-center justify-center gap-3"
       >
         <Weight size={18} /> บันทึกน้ำหนักวันนี้
       </button>
