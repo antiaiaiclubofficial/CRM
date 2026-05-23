@@ -306,18 +306,21 @@ const Index = () => {
       if (savedPetId && weight) {
         const weightNum = parseFloat(weight);
         if (!isNaN(weightNum)) {
+          const today = new Date().toISOString().split('T')[0];
           const { data: existing } = await supabase
             .from('pet_weight_history')
             .select('*')
             .eq('pet_id', savedPetId)
-            .eq('date', new Date().toISOString().split('T')[0])
+            .eq('date', today)
             .maybeSingle();
 
-          if (!existing) {
+          if (existing) {
+            await supabase.from('pet_weight_history').update({ weight: weightNum }).eq('id', existing.id);
+          } else {
             await supabase.from('pet_weight_history').insert([{
               pet_id: savedPetId,
               weight: weightNum,
-              date: new Date().toISOString()
+              date: today
             }]);
           }
         }
@@ -335,8 +338,31 @@ const Index = () => {
 
   const weightMutation = useMutation({
     mutationFn: async ({ petId, weight }: { petId: string | number, weight: number }) => {
+      // Update the main pet weight
       await supabase.from('pets').update({ weight: weight.toString() }).eq('id', petId);
-      return await supabase.from('pet_weight_history').insert([{ pet_id: petId, weight: weight, date: new Date().toISOString() }]);
+      
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Check for existing record for today
+      const { data: existing } = await supabase
+        .from('pet_weight_history')
+        .select('id')
+        .eq('pet_id', petId)
+        .eq('date', today)
+        .maybeSingle();
+
+      if (existing) {
+        // Update today's record
+        return await supabase
+          .from('pet_weight_history')
+          .update({ weight })
+          .eq('id', existing.id);
+      } else {
+        // Insert new record for today
+        return await supabase
+          .from('pet_weight_history')
+          .insert([{ pet_id: petId, weight: weight, date: today }]);
+      }
     },
     onSuccess: () => {
       toast.success('บันทึกน้ำหนักเรียบร้อยแล้วค่ะ ⚖️');
