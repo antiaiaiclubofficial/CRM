@@ -90,12 +90,12 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       {/* Compact Header Section */}
       <div className="px-1 pt-4">
         {showWeightDetail ? (
-          <div className="flex items-center gap-4 mb-8 px-4">
+          <div className="flex items-center gap-4 mb-8 px-2">
             <button 
               onClick={() => setShowWeightDetail(false)} 
-              className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-primary/40 shadow-ambient active:scale-90 transition-all"
+              className="w-10 h-10 flex items-center justify-center text-primary/40 hover:text-primary hover:bg-slate-100 rounded-full active:scale-90 transition-all shrink-0"
             >
-              <ArrowLeft size={24} strokeWidth={2.5} />
+              <ArrowLeft size={28} strokeWidth={2.5} />
             </button>
             <div className="flex-1 min-w-0">
                <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mb-0.5">Physical Tracker</p>
@@ -194,7 +194,6 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
                     onActionClick={handleHealthAction}
                   />
 
-                  {/* Delete Button moved inside Overview tab */}
                   <div className="pt-4 flex flex-col items-center gap-4">
                     <button 
                       onClick={() => setShowDeleteConfirm(true)}
