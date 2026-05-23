@@ -90,18 +90,16 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       {/* Compact Header Section */}
       <div className="px-1 pt-4">
         {showWeightDetail ? (
-          <div className="flex items-center gap-3 mb-6 px-2">
+          <div className="flex items-center gap-4 mb-8 px-4">
             <button 
               onClick={() => setShowWeightDetail(false)} 
-              className="p-1 text-primary/40 hover:text-primary transition-colors"
+              className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-primary/40 shadow-ambient active:scale-90 transition-all"
             >
-              <ArrowLeft size={28} strokeWidth={2.5} />
+              <ArrowLeft size={24} strokeWidth={2.5} />
             </button>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 shadow-sm">
-                <Scale size={20} />
-              </div>
-              <h3 className="text-xl font-black text-primary tracking-tight">น้ำหนัก: {pet.name}</h3>
+            <div className="flex-1 min-w-0">
+               <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mb-0.5">Physical Tracker</p>
+               <h3 className="text-2xl font-black text-primary tracking-tight truncate">น้ำหนัก: {pet.name}</h3>
             </div>
           </div>
         ) : (
@@ -158,7 +156,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
       </div>
 
       {showWeightDetail ? (
-        <div className="px-1 pt-2">
+        <div className="px-4 pt-2">
            <PetWeightChart 
               data={weightHistory} 
               petName={pet.name} 

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Scale, Check } from 'lucide-react';
+import { X, Scale, Check, Weight } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AddWeightModalProps {
@@ -38,29 +38,39 @@ const AddWeightModal = ({ isOpen, onClose, petName, onSave }: AddWeightModalProp
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center px-6">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-primary/40 backdrop-blur-xl"
           />
           <motion.div 
-            initial={{ scale: 0.9, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.9, y: 20 }}
-            className="relative w-full max-w-xs bg-white rounded-[2.5rem] shadow-2xl p-8 border border-slate-100"
+            initial={{ scale: 0.9, y: 40, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.9, y: 40, opacity: 0 }}
+            className="relative w-full max-w-[340px] bg-white rounded-xl shadow-ambient p-10 text-center"
           >
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-black text-slate-800">บันทึกน้ำหนักน้อง{petName}</h3>
-              <button onClick={onClose} className="p-1.5 bg-slate-100 rounded-full text-slate-400">
+            <div className="absolute top-6 right-6">
+              <button 
+                onClick={onClose} 
+                className="p-2 bg-surface-container-low rounded-full text-primary/30 hover:text-primary active:scale-90 transition-all"
+              >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="space-y-6">
-              <div className="relative">
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 bg-surface-container-low rounded-[2rem] flex items-center justify-center text-primary mb-6 shadow-inner">
+                <Weight size={32} />
+              </div>
+              <h3 className="text-2xl font-black text-primary tracking-tight mb-1">น้ำหนักใหม่</h3>
+              <p className="text-xs font-bold text-surface-variant opacity-50 uppercase tracking-widest mb-8">บันทึกน้ำหนักน้อง{petName}</p>
+            </div>
+
+            <div className="space-y-8">
+              <div className="relative group">
                 <input 
                   type="number" 
                   step="0.1"
@@ -68,17 +78,17 @@ const AddWeightModal = ({ isOpen, onClose, petName, onSave }: AddWeightModalProp
                   onChange={(e) => setWeight(e.target.value)}
                   placeholder="0.0"
                   autoFocus
-                  className="w-full text-center text-4xl font-black py-4 bg-slate-50 rounded-2xl border-2 border-slate-100 focus:border-blue-500 outline-none transition-colors"
+                  className="w-full text-center text-5xl font-black py-6 bg-surface-container-low rounded-lg outline-none group-focus-within:bg-white group-focus-within:shadow-ambient transition-all text-primary placeholder:text-primary/10"
                 />
-                <span className="absolute right-6 top-1/2 -translate-y-1/2 font-black text-slate-400">kg</span>
+                <span className="absolute right-8 top-1/2 -translate-y-1/2 font-black text-primary/20 text-lg uppercase">kg</span>
               </div>
 
               <button 
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-100 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-5 bg-tertiary text-primary rounded-xl font-black shadow-lg shadow-tertiary/20 active:scale-95 active:shadow-none transition-all flex items-center justify-center gap-3 disabled:opacity-50 text-sm uppercase tracking-widest"
               >
-                {isSubmitting ? 'กำลังบันทึก...' : <><Check size={20} /> ยืนยันบันทึกน้ำหนัก</>}
+                {isSubmitting ? 'กำลังบันทึก...' : <><Check size={20} strokeWidth={3} /> ยืนยันข้อมูล</>}
               </button>
             </div>
           </motion.div>

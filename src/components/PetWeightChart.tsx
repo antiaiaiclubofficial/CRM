@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
-import { TrendingUp, Scale, Calendar, Plus } from 'lucide-react';
+import { TrendingUp, Scale, Calendar, Plus, Weight } from 'lucide-react';
 import AddWeightModal from './AddWeightModal';
 
 interface WeightEntry {
@@ -29,43 +29,53 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+      className="space-y-8"
     >
-      {/* Stats Header */}
+      {/* Visual Header / Summary Stats */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white p-4 rounded-[2rem] border-2 border-slate-100 shadow-sm">
-          <div className="flex items-center gap-2 mb-1">
-            <Scale size={14} className="text-blue-500" />
-            <span className="text-[10px] font-black text-slate-400 uppercase">น้ำหนักล่าสุด</span>
+        <div className="bg-white p-6 rounded-lg shadow-ambient relative overflow-hidden group">
+          <div className="absolute -right-4 -top-4 w-16 h-16 bg-primary/5 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700" />
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 bg-surface-container-low rounded-xl flex items-center justify-center text-primary">
+               <Scale size={16} />
+            </div>
+            <span className="text-[10px] font-black text-surface-variant opacity-60 uppercase tracking-widest">น้ำหนักปัจจุบัน</span>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-black text-slate-800">{latestWeight}</span>
-            <span className="text-xs font-bold text-slate-400">kg</span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-3xl font-black text-primary tracking-tighter">{latestWeight}</span>
+            <span className="text-sm font-bold text-surface-variant opacity-40 uppercase">kg</span>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-[2rem] border-2 border-slate-100 shadow-sm">
-          <div className="flex items-center gap-2 mb-1">
-            <TrendingUp size={14} className={isGain ? "text-emerald-500" : "text-rose-500"} />
-            <span className="text-[10px] font-black text-slate-400 uppercase">เทียบกับครั้งก่อน</span>
+
+        <div className="bg-white p-6 rounded-lg shadow-ambient relative overflow-hidden group">
+          <div className={`absolute -right-4 -top-4 w-16 h-16 ${isGain ? 'bg-emerald-500/5' : 'bg-rose-500/5'} rounded-full blur-xl group-hover:scale-150 transition-transform duration-700`} />
+          <div className="flex items-center gap-2 mb-2">
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isGain ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+               <TrendingUp size={16} />
+            </div>
+            <span className="text-[10px] font-black text-surface-variant opacity-60 uppercase tracking-widest">การเปลี่ยนแปลง</span>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-black ${isGain ? "text-emerald-600" : "text-rose-600"}`}>
+          <div className="flex items-baseline gap-1.5">
+            <span className={`text-3xl font-black tracking-tighter ${isGain ? "text-emerald-600" : "text-rose-600"}`}>
               {isGain ? "+" : ""}{weightDiff}
             </span>
-            <span className="text-xs font-bold text-slate-400">kg</span>
+            <span className="text-sm font-bold text-surface-variant opacity-40 uppercase">kg</span>
           </div>
         </div>
       </div>
 
-      {/* Chart Container */}
-      <div className="bg-white p-6 rounded-[2.5rem] border-2 border-slate-100 shadow-sm relative overflow-hidden">
-        <div className="flex justify-between items-center mb-6">
-          <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight">กราฟน้ำหนัก</h4>
+      {/* Main Chart Card (The Glass Vessel) */}
+      <div className="bg-white p-8 rounded-xl shadow-ambient relative overflow-hidden">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h4 className="text-lg font-black text-primary tracking-tight">กราฟการเจริญเติบโต</h4>
+            <p className="text-[11px] font-bold text-surface-variant opacity-50 uppercase tracking-widest">Weight Distribution Timeline</p>
+          </div>
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 text-white p-2 rounded-full shadow-md active:scale-90 transition-transform"
+            className="w-12 h-12 bg-tertiary text-primary rounded-2xl shadow-lg shadow-tertiary/20 flex items-center justify-center active:scale-90 transition-all"
           >
-            <Plus size={18} strokeWidth={3} />
+            <Plus size={24} strokeWidth={3} />
           </button>
         </div>
 
@@ -73,70 +83,89 @@ const PetWeightChart = ({ data, petName, onAddWeight }: PetWeightChartProps) => 
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data}>
               <defs>
-                <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                <linearGradient id="liquidGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#18234A" stopOpacity={0.15}/>
+                  <stop offset="95%" stopColor="#18234A" stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+              <CartesianGrid vertical={false} stroke="#f3f3f3" strokeDasharray="10 10" />
               <XAxis 
                 dataKey="date" 
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 10, fontWeight: 700, fill: '#94A3B8' }}
-                dy={10}
+                tick={{ fontSize: 10, fontWeight: 800, fill: '#45464E', opacity: 0.4 }}
+                dy={15}
               />
               <YAxis 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 10, fontWeight: 700, fill: '#94A3B8' }}
+                hide
                 domain={['auto', 'auto']}
               />
               <Tooltip 
+                cursor={{ stroke: '#18234A', strokeWidth: 1, strokeDasharray: '5 5' }}
                 contentStyle={{ 
-                  borderRadius: '16px', 
+                  borderRadius: '2rem', 
                   border: 'none', 
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                  padding: '12px'
+                  boxShadow: '0 20px 40px rgba(24, 35, 74, 0.08)',
+                  padding: '16px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(10px)'
                 }}
-                labelStyle={{ fontWeight: 800, marginBottom: '4px', fontSize: '12px' }}
-                itemStyle={{ fontWeight: 700, color: '#3B82F6', fontSize: '12px' }}
+                labelStyle={{ fontWeight: 900, marginBottom: '4px', fontSize: '12px', color: '#18234A', textTransform: 'uppercase' }}
+                itemStyle={{ fontWeight: 700, color: '#18234A', fontSize: '12px' }}
               />
               <Area 
                 type="monotone" 
                 dataKey="weight" 
-                stroke="#3B82F6" 
-                strokeWidth={4}
+                stroke="#18234A" 
+                strokeWidth={5}
                 fillOpacity={1} 
-                fill="url(#colorWeight)" 
-                animationDuration={1500}
+                fill="url(#liquidGradient)" 
+                animationDuration={2000}
+                animationEasing="ease-in-out"
               />
             </AreaChart>
           </ResponsiveContainer>
         </div>
       </div>
 
+      {/* Tonal CTA */}
       <button 
         onClick={() => setIsModalOpen(true)}
-        className="w-full py-4 bg-slate-50 text-blue-600 rounded-2xl font-black border-2 border-dashed border-blue-200 active:bg-blue-50 transition-all flex items-center justify-center gap-2"
+        className="w-full py-5 bg-surface-container-low text-primary rounded-xl font-black uppercase tracking-widest text-[11px] active:bg-surface-container-high transition-all flex items-center justify-center gap-3"
       >
-        <Plus size={20} /> บันทึกน้ำหนักวันนี้
+        <Weight size={18} /> บันทึกน้ำหนักวันนี้
       </button>
 
-      {/* History List */}
-      <div className="space-y-3">
-        <h4 className="text-sm font-black text-slate-800 px-1 uppercase tracking-tight">ประวัติการชั่งน้ำหนัก</h4>
-        <div className="space-y-2">
+      {/* History List - Nested Layout Grid */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center px-1">
+          <h4 className="text-sm font-black text-primary uppercase tracking-widest">บันทึกย้อนหลัง</h4>
+          <span className="text-[10px] font-bold text-surface-variant opacity-40 uppercase">{data.length} รายการ</span>
+        </div>
+        
+        <div className="space-y-3">
           {data.slice().reverse().map((entry, i) => (
-            <div key={i} className="bg-white p-4 rounded-2xl border border-slate-50 flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400">
-                  <Calendar size={16} />
+            <motion.div 
+              key={i} 
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="bg-white p-5 rounded-lg shadow-ambient flex justify-between items-center group hover:bg-primary transition-all duration-300"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-surface-container-low rounded-2xl flex items-center justify-center text-surface-variant group-hover:bg-white/10 group-hover:text-tertiary transition-colors">
+                  <Calendar size={18} />
                 </div>
-                <span className="text-sm font-bold text-slate-600">{entry.date}</span>
+                <div>
+                  <span className="text-sm font-black text-primary group-hover:text-white transition-colors">{entry.date}</span>
+                  <p className="text-[9px] font-bold text-surface-variant opacity-40 group-hover:text-white/40 uppercase transition-colors">Scheduled Check</p>
+                </div>
               </div>
-              <span className="text-sm font-black text-slate-800">{entry.weight} kg</span>
-            </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-lg font-black text-primary group-hover:text-tertiary transition-colors">{entry.weight}</span>
+                <span className="text-[10px] font-bold text-surface-variant opacity-40 group-hover:text-white/40 uppercase transition-colors">kg</span>
+              </div>
+            </motion.div>
           ))}
         </div>
       </div>
