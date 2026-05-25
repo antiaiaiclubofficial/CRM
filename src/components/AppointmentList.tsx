@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, Scissors, Bath, ChevronRight, AlertCircle, CheckCircle2, XCircle, Timer } from 'lucide-react';
+import { Calendar, Clock, ChevronRight, CheckCircle2, XCircle, Timer, Plus, CalendarDays } from 'lucide-react';
 
 interface Appointment {
   id: string;
@@ -20,10 +20,10 @@ interface AppointmentListProps {
 }
 
 const statusConfig = {
-  pending: { label: 'รอพิจารณา', icon: <Timer size={12} />, color: 'text-amber-500', bg: 'bg-amber-50' },
-  confirmed: { label: 'ยืนยันแล้ว', icon: <CheckCircle2 size={12} />, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-  completed: { label: 'เสร็จสิ้น', icon: <CheckCircle2 size={12} />, color: 'text-blue-500', bg: 'bg-blue-50' },
-  cancelled: { label: 'ยกเลิก', icon: <XCircle size={12} />, color: 'text-red-500', bg: 'bg-red-50' },
+  pending: { label: 'รอพิจารณา', icon: <Timer size={12} />, color: 'text-amber-600 bg-amber-50 border-amber-100' },
+  confirmed: { label: 'ยืนยันแล้ว', icon: <CheckCircle2 size={12} />, color: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
+  completed: { label: 'เสร็จสิ้น', icon: <CheckCircle2 size={12} />, color: 'text-blue-600 bg-blue-50 border-blue-100' },
+  cancelled: { label: 'ยกเลิก', icon: <XCircle size={12} />, color: 'text-rose-600 bg-rose-50 border-rose-100' },
 };
 
 const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: AppointmentListProps) => {
@@ -39,62 +39,80 @@ const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: Appoi
   };
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-8 pb-24">
+      {/* Header Section */}
       <div className="flex justify-between items-center px-1">
-        <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">นัดหมายของฉัน</h2>
-        <button 
+        <div>
+          <h2 className="text-2xl font-black text-[#020d35] tracking-tight">นัดหมายของฉัน</h2>
+          <p className="text-[11px] font-bold text-[#45464E] opacity-60 uppercase tracking-wider">Manage Bookings</p>
+        </div>
+        <motion.button 
+          whileTap={{ scale: 0.95 }}
           onClick={onAddClick}
-          className="bg-pink-500 text-white text-xs font-black px-5 py-2.5 rounded-2xl border-2 border-slate-800 shadow-soft active:translate-y-0.5 active:shadow-none transition-all"
+          className="bg-gradient-to-br from-[#18234a] to-[#020d35] text-white text-xs font-black px-5 py-3 rounded-full shadow-ambient flex items-center gap-1.5"
         >
+          <Plus size={16} strokeWidth={3} />
           จองนัดหมาย
-        </button>
+        </motion.button>
       </div>
 
+      {/* Appointments List */}
       <div className="space-y-4">
         {appointments.length > 0 ? (
           appointments.map((apt, index) => {
-            const config = statusConfig[apt.status];
+            const config = statusConfig[apt.status] || statusConfig.pending;
             return (
               <motion.div
                 key={apt.id}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.05 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => onAppointmentClick(apt)}
-                className="bg-white p-5 rounded-[2.5rem] border-2 border-slate-800 shadow-soft relative overflow-hidden active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 relative overflow-hidden cursor-pointer flex items-center justify-between gap-4"
               >
-                <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 bg-slate-50 border-2 border-slate-800 rounded-2xl flex items-center justify-center text-xl shrink-0`}>
-                    <Calendar className="text-slate-400" />
+                {/* Soft background glow */}
+                <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+
+                <div className="flex items-center gap-4 min-w-0 flex-1">
+                  <div className="w-14 h-14 bg-[#F3F3F3] rounded-2xl flex items-center justify-center text-[#020d35] shrink-0">
+                    <CalendarDays size={24} />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start mb-1">
-                      <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-slate-800/10 flex items-center gap-1 ${config.bg} ${config.color}`}>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full border flex items-center gap-1 ${config.color}`}>
                         {config.icon} {config.label}
                       </span>
                     </div>
-                    <h4 className="font-black text-slate-800 text-sm mb-0.5 truncate">น้อง{apt.petName}</h4>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1">
-                      <Clock size={10} /> {formatDate(apt.startTime)}
+                    <h4 className="font-black text-[#020d35] text-base truncate leading-tight">น้อง{apt.petName}</h4>
+                    <p className="text-[11px] font-bold text-[#45464E] opacity-60 flex items-center gap-1 mt-1">
+                      <Clock size={12} /> {formatDate(apt.startTime)}
                     </p>
                   </div>
-                  <div className="p-2 border-2 border-slate-800 rounded-xl shrink-0">
-                    <ChevronRight size={16} strokeWidth={3} />
-                  </div>
+                </div>
+
+                <div className="w-10 h-10 bg-[#F3F3F3] rounded-full flex items-center justify-center text-[#020d35] shrink-0">
+                  <ChevronRight size={16} strokeWidth={3} />
                 </div>
               </motion.div>
             );
           })
         ) : (
-          <div className="text-center py-20 border-2 border-dashed border-slate-300 rounded-[2.5rem] bg-white/50">
-            <Calendar size={48} className="mx-auto text-slate-200 mb-4" />
-            <p className="text-sm font-black text-slate-400 uppercase">ยังไม่มีรายการนัดหมาย</p>
-            <button 
+          <div className="text-center py-20 bg-white rounded-[3rem] shadow-ambient border border-black/5 p-8 flex flex-col items-center justify-center">
+            <div className="w-16 h-16 bg-[#F3F3F3] rounded-2xl flex items-center justify-center text-slate-300 mb-4">
+              <Calendar size={28} />
+            </div>
+            <h3 className="text-base font-black text-[#020d35] mb-1">ยังไม่มีรายการนัดหมาย</h3>
+            <p className="text-xs font-bold text-[#45464E] opacity-60 max-w-[220px] leading-relaxed mb-6">
+              จองคิวล่วงหน้าเพื่อรับบริการที่รวดเร็วและสะดวกสบายสำหรับสัตว์เลี้ยงของคุณค่ะ ✨
+            </p>
+            <motion.button 
+              whileTap={{ scale: 0.95 }}
               onClick={onAddClick}
-              className="mt-4 text-pink-500 font-black text-xs underline underline-offset-4"
+              className="bg-gradient-to-br from-[#18234a] to-[#020d35] text-white text-xs font-black px-6 py-3.5 rounded-full shadow-ambient"
             >
-              จองนัดหมายครั้งแรกได้ที่นี่ ✨
-            </button>
+              จองนัดหมายครั้งแรกเลย 🐾
+            </motion.button>
           </div>
         )}
       </div>
