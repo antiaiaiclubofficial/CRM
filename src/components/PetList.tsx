@@ -56,13 +56,13 @@ const PetList = ({ pets, onPetClick, onViewAll, onToggleFavorite }: PetListProps
                 
                 {/* Content container */}
                 <div className="relative z-10 flex flex-col h-full justify-between">
-                  {/* Image Area */}
-                  <div className="relative w-full h-24 rounded-2xl overflow-hidden bg-white shadow-sm mb-3">
+                  {/* Image Area - Adjusted border radius to match container proportions */}
+                  <div className="relative w-full h-24 rounded-[1.8rem] overflow-hidden bg-white shadow-sm mb-3">
                     <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
                   </div>
 
-                  {/* Weight & Gender Row */}
-                  <div className="flex justify-between items-center mb-1.5">
+                  {/* Weight & Gender Row - Added px-1.5 to prevent edge clipping */}
+                  <div className="flex justify-between items-center mb-1.5 px-1.5">
                     <span className="text-[9px] text-primary/60 font-bold flex items-center gap-0.5">
                       <AnalogScaleIcon size={12} />
                       {pet.weight || '-'} kg
@@ -72,8 +72,8 @@ const PetList = ({ pets, onPetClick, onViewAll, onToggleFavorite }: PetListProps
                     </span>
                   </div>
 
-                  {/* Name, Breed & Favorite Row */}
-                  <div className="flex justify-between items-end">
+                  {/* Name, Breed & Favorite Row - Added px-1.5 to prevent edge clipping */}
+                  <div className="flex justify-between items-end px-1.5">
                     <div className="min-w-0 flex-1 pr-1">
                       <h4 className="font-black text-primary text-xs truncate uppercase tracking-tighter leading-tight">{pet.name}</h4>
                       <p className="text-[9px] font-bold text-primary/40 truncate uppercase tracking-tighter">{pet.breed}</p>
