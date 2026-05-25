@@ -52,19 +52,6 @@ const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: Appoi
     return appointments.map(apt => parseISO(apt.startTime));
   }, [appointments]);
 
-  // Custom modifiers for the Calendar to highlight dates with appointments
-  const modifiers = {
-    hasAppointment: appointmentDates,
-  };
-
-  const modifiersStyles = {
-    hasAppointment: {
-      fontWeight: 'bold',
-      textDecoration: 'underline',
-      color: '#020d35',
-    }
-  };
-
   return (
     <div className="space-y-6 pb-24">
       {/* Header Section */}
@@ -83,17 +70,30 @@ const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: Appoi
         </motion.button>
       </div>
 
-      {/* Top Half: Interactive Calendar */}
-      <div className="bg-white p-4 rounded-[2.5rem] shadow-ambient border border-black/5 flex justify-center">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          locale={th}
-          modifiers={modifiers}
-          modifiersStyles={modifiersStyles}
-          className="rounded-md border-none w-full max-w-full"
-        />
+      {/* Top Half: Interactive Calendar (Centered with custom dot indicators) */}
+      <div className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 flex justify-center items-center">
+        <div className="w-full max-w-sm flex justify-center">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            locale={th}
+            className="rounded-md border-none mx-auto"
+            components={{
+              DayContent: (props) => {
+                const hasApt = appointmentDates.some(date => isSameDay(date, props.date));
+                return (
+                  <div className="relative flex flex-col items-center justify-center w-full h-full">
+                    <span className="z-10">{props.date.getDate()}</span>
+                    {hasApt && (
+                      <span className="absolute bottom-1 w-1.5 h-1.5 bg-pink-500 rounded-full shadow-[0_0_4px_rgba(236,72,153,0.6)]" />
+                    )}
+                  </div>
+                );
+              }
+            }}
+          />
+        </div>
       </div>
 
       {/* Bottom Half: Appointment Details for Selected Date */}
