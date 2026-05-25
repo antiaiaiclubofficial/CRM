@@ -18,6 +18,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["IBM Plex Sans Thai", "sans-serif"],
+      },
       colors: {
         border: "rgba(24, 35, 74, 0.05)",
         input: "rgba(24, 35, 74, 0.05)",
