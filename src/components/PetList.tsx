@@ -41,15 +41,22 @@ const PetList = ({ pets, onPetClick, onViewAll }: PetListProps) => {
                 key={pet.id}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => onPetClick?.(pet)}
-                className="flex-shrink-0 w-32 p-4 rounded-[2rem] shadow-ambient text-center cursor-pointer transition-all"
-                style={{ backgroundColor: bgColor }}
+                className="flex-shrink-0 w-32 p-4 rounded-[2rem] shadow-ambient text-center cursor-pointer transition-all relative overflow-hidden bg-white"
               >
-                <div className="relative w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-3 bg-white/80 shadow-sm">
-                  <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-tertiary/10 opacity-0 hover:opacity-100 transition-opacity" />
+                {/* Softened background overlay (40% opacity) to match other pages */}
+                <div 
+                  className="absolute inset-0 opacity-40" 
+                  style={{ backgroundColor: bgColor }} 
+                />
+                
+                {/* Content container */}
+                <div className="relative z-10">
+                  <div className="relative w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-3 bg-white shadow-sm">
+                    <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+                  </div>
+                  <h4 className="font-black text-primary text-xs truncate uppercase tracking-tighter">{pet.name}</h4>
+                  <p className="text-[9px] font-bold text-surface-variant opacity-50 truncate uppercase">{pet.breed}</p>
                 </div>
-                <h4 className="font-black text-primary text-xs truncate uppercase tracking-tighter">{pet.name}</h4>
-                <p className="text-[9px] font-bold text-surface-variant opacity-50 truncate uppercase">{pet.breed}</p>
               </motion.div>
             );
           })}
