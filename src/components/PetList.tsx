@@ -72,8 +72,8 @@ const PetList = ({ pets, onPetClick, onViewAll, onToggleFavorite }: PetListProps
                     </span>
                   </div>
 
-                  {/* Name, Breed & Favorite Row - Added px-1.5 to prevent edge clipping */}
-                  <div className="flex justify-between items-end px-1.5">
+                  {/* Name, Breed & Favorite Row - Changed items-end to items-center for perfect vertical alignment */}
+                  <div className="flex justify-between items-center px-1.5">
                     <div className="min-w-0 flex-1 pr-1">
                       <h4 className="font-black text-primary text-xs truncate uppercase tracking-tighter leading-tight">{pet.name}</h4>
                       <p className="text-[9px] font-bold text-primary/40 truncate uppercase tracking-tighter">{pet.breed}</p>
