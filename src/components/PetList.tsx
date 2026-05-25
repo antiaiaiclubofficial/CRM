@@ -9,6 +9,8 @@ interface Pet {
   name: string;
   breed: string;
   imageUrl: string;
+  cardBgColor?: string;
+  card_bg_color?: string;
 }
 
 interface PetListProps {
@@ -32,21 +34,25 @@ const PetList = ({ pets, onPetClick, onViewAll }: PetListProps) => {
       
       {pets.length > 0 ? (
         <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 px-1">
-          {pets.map((pet) => (
-            <motion.div 
-              key={pet.id}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onPetClick?.(pet)}
-              className="flex-shrink-0 w-32 bg-[#efecff] p-4 rounded-[2rem] shadow-ambient text-center cursor-pointer transition-all"
-            >
-              <div className="relative w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-3 bg-surface-low shadow-sm">
-                <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-tertiary/10 opacity-0 hover:opacity-100 transition-opacity" />
-              </div>
-              <h4 className="font-black text-primary text-xs truncate uppercase tracking-tighter">{pet.name}</h4>
-              <p className="text-[9px] font-bold text-surface-variant opacity-50 truncate uppercase">{pet.breed}</p>
-            </motion.div>
-          ))}
+          {pets.map((pet) => {
+            const bgColor = pet.cardBgColor || pet.card_bg_color || '#efecff';
+            return (
+              <motion.div 
+                key={pet.id}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => onPetClick?.(pet)}
+                className="flex-shrink-0 w-32 p-4 rounded-[2rem] shadow-ambient text-center cursor-pointer transition-all"
+                style={{ backgroundColor: bgColor }}
+              >
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-3 bg-white/80 shadow-sm">
+                  <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-tertiary/10 opacity-0 hover:opacity-100 transition-opacity" />
+                </div>
+                <h4 className="font-black text-primary text-xs truncate uppercase tracking-tighter">{pet.name}</h4>
+                <p className="text-[9px] font-bold text-surface-variant opacity-50 truncate uppercase">{pet.breed}</p>
+              </motion.div>
+            );
+          })}
           <motion.div 
             whileTap={{ scale: 0.95 }}
             onClick={onViewAll}
