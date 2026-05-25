@@ -26,12 +26,32 @@ html, body {
 
 body {
   font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
+  line-height: 1.6; /* เพิ่มระยะบรรทัดเริ่มต้นให้สระไทยแสดงผลได้ครบถ้วน */
   @apply text-surface-variant;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
   @apply text-primary font-extrabold;
+}
+
+/* ป้องกันสระและวรรณยุกต์ไทยโดนตัดขอบจากคลาสบีบระยะบรรทัดของ Tailwind */
+.leading-none {
+  line-height: 1.35 !important; /* ปรับจาก 1 เป็น 1.35 เพื่อให้สระบน-ล่างไม่ขาดหาย */
+}
+
+.leading-tight {
+  line-height: 1.45 !important; /* ปรับจาก 1.25 เป็น 1.45 */
+}
+
+.leading-snug {
+  line-height: 1.55 !important; /* ปรับจาก 1.375 เป็น 1.55 */
+}
+
+/* เพิ่มระยะขอบบน-ล่างเล็กน้อยให้กับปุ่มและอินพุตเพื่อป้องกันสระโดนตัดขอบ */
+input, select, textarea, button {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
 }
 
 /* Glassmorphism utility - Liquid Glass Style Refined */
