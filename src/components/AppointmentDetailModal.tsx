@@ -73,8 +73,16 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
             <div className="px-8 pb-12 space-y-6 overflow-y-auto no-scrollbar flex-1">
               {/* QR Code Section */}
               <div className="flex flex-col items-center py-2">
-                <div className="p-4 bg-white rounded-[2rem] border border-slate-100 shadow-ambient mb-3">
-                  <QrCode size={120} className="text-[#020d35]" />
+                <div className="relative p-6 bg-white rounded-[2.5rem] shadow-ambient border border-slate-100 mb-3 group">
+                  {/* Decorative corners */}
+                  <div className="absolute top-4 left-4 w-6 h-6 border-t-4 border-l-4 border-pink-500 rounded-tl-lg" />
+                  <div className="absolute top-4 right-4 w-6 h-6 border-t-4 border-r-4 border-pink-500 rounded-tr-lg" />
+                  <div className="absolute bottom-4 left-4 w-6 h-6 border-b-4 border-l-4 border-pink-500 rounded-bl-lg" />
+                  <div className="absolute bottom-4 right-4 w-6 h-6 border-b-4 border-r-4 border-pink-500 rounded-br-lg" />
+                  
+                  <div className="p-2 bg-slate-50 rounded-2xl">
+                    <QrCode size={120} className="text-[#020d35]" />
+                  </div>
                 </div>
                 <p className="text-[10px] font-black text-[#45464E] opacity-40 uppercase tracking-widest">Booking ID: {appointment.id.split('-')[0].toUpperCase()}</p>
                 <p className="text-[10px] font-bold text-pink-500 mt-1">แสดง QR เพื่อเช็คอินรับบริการ</p>

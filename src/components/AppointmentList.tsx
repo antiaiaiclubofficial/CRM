@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar as CalendarIcon, Clock, ChevronRight, CheckCircle2, XCircle, Timer, Plus, CalendarDays, AlertCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, ChevronRight, CheckCircle2, XCircle, Timer, Plus, CalendarDays, Sparkles } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { format, isSameDay, parseISO } from 'date-fns';
 import { th } from 'date-fns/locale';
@@ -71,22 +71,34 @@ const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: Appoi
       </div>
 
       {/* Top Half: Interactive Calendar (Centered with custom dot indicators) */}
-      <div className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 flex justify-center items-center">
-        <div className="w-full max-w-sm flex justify-center">
+      <div className="bg-white/80 backdrop-blur-md p-6 rounded-[2.5rem] shadow-ambient border border-white/40 flex justify-center items-center relative overflow-hidden">
+        {/* Decorative background glow */}
+        <div className="absolute -right-10 -top-10 w-32 h-32 bg-tertiary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-pink-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="w-full max-w-sm flex justify-center relative z-10">
           <Calendar
             mode="single"
             selected={selectedDate}
             onSelect={setSelectedDate}
             locale={th}
             className="rounded-md border-none mx-auto"
+            classNames={{
+              day_selected: "bg-primary text-white hover:bg-primary hover:text-white focus:bg-primary focus:text-white rounded-2xl font-black shadow-md",
+              day_today: "bg-tertiary text-primary font-black rounded-2xl shadow-sm",
+              day: "h-10 w-10 p-0 font-bold text-sm text-primary/80 hover:bg-slate-100 rounded-2xl transition-all flex items-center justify-center relative",
+            }}
             components={{
               DayContent: (props) => {
                 const hasApt = appointmentDates.some(date => isSameDay(date, props.date));
+                const isSelected = selectedDate && isSameDay(selectedDate, props.date);
                 return (
                   <div className="relative flex flex-col items-center justify-center w-full h-full">
                     <span className="z-10">{props.date.getDate()}</span>
                     {hasApt && (
-                      <span className="absolute bottom-1 w-1.5 h-1.5 bg-pink-500 rounded-full shadow-[0_0_4px_rgba(236,72,153,0.6)]" />
+                      <span className={`absolute bottom-1 w-1.5 h-1.5 rounded-full shadow-sm transition-colors ${
+                        isSelected ? 'bg-tertiary' : 'bg-pink-500'
+                      }`} />
                     )}
                   </div>
                 );
@@ -99,7 +111,8 @@ const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: Appoi
       {/* Bottom Half: Appointment Details for Selected Date */}
       <div className="space-y-4">
         <div className="flex justify-between items-center px-1">
-          <h3 className="text-sm font-black text-[#020d35] uppercase tracking-wider">
+          <h3 className="text-sm font-black text-[#020d35] uppercase tracking-wider flex items-center gap-1.5">
+            <CalendarIcon size={14} className="text-pink-500" />
             {selectedDate ? format(selectedDate, 'd MMMM yyyy', { locale: th }) : 'เลือกวันที่'}
           </h3>
           <span className="text-[10px] font-bold text-[#45464E] opacity-50 uppercase">
@@ -124,12 +137,12 @@ const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: Appoi
                     key={apt.id}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => onAppointmentClick(apt)}
-                    className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 relative overflow-hidden cursor-pointer flex items-center justify-between gap-4"
+                    className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 relative overflow-hidden cursor-pointer flex items-center justify-between gap-4 group hover:border-primary/10 transition-all"
                   >
                     <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
 
                     <div className="flex items-center gap-4 min-w-0 flex-1">
-                      <div className="w-12 h-12 bg-[#F3F3F3] rounded-2xl flex items-center justify-center text-[#020d35] shrink-0">
+                      <div className="w-12 h-12 bg-[#F3F3F3] rounded-2xl flex items-center justify-center text-[#020d35] shrink-0 group-hover:scale-105 transition-transform">
                         <Clock size={20} />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -145,7 +158,7 @@ const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: Appoi
                       </div>
                     </div>
 
-                    <div className="w-8 h-8 bg-[#F3F3F3] rounded-full flex items-center justify-center text-[#020d35] shrink-0">
+                    <div className="w-8 h-8 bg-[#F3F3F3] rounded-full flex items-center justify-center text-[#020d35] shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
                       <ChevronRight size={14} strokeWidth={3} />
                     </div>
                   </motion.div>
