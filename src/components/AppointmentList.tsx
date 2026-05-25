@@ -1,8 +1,11 @@
 "use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Calendar, Clock, ChevronRight, CheckCircle2, XCircle, Timer, Plus, CalendarDays } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Calendar as CalendarIcon, Clock, ChevronRight, CheckCircle2, XCircle, Timer, Plus, CalendarDays, AlertCircle } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { format, isSameDay, parseISO } from 'date-fns';
+import { th } from 'date-fns/locale';
 
 interface Appointment {
   id: string;
@@ -27,24 +30,48 @@ const statusConfig = {
 };
 
 const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: AppointmentListProps) => {
-  const formatDate = (dateStr: string) => {
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+
+  // Format time helper
+  const formatTime = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('th-TH', { 
-      day: 'numeric', 
-      month: 'short', 
-      year: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    }) + ' น.';
+    return format(date, 'HH:mm') + ' น.';
+  };
+
+  // Filter appointments for the selected date
+  const filteredAppointments = useMemo(() => {
+    if (!selectedDate) return [];
+    return appointments.filter(apt => {
+      const aptDate = parseISO(apt.startTime);
+      return isSameDay(aptDate, selectedDate);
+    });
+  }, [appointments, selectedDate]);
+
+  // Get all dates that have appointments to highlight them on the calendar
+  const appointmentDates = useMemo(() => {
+    return appointments.map(apt => parseISO(apt.startTime));
+  }, [appointments]);
+
+  // Custom modifiers for the Calendar to highlight dates with appointments
+  const modifiers = {
+    hasAppointment: appointmentDates,
+  };
+
+  const modifiersStyles = {
+    hasAppointment: {
+      fontWeight: 'bold',
+      textDecoration: 'underline',
+      color: '#020d35',
+    }
   };
 
   return (
-    <div className="space-y-8 pb-24">
+    <div className="space-y-6 pb-24">
       {/* Header Section */}
       <div className="flex justify-between items-center px-1">
         <div>
-          <h2 className="text-2xl font-black text-[#020d35] tracking-tight">นัดหมายของฉัน</h2>
-          <p className="text-[11px] font-bold text-[#45464E] opacity-60 uppercase tracking-wider">Manage Bookings</p>
+          <h2 className="text-2xl font-black text-[#020d35] tracking-tight">ตารางนัดหมาย</h2>
+          <p className="text-[11px] font-bold text-[#45464E] opacity-60 uppercase tracking-wider">Interactive Schedule</p>
         </div>
         <motion.button 
           whileTap={{ scale: 0.95 }}
@@ -52,69 +79,98 @@ const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: Appoi
           className="bg-gradient-to-br from-[#18234a] to-[#020d35] text-white text-xs font-black px-5 py-3 rounded-full shadow-ambient flex items-center gap-1.5"
         >
           <Plus size={16} strokeWidth={3} />
-          จองนัดหมาย
+          จองคิว
         </motion.button>
       </div>
 
-      {/* Appointments List */}
+      {/* Top Half: Interactive Calendar */}
+      <div className="bg-white p-4 rounded-[2.5rem] shadow-ambient border border-black/5 flex justify-center">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={setSelectedDate}
+          locale={th}
+          modifiers={modifiers}
+          modifiersStyles={modifiersStyles}
+          className="rounded-md border-none w-full max-w-full"
+        />
+      </div>
+
+      {/* Bottom Half: Appointment Details for Selected Date */}
       <div className="space-y-4">
-        {appointments.length > 0 ? (
-          appointments.map((apt, index) => {
-            const config = statusConfig[apt.status] || statusConfig.pending;
-            return (
-              <motion.div
-                key={apt.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => onAppointmentClick(apt)}
-                className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 relative overflow-hidden cursor-pointer flex items-center justify-between gap-4"
-              >
-                {/* Soft background glow */}
-                <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+        <div className="flex justify-between items-center px-1">
+          <h3 className="text-sm font-black text-[#020d35] uppercase tracking-wider">
+            {selectedDate ? format(selectedDate, 'd MMMM yyyy', { locale: th }) : 'เลือกวันที่'}
+          </h3>
+          <span className="text-[10px] font-bold text-[#45464E] opacity-50 uppercase">
+            {filteredAppointments.length} รายการ
+          </span>
+        </div>
 
-                <div className="flex items-center gap-4 min-w-0 flex-1">
-                  <div className="w-14 h-14 bg-[#F3F3F3] rounded-2xl flex items-center justify-center text-[#020d35] shrink-0">
-                    <CalendarDays size={24} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full border flex items-center gap-1 ${config.color}`}>
-                        {config.icon} {config.label}
-                      </span>
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={selectedDate ? selectedDate.toString() : 'empty'}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-4"
+          >
+            {filteredAppointments.length > 0 ? (
+              filteredAppointments.map((apt) => {
+                const config = statusConfig[apt.status] || statusConfig.pending;
+                return (
+                  <motion.div
+                    key={apt.id}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => onAppointmentClick(apt)}
+                    className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 relative overflow-hidden cursor-pointer flex items-center justify-between gap-4"
+                  >
+                    <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+
+                    <div className="flex items-center gap-4 min-w-0 flex-1">
+                      <div className="w-12 h-12 bg-[#F3F3F3] rounded-2xl flex items-center justify-center text-[#020d35] shrink-0">
+                        <Clock size={20} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full border flex items-center gap-1 ${config.color}`}>
+                            {config.icon} {config.label}
+                          </span>
+                        </div>
+                        <h4 className="font-black text-[#020d35] text-sm truncate leading-tight">น้อง{apt.petName}</h4>
+                        <p className="text-[11px] font-bold text-[#45464E] opacity-60 mt-0.5">
+                          {apt.service} • {formatTime(apt.startTime)}
+                        </p>
+                      </div>
                     </div>
-                    <h4 className="font-black text-[#020d35] text-base truncate leading-tight">น้อง{apt.petName}</h4>
-                    <p className="text-[11px] font-bold text-[#45464E] opacity-60 flex items-center gap-1 mt-1">
-                      <Clock size={12} /> {formatDate(apt.startTime)}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="w-10 h-10 bg-[#F3F3F3] rounded-full flex items-center justify-center text-[#020d35] shrink-0">
-                  <ChevronRight size={16} strokeWidth={3} />
+                    <div className="w-8 h-8 bg-[#F3F3F3] rounded-full flex items-center justify-center text-[#020d35] shrink-0">
+                      <ChevronRight size={14} strokeWidth={3} />
+                    </div>
+                  </motion.div>
+                );
+              })
+            ) : (
+              <div className="text-center py-12 bg-white rounded-[2.5rem] shadow-ambient border border-black/5 p-6 flex flex-col items-center justify-center">
+                <div className="w-12 h-12 bg-[#F3F3F3] rounded-2xl flex items-center justify-center text-slate-300 mb-3">
+                  <CalendarIcon size={20} />
                 </div>
-              </motion.div>
-            );
-          })
-        ) : (
-          <div className="text-center py-20 bg-white rounded-[3rem] shadow-ambient border border-black/5 p-8 flex flex-col items-center justify-center">
-            <div className="w-16 h-16 bg-[#F3F3F3] rounded-2xl flex items-center justify-center text-slate-300 mb-4">
-              <Calendar size={28} />
-            </div>
-            <h3 className="text-base font-black text-[#020d35] mb-1">ยังไม่มีรายการนัดหมาย</h3>
-            <p className="text-xs font-bold text-[#45464E] opacity-60 max-w-[220px] leading-relaxed mb-6">
-              จองคิวล่วงหน้าเพื่อรับบริการที่รวดเร็วและสะดวกสบายสำหรับสัตว์เลี้ยงของคุณค่ะ ✨
-            </p>
-            <motion.button 
-              whileTap={{ scale: 0.95 }}
-              onClick={onAddClick}
-              className="bg-gradient-to-br from-[#18234a] to-[#020d35] text-white text-xs font-black px-6 py-3.5 rounded-full shadow-ambient"
-            >
-              จองนัดหมายครั้งแรกเลย 🐾
-            </motion.button>
-          </div>
-        )}
+                <h4 className="text-sm font-black text-[#020d35] mb-1">ไม่มีนัดหมายในวันนี้</h4>
+                <p className="text-[11px] font-bold text-[#45464E] opacity-60 max-w-[200px] leading-relaxed mb-4">
+                  คุณสามารถจองคิวล่วงหน้าสำหรับวันนี้ได้ทันทีค่ะ
+                </p>
+                <motion.button 
+                  whileTap={{ scale: 0.95 }}
+                  onClick={onAddClick}
+                  className="bg-gradient-to-br from-[#18234a] to-[#020d35] text-white text-[10px] font-black px-4 py-2.5 rounded-full shadow-ambient"
+                >
+                  จองคิววันนี้นะคะ 🐾
+                </motion.button>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
