@@ -84,9 +84,10 @@ const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: Appoi
             locale={th}
             className="rounded-md border-none mx-auto"
             classNames={{
-              day_selected: "bg-primary text-white hover:bg-tertiary hover:text-primary focus:bg-primary focus:text-white rounded-2xl font-black shadow-md transition-colors duration-300",
-              day_today: "bg-tertiary text-primary font-black rounded-2xl shadow-sm",
-              day: "h-10 w-10 p-0 font-bold text-sm text-primary/80 hover:bg-slate-100 rounded-2xl transition-all flex items-center justify-center relative",
+              cell: "p-1 text-center relative", // Added padding to prevent overlapping
+              day_selected: "bg-primary text-white hover:bg-tertiary hover:text-primary focus:bg-primary focus:text-white rounded-xl font-black shadow-md transition-colors duration-300",
+              day_today: "bg-tertiary text-primary font-black rounded-xl shadow-sm",
+              day: "h-9 w-9 p-0 font-bold text-sm text-primary/80 hover:bg-slate-100 rounded-xl transition-all flex items-center justify-center relative mx-auto",
             }}
             components={{
               DayContent: (props) => {
