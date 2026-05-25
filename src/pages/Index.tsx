@@ -232,6 +232,20 @@ const Index = () => {
     }
   });
 
+  const cancelAppointmentMutation = useMutation({
+    mutationFn: async (appointmentId: string) => {
+      const { error } = await supabase.from('appointments').delete().eq('id', appointmentId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('ยกเลิกการจองเรียบร้อยแล้วค่ะ 📅');
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    },
+    onError: () => {
+      toast.error('เกิดข้อผิดพลาดในการยกเลิกการจองค่ะ');
+    }
+  });
+
   const redeemMutation = useMutation({
     mutationFn: async ({ template, points, type }: { template: any, points: number, type: 'coupon' | 'deal' }) => {
       const customerId = customerData?.profile?.id;
@@ -538,6 +552,7 @@ const Index = () => {
       <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={petToEdit} />
       <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={customerData?.pets || []} services={[]} onConfirm={async () => {}} />
       <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => {}} />
+      <AppointmentDetailModal isOpen={isAppointmentDetailOpen} onClose={() => setIsAppointmentDetailOpen(false)} appointment={selectedAppointment} onDelete={(id) => cancelAppointmentMutation.mutate(id)} />
     </div>
   );
 };
