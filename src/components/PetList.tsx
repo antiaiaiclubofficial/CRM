@@ -61,37 +61,43 @@ const PetList = ({ pets, onPetClick, onViewAll, onToggleFavorite }: PetListProps
                     <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
                   </div>
 
-                  {/* Weight & Gender Row - Added px-1.5 to prevent edge clipping */}
+                  {/* Weight & Gender Row */}
                   <div className="flex justify-between items-center mb-1.5 px-1.5">
                     <span className="text-[9px] text-primary/60 font-bold flex items-center gap-0.5">
                       <AnalogScaleIcon size={12} />
                       {pet.weight || '-'} kg
                     </span>
-                    <span className="text-[8px] font-black px-2 py-0.5 rounded-full bg-white/60 text-primary uppercase">
-                      {pet.gender || '-'}
-                    </span>
+                    {/* Fixed width container to align center with the heart button below */}
+                    <div className="w-10 flex justify-center shrink-0">
+                      <span className="text-[8px] font-black px-2 py-0.5 rounded-full bg-white/60 text-primary uppercase block text-center truncate">
+                        {pet.gender || '-'}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Name, Breed & Favorite Row - Changed items-end to items-center for perfect vertical alignment */}
+                  {/* Name, Breed & Favorite Row */}
                   <div className="flex justify-between items-center px-1.5">
                     <div className="min-w-0 flex-1 pr-1">
                       <h4 className="font-black text-primary text-xs truncate uppercase tracking-tighter leading-tight">{pet.name}</h4>
                       <p className="text-[9px] font-bold text-primary/40 truncate uppercase tracking-tighter">{pet.breed}</p>
                     </div>
                     
-                    {onToggleFavorite && (
-                      <button
-                        onClick={(e) => onToggleFavorite(e, pet.id, !!pet.is_favorite)}
-                        className="p-1 bg-white/80 backdrop-blur-sm rounded-full shadow-sm transition-all active:scale-110 shrink-0"
-                      >
-                        <Heart 
-                          size={10} 
-                          className={pet.is_favorite ? 'text-pink-500' : 'text-primary/20'}
-                          fill={pet.is_favorite ? "currentColor" : "none"} 
-                          strokeWidth={2.5} 
-                        />
-                      </button>
-                    )}
+                    {/* Fixed width container to align center with the gender badge above */}
+                    <div className="w-10 flex justify-center shrink-0">
+                      {onToggleFavorite && (
+                        <button
+                          onClick={(e) => onToggleFavorite(e, pet.id, !!pet.is_favorite)}
+                          className="p-1 bg-white/80 backdrop-blur-sm rounded-full shadow-sm transition-all active:scale-110"
+                        >
+                          <Heart 
+                            size={10} 
+                            className={pet.is_favorite ? 'text-pink-500' : 'text-primary/20'}
+                            fill={pet.is_favorite ? "currentColor" : "none"} 
+                            strokeWidth={2.5} 
+                          />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </motion.div>
