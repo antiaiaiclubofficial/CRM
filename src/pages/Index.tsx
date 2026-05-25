@@ -453,7 +453,15 @@ const Index = () => {
                   onCouponsClick={() => setActiveTab('promo')} 
                   onAppointmentClick={() => { setActiveTab('appointments'); setIsBookingFormOpen(true); }} 
                 />
-                <PetList pets={customerData?.pets || []} onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} onViewAll={() => setActiveTab('pets')} />
+                <PetList 
+                  pets={customerData?.pets || []} 
+                  onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} 
+                  onViewAll={() => setActiveTab('pets')} 
+                  onToggleFavorite={(e, id, fav) => {
+                    e.stopPropagation();
+                    favoriteMutation.mutate({ petId: id, isFavorite: fav });
+                  }}
+                />
                 <MyCouponsHomePreview coupons={customerData?.myCoupons?.slice(0, 5) || []} onViewAll={() => { setActiveTab('promo'); setTimeout(() => { document.getElementById('my-coupons-section')?.scrollIntoView({ behavior: 'smooth' }); }, 100); }} />
               </motion.div>
             )}
