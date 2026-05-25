@@ -87,34 +87,34 @@ const Promotions = ({
       <div className="bg-white p-1.5 rounded-full flex gap-1.5 shadow-ambient border border-black/5 relative">
         <button 
           onClick={() => setActiveTab('redeem')}
-          className="relative flex-1 py-3.5 px-4 flex items-center justify-center gap-2 transition-colors duration-300 z-10"
+          className="relative flex-1 py-3.5 px-4 flex items-center justify-center gap-2 transition-colors duration-300 z-10 group"
         >
           {activeTab === 'redeem' && (
             <motion.div 
               layoutId="promoTabBg"
-              className="absolute inset-0 bg-primary rounded-full shadow-lg"
+              className="absolute inset-0 bg-primary group-hover:bg-tertiary rounded-full shadow-lg transition-colors duration-300"
               transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
             />
           )}
           <span className={`relative z-10 text-xs font-black uppercase tracking-wider transition-colors duration-300 ${
-            activeTab === 'redeem' ? 'text-white' : 'text-primary/50'
+            activeTab === 'redeem' ? 'text-white group-hover:text-primary' : 'text-primary/50 group-hover:text-primary'
           }`}>
             แลกรับรางวัล
           </span>
         </button>
         <button 
           onClick={() => setActiveTab('my-coupons')}
-          className="relative flex-1 py-3.5 px-4 flex items-center justify-center gap-2 transition-colors duration-300 z-10"
+          className="relative flex-1 py-3.5 px-4 flex items-center justify-center gap-2 transition-colors duration-300 z-10 group"
         >
           {activeTab === 'my-coupons' && (
             <motion.div 
               layoutId="promoTabBg"
-              className="absolute inset-0 bg-primary rounded-full shadow-lg"
+              className="absolute inset-0 bg-primary group-hover:bg-tertiary rounded-full shadow-lg transition-colors duration-300"
               transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
             />
           )}
           <span className={`relative z-10 text-xs font-black uppercase tracking-wider transition-colors duration-300 ${
-            activeTab === 'my-coupons' ? 'text-white' : 'text-primary/50'
+            activeTab === 'my-coupons' ? 'text-white group-hover:text-primary' : 'text-primary/50 group-hover:text-primary'
           }`}>
             คูปองของฉัน ({collectedCoupons.length})
           </span>

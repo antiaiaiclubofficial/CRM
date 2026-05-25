@@ -558,9 +558,9 @@ const Index = () => {
 };
 
 const NavButton = ({ active, icon, onClick }: { active: boolean; icon: any; onClick: () => void }) => (
-  <button onClick={onClick} className="relative flex items-center justify-center w-10 h-10">
-    {active && <motion.div layoutId="activeNavBg" className="absolute inset-0 bg-primary rounded-2xl shadow-ambient" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />}
-    <div className={`relative z-10 ${active ? 'text-tertiary' : 'text-primary/40'}`}>{icon}</div>
+  <button onClick={onClick} className="relative flex items-center justify-center w-10 h-10 group">
+    {active && <motion.div layoutId="activeNavBg" className="absolute inset-0 bg-primary group-hover:bg-tertiary rounded-2xl shadow-ambient transition-colors duration-300" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />}
+    <div className={`relative z-10 transition-colors duration-300 ${active ? 'text-tertiary group-hover:text-primary' : 'text-primary/40 group-hover:text-primary'}`}>{icon}</div>
   </button>
 );
 

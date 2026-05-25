@@ -317,17 +317,17 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
 const TabButton = ({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) => (
   <button 
     onClick={onClick}
-    className="relative flex-1 py-2.5 px-3 flex items-center justify-center gap-1 transition-colors duration-300 z-10"
+    className="relative flex-1 py-2.5 px-3 flex items-center justify-center gap-1 transition-colors duration-300 z-10 group"
   >
     {active && (
       <motion.div 
         layoutId="activeTabBg"
-        className="absolute inset-0 bg-primary rounded-full shadow-lg"
+        className="absolute inset-0 bg-primary group-hover:bg-tertiary rounded-full shadow-lg transition-colors duration-300"
         transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
       />
     )}
     <span className={`relative z-10 whitespace-nowrap transition-colors duration-300 ${
-      active ? 'text-white font-bold' : 'text-primary/40 font-black uppercase tracking-widest text-[10px]'
+      active ? 'text-white group-hover:text-primary font-bold' : 'text-primary/40 group-hover:text-primary font-black uppercase tracking-widest text-[10px]'
     }`}>
       {label}
     </span>
