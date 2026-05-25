@@ -1,8 +1,8 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Clock, Scissors, QrCode, Trash2, CheckCircle2, DollarSign, AlertCircle, Sparkles } from 'lucide-react';
+import { X, Calendar, Clock, Scissors, QrCode, Trash2, CheckCircle2, DollarSign, AlertTriangle, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
 
@@ -49,10 +49,18 @@ const statusConfig = {
 };
 
 const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: AppointmentDetailModalProps) => {
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+
   if (!appointment) return null;
 
   const config = statusConfig[appointment.status] || statusConfig.pending;
   const date = new Date(appointment.startTime);
+
+  const handleConfirmCancel = () => {
+    onDelete(appointment.id);
+    setShowCancelConfirm(false);
+    onClose();
+  };
 
   return (
     <AnimatePresence>
@@ -219,12 +227,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
               {appointment.status !== 'completed' && appointment.status !== 'cancelled' && (
                 <div className="pt-4 space-y-4">
                   <button 
-                    onClick={() => {
-                      if (window.confirm(`ยืนยันการยกเลิกนัดหมายของน้อง${appointment.petName} ใช่หรือไม่?`)) {
-                        onDelete(appointment.id);
-                        onClose();
-                      }
-                    }}
+                    onClick={() => setShowCancelConfirm(true)}
                     className="w-full py-4 flex items-center justify-center gap-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-black rounded-2xl border border-rose-100 shadow-sm active:scale-95 transition-all text-xs uppercase tracking-widest"
                   >
                     <Trash2 size={16} strokeWidth={3} />
@@ -239,6 +242,50 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
           </motion.div>
         </div>
       )}
+
+      {/* Custom Confirmation Modal for Cancellation */}
+      <AnimatePresence>
+        {showCancelConfirm && (
+          <div className="fixed inset-0 z-[150] flex items-center justify-center px-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowCancelConfirm(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              className="relative w-full max-w-[320px] bg-white rounded-[2.5rem] shadow-2xl p-8 text-center border border-black/5 z-[160]"
+            >
+              <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertTriangle size={40} className="text-rose-500" />
+              </div>
+              <h3 className="text-xl font-black text-[#020d35] mb-2 tracking-tight">ยืนยันการยกเลิก?</h3>
+              <p className="text-xs font-medium text-slate-500 mb-8 leading-relaxed">
+                คุณต้องการยกเลิกการจองนัดหมายของ <br/>
+                <span className="font-black text-[#020d35]">น้อง{appointment.petName}</span> ใช่หรือไม่?
+              </p>
+              <div className="space-y-3">
+                <button 
+                  onClick={handleConfirmCancel}
+                  className="w-full py-4 bg-rose-500 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-rose-500/10 active:scale-95 transition-all"
+                >
+                  ยืนยันการยกเลิก
+                </button>
+                <button 
+                  onClick={() => setShowCancelConfirm(false)}
+                  className="w-full py-4 bg-slate-100 text-[#020d35] rounded-2xl font-black uppercase tracking-widest text-xs active:scale-95 transition-all"
+                >
+                  เก็บนัดหมายไว้
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </AnimatePresence>
   );
 };
