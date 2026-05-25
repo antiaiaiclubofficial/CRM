@@ -37,7 +37,7 @@ const PetList = ({ pets, onPetClick, onViewAll }: PetListProps) => {
               key={pet.id}
               whileTap={{ scale: 0.95 }}
               onClick={() => onPetClick?.(pet)}
-              className="flex-shrink-0 w-32 bg-surface-lowest p-4 rounded-[2rem] shadow-ambient text-center cursor-pointer transition-all"
+              className="flex-shrink-0 w-32 bg-[#efecff] p-4 rounded-[2rem] shadow-ambient text-center cursor-pointer transition-all"
             >
               <div className="relative w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-3 bg-surface-low shadow-sm">
                 <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
