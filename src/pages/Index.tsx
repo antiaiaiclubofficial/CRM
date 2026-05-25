@@ -148,6 +148,25 @@ const Index = () => {
     enabled: !!lineProfile?.userId && !!store?.id,
   });
 
+  const { data: services } = useQuery({
+    queryKey: ['services', store?.id],
+    queryFn: async () => {
+      if (!store?.id) return [];
+      const { data } = await supabase.from('services').select('*').eq('store_id', store.id);
+      return data || [];
+    },
+    enabled: !!store?.id
+  });
+
+  const displayServices = useMemo(() => {
+    const defaultServices = [
+      { id: '1', name: 'อาบน้ำสุนัข/แมว', price: 350, description: 'อาบน้ำ เป่าขน ตัดเล็บ เช็ดหู' },
+      { id: '2', name: 'ตัดขนสไตล์แฟชั่น', price: 550, description: 'ออกแบบทรงขนโดยช่างมืออาชีพ' },
+      { id: '3', name: 'สปาโอโซนบำรุงผิวหนัง', price: 450, description: 'ช่วยฟื้นฟูผิวหนังและเส้นขนให้นุ่มสลวย' }
+    ];
+    return services && services.length > 0 ? services : defaultServices;
+  }, [services]);
+
   const { data: couponTemplates } = useQuery({
     queryKey: ['coupon_templates', store?.id],
     queryFn: async () => {
@@ -229,6 +248,32 @@ const Index = () => {
     },
     onError: () => {
       toast.error('เกิดข้อผิดพลาดในการลบข้อมูลค่ะ');
+    }
+  });
+
+  const createAppointmentMutation = useMutation({
+    mutationFn: async (bookingData: any) => {
+      const customerId = customerData?.profile?.id;
+      const storeId = store?.id;
+      if (!customerId || !storeId) throw new Error("Missing context");
+
+      const { error } = await supabase.from('appointments').insert([{
+        customer_id: customerId,
+        store_id: storeId,
+        pet_id: bookingData.pet_id,
+        service_id: bookingData.service_id,
+        start_time: bookingData.start_time,
+        notes: bookingData.notes,
+        status: 'pending'
+      }]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('ส่งคำขอจองคิวเรียบร้อยแล้วค่ะ รอพนักงานยืนยันนะคะ 📅');
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    },
+    onError: () => {
+      toast.error('เกิดข้อผิดพลาดในการจองคิว กรุณาลองใหม่อีกครั้งค่ะ');
     }
   });
 
@@ -428,7 +473,7 @@ const Index = () => {
   }
 
   return (
-    <div className="w-full h-[100dvh] max-md:max-w-md mx-auto bg-surface relative font-['Inter'] overflow-hidden">
+    <div className="w-full h-[100dvh] max-md:max-w-md mx-auto bg-surface relative overflow-hidden">
       <div 
         ref={mainScrollRef} 
         className="h-full w-full overflow-y-scroll no-scrollbar touch-pan-y relative"
@@ -550,7 +595,7 @@ const Index = () => {
 
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.phone || ''} />
       <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={petToEdit} />
-      <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={customerData?.pets || []} services={[]} onConfirm={async () => {}} />
+      <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={customerData?.pets || []} services={displayServices} onConfirm={async (data) => { await createAppointmentMutation.mutateAsync(data); }} />
       <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => {}} />
       <AppointmentDetailModal isOpen={isAppointmentDetailOpen} onClose={() => setIsAppointmentDetailOpen(false)} appointment={selectedAppointment} onDelete={(id) => cancelAppointmentMutation.mutate(id)} />
     </div>
