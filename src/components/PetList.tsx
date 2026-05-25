@@ -67,8 +67,8 @@ const PetList = ({ pets, onPetClick, onViewAll, onToggleFavorite }: PetListProps
                       <AnalogScaleIcon size={12} />
                       {pet.weight || '-'} kg
                     </span>
-                    {/* Fixed width container to align center with the heart button below */}
-                    <div className="w-10 flex justify-center shrink-0">
+                    {/* Changed justify-center to justify-end to align with the right edge */}
+                    <div className="w-10 flex justify-end shrink-0">
                       <span className="text-[8px] font-black px-2 py-0.5 rounded-full bg-white/60 text-primary uppercase block text-center truncate">
                         {pet.gender || '-'}
                       </span>
@@ -82,8 +82,8 @@ const PetList = ({ pets, onPetClick, onViewAll, onToggleFavorite }: PetListProps
                       <p className="text-[9px] font-bold text-primary/40 truncate uppercase tracking-tighter">{pet.breed}</p>
                     </div>
                     
-                    {/* Fixed width container to align center with the gender badge above */}
-                    <div className="w-10 flex justify-center shrink-0">
+                    {/* Changed justify-center to justify-end to align with the right edge */}
+                    <div className="w-10 flex justify-end shrink-0">
                       {onToggleFavorite && (
                         <button
                           onClick={(e) => onToggleFavorite(e, pet.id, !!pet.is_favorite)}
