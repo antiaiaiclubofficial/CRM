@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Scissors, Bath, Sparkles, Calendar, ChevronRight, X } from 'lucide-react';
+import { Scissors, Bath, Sparkles, Calendar, ChevronRight, X, Clock, DollarSign } from 'lucide-react';
 
 interface ServiceHistoryItem {
   id: string | number;
@@ -34,71 +34,99 @@ const ServiceHistory = ({ historyData, filterPetName, onClearFilter, onServiceCl
     : historyData;
 
   return (
-    <div className="space-y-6 pb-20">
-      <div className="flex justify-between items-center px-1">
-        <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">ประวัติการใช้บริการ</h2>
-        <div className="bg-white border-2 border-black px-3 py-1 rounded-full shadow-sm">
-          <span className="text-[10px] font-black text-black uppercase">ทั้งหมด {filteredData.length} ครั้ง</span>
+    <div className="space-y-8 pb-24">
+      {/* Header Section */}
+      <div className="flex justify-between items-end px-1">
+        <div>
+          <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mb-1">Service Records</p>
+          <h2 className="text-2xl font-black text-primary tracking-tight">ประวัติการใช้บริการ</h2>
+        </div>
+        <div className="bg-white px-4 py-1.5 rounded-full shadow-ambient border border-white/40">
+          <span className="text-[10px] font-black text-primary uppercase tracking-wider">ทั้งหมด {filteredData.length} ครั้ง</span>
         </div>
       </div>
 
+      {/* Filter Indicator */}
       {filterPetName && (
-        <div className="flex items-center justify-between bg-white px-4 py-2 rounded-2xl border-2 border-black shadow-sm">
-          <p className="text-[10px] font-black text-black uppercase">
-            แสดงผลเฉพาะ: <span className="text-pink-500 underline">{filterPetName}</span>
+        <div className="flex items-center justify-between bg-white/80 backdrop-blur-md px-5 py-3 rounded-2xl shadow-ambient border border-white/40">
+          <p className="text-xs font-bold text-surface-variant">
+            แสดงผลเฉพาะ: <span className="text-primary font-black underline">น้อง{filterPetName}</span>
           </p>
           <button 
             onClick={onClearFilter}
-            className="p-1 bg-slate-100 hover:bg-pink-100 border border-black rounded-lg text-black transition-colors"
+            className="p-1.5 bg-slate-100 hover:bg-pink-50 rounded-full text-slate-400 hover:text-pink-500 transition-colors"
           >
-            <X size={12} />
+            <X size={14} />
           </button>
         </div>
       )}
 
+      {/* History List */}
       <div className="space-y-4">
         {filteredData.length > 0 ? (
           filteredData.map((item, index) => (
             <motion.div
               key={item.id}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.05 }}
               onClick={() => onServiceClick(item)}
-              className="bg-white p-5 rounded-[2.5rem] border-2 border-black shadow-soft group active:translate-y-0.5 active:shadow-none transition-all cursor-pointer overflow-hidden relative"
+              className="bg-white p-6 rounded-[2.5rem] shadow-ambient hover:shadow-glass border border-white/40 group active:scale-[0.99] transition-all cursor-pointer overflow-hidden relative"
             >
-              <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 ${item.bg} border-2 border-black rounded-2xl flex items-center justify-center text-xl shadow-sm shrink-0`}>
+              {/* Soft background glow behind card */}
+              <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="flex items-center gap-5 relative z-10">
+                {/* Icon Vessel */}
+                <div className={`w-14 h-14 ${item.bg} rounded-2xl flex items-center justify-center text-2xl shadow-inner shrink-0`}>
                   {item.icon}
                 </div>
-                <div className="flex-1">
+                
+                {/* Content */}
+                <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-1">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                    <span className="text-[9px] font-black text-surface-variant opacity-40 uppercase tracking-widest flex items-center gap-1">
                       <Calendar size={10} /> {item.date}
                     </span>
-                    <span className="text-sm font-black text-pink-500">฿{item.price}</span>
+                    <span className="text-sm font-black text-primary">฿{item.price}</span>
                   </div>
-                  <h4 className="font-black text-slate-800 text-sm mb-0.5">{item.service}</h4>
-                  <p className="text-[10px] font-bold text-slate-500 uppercase">
-                    สำหรับ: <span className="text-black underline">{item.petName}</span>
-                  </p>
+                  <h4 className="font-black text-primary text-sm truncate leading-tight">{item.service}</h4>
+                  
+                  {/* Pet Status Bubble */}
+                  <div className="flex items-center gap-1.5 mt-2">
+                    <span className="text-[9px] font-black px-2.5 py-0.5 rounded-full bg-secondary/10 text-primary uppercase tracking-wider">
+                      {item.petName}
+                    </span>
+                  </div>
                 </div>
-                <div className="p-2 border-2 border-black rounded-xl group-hover:bg-black group-hover:text-white transition-colors shrink-0">
-                  <ChevronRight size={16} strokeWidth={3} />
+
+                {/* Chevron Action */}
+                <div className="w-9 h-9 bg-slate-50 rounded-full flex items-center justify-center text-primary/40 group-hover:bg-primary group-hover:text-white transition-colors shrink-0">
+                  <ChevronRight size={14} strokeWidth={3} />
                 </div>
               </div>
             </motion.div>
           ))
         ) : (
-          <div className="text-center py-12 border-2 border-dashed border-slate-300 rounded-[2.5rem] bg-white/50">
-            <p className="text-sm font-black text-slate-400 uppercase">ไม่พบประวัติการใช้บริการ</p>
+          <div className="text-center py-16 bg-white rounded-[3rem] shadow-ambient border border-white/40 p-8 flex flex-col items-center justify-center">
+            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 mb-4 border border-slate-100">
+              <History size={28} />
+            </div>
+            <h3 className="text-base font-black text-primary mb-1">ยังไม่มีประวัติการใช้บริการ</h3>
+            <p className="text-xs font-bold text-surface-variant opacity-60 max-w-[200px] leading-relaxed">
+              เมื่อสัตว์เลี้ยงของคุณเข้ารับบริการที่ร้าน ประวัติจะแสดงที่นี่โดยอัตโนมัติค่ะ 🐾
+            </p>
           </div>
         )}
       </div>
 
-      <div className="bg-slate-50 border-2 border-dashed border-slate-300 rounded-[2.5rem] p-8 text-center">
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">--- สิ้นสุดรายการประวัติ ---</p>
-      </div>
+      {filteredData.length > 0 && (
+        <div className="text-center py-4">
+          <p className="text-[9px] font-black text-surface-variant opacity-30 uppercase tracking-[0.2em]">
+            --- End of Records ---
+          </p>
+        </div>
+      )}
     </div>
   );
 };
