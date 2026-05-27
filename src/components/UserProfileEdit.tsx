@@ -129,11 +129,11 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
             {/* Scrollable Content */}
             <div className="flex-1 space-y-6 px-6 pb-6 overflow-y-auto no-scrollbar pt-2 relative z-10">
               
-              {/* Section 1: General Info */}
-              <div className="bg-white/75 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-ambient border border-white/40 space-y-5">
-                <div className="flex items-center gap-2 pb-1 border-b border-primary/5">
-                  <User size={16} className="text-[#020d35]/60" />
-                  <h4 className="text-[10px] font-black text-[#020d35] uppercase tracking-widest">ข้อมูลทั่วไป</h4>
+              {/* Section 1: General Info (Pink Theme) */}
+              <div className="bg-white/75 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-ambient border border-white/40 border-l-4 border-l-pink-400 space-y-5">
+                <div className="flex items-center gap-2 pb-1 border-b border-pink-100">
+                  <User size={16} className="text-pink-500" />
+                  <h4 className="text-[10px] font-black text-pink-600 uppercase tracking-widest">ข้อมูลทั่วไป</h4>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -143,7 +143,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       type="text" 
                       value={formData.firstName}
                       onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -152,7 +152,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       type="text" 
                       value={formData.lastName}
                       onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
                   </div>
                 </div>
@@ -163,7 +163,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                     <select 
                       value={formData.gender}
                       onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all appearance-none"
+                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold text-[#020d35] transition-all appearance-none"
                     >
                       <option value="หญิง">หญิง</option>
                       <option value="ชาย">ชาย</option>
@@ -176,29 +176,29 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       type="number" 
                       value={formData.age}
                       onChange={(e) => setFormData({...formData, age: e.target.value})}
-                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Section 2: Contact Info */}
-              <div className="bg-white/75 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-ambient border border-white/40 space-y-5">
-                <div className="flex items-center gap-2 pb-1 border-b border-primary/5">
-                  <Mail size={16} className="text-[#020d35]/60" />
-                  <h4 className="text-[10px] font-black text-[#020d35] uppercase tracking-widest">ข้อมูลการติดต่อ</h4>
+              {/* Section 2: Contact Info (Blue Theme) */}
+              <div className="bg-white/75 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-ambient border border-white/40 border-l-4 border-l-blue-400 space-y-5">
+                <div className="flex items-center gap-2 pb-1 border-b border-blue-100">
+                  <Mail size={16} className="text-blue-500" />
+                  <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-widest">ข้อมูลการติดต่อ</h4>
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1 flex items-center gap-1">
-                    <Phone size={10} className="text-pink-500" /> เบอร์โทรศัพท์
+                    <Phone size={10} className="text-blue-500" /> เบอร์โทรศัพท์
                   </label>
                   <input 
                     type="tel" 
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     placeholder="08X-XXX-XXXX"
-                    className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                    className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-blue-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                   />
                 </div>
 
@@ -209,29 +209,29 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                     placeholder="example@mail.com"
-                    className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                    className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-blue-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                   />
                 </div>
               </div>
 
-              {/* Section 3: Address Info */}
-              <div className="bg-white/75 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-ambient border border-white/40 space-y-5">
-                <div className="flex items-center gap-2 pb-1 border-b border-primary/5">
-                  <MapPin size={16} className="text-[#020d35]/60" />
-                  <h4 className="text-[10px] font-black text-[#020d35] uppercase tracking-widest">ข้อมูลที่อยู่</h4>
+              {/* Section 3: Address Info (Emerald Theme) */}
+              <div className="bg-white/75 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-ambient border border-white/40 border-l-4 border-l-emerald-400 space-y-5">
+                <div className="flex items-center gap-2 pb-1 border-b border-emerald-100">
+                  <MapPin size={16} className="text-emerald-500" />
+                  <h4 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">ข้อมูลที่อยู่</h4>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1 flex items-center gap-1">
-                      <Home size={10} /> เลขที่บ้าน
+                      <Home size={10} className="text-emerald-500" /> เลขที่บ้าน
                     </label>
                     <input 
                       type="text" 
                       value={addressParts.houseNo}
                       onChange={(e) => setAddressParts({...addressParts, houseNo: e.target.value})}
                       placeholder="เช่น 123/4"
-                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -241,7 +241,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       value={addressParts.moo}
                       onChange={(e) => setAddressParts({...addressParts, moo: e.target.value})}
                       placeholder="เช่น 5"
-                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
                   </div>
                 </div>
@@ -254,7 +254,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       value={addressParts.soi}
                       onChange={(e) => setAddressParts({...addressParts, soi: e.target.value})}
                       placeholder="เช่น สุขุมวิท 1"
-                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -264,7 +264,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       value={addressParts.road}
                       onChange={(e) => setAddressParts({...addressParts, road: e.target.value})}
                       placeholder="เช่น รามคำแหง"
-                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
                   </div>
                 </div>
@@ -277,7 +277,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       value={formData.subDistrict}
                       onChange={(e) => setFormData({...formData, subDistrict: e.target.value})}
                       placeholder="ตำบล"
-                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -287,7 +287,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       value={formData.district}
                       onChange={(e) => setFormData({...formData, district: e.target.value})}
                       placeholder="อำเภอ"
-                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
                   </div>
                 </div>
@@ -300,7 +300,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       value={formData.province}
                       onChange={(e) => setFormData({...formData, province: e.target.value})}
                       placeholder="จังหวัด"
-                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -310,7 +310,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                       value={formData.postalCode}
                       onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
                       placeholder="10XXX"
-                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all"
+                      className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
                   </div>
                 </div>
