@@ -350,6 +350,38 @@ const Index = () => {
     }
   });
 
+  const updateProfileMutation = useMutation({
+    mutationFn: async (updatedProfile: any) => {
+      const customerId = customerData?.profile?.id;
+      if (!customerId) throw new Error("Missing customer ID");
+      
+      const { error } = await supabase
+        .from('customers')
+        .update({
+          first_name: updatedProfile.firstName,
+          last_name: updatedProfile.lastName,
+          gender: updatedProfile.gender,
+          age: updatedProfile.age,
+          phone: updatedProfile.phone,
+          address: updatedProfile.address,
+          sub_district: updatedProfile.subDistrict,
+          district: updatedProfile.district,
+          province: updatedProfile.province,
+          postal_code: updatedProfile.postalCode,
+          email: updatedProfile.email
+        })
+        .eq('id', customerId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('อัปเดตข้อมูลส่วนตัวเรียบร้อยแล้วค่ะ ✨');
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    },
+    onError: () => {
+      toast.error('เกิดข้อผิดพลาดในการอัปเดตข้อมูลค่ะ');
+    }
+  });
+
   const petMutation = useMutation({
     mutationFn: async (pet: any) => {
       const { id, weight, ...petData } = pet;
@@ -458,6 +490,23 @@ const Index = () => {
     setPetToEdit(null);
     setIsPetFormOpen(true);
   };
+
+  const mappedProfile = useMemo(() => {
+    const p = customerData?.profile;
+    return {
+      firstName: p?.first_name || '',
+      lastName: p?.last_name || '',
+      gender: p?.gender || 'หญิง',
+      age: p?.age || '',
+      phone: p?.phone || '',
+      address: p?.address || '',
+      subDistrict: p?.sub_district || '',
+      district: p?.district || '',
+      province: p?.province || '',
+      postalCode: p?.postal_code || '',
+      email: p?.email || ''
+    };
+  }, [customerData?.profile]);
 
   if (liffLoading || storeLoading || (lineProfile && profileLoading)) {
     return (
@@ -598,6 +647,7 @@ const Index = () => {
       <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={customerData?.pets || []} services={displayServices} onConfirm={async (data) => { await createAppointmentMutation.mutateAsync(data); }} />
       <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => {}} />
       <AppointmentDetailModal isOpen={isAppointmentDetailOpen} onClose={() => setIsAppointmentDetailOpen(false)} appointment={selectedAppointment} onDelete={(id) => cancelAppointmentMutation.mutate(id)} />
+      <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={mappedProfile} onSave={(data) => updateProfileMutation.mutate(data)} />
     </div>
   );
 };
