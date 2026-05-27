@@ -58,28 +58,30 @@ const Promotions = ({
   const regularRedeemables = redeemableTemplates.filter(t => t.pointsRequired > 0);
 
   return (
-    <div className="space-y-8 pb-24">
-      {/* Premium Glassmorphic Points Card - Compact Version */}
-      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#18234a] to-[#020d35] p-6 text-white shadow-ambient border border-white/10">
-        {/* Glowing Liquid Blobs */}
-        <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#EAFD69]/15 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -left-10 -bottom-10 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl" />
-
-        <div className="relative z-10 flex justify-between items-center">
-          <div className="space-y-1">
-            <span className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] flex items-center gap-1.5">
-              <Coins size={12} className="text-[#EAFD69]" /> คะแนนสะสมของคุณ
-            </span>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-3xl font-black text-[#EAFD69] tracking-tighter leading-none">
+    <div className="space-y-6 pb-24">
+      {/* Super Sleek & Compact Points Status Bar */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#18234a] to-[#020d35] py-3.5 px-5 text-white shadow-ambient border border-white/10 flex items-center justify-between">
+        {/* Subtle background glow */}
+        <div className="absolute right-0 top-0 w-24 h-24 bg-[#EAFD69]/10 rounded-full blur-2xl pointer-events-none" />
+        
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="w-8 h-8 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-[#EAFD69] border border-white/10">
+            <Coins size={16} className="animate-pulse" />
+          </div>
+          <div>
+            <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">คะแนนสะสมของคุณ</p>
+            <div className="flex items-baseline gap-1">
+              <span className="text-xl font-black text-[#EAFD69] tracking-tight leading-none">
                 {userPoints.toLocaleString()}
               </span>
-              <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider">คะแนน</span>
+              <span className="text-[8px] font-bold text-white/60 uppercase">pts</span>
             </div>
           </div>
-          <div className="w-11 h-11 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-[#EAFD69] border border-white/20 shadow-inner">
-            <Crown size={20} className="animate-bounce" style={{ animationDuration: '3s' }} />
-          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 bg-white/5 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-white/5 relative z-10">
+          <Crown size={12} className="text-[#EAFD69]" />
+          <span className="text-[9px] font-black text-white/80 uppercase tracking-wider">Premium</span>
         </div>
       </div>
 
