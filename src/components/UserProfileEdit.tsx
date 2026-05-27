@@ -312,7 +312,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
             </div>
 
             {/* Sticky Footer for Save Button (Wider & Always Accessible) */}
-            <div className="p-4 bg-white/80 backdrop-blur-md border-t border-slate-100/50 shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <div className="p-4 bg-white/90 backdrop-blur-2xl border-t border-slate-100/50 shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom))]">
               <button 
                 onClick={handleSave}
                 className="w-full py-4 bg-gradient-to-br from-[#18234a] to-[#020d35] text-white rounded-full font-black shadow-ambient active:scale-95 transition-all flex items-center justify-center gap-2 border-none text-sm uppercase tracking-widest"
