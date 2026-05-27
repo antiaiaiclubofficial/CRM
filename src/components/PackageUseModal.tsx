@@ -89,7 +89,7 @@ const PackageUseModal = ({ isOpen, onClose, customerPackage, onConfirmUse }: Pac
                     <span className="text-[9px] font-black text-[#020d35] bg-[#EAFD69] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                       ACTIVE PACKAGE
                     </span>
-                    <h4 className="text-lg font-black mt-2 leading-tight">{customerPackage.title}</h4>
+                    <h4 className="text-lg font-black mt-2 leading-tight text-white">{customerPackage.title}</h4>
                     <p className="text-xs text-white/60 mt-1">{customerPackage.description}</p>
                   </div>
 
