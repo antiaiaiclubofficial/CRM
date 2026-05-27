@@ -18,6 +18,7 @@ import PetManagement from '@/components/PetManagement';
 import QRCodeModal from '@/components/QRCodeModal';
 import MyCouponsHomePreview from '@/components/MyCouponsHomePreview';
 import CouponUseModal from '@/components/CouponUseModal';
+import PackageUseModal from '@/components/PackageUseModal';
 import HomeQuickActions from '@/components/HomeQuickActions';
 import AppointmentList from '@/components/AppointmentList';
 import AppointmentDetailModal from '@/components/AppointmentDetailModal';
@@ -43,6 +44,8 @@ const Index = () => {
   const [isPreferenceFormOpen, setIsPreferenceFormOpen] = useState(false);
   const [selectedCouponToUse, setSelectedCouponToUse] = useState<any | null>(null);
   const [isCouponUseModalOpen, setIsCouponUseModalOpen] = useState(false);
+  const [selectedPackageToUse, setSelectedPackageToUse] = useState<any | null>(null);
+  const [isPackageUseModalOpen, setIsPackageUseModalOpen] = useState(false);
   const [isBookingFormOpen, setIsBookingFormOpen] = useState(false);
   const [isAppointmentDetailOpen, setIsAppointmentDetailOpen] = useState(false);
   
@@ -104,6 +107,33 @@ const Index = () => {
       
       const { data: appointmentsData } = await supabase.from('appointments').select('*, pets(name, image_url, breed), services(name, price)').eq('customer_id', customer.id).order('start_time', { ascending: true });
 
+      // Fetch customer packages with templates and usage history
+      const { data: packagesData } = await supabase
+        .from('customer_packages')
+        .select('*, package_templates(*)')
+        .eq('customer_id', customer.id)
+        .eq('store_id', store.id)
+        .eq('status', 'active');
+
+      const packageIds = (packagesData || []).map(p => p.id);
+      const { data: usageHistory } = await supabase
+        .from('package_usage_history')
+        .select('*')
+        .in('customer_package_id', packageIds)
+        .order('used_at', { ascending: false });
+
+      const customerPackages = (packagesData || []).map(pkg => ({
+        id: pkg.id,
+        title: pkg.package_templates?.title || 'แพ็คเกจสะสม',
+        description: pkg.package_templates?.description || '',
+        total_sessions: pkg.total_sessions,
+        remaining_sessions: pkg.remaining_sessions,
+        status: pkg.status,
+        expires_at: pkg.expires_at,
+        created_at: pkg.created_at,
+        usage_history: (usageHistory || []).filter(uh => uh.customer_package_id === pkg.id)
+      }));
+
       const myCoupons = [
         ...(coupons || []).map(c => ({
           ...c,
@@ -132,6 +162,7 @@ const Index = () => {
         membership: membership,
         pets,
         myCoupons,
+        customerPackages,
         appointments: (appointmentsData || []).map(apt => ({
           id: apt.id,
           petName: apt.pets?.name || 'Unknown',
@@ -195,6 +226,16 @@ const Index = () => {
         pointsRequired: t.points_required,
         expiry: `${t.expiry_days} วัน`
       }));
+    },
+    enabled: !!store?.id
+  });
+
+  const { data: packageTemplates } = useQuery({
+    queryKey: ['package_templates', store?.id],
+    queryFn: async () => {
+      if (!store?.id) return [];
+      const { data } = await supabase.from('package_templates').select('*').eq('store_id', store.id).eq('is_active', true);
+      return data || [];
     },
     enabled: !!store?.id
   });
@@ -292,7 +333,7 @@ const Index = () => {
   });
 
   const redeemMutation = useMutation({
-    mutationFn: async ({ template, points, type }: { template: any, points: number, type: 'coupon' | 'deal' }) => {
+    mutationFn: async ({ template, points, type }: { template: any, points: number, type: 'coupon' | 'deal' | 'package' }) => {
       const customerId = customerData?.profile?.id;
       const storeId = store?.id;
       if (!customerId || !storeId) throw new Error("Missing context");
@@ -308,7 +349,7 @@ const Index = () => {
       if (pointsError) throw pointsError;
 
       const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + (template.expiry_days || 30));
+      expiresAt.setDate(expiresAt.getDate() + (template.expiry_days || 365)); // Packages valid for 1 year by default
 
       if (type === 'coupon') {
         await supabase.from('customer_coupons').insert([{
@@ -318,7 +359,7 @@ const Index = () => {
           expires_at: expiresAt.toISOString(),
           status: 'unused'
         }]);
-      } else {
+      } else if (type === 'deal') {
         await supabase.from('customers_deals').insert([{
           template_id: template.id,
           customer_id: customerId,
@@ -326,14 +367,54 @@ const Index = () => {
           expires_at: expiresAt.toISOString(),
           status: 'unused'
         }]);
+      } else if (type === 'package') {
+        await supabase.from('customer_packages').insert([{
+          template_id: template.id,
+          customer_id: customerId,
+          store_id: storeId,
+          total_sessions: template.total_sessions,
+          remaining_sessions: template.total_sessions,
+          expires_at: expiresAt.toISOString(),
+          status: 'active'
+        }]);
       }
     },
     onSuccess: () => {
-      toast.success('แลกรับเรียบร้อยแล้วค่ะ! ดูได้ที่เมนู "คูปองของฉัน" นะคะ 🎫');
+      toast.success('แลกรับเรียบร้อยแล้วค่ะ! ดูได้ที่เมนู "คูปอง/แพ็คเกจของฉัน" นะคะ 🎫');
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
     },
     onError: (error: any) => {
       toast.error(error.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ');
+    }
+  });
+
+  const usePackageSessionMutation = useMutation({
+    mutationFn: async (packageId: string) => {
+      const pkg = customerData?.customerPackages?.find(p => p.id === packageId);
+      if (!pkg || pkg.remaining_sessions <= 0) throw new Error("สิทธิ์คงเหลือไม่เพียงพอ");
+
+      const newRemaining = pkg.remaining_sessions - 1;
+      const newStatus = newRemaining === 0 ? 'completed' : 'active';
+
+      // Update remaining sessions
+      const { error: updateError } = await supabase
+        .from('customer_packages')
+        .update({ remaining_sessions: newRemaining, status: newStatus })
+        .eq('id', packageId);
+      if (updateError) throw updateError;
+
+      // Insert usage history
+      const { error: historyError } = await supabase
+        .from('package_usage_history')
+        .insert([{ customer_package_id: packageId, notes: 'หักสิทธิ์การใช้งานบริการ' }]);
+      if (historyError) throw historyError;
+    },
+    onSuccess: () => {
+      toast.success('หักสิทธิ์การใช้งานแพ็คเกจเรียบร้อยแล้วค่ะ 🐾');
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'เกิดข้อผิดพลาดในการหักสิทธิ์ค่ะ');
     }
   });
 
@@ -588,9 +669,13 @@ const Index = () => {
                    usedOrExpiredCoupons={[]} 
                    redeemableTemplates={couponTemplates || []} 
                    dealTemplates={dealTemplates || []} 
+                   packageTemplates={packageTemplates || []}
+                   customerPackages={customerData?.customerPackages || []}
                    onRedeemCoupon={(t, p) => redeemMutation.mutate({ template: t, points: p, type: 'coupon' })} 
                    onBuyDeal={(t, p) => redeemMutation.mutate({ template: t, points: p, type: 'deal' })} 
+                   onBuyPackage={(t, p) => redeemMutation.mutate({ template: t, points: p, type: 'package' })}
                    onUseCoupon={(c) => { setSelectedCouponToUse(c); setIsCouponUseModalOpen(true); }} 
+                   onUsePackage={(pkg) => { setSelectedPackageToUse(pkg); setIsPackageUseModalOpen(true); }}
                  />
               </motion.div>
             )}
@@ -646,6 +731,7 @@ const Index = () => {
       <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={petToEdit} />
       <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={customerData?.pets || []} services={displayServices} onConfirm={async (data) => { await createAppointmentMutation.mutateAsync(data); }} />
       <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => {}} />
+      <PackageUseModal isOpen={isPackageUseModalOpen} onClose={() => setIsPackageUseModalOpen(false)} customerPackage={selectedPackageToUse} onConfirmUse={async (id) => { await usePackageSessionMutation.mutateAsync(id); }} />
       <AppointmentDetailModal isOpen={isAppointmentDetailOpen} onClose={() => setIsAppointmentDetailOpen(false)} appointment={selectedAppointment} onDelete={(id) => cancelAppointmentMutation.mutate(id)} />
       <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={mappedProfile} onSave={(data) => updateProfileMutation.mutate(data)} />
     </div>
