@@ -338,15 +338,18 @@ const Index = () => {
       const storeId = store?.id;
       if (!customerId || !storeId) throw new Error("Missing context");
 
-      const currentPoints = customerData?.membership?.points || 0;
-      if (currentPoints < points) throw new Error("คะแนนไม่เพียงพอค่ะ");
+      // Only deduct points for coupons and deals, packages are cash-only
+      if (type !== 'package') {
+        const currentPoints = customerData?.membership?.points || 0;
+        if (currentPoints < points) throw new Error("คะแนนไม่เพียงพอค่ะ");
 
-      const { error: pointsError } = await supabase
-        .from('store_customers')
-        .update({ points: currentPoints - points })
-        .eq('customer_id', customerId)
-        .eq('store_id', storeId);
-      if (pointsError) throw pointsError;
+        const { error: pointsError } = await supabase
+          .from('store_customers')
+          .update({ points: currentPoints - points })
+          .eq('customer_id', customerId)
+          .eq('store_id', storeId);
+        if (pointsError) throw pointsError;
+      }
 
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + (template.expiry_days || 365)); // Packages valid for 1 year by default
@@ -379,8 +382,12 @@ const Index = () => {
         }]);
       }
     },
-    onSuccess: () => {
-      toast.success('แลกรับเรียบร้อยแล้วค่ะ! ดูได้ที่เมนู "คูปอง/แพ็คเกจของฉัน" นะคะ 🎫');
+    onSuccess: (data, variables) => {
+      if (variables.type === 'package') {
+        toast.success('ซื้อแพ็คเกจเรียบร้อยแล้วค่ะ! ดูได้ที่เมนู "แพ็คเกจของฉัน" นะคะ 📦');
+      } else {
+        toast.success('แลกรับเรียบร้อยแล้วค่ะ! ดูได้ที่เมนู "คูปองของฉัน" นะคะ 🎫');
+      }
       queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
     },
     onError: (error: any) => {
@@ -673,7 +680,7 @@ const Index = () => {
                    customerPackages={customerData?.customerPackages || []}
                    onRedeemCoupon={(t, p) => redeemMutation.mutate({ template: t, points: p, type: 'coupon' })} 
                    onBuyDeal={(t, p) => redeemMutation.mutate({ template: t, points: p, type: 'deal' })} 
-                   onBuyPackage={(t, p) => redeemMutation.mutate({ template: t, points: p, type: 'package' })}
+                   onBuyPackage={(t) => redeemMutation.mutate({ template: t, points: 0, type: 'package' })}
                    onUseCoupon={(c) => { setSelectedCouponToUse(c); setIsCouponUseModalOpen(true); }} 
                    onUsePackage={(pkg) => { setSelectedPackageToUse(pkg); setIsPackageUseModalOpen(true); }}
                  />

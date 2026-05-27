@@ -32,7 +32,7 @@ interface PromotionsProps {
   customerPackages: any[];
   onRedeemCoupon: (template: any, pointsCost: number) => void;
   onBuyDeal: (template: any, pointsCost: number) => void;
-  onBuyPackage: (template: any, pointsCost: number) => void;
+  onBuyPackage: (template: any) => void;
   onUseCoupon: (coupon: any) => void;
   onUsePackage: (pkg: any) => void;
 }
@@ -189,8 +189,8 @@ const Promotions = ({
                             <span className="text-[9px] font-black text-pink-600 bg-pink-50 px-3 py-1 rounded-full uppercase tracking-wider">
                               {pkg.total_sessions} ครั้ง
                             </span>
-                            <span className="text-[10px] font-black text-[#020d35] bg-slate-100 px-3 py-1 rounded-full">
-                              {pkg.points_required} pts
+                            <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-wider">
+                              ชำระเงินสด/โอน
                             </span>
                           </div>
                           <h3 className="text-sm font-black text-[#020d35] leading-tight truncate">
@@ -202,19 +202,17 @@ const Promotions = ({
                         </div>
                         
                         <div className="relative z-10 flex justify-between items-center pt-3 border-t border-slate-50">
-                          <span className="text-xs font-black text-pink-500">
-                            ฿{pkg.price?.toLocaleString()}
-                          </span>
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase">ราคาแพ็คเกจ</span>
+                            <span className="text-sm font-black text-pink-500">
+                              ฿{pkg.price?.toLocaleString()}
+                            </span>
+                          </div>
                           <button 
-                            onClick={() => onBuyPackage(pkg, pkg.points_required)}
-                            disabled={userPoints < pkg.points_required}
-                            className={`text-[10px] font-black px-4 py-2 rounded-full transition-all shadow-sm ${
-                              userPoints < pkg.points_required
-                                ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
-                                : 'bg-gradient-to-br from-[#18234a] to-[#020d35] text-white active:scale-95'
-                            }`}
+                            onClick={() => onBuyPackage(pkg)}
+                            className="text-[10px] font-black px-4 py-2 rounded-full bg-gradient-to-br from-[#18234a] to-[#020d35] text-white active:scale-95 transition-all shadow-sm"
                           >
-                            {userPoints < pkg.points_required ? 'คะแนนไม่พอ' : 'แลกแพ็คเกจ'}
+                            ซื้อแพ็คเกจ
                           </button>
                         </div>
                       </motion.div>
