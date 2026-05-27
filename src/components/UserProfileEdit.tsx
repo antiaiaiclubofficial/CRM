@@ -129,8 +129,8 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
             {/* Scrollable Content */}
             <div className="flex-1 space-y-6 px-6 pb-6 overflow-y-auto no-scrollbar pt-2 relative z-10">
               
-              {/* Section 1: General Info (Pink Theme) */}
-              <div className="bg-white/75 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-ambient border border-white/40 border-l-4 border-l-pink-400 space-y-5">
+              {/* Section 1: General Info */}
+              <div className="bg-white/75 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-ambient border border-white/40 space-y-5">
                 <div className="flex items-center gap-2 pb-1 border-b border-pink-100">
                   <User size={16} className="text-pink-500" />
                   <h4 className="text-[10px] font-black text-pink-600 uppercase tracking-widest">ข้อมูลทั่วไป</h4>
@@ -182,8 +182,8 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                 </div>
               </div>
 
-              {/* Section 2: Contact Info (Blue Theme) */}
-              <div className="bg-white/75 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-ambient border border-white/40 border-l-4 border-l-blue-400 space-y-5">
+              {/* Section 2: Contact Info */}
+              <div className="bg-white/75 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-ambient border border-white/40 space-y-5">
                 <div className="flex items-center gap-2 pb-1 border-b border-blue-100">
                   <Mail size={16} className="text-blue-500" />
                   <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-widest">ข้อมูลการติดต่อ</h4>
@@ -214,8 +214,8 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                 </div>
               </div>
 
-              {/* Section 3: Address Info (Emerald Theme) */}
-              <div className="bg-white/75 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-ambient border border-white/40 border-l-4 border-l-emerald-400 space-y-5">
+              {/* Section 3: Address Info */}
+              <div className="bg-white/75 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-ambient border border-white/40 space-y-5">
                 <div className="flex items-center gap-2 pb-1 border-b border-emerald-100">
                   <MapPin size={16} className="text-emerald-500" />
                   <h4 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">ข้อมูลที่อยู่</h4>
