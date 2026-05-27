@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Scissors, Bath, Sparkles, Calendar, ChevronRight, X, Clock, DollarSign } from 'lucide-react';
+import { Scissors, Bath, Sparkles, Calendar, ChevronRight, X, Clock, DollarSign, History } from 'lucide-react';
 
 interface ServiceHistoryItem {
   id: string | number;
