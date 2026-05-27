@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Ticket, Scissors, Sparkles, Gift, ShowerHead, Leaf, Hand, Tag, Heart, 
   History, Crown, PawPrint, Award, LucideIcon, Zap, Clock, ChevronRight,
-  Coins, CheckCircle2, AlertCircle, ArrowRight, Box, Play
+  Coins, CheckCircle2, AlertCircle, ArrowRight, Box, Play, Star, Diamond
 } from 'lucide-react';
 
 interface Coupon {
@@ -24,6 +24,7 @@ interface Coupon {
 
 interface PromotionsProps {
   userPoints: number;
+  totalAccumulatedPoints: number;
   collectedCoupons: any[];
   usedOrExpiredCoupons: any[];
   redeemableTemplates: any[];
@@ -46,8 +47,72 @@ const getIconComponent = (iconName: string, size: number, className?: string) =>
   return <IconComponent size={size} className={className} />;
 };
 
+const tiers = [
+  { 
+    id: 'bronze', 
+    name: 'Bronze Tier', 
+    minPoints: 0, 
+    icon: <PawPrint size={12} />,
+    bgClass: 'from-[#FFD8E4] to-[#FFA6C9]',
+    textColor: 'text-slate-800',
+    subTextColor: 'text-slate-600/70',
+    badgeClass: 'bg-slate-800 text-white',
+    iconColor: 'text-pink-600',
+    iconBg: 'bg-slate-800/10'
+  },
+  { 
+    id: 'silver', 
+    name: 'Silver Tier', 
+    minPoints: 300, 
+    icon: <Star size={12} />,
+    bgClass: 'from-[#B2F2BB] to-[#8ce99a]',
+    textColor: 'text-slate-800',
+    subTextColor: 'text-slate-600/70',
+    badgeClass: 'bg-slate-800 text-white',
+    iconColor: 'text-emerald-600',
+    iconBg: 'bg-slate-800/10'
+  },
+  { 
+    id: 'gold', 
+    name: 'Gold Tier', 
+    minPoints: 700, 
+    icon: <Crown size={12} />,
+    bgClass: 'from-[#FFE3BC] to-[#ffd099]',
+    textColor: 'text-slate-800',
+    subTextColor: 'text-slate-600/70',
+    badgeClass: 'bg-slate-800 text-white',
+    iconColor: 'text-amber-600',
+    iconBg: 'bg-slate-800/10'
+  },
+  { 
+    id: 'platinum', 
+    name: 'Platinum Tier', 
+    minPoints: 1000, 
+    icon: <Zap size={12} />,
+    bgClass: 'from-[#BBDEFB] to-[#90caf9]',
+    textColor: 'text-slate-800',
+    subTextColor: 'text-slate-600/70',
+    badgeClass: 'bg-slate-800 text-white',
+    iconColor: 'text-blue-600',
+    iconBg: 'bg-slate-800/10'
+  },
+  { 
+    id: 'vip', 
+    name: 'VIP Tier', 
+    minPoints: 2000, 
+    icon: <Diamond size={12} />,
+    bgClass: 'from-[#E1BEE7] to-[#ce93d8]',
+    textColor: 'text-slate-800',
+    subTextColor: 'text-slate-600/70',
+    badgeClass: 'bg-slate-800 text-white',
+    iconColor: 'text-purple-600',
+    iconBg: 'bg-slate-800/10'
+  },
+];
+
 const Promotions = ({ 
   userPoints, 
+  totalAccumulatedPoints,
   collectedCoupons, 
   usedOrExpiredCoupons, 
   redeemableTemplates,
@@ -65,31 +130,34 @@ const Promotions = ({
   const specialPromos = redeemableTemplates.filter(t => t.pointsRequired === 0);
   const regularRedeemables = redeemableTemplates.filter(t => t.pointsRequired > 0);
 
+  // Calculate current tier based on lifetime accumulated points
+  const currentTier = [...tiers].reverse().find(t => totalAccumulatedPoints >= t.minPoints) || tiers[0];
+
   return (
     <div className="space-y-6 pb-24">
-      {/* Super Sleek & Compact Points Status Bar */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#18234a] to-[#020d35] py-3.5 px-5 text-white shadow-ambient border border-white/10 flex items-center justify-between">
+      {/* Super Sleek & Compact Points Status Bar - Dynamic Tier Styling */}
+      <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-r py-3.5 px-5 shadow-ambient border border-white/20 flex items-center justify-between ${currentTier.bgClass}`}>
         {/* Subtle background glow */}
-        <div className="absolute right-0 top-0 w-24 h-24 bg-[#EAFD69]/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute right-0 top-0 w-24 h-24 bg-white/10 rounded-full blur-2xl pointer-events-none" />
         
         <div className="flex items-center gap-3 relative z-10">
-          <div className="w-8 h-8 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-[#EAFD69] border border-white/10">
+          <div className={`w-8 h-8 rounded-xl flex items-center justify-center border border-slate-800/10 ${currentTier.iconBg} ${currentTier.iconColor}`}>
             <Coins size={16} className="animate-pulse" />
           </div>
           <div>
-            <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">คะแนนสะสมของคุณ</p>
+            <p className={`text-[9px] font-bold uppercase tracking-widest ${currentTier.subTextColor}`}>คะแนนสะสมของคุณ</p>
             <div className="flex items-baseline gap-1">
-              <span className="text-xl font-black text-[#EAFD69] tracking-tight leading-none">
+              <span className={`text-xl font-black tracking-tight leading-none ${currentTier.textColor}`}>
                 {userPoints.toLocaleString()}
               </span>
-              <span className="text-[8px] font-bold text-white/60 uppercase">pts</span>
+              <span className={`text-[8px] font-bold uppercase ${currentTier.subTextColor}`}>pts</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-white/5 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-white/5 relative z-10">
-          <Crown size={12} className="text-[#EAFD69]" />
-          <span className="text-[9px] font-black text-white/80 uppercase tracking-wider">Premium</span>
+        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-800/5 relative z-10 ${currentTier.badgeClass}`}>
+          {React.cloneElement(currentTier.icon as React.ReactElement, { size: 12 })}
+          <span className="text-[9px] font-black uppercase tracking-wider">{currentTier.name}</span>
         </div>
       </div>
 

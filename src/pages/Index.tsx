@@ -672,6 +672,7 @@ const Index = () => {
               <motion.div key="promo-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                  <Promotions 
                    userPoints={customerData?.membership?.points || 0} 
+                   totalAccumulatedPoints={customerData?.membership?.total_points || 0}
                    collectedCoupons={customerData?.myCoupons || []} 
                    usedOrExpiredCoupons={[]} 
                    redeemableTemplates={couponTemplates || []} 
