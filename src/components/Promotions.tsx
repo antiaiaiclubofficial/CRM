@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Ticket, Scissors, Sparkles, Gift, ShowerHead, Leaf, Hand, Tag, Heart, 
   History, Crown, PawPrint, Award, LucideIcon, Zap, Clock, ChevronRight,
-  Coins, CheckCircle2, AlertCircle, ArrowRight
+  Coins, CheckCircle2, AlertCircle, ArrowRight, Box, Play
 } from 'lucide-react';
 
 interface Coupon {
@@ -28,9 +28,13 @@ interface PromotionsProps {
   usedOrExpiredCoupons: any[];
   redeemableTemplates: any[];
   dealTemplates: any[];
+  packageTemplates: any[];
+  customerPackages: any[];
   onRedeemCoupon: (template: any, pointsCost: number) => void;
   onBuyDeal: (template: any, pointsCost: number) => void;
+  onBuyPackage: (template: any, pointsCost: number) => void;
   onUseCoupon: (coupon: any) => void;
+  onUsePackage: (pkg: any) => void;
 }
 
 const iconMap: Record<string, LucideIcon> = {
@@ -48,11 +52,15 @@ const Promotions = ({
   usedOrExpiredCoupons, 
   redeemableTemplates,
   dealTemplates,
+  packageTemplates,
+  customerPackages,
   onRedeemCoupon, 
   onBuyDeal,
-  onUseCoupon
+  onBuyPackage,
+  onUseCoupon,
+  onUsePackage
 }: PromotionsProps) => {
-  const [activeTab, setActiveTab] = useState<'redeem' | 'my-coupons'>('redeem');
+  const [activeTab, setActiveTab] = useState<'redeem' | 'my-coupons' | 'my-packages'>('redeem');
 
   const specialPromos = redeemableTemplates.filter(t => t.pointsRequired === 0);
   const regularRedeemables = redeemableTemplates.filter(t => t.pointsRequired > 0);
@@ -85,11 +93,11 @@ const Promotions = ({
         </div>
       </div>
 
-      {/* Sliding Tab Switcher */}
-      <div className="bg-white p-1.5 rounded-full flex gap-1.5 shadow-ambient border border-black/5 relative">
+      {/* Sliding Tab Switcher with 3 Tabs */}
+      <div className="bg-white p-1.5 rounded-full flex gap-1 shadow-ambient border border-black/5 relative overflow-x-auto no-scrollbar">
         <button 
           onClick={() => setActiveTab('redeem')}
-          className="relative flex-1 py-3.5 px-4 flex items-center justify-center gap-2 transition-colors duration-300 z-10 group"
+          className="relative flex-1 py-3 px-3 flex items-center justify-center gap-1.5 transition-colors duration-300 z-10 group min-w-[80px]"
         >
           {activeTab === 'redeem' && (
             <motion.div 
@@ -98,15 +106,15 @@ const Promotions = ({
               transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
             />
           )}
-          <span className={`relative z-10 text-xs font-black uppercase tracking-wider transition-colors duration-300 ${
+          <span className={`relative z-10 text-[10px] font-black uppercase tracking-wider transition-colors duration-300 whitespace-nowrap ${
             activeTab === 'redeem' ? 'text-white group-hover:text-primary' : 'text-primary/50 group-hover:text-primary'
           }`}>
-            แลกรับรางวัล
+            แลกรางวัล
           </span>
         </button>
         <button 
           onClick={() => setActiveTab('my-coupons')}
-          className="relative flex-1 py-3.5 px-4 flex items-center justify-center gap-2 transition-colors duration-300 z-10 group"
+          className="relative flex-1 py-3 px-3 flex items-center justify-center gap-1.5 transition-colors duration-300 z-10 group min-w-[90px]"
         >
           {activeTab === 'my-coupons' && (
             <motion.div 
@@ -115,10 +123,27 @@ const Promotions = ({
               transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
             />
           )}
-          <span className={`relative z-10 text-xs font-black uppercase tracking-wider transition-colors duration-300 ${
+          <span className={`relative z-10 text-[10px] font-black uppercase tracking-wider transition-colors duration-300 whitespace-nowrap ${
             activeTab === 'my-coupons' ? 'text-white group-hover:text-primary' : 'text-primary/50 group-hover:text-primary'
           }`}>
-            คูปองของฉัน ({collectedCoupons.length})
+            คูปอง ({collectedCoupons.length})
+          </span>
+        </button>
+        <button 
+          onClick={() => setActiveTab('my-packages')}
+          className="relative flex-1 py-3 px-3 flex items-center justify-center gap-1.5 transition-colors duration-300 z-10 group min-w-[100px]"
+        >
+          {activeTab === 'my-packages' && (
+            <motion.div 
+              layoutId="promoTabBg"
+              className="absolute inset-0 bg-primary group-hover:bg-tertiary rounded-full shadow-lg transition-colors duration-300"
+              transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+            />
+          )}
+          <span className={`relative z-10 text-[10px] font-black uppercase tracking-wider transition-colors duration-300 whitespace-nowrap ${
+            activeTab === 'my-packages' ? 'text-white group-hover:text-primary' : 'text-primary/50 group-hover:text-primary'
+          }`}>
+            แพ็คเกจ ({customerPackages.length})
           </span>
         </button>
       </div>
@@ -134,6 +159,71 @@ const Promotions = ({
             transition={{ duration: 0.3 }}
             className="space-y-10"
           >
+            {/* Package Templates Section */}
+            {packageTemplates.length > 0 && (
+              <div className="space-y-5">
+                <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 bg-pink-50 rounded-xl flex items-center justify-center text-pink-500">
+                      <Box size={18} />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-black text-[#020d35] tracking-tight">แพ็คเกจสุดคุ้ม</h2>
+                      <p className="text-[10px] font-bold text-[#45464E] opacity-50 uppercase tracking-widest">Value Packages</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 px-1">
+                  {packageTemplates.map((pkg) => {
+                    return (
+                      <motion.div
+                        key={pkg.id}
+                        whileTap={{ scale: 0.98 }}
+                        className="relative flex-shrink-0 w-[280px] bg-white rounded-[2.5rem] p-6 overflow-hidden shadow-ambient border border-black/5 flex flex-col justify-between h-52 transition-all"
+                      >
+                        <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-pink-500/5 rounded-full blur-2xl" />
+                        
+                        <div className="relative z-10">
+                          <div className="flex justify-between items-center mb-3">
+                            <span className="text-[9px] font-black text-pink-600 bg-pink-50 px-3 py-1 rounded-full uppercase tracking-wider">
+                              {pkg.total_sessions} ครั้ง
+                            </span>
+                            <span className="text-[10px] font-black text-[#020d35] bg-slate-100 px-3 py-1 rounded-full">
+                              {pkg.points_required} pts
+                            </span>
+                          </div>
+                          <h3 className="text-sm font-black text-[#020d35] leading-tight truncate">
+                            {pkg.title}
+                          </h3>
+                          <p className="text-[11px] font-bold text-[#45464E] opacity-70 mt-1.5 line-clamp-2 leading-relaxed">
+                            {pkg.description}
+                          </p>
+                        </div>
+                        
+                        <div className="relative z-10 flex justify-between items-center pt-3 border-t border-slate-50">
+                          <span className="text-xs font-black text-pink-500">
+                            ฿{pkg.price?.toLocaleString()}
+                          </span>
+                          <button 
+                            onClick={() => onBuyPackage(pkg, pkg.points_required)}
+                            disabled={userPoints < pkg.points_required}
+                            className={`text-[10px] font-black px-4 py-2 rounded-full transition-all shadow-sm ${
+                              userPoints < pkg.points_required
+                                ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                                : 'bg-gradient-to-br from-[#18234a] to-[#020d35] text-white active:scale-95'
+                            }`}
+                          >
+                            {userPoints < pkg.points_required ? 'คะแนนไม่พอ' : 'แลกแพ็คเกจ'}
+                          </button>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Exclusive Deals Section */}
             {dealTemplates.length > 0 && (
               <div className="space-y-5">
@@ -335,7 +425,7 @@ const Promotions = ({
               </div>
             </div>
           </motion.div>
-        ) : (
+        ) : activeTab === 'my-coupons' ? (
           <motion.div
             key="my-coupons-tab"
             initial={{ opacity: 0, y: 15 }}
@@ -404,6 +494,80 @@ const Promotions = ({
                 <h3 className="text-base font-black text-[#020d35] mb-1">ยังไม่มีคูปองที่เก็บไว้ค่ะ</h3>
                 <p className="text-xs font-bold text-[#45464E] opacity-60 max-w-[200px] leading-relaxed">
                   สะสมคะแนนเพื่อแลกรับส่วนลดและสิทธิพิเศษสุด Exclusive กันนะคะ ✨
+                </p>
+              </div>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="my-packages-tab"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-5"
+          >
+            {customerPackages.length > 0 ? (
+              customerPackages.map((pkg, index) => {
+                const progress = (pkg.remaining_sessions / pkg.total_sessions) * 100;
+                return (
+                  <motion.div
+                    key={pkg.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="bg-white rounded-[2rem] shadow-ambient border border-black/5 overflow-hidden flex flex-col"
+                  >
+                    <div className="p-6 space-y-4">
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="min-w-0 flex-1">
+                          <span className="text-[9px] font-black text-pink-600 bg-pink-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                            แพ็คเกจสะสม
+                          </span>
+                          <h4 className="font-black text-[#020d35] text-sm mt-1.5 truncate">{pkg.title}</h4>
+                          <p className="text-[11px] font-bold text-[#45464E] opacity-60 mt-0.5 line-clamp-1">
+                            {pkg.description}
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase">คงเหลือ</p>
+                          <p className="text-xl font-black text-pink-500">{pkg.remaining_sessions} / {pkg.total_sessions} ครั้ง</p>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${progress}%` }}
+                          className="bg-pink-500 h-full rounded-full"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="px-6 py-4 bg-slate-50/50 flex justify-between items-center rounded-b-[2rem] border-t border-slate-100">
+                      <span className="text-[10px] font-bold text-[#45464E]/60 flex items-center gap-1">
+                        <Clock size={12} /> ซื้อเมื่อ: {new Date(pkg.created_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' })}
+                      </span>
+                      <button
+                        onClick={() => onUsePackage(pkg)}
+                        className="bg-gradient-to-br from-[#18234a] to-[#020d35] text-white text-[10px] font-black px-5 py-2.5 rounded-full shadow-sm active:scale-95 transition-all flex items-center gap-1"
+                      >
+                        ใช้งานแพ็คเกจ <Play size={10} className="fill-white" />
+                      </button>
+                    </div>
+                  </motion.div>
+                );
+              })
+            ) : (
+              <div className="text-center py-16 bg-white rounded-[2.5rem] shadow-ambient border border-black/5 flex flex-col items-center justify-center p-8">
+                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 mb-4 border border-slate-100">
+                  <Box size={28} />
+                </div>
+                <h3 className="text-base font-black text-[#020d35] mb-1">ยังไม่มีแพ็คเกจสะสมค่ะ</h3>
+                <p className="text-xs font-bold text-[#45464E] opacity-60 max-w-[200px] leading-relaxed">
+                  เลือกซื้อแพ็คเกจสุดคุ้ม (เช่น ซื้อ 10 แถม 1) เพื่อรับสิทธิ์บริการราคาพิเศษได้ทันทีค่ะ ✨
                 </p>
               </div>
             )}
