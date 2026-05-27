@@ -10,32 +10,45 @@ interface MembershipCardProps {
   ownerProfile: any;
   onShowQR: () => void;
   onTierClick?: () => void;
+  tiers?: any[];
 }
 
-const tiers = [
-  { id: 'bronze', name: 'Bronze Tier', minPoints: 0, icon: <PawPrint size={12} /> },
-  { id: 'silver', name: 'Silver Tier', minPoints: 300, icon: <Star size={12} /> },
-  { id: 'gold', name: 'Gold Tier', minPoints: 700, icon: <Crown size={12} /> },
-  { id: 'platinum', name: 'Platinum Tier', minPoints: 1000, icon: <Zap size={12} /> },
-  { id: 'vip', name: 'VIP Tier', minPoints: 2000, icon: <Diamond size={12} /> },
+const iconMap: Record<string, any> = {
+  PawPrint: <PawPrint size={12} />,
+  Star: <Star size={12} />,
+  Crown: <Crown size={12} />,
+  Gem: <Zap size={12} />,
+  Diamond: <Diamond size={12} />,
+};
+
+const defaultTiers = [
+  { id: 'bronze', name: 'Bronze Tier', min_points: 0, icon_name: 'PawPrint' },
+  { id: 'silver', name: 'Silver Tier', min_points: 300, icon_name: 'Star' },
+  { id: 'gold', name: 'Gold Tier', min_points: 700, icon_name: 'Crown' },
+  { id: 'platinum', name: 'Platinum Tier', min_points: 1000, icon_name: 'Gem' },
+  { id: 'vip', name: 'VIP Tier', min_points: 2000, icon_name: 'Diamond' },
 ];
 
-const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile, onShowQR, onTierClick }: MembershipCardProps) => {
+const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile, onShowQR, onTierClick, tiers }: MembershipCardProps) => {
+  const activeTiers = tiers && tiers.length > 0 ? tiers : defaultTiers;
+  
   // Calculate current tier based on lifetime accumulated points
-  const currentTier = [...tiers].reverse().find(t => totalAccumulatedPoints >= t.minPoints) || tiers[0];
+  const currentTier = [...activeTiers].reverse().find(t => totalAccumulatedPoints >= t.min_points) || activeTiers[0];
   
   // Calculate next tier info
-  const nextTierIndex = tiers.findIndex(t => t.id === currentTier.id) + 1;
-  const nextTier = tiers[nextTierIndex];
+  const nextTierIndex = activeTiers.findIndex(t => t.tier_key === currentTier.tier_key || t.id === currentTier.id) + 1;
+  const nextTier = activeTiers[nextTierIndex];
   
   let progressPercentage = 100;
   let pointsNeeded = 0;
   
   if (nextTier) {
-    pointsNeeded = nextTier.minPoints - totalAccumulatedPoints;
+    pointsNeeded = nextTier.min_points - totalAccumulatedPoints;
     // Calculate progress as actual absolute ratio of current points to next goal
-    progressPercentage = Math.min(100, Math.max(0, (totalAccumulatedPoints / nextTier.minPoints) * 100));
+    progressPercentage = Math.min(100, Math.max(0, (totalAccumulatedPoints / nextTier.min_points) * 100));
   }
+
+  const currentIcon = iconMap[currentTier.icon_name] || <PawPrint size={12} />;
 
   return (
     <motion.div 
@@ -96,7 +109,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                 className="flex items-center gap-1 justify-end text-tertiary mb-0.5 cursor-pointer active:scale-95 transition-transform"
                 onClick={onTierClick}
               >
-                {React.cloneElement(currentTier.icon as React.ReactElement, { fill: "currentColor" })}
+                {React.cloneElement(currentIcon as React.ReactElement, { fill: "currentColor" })}
                 <span className="text-[9px] font-black uppercase tracking-widest">คะแนนสะสมทั้งหมด</span>
               </div>
               <p className="text-sm font-black text-white leading-none tracking-tighter">{totalAccumulatedPoints.toLocaleString()}</p>

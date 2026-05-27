@@ -23,10 +23,10 @@ import HomeQuickActions from '@/components/HomeQuickActions';
 import AppointmentList from '@/components/AppointmentList';
 import AppointmentDetailModal from '@/components/AppointmentDetailModal';
 import BookingForm from '@/components/BookingForm';
-import Register from './Register';
 import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import Register from './Register';
 
 const Index = () => {
   const queryClient = useQueryClient();
@@ -72,6 +72,23 @@ const Index = () => {
       const { data } = await supabase.from('stores').select('*').eq('id', targetStoreId).maybeSingle();
       return data;
     }
+  });
+
+  // ดึงข้อมูลระดับสมาชิก (Membership Tiers) จากฐานข้อมูล
+  const { data: membershipTiers, isLoading: tiersLoading } = useQuery({
+    queryKey: ['membership_tiers', store?.id],
+    queryFn: async () => {
+      if (!store?.id) return [];
+      const { data, error } = await supabase
+        .from('membership_tiers')
+        .select('*')
+        .eq('store_id', store.id)
+        .order('min_points', { ascending: true });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!store?.id
   });
 
   const { data: customerData, isLoading: profileLoading } = useQuery({
@@ -636,7 +653,7 @@ const Index = () => {
     };
   }, [customerData?.profile]);
 
-  if (liffLoading || storeLoading || (lineProfile && profileLoading)) {
+  if (liffLoading || storeLoading || tiersLoading || (lineProfile && profileLoading)) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-surface p-8 text-center">
         <PawPrint className="text-primary animate-pulse" size={64} />
@@ -683,6 +700,7 @@ const Index = () => {
                   ownerProfile={customerData?.profile as any} 
                   onShowQR={() => setIsQRCodeOpen(true)}
                   onTierClick={() => handleNavClick('level')}
+                  tiers={membershipTiers}
                 />
                 <UpcomingAppointments appointments={customerData?.appointments || []} onViewAll={() => handleNavClick('appointments')} />
                 <HomeQuickActions 
@@ -724,6 +742,7 @@ const Index = () => {
                    onBuyPackage={(t) => redeemMutation.mutate({ template: t, points: 0, type: 'package' })}
                    onUseCoupon={(c) => { setSelectedCouponToUse(c); setIsCouponUseModalOpen(true); }} 
                    onUsePackage={(pkg) => { setSelectedPackageToUse(pkg); setIsPackageUseModalOpen(true); }}
+                   tiers={membershipTiers}
                  />
               </motion.div>
             )}
@@ -760,7 +779,11 @@ const Index = () => {
             
             {activeTab === 'level' && (
               <motion.div key="level-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <MembershipLevels totalAccumulatedPoints={customerData?.membership?.total_points || 0} redeemablePoints={customerData?.membership?.points || 0} />
+                <MembershipLevels 
+                  totalAccumulatedPoints={customerData?.membership?.total_points || 0} 
+                  redeemablePoints={customerData?.membership?.points || 0} 
+                  tiers={membershipTiers}
+                />
               </motion.div>
             )}
           </AnimatePresence>
