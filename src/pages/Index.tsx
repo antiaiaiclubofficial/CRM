@@ -9,6 +9,7 @@ import PetList from '@/components/PetList';
 import PetDetailView from '@/components/PetDetailView';
 import PetForm from '@/components/PetForm';
 import ServiceHistory from '@/components/ServiceHistory';
+import ServiceHistoryDetail from '@/components/ServiceHistoryDetail';
 import Promotions from '@/components/Promotions';
 import UpcomingAppointments from '@/components/UpcomingAppointments';
 import UserProfileEdit from '@/components/UserProfileEdit';
@@ -38,6 +39,7 @@ const Index = () => {
   
   const [selectedPetId, setSelectedPetId] = useState<string | number | null>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<any | null>(null);
+  const [selectedHistoryItem, setSelectedHistoryItem] = useState<any | null>(null);
   
   const [isPetFormOpen, setIsPetFormOpen] = useState(false);
   const [petToEdit, setPetToEdit] = useState<any | null>(null);
@@ -124,6 +126,33 @@ const Index = () => {
       
       const { data: appointmentsData } = await supabase.from('appointments').select('*, pets(name, image_url, breed), services(name, price)').eq('customer_id', customer.id).order('start_time', { ascending: true });
 
+      // ดึงข้อมูลประวัติการใช้บริการ (Service History)
+      const { data: historyData } = await supabase
+        .from('service_history')
+        .select('*, pets(name, type, breed)')
+        .eq('customer_id', customer.id)
+        .eq('store_id', store.id)
+        .order('created_at', { ascending: false });
+
+      const serviceHistory = (historyData || []).map(h => {
+        const petType = h.pets?.type || 'สุนัข';
+        const isCat = petType === 'cat' || petType === 'แมว';
+        return {
+          id: h.id,
+          date: new Date(h.created_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
+          petName: h.pets?.name || 'สัตว์เลี้ยง',
+          service: h.note || 'บริการอาบน้ำตัดขนสปา',
+          price: h.price ? h.price.toString() : '0',
+          icon: isCat ? '🐱' : '🐶',
+          bg: isCat ? 'bg-pink-50' : 'bg-blue-50',
+          description: h.note || 'บริการดูแลทำความสะอาดและตัดแต่งขนอย่างประณีต',
+          notes: h.note,
+          shampooUsed: 'แชมพูสูตรอ่อนโยนพิเศษสำหรับผิวแพ้ง่าย',
+          spaTreatment: 'สปาโอโซนบำรุงรากขน',
+          groomerNotes: 'น้องน่ารักและให้ความร่วมมือดีมากค่ะ'
+        };
+      });
+
       // Fetch customer packages with templates and usage history
       const { data: packagesData } = await supabase
         .from('customer_packages')
@@ -180,6 +209,7 @@ const Index = () => {
         pets,
         myCoupons,
         customerPackages,
+        serviceHistory,
         appointments: (appointmentsData || []).map(apt => ({
           id: apt.id,
           petName: apt.pets?.name || 'Unknown',
@@ -772,6 +802,22 @@ const Index = () => {
                     onViewDetails={(p: any) => setSelectedPetId(p.id)} 
                     onAddPet={handleAddPetClick}
                     onToggleFavorite={(id, fav) => favoriteMutation.mutate({ petId: id, isFavorite: fav })}
+                  />
+                )}
+              </motion.div>
+            )}
+
+            {activeTab === 'history' && (
+              <motion.div key="history-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                {selectedHistoryItem ? (
+                  <ServiceHistoryDetail 
+                    service={selectedHistoryItem} 
+                    onBack={() => setSelectedHistoryItem(null)} 
+                  />
+                ) : (
+                  <ServiceHistory 
+                    historyData={customerData?.serviceHistory || []} 
+                    onServiceClick={(item) => setSelectedHistoryItem(item)}
                   />
                 )}
               </motion.div>
