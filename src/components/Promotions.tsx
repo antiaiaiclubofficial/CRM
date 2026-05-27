@@ -648,7 +648,7 @@ const Promotions = ({
                     <div className="p-6 space-y-4">
                       <div className="flex justify-between items-start gap-4">
                         <div className="min-w-0 flex-1">
-                          <span className="text-[9px] font-black text-pink-600 bg-pink-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                          <span className="text-[9px] font-black text-[#8cb811] bg-[#EAFD69]/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                             แพ็คเกจสะสม
                           </span>
                           <h4 className="font-black text-[#020d35] text-sm mt-1.5 truncate">{pkg.title}</h4>
@@ -658,7 +658,7 @@ const Promotions = ({
                         </div>
                         <div className="text-right shrink-0">
                           <p className="text-[10px] font-bold text-slate-400 uppercase">คงเหลือ</p>
-                          <p className="text-xl font-black text-pink-500">{pkg.remaining_sessions} / {pkg.total_sessions} ครั้ง</p>
+                          <p className="text-xl font-black text-[#8cb811]">{pkg.remaining_sessions} / {pkg.total_sessions} ครั้ง</p>
                         </div>
                       </div>
 
@@ -667,7 +667,7 @@ const Promotions = ({
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${progress}%` }}
-                          className="bg-pink-500 h-full rounded-full"
+                          className="bg-[#bed041] h-full rounded-full"
                         />
                       </div>
                     </div>

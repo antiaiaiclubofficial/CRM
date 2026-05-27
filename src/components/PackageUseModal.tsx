@@ -117,7 +117,7 @@ const PackageUseModal = ({ isOpen, onClose, customerPackage, onConfirmUse }: Pac
               {/* Usage History */}
               <div className="space-y-3">
                 <h5 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                  <History size={16} className="text-pink-500" /> ประวัติการใช้งานแพ็คเกจ
+                  <History size={16} className="text-[#bed041]" /> ประวัติการใช้งานแพ็คเกจ
                 </h5>
                 
                 {customerPackage.usage_history && customerPackage.usage_history.length > 0 ? (
@@ -125,7 +125,7 @@ const PackageUseModal = ({ isOpen, onClose, customerPackage, onConfirmUse }: Pac
                     {customerPackage.usage_history.map((usage, idx) => (
                       <div key={usage.id} className="flex justify-between items-center bg-slate-50 p-3 rounded-2xl border border-slate-100">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 bg-pink-50 rounded-lg flex items-center justify-center text-pink-500">
+                          <div className="w-7 h-7 bg-[#EAFD69]/20 rounded-lg flex items-center justify-center text-[#8cb811]">
                             <Calendar size={14} />
                           </div>
                           <span className="text-xs font-bold text-slate-700">
@@ -148,20 +148,20 @@ const PackageUseModal = ({ isOpen, onClose, customerPackage, onConfirmUse }: Pac
               {/* Conditions */}
               <div className="space-y-3">
                 <h5 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                  <Info size={16} className="text-pink-500" /> เงื่อนไขการใช้งานแพ็คเกจ
+                  <Info size={16} className="text-[#bed041]" /> เงื่อนไขการใช้งานแพ็คเกจ
                 </h5>
                 <ul className="space-y-1.5">
                   <li className="text-xs text-slate-500 flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-pink-300 mt-1.5 shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#bed041] mt-1.5 shrink-0" />
                     กรุณาแจ้งพนักงานก่อนรับบริการเพื่อหักสิทธิ์ในระบบ
                   </li>
                   <li className="text-xs text-slate-500 flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-pink-300 mt-1.5 shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#bed041] mt-1.5 shrink-0" />
                     สิทธิ์ในแพ็คเกจไม่สามารถแลกเปลี่ยนเป็นเงินสดได้
                   </li>
                   {customerPackage.expires_at && (
                     <li className="text-xs text-slate-500 flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-pink-300 mt-1.5 shrink-0" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#bed041] mt-1.5 shrink-0" />
                       แพ็คเกจหมดอายุวันที่ {new Date(customerPackage.expires_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </li>
                   )}
