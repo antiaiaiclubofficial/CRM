@@ -120,7 +120,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 space-y-6 px-6 pb-28 overflow-y-auto no-scrollbar pt-2">
+            <div className="flex-1 space-y-6 px-6 pb-6 overflow-y-auto no-scrollbar pt-2">
               
               {/* Glass Vessel 1: General Info */}
               <div className="bg-white/60 backdrop-blur-md p-6 rounded-[2rem] shadow-ambient border border-white/40 space-y-5">
@@ -309,10 +309,13 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                 </div>
               </div>
 
-              {/* Premium Action Button */}
+            </div>
+
+            {/* Sticky Footer for Save Button (Wider & Always Accessible) */}
+            <div className="p-4 bg-white/80 backdrop-blur-md border-t border-slate-100/50 shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom))]">
               <button 
                 onClick={handleSave}
-                className="w-full py-4.5 bg-gradient-to-br from-[#18234a] to-[#020d35] text-white rounded-full font-black shadow-ambient active:scale-95 transition-all flex items-center justify-center gap-2 border-none text-sm uppercase tracking-widest"
+                className="w-full py-4 bg-gradient-to-br from-[#18234a] to-[#020d35] text-white rounded-full font-black shadow-ambient active:scale-95 transition-all flex items-center justify-center gap-2 border-none text-sm uppercase tracking-widest"
               >
                 <Check size={18} strokeWidth={3} />
                 บันทึกการเปลี่ยนแปลง
