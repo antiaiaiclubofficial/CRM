@@ -59,26 +59,26 @@ const Promotions = ({
 
   return (
     <div className="space-y-8 pb-24">
-      {/* Premium Glassmorphic Points Card */}
-      <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#18234a] to-[#020d35] p-8 text-white shadow-ambient border border-white/10">
+      {/* Premium Glassmorphic Points Card - Compact Version */}
+      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#18234a] to-[#020d35] p-6 text-white shadow-ambient border border-white/10">
         {/* Glowing Liquid Blobs */}
-        <div className="absolute -right-10 -top-10 w-40 h-40 bg-[#EAFD69]/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-pink-500/10 rounded-full blur-2xl" />
+        <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#EAFD69]/15 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -left-10 -bottom-10 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl" />
 
         <div className="relative z-10 flex justify-between items-center">
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <span className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] flex items-center gap-1.5">
               <Coins size={12} className="text-[#EAFD69]" /> คะแนนสะสมของคุณ
             </span>
-            <div className="flex items-baseline gap-2">
-              <span className="text-5xl font-black text-[#EAFD69] tracking-tighter leading-none">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-3xl font-black text-[#EAFD69] tracking-tighter leading-none">
                 {userPoints.toLocaleString()}
               </span>
-              <span className="text-xs font-bold text-white/70 uppercase tracking-wider">คะแนน</span>
+              <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider">คะแนน</span>
             </div>
           </div>
-          <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-[#EAFD69] border border-white/20 shadow-inner">
-            <Crown size={28} className="animate-bounce" style={{ animationDuration: '3s' }} />
+          <div className="w-11 h-11 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-[#EAFD69] border border-white/20 shadow-inner">
+            <Crown size={20} className="animate-bounce" style={{ animationDuration: '3s' }} />
           </div>
         </div>
       </div>
