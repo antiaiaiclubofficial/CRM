@@ -777,7 +777,18 @@ const Index = () => {
 
       <QRCodeModal isOpen={isQRCodeOpen} onClose={() => setIsQRCodeOpen(false)} lineId={lineProfile?.displayName || ''} memberId={customerData?.profile?.phone || ''} />
       <PetForm isOpen={isPetFormOpen} onClose={() => setIsPetFormOpen(false)} onSave={(data) => petMutation.mutate(data)} initialData={petToEdit} />
-      <BookingForm isOpen={isBookingFormOpen} onClose={() => setIsBookingFormOpen(false)} pets={customerData?.pets || []} services={displayServices} onConfirm={async (data) => { await createAppointmentMutation.mutateAsync(data); }} />
+      <BookingForm 
+        isOpen={isBookingFormOpen} 
+        onClose={() => setIsBookingFormOpen(false)} 
+        pets={customerData?.pets || []} 
+        services={displayServices} 
+        onConfirm={async (data) => { await createAppointmentMutation.mutateAsync(data); }} 
+        onAddPet={() => {
+          setIsBookingFormOpen(false);
+          setPetToEdit(null);
+          setIsPetFormOpen(true);
+        }}
+      />
       <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => {}} />
       <PackageUseModal isOpen={isPackageUseModalOpen} onClose={() => setIsPackageUseModalOpen(false)} customerPackage={selectedPackageToUse} onConfirmUse={async (id) => { await usePackageSessionMutation.mutateAsync(id); }} />
       <AppointmentDetailModal isOpen={isAppointmentDetailOpen} onClose={() => setIsAppointmentDetailOpen(false)} appointment={selectedAppointment} onDelete={(id) => cancelAppointmentMutation.mutate(id)} />

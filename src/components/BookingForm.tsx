@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight, ChevronLeft, Calendar as CalendarIcon, Clock, Scissors, Check, Info, AlertCircle, PawPrint } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, Calendar as CalendarIcon, Clock, Scissors, Check, Info, AlertCircle, PawPrint, Plus } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
@@ -28,13 +28,14 @@ interface BookingFormProps {
   pets: Pet[];
   services: Service[];
   onConfirm: (data: any) => Promise<void>;
+  onAddPet?: () => void;
 }
 
 const timeSlots = [
   '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'
 ];
 
-const BookingForm = ({ isOpen, onClose, pets, services, onConfirm }: BookingFormProps) => {
+const BookingForm = ({ isOpen, onClose, pets, services, onConfirm, onAddPet }: BookingFormProps) => {
   const [step, setStep] = useState(1);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -131,8 +132,26 @@ const BookingForm = ({ isOpen, onClose, pets, services, onConfirm }: BookingForm
                       </button>
                     ))}
                     {pets.length === 0 && (
-                      <div className="col-span-2 py-8 text-center bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-                        <p className="text-sm text-slate-400">กรุณาเพิ่มสัตว์เลี้ยงก่อนจองนะคะ</p>
+                      <div className="col-span-2 py-10 px-6 text-center bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-4">
+                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm text-slate-300">
+                          <PawPrint size={32} />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="font-black text-slate-800 text-base">ยังไม่มีข้อมูลสัตว์เลี้ยง</p>
+                          <p className="text-xs font-bold text-slate-400 leading-relaxed">กรุณาเพิ่มข้อมูลสัตว์เลี้ยงก่อนทำการจองคิวนะคะ</p>
+                        </div>
+                        {onAddPet && (
+                          <button
+                            onClick={() => {
+                              onClose();
+                              onAddPet();
+                            }}
+                            className="mt-2 px-6 py-3 bg-gradient-to-br from-[#18234a] to-[#020d35] text-white rounded-full font-black text-xs uppercase tracking-widest shadow-md active:scale-95 transition-all flex items-center gap-2"
+                          >
+                            <Plus size={14} strokeWidth={3} className="text-[#EAFD69]" />
+                            เพิ่มสมาชิกคนสำคัญ
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
