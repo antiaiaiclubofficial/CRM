@@ -1,127 +1,138 @@
 "use client";
 
 import React from 'react';
-import { Plus, PawPrint } from 'lucide-react';
 import { motion } from 'framer-motion';
-import PetCategoryCard from './PetCategoryCard';
-
-interface Pet {
-  id: number;
-  name: string;
-  type: string;
-  breed: string;
-  age: string;
-  gender: string;
-  weight: string;
-  medicalCondition: string;
-  precautions: string;
-  color: string;
-  icon: string;
-  furLength?: string;
-  customPreferences?: { id: string; label: string; value: string; }[];
-  imageUrl: string;
-  cardBgColor: string;
-  is_favorite?: boolean;
-}
+import { PawPrint, Plus, ArrowLeft, Heart, Sparkles, ShieldAlert } from 'lucide-react';
 
 interface PetManagementProps {
-  pets: Pet[];
+  pets: any[];
   onBack: () => void;
-  onViewDetails: (pet: Pet) => void;
+  onViewDetails: (pet: any) => void;
   onAddPet: () => void;
-  onToggleFavorite?: (petId: number, currentFav: boolean) => void;
+  onToggleFavorite: (id: string | number, isFavorite: boolean) => void;
 }
 
-const PetManagement = ({ pets, onViewDetails, onAddPet, onToggleFavorite }: PetManagementProps) => {
-  const leftColumnPets = pets.filter((_, index) => index % 2 === 0);
-  const rightColumnPets = pets.filter((_, index) => index % 2 !== 0);
-
-  const handleToggleFav = (e: React.MouseEvent, petId: number, currentFav: boolean) => {
-    e.stopPropagation(); 
-    onToggleFavorite?.(petId, currentFav);
-  };
+const PetManagement = ({ pets, onBack, onViewDetails, onAddPet, onToggleFavorite }: PetManagementProps) => {
+  const hasPets = pets && pets.length > 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="space-y-6 pb-20"
-    >
-      <div className="flex justify-between items-center mb-4 px-1">
-        <h2 className="text-xl font-bold text-slate-800">สัตว์เลี้ยงของฉัน</h2>
+    <div className="space-y-8 relative min-h-[70vh]">
+      {/* Header Area */}
+      <div className="flex items-center justify-between">
         <button 
-          onClick={onAddPet}
-          className="p-2 bg-pink-100 text-pink-700 rounded-full active:scale-95 transition-all border border-pink-200"
+          onClick={onBack}
+          className="w-12 h-12 rounded-2xl bg-white shadow-ambient flex items-center justify-center text-[#020d35] active:scale-95 transition-all"
         >
-          <Plus size={20} />
+          <ArrowLeft size={20} strokeWidth={2.5} />
         </button>
+        <h2 className="text-xl font-black text-[#020d35] tracking-tight uppercase">สัตว์เลี้ยงของฉัน</h2>
+        {hasPets ? (
+          <button 
+            onClick={onAddPet}
+            className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#18234a] to-[#020d35] text-[#EAFD69] shadow-ambient flex items-center justify-center active:scale-95 transition-all"
+          >
+            <Plus size={20} strokeWidth={3} />
+          </button>
+        ) : (
+          <div className="w-12" /> /* Spacer */
+        )}
       </div>
 
-      {pets.length > 0 ? (
-        <div className="flex gap-4 items-start">
-          <div className="flex-1 space-y-4">
-            {leftColumnPets.map((pet) => (
-              <PetCategoryCard
-                key={pet.id}
-                pet={{
-                  id: pet.id,
-                  name: pet.name,
-                  breed: pet.breed,
-                  imageUrl: pet.imageUrl,
-                  weight: pet.weight,
-                  gender: pet.gender,
-                  cardBgColor: pet.cardBgColor,
-                  is_favorite: pet.is_favorite
-                }}
-                onClick={() => onViewDetails(pet)}
-                onToggleFavorite={handleToggleFav}
-              />
-            ))}
-          </div>
+      {/* Content Area */}
+      {!hasPets ? (
+        /* Empty State - Redesigned according to DESIGN.md */
+        <div className="relative py-12 px-4 flex flex-col items-center justify-center min-h-[55vh] overflow-hidden rounded-[3rem]">
+          {/* Liquid Background Blobs for Empty State */}
+          <div className="absolute top-[10%] left-[-10%] w-[200px] h-[200px] bg-[#FFD8E4] rounded-full blur-[60px] opacity-70 pointer-events-none" />
+          <div className="absolute bottom-[10%] right-[-10%] w-[220px] h-[220px] bg-[#EAFD69] rounded-full blur-[70px] opacity-50 pointer-events-none" />
 
-          <div className="flex-1 space-y-4">
-            {rightColumnPets.map((pet) => (
-              <PetCategoryCard
-                key={pet.id}
-                pet={{
-                  id: pet.id,
-                  name: pet.name,
-                  breed: pet.breed,
-                  imageUrl: pet.imageUrl,
-                  weight: pet.weight,
-                  gender: pet.gender,
-                  cardBgColor: pet.cardBgColor,
-                  is_favorite: pet.is_favorite
-                }}
-                onClick={() => onViewDetails(pet)}
-                onToggleFavorite={handleToggleFav}
-              />
-            ))}
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", damping: 20 }}
+            className="w-full max-w-sm bg-white/70 backdrop-blur-2xl p-8 rounded-[3rem] shadow-ambient border border-white/40 text-center space-y-8 relative z-10"
+          >
+            {/* Tactile Icon Container with Halo Effect */}
+            <div className="relative inline-block">
+              <div className="absolute inset-0 bg-[#FFD8E4] rounded-[2.5rem] blur-xl opacity-60 scale-125 animate-pulse" />
+              <div className="relative w-24 h-24 bg-gradient-to-br from-[#18234a] to-[#020d35] rounded-[2.5rem] flex items-center justify-center mx-auto shadow-ambient border border-white/20">
+                <PawPrint size={44} className="text-[#EAFD69] animate-bounce" style={{ animationDuration: '3s' }} />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-pink-400 rounded-full flex items-center justify-center text-white shadow-ambient">
+                <Heart size={16} className="fill-white" />
+              </div>
+            </div>
+
+            {/* High-Contrast Typography */}
+            <div className="space-y-3">
+              <h3 className="text-2xl font-black text-[#020d35] tracking-tight flex items-center justify-center gap-2">
+                ยังไม่มีสมาชิกสี่ขา <Sparkles size={20} className="text-[#EAFD69] fill-[#EAFD69]" />
+              </h3>
+              <p className="text-[#45464E] text-sm font-medium leading-relaxed max-w-[240px] mx-auto opacity-80">
+                เพิ่มข้อมูลสัตว์เลี้ยงของคุณเพื่อรับการดูแลที่ตรงใจและบันทึกประวัติน้ำหนักที่นี่ค่ะ
+              </p>
+            </div>
+
+            {/* Signature Navy Gradient Button */}
+            <button 
+              onClick={onAddPet}
+              className="w-full py-4 bg-gradient-to-br from-[#18234a] to-[#020d35] text-white rounded-full font-black shadow-ambient active:scale-95 transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-widest"
+            >
+              <Plus size={18} strokeWidth={3} className="text-[#EAFD69]" />
+              เพิ่มสัตว์เลี้ยงตัวแรก
+            </button>
+          </motion.div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="w-24 h-24 bg-white border-2 border-dashed border-slate-200 rounded-full flex items-center justify-center mb-6 shadow-sm"
-          >
-            <PawPrint size={48} className="text-slate-300" />
-          </motion.div>
-          <h3 className="text-lg font-bold text-slate-800 mb-2">ยังไม่มีเด็กๆ ในสังกัดเลยค่ะ 🏠</h3>
-          <p className="text-sm text-slate-500 mb-8 leading-relaxed">
-            มาลงทะเบียนน้องๆ เพื่อเก็บประวัติสุขภาพ<br/>และรับสิทธิพิเศษสุด Exclusive กันนะคะ ✨
-          </p>
-          <button
-            onClick={onAddPet}
-            className="px-10 py-4 bg-pink-500 text-white rounded-2xl font-black shadow-lg shadow-pink-200 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-2 border-2 border-black"
-          >
-            <Plus size={20} strokeWidth={3} /> เพิ่มสมาชิกคนสำคัญ
-          </button>
+        /* Pet List Grid */
+        <div className="grid grid-cols-1 gap-6">
+          {pets.map((pet, index) => (
+            <motion.div
+              key={pet.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              onClick={() => onViewDetails(pet)}
+              className="bg-white p-5 rounded-[2rem] shadow-ambient flex items-center gap-5 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all relative overflow-hidden group"
+            >
+              {/* Favorite Badge */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite(pet.id, !!pet.is_favorite);
+                }}
+                className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-[#F9F9F9] flex items-center justify-center text-pink-500 shadow-sm active:scale-90 transition-all"
+              >
+                <Heart size={16} className={pet.is_favorite ? "fill-pink-500" : ""} />
+              </button>
+
+              {/* Pet Image */}
+              <div className="w-20 h-20 rounded-2xl overflow-hidden bg-[#F3F3F3] shrink-0 border-2 border-white shadow-sm">
+                {pet.imageUrl ? (
+                  <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#18234a]/10 to-[#020d35]/10 text-[#020d35]/40">
+                    <PawPrint size={28} />
+                  </div>
+                )}
+              </div>
+
+              {/* Pet Info */}
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex items-center gap-2">
+                  <h4 className="text-lg font-black text-[#020d35] truncate">{pet.name}</h4>
+                  <span className="px-2.5 py-0.5 bg-[#F3F3F3] text-[#020d35] text-[10px] font-black rounded-full uppercase tracking-wider">
+                    {pet.type === 'dog' ? 'สุนัข' : pet.type === 'cat' ? 'แมว' : 'อื่นๆ'}
+                  </span>
+                </div>
+                <p className="text-xs font-bold text-[#45464E]/60 truncate">สายพันธุ์: {pet.breed || 'ไม่ระบุ'}</p>
+                <p className="text-xs font-bold text-[#45464E]/60">น้ำหนัก: {pet.weight ? `${pet.weight} กก.` : 'ยังไม่ได้บันทึก'}</p>
+              </div>
+            </motion.div>
+          ))}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 };
 
