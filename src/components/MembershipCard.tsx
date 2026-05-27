@@ -13,11 +13,76 @@ interface MembershipCardProps {
 }
 
 const tiers = [
-  { id: 'bronze', name: 'Bronze Tier', minPoints: 0, icon: <PawPrint size={12} /> },
-  { id: 'silver', name: 'Silver Tier', minPoints: 300, icon: <Star size={12} /> },
-  { id: 'gold', name: 'Gold Tier', minPoints: 700, icon: <Crown size={12} /> },
-  { id: 'platinum', name: 'Platinum Tier', minPoints: 1000, icon: <Zap size={12} /> },
-  { id: 'vip', name: 'VIP Tier', minPoints: 2000, icon: <Diamond size={12} /> },
+  { 
+    id: 'bronze', 
+    name: 'Bronze Tier', 
+    minPoints: 0, 
+    icon: <PawPrint size={12} />,
+    bgClass: 'bg-gradient-to-br from-[#FFD8E4] to-[#FFA6C9]',
+    textColor: 'text-slate-800',
+    subTextColor: 'text-slate-600/70',
+    badgeClass: 'bg-slate-800 text-white',
+    progressTrack: 'bg-slate-800/10',
+    progressFill: 'bg-pink-600 shadow-[0_0_10px_rgba(219,39,119,0.4)]',
+    pointsColor: 'text-pink-600',
+    qrBtnClass: 'bg-slate-800/10 border-slate-800/20 text-slate-800 hover:bg-slate-800/20'
+  },
+  { 
+    id: 'silver', 
+    name: 'Silver Tier', 
+    minPoints: 300, 
+    icon: <Star size={12} />,
+    bgClass: 'bg-gradient-to-br from-[#B2F2BB] to-[#8ce99a]',
+    textColor: 'text-slate-800',
+    subTextColor: 'text-slate-600/70',
+    badgeClass: 'bg-slate-800 text-white',
+    progressTrack: 'bg-slate-800/10',
+    progressFill: 'bg-emerald-600 shadow-[0_0_10px_rgba(5,150,105,0.4)]',
+    pointsColor: 'text-emerald-600',
+    qrBtnClass: 'bg-slate-800/10 border-slate-800/20 text-slate-800 hover:bg-slate-800/20'
+  },
+  { 
+    id: 'gold', 
+    name: 'Gold Tier', 
+    minPoints: 700, 
+    icon: <Crown size={12} />,
+    bgClass: 'bg-gradient-to-br from-[#FFE3BC] to-[#ffd099]',
+    textColor: 'text-slate-800',
+    subTextColor: 'text-slate-600/70',
+    badgeClass: 'bg-slate-800 text-white',
+    progressTrack: 'bg-slate-800/10',
+    progressFill: 'bg-amber-600 shadow-[0_0_10px_rgba(217,119,6,0.4)]',
+    pointsColor: 'text-amber-600',
+    qrBtnClass: 'bg-slate-800/10 border-slate-800/20 text-slate-800 hover:bg-slate-800/20'
+  },
+  { 
+    id: 'platinum', 
+    name: 'Platinum Tier', 
+    minPoints: 1000, 
+    icon: <Zap size={12} />,
+    bgClass: 'bg-gradient-to-br from-[#BBDEFB] to-[#90caf9]',
+    textColor: 'text-slate-800',
+    subTextColor: 'text-slate-600/70',
+    badgeClass: 'bg-slate-800 text-white',
+    progressTrack: 'bg-slate-800/10',
+    progressFill: 'bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]',
+    pointsColor: 'text-blue-600',
+    qrBtnClass: 'bg-slate-800/10 border-slate-800/20 text-slate-800 hover:bg-slate-800/20'
+  },
+  { 
+    id: 'vip', 
+    name: 'VIP Tier', 
+    minPoints: 2000, 
+    icon: <Diamond size={12} />,
+    bgClass: 'bg-gradient-to-br from-[#E1BEE7] to-[#ce93d8]',
+    textColor: 'text-slate-800',
+    subTextColor: 'text-slate-600/70',
+    badgeClass: 'bg-slate-800 text-white',
+    progressTrack: 'bg-slate-800/10',
+    progressFill: 'bg-purple-600 shadow-[0_0_10px_rgba(147,51,234,0.4)]',
+    pointsColor: 'text-purple-600',
+    qrBtnClass: 'bg-slate-800/10 border-slate-800/20 text-slate-800 hover:bg-slate-800/20'
+  },
 ];
 
 const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile, onShowQR, onTierClick }: MembershipCardProps) => {
@@ -41,10 +106,10 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative w-full aspect-[1.6/1] overflow-hidden p-6 rounded-3xl bg-liquid-primary shadow-ambient border-none flex flex-col justify-between"
+      className={`relative w-full aspect-[1.6/1] overflow-hidden p-6 rounded-3xl shadow-ambient border-none flex flex-col justify-between ${currentTier.bgClass}`}
     >
       {/* Liquid Background Elements */}
-      <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-tertiary/10 rounded-full blur-3xl" />
+      <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl" />
       <div className="absolute bottom-[-20%] left-[-10%] w-48 h-48 bg-white/5 rounded-full blur-2xl" />
 
       <div className="relative z-10 flex flex-col h-full justify-between">
@@ -55,16 +120,16 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
             className="space-y-1 cursor-pointer active:scale-95 transition-transform" 
             onClick={onTierClick}
           >
-            <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Membership Status</p>
-            <span className="bg-tertiary text-primary text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block">
+            <p className={`text-[9px] font-bold uppercase tracking-widest ${currentTier.subTextColor}`}>Membership Status</p>
+            <span className={`text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block ${currentTier.badgeClass}`}>
               {currentTier.name.toUpperCase()}
             </span>
           </div>
           
           {/* Right Side: Member ID and Name */}
           <div className="text-right space-y-0.5">
-            <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Member ID: {ownerProfile?.phone || 'N/A'}</p>
-            <h2 className="text-lg font-black text-white drop-shadow-md truncate max-w-[180px]">
+            <p className={`text-[9px] font-bold uppercase tracking-widest ${currentTier.subTextColor}`}>Member ID: {ownerProfile?.phone || 'N/A'}</p>
+            <h2 className={`text-lg font-black drop-shadow-sm truncate max-w-[180px] ${currentTier.textColor}`}>
               {ownerProfile?.first_name} {ownerProfile?.last_name}
             </h2>
           </div>
@@ -75,10 +140,10 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           {/* Points & Tier Display */}
           <div className="flex justify-between items-end">
             <div className="space-y-0.5">
-              <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">คะแนนที่ใช้ได้ (Balance)</p>
+              <p className={`text-[9px] font-bold uppercase tracking-widest ${currentTier.subTextColor}`}>คะแนนที่ใช้ได้ (Balance)</p>
               <div className="flex items-baseline gap-1.5">
-                <span className="text-4xl font-black text-tertiary leading-none tracking-tighter">{redeemablePoints.toLocaleString()}</span>
-                <span className="text-[10px] font-black text-white/70 uppercase">pts</span>
+                <span className={`text-4xl font-black leading-none tracking-tighter ${currentTier.textColor}`}>{redeemablePoints.toLocaleString()}</span>
+                <span className={`text-[10px] font-black uppercase ${currentTier.subTextColor}`}>pts</span>
               </div>
             </div>
             <div className="text-right flex flex-col items-end">
@@ -86,35 +151,35 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               <motion.button 
                 whileTap={{ scale: 0.95 }}
                 onClick={onShowQR}
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white mb-2 hover:bg-white/20 transition-colors"
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-black uppercase tracking-widest transition-colors ${currentTier.qrBtnClass}`}
               >
                 <QrCode size={12} />
                 <span className="text-[8px] font-black uppercase tracking-widest">My QR</span>
               </motion.button>
               
               <div 
-                className="flex items-center gap-1 justify-end text-tertiary mb-0.5 cursor-pointer active:scale-95 transition-transform"
+                className={`flex items-center gap-1 justify-end mb-0.5 cursor-pointer active:scale-95 transition-transform ${currentTier.pointsColor}`}
                 onClick={onTierClick}
               >
                 {React.cloneElement(currentTier.icon as React.ReactElement, { fill: "currentColor" })}
                 <span className="text-[9px] font-black uppercase tracking-widest">คะแนนสะสมทั้งหมด</span>
               </div>
-              <p className="text-sm font-black text-white leading-none tracking-tighter">{totalAccumulatedPoints.toLocaleString()}</p>
+              <p className={`text-sm font-black leading-none tracking-tighter ${currentTier.textColor}`}>{totalAccumulatedPoints.toLocaleString()}</p>
             </div>
           </div>
 
           {/* Progress Section */}
           <div className="space-y-2">
-            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+            <div className={`w-full h-1.5 rounded-full overflow-hidden ${currentTier.progressTrack}`}>
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercentage}%` }}
                 transition={{ duration: 1.5, ease: "easeOut" }}
-                className="bg-[#EAFD69] h-full rounded-full shadow-[0_0_12px_rgba(234,253,105,0.6)]"
+                className={`h-full rounded-full ${currentTier.progressFill}`}
               />
             </div>
             <div className="flex justify-center items-center text-center">
-              <p className="text-[11px] font-black text-white/70 uppercase tracking-tight">
+              <p className={`text-[11px] font-black uppercase tracking-tight ${currentTier.subTextColor}`}>
                 {nextTier 
                   ? `สะสมอีก ${pointsNeeded.toLocaleString()} คะแนนเพื่อเลื่อนเป็น ${nextTier.name}`
                   : 'ยินดีด้วย! คุณอยู่ในระดับสูงสุดแล้ว ✨'}
