@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, Phone, MapPin, Mail, Calendar, Check, ArrowRight, PawPrint, Home } from 'lucide-react';
+import { User, Phone, MapPin, Mail, ArrowRight, PawPrint, Home, Sparkles, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface RegisterProps {
@@ -19,7 +19,6 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
     age: '',
     phone: lineProfile?.phone || '',
     email: lineProfile?.email || '',
-    // Split address fields
     houseNo: '',
     moo: '',
     soi: '',
@@ -40,7 +39,6 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
     
     setIsSubmitting(true);
     try {
-      // Concatenate split address fields into one address string
       const fullAddress = [
         formData.houseNo ? `เลขที่ ${formData.houseNo}` : '',
         formData.moo ? `หมู่ ${formData.moo}` : '',
@@ -64,78 +62,110 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF9F0] flex flex-col items-center justify-center p-4 pb-12">
+    <div className="min-h-screen bg-[#F9F9F9] relative flex flex-col items-center justify-center p-4 pb-12 overflow-hidden">
+      {/* Liquid Background Blobs */}
+      <div className="absolute top-[-10%] left-[-20%] w-[300px] h-[300px] bg-[#FFD8E4] rounded-full blur-[80px] opacity-60 pointer-events-none" />
+      <div className="absolute bottom-[10%] right-[-20%] w-[350px] h-[350px] bg-[#EAFD69] rounded-full blur-[100px] opacity-40 pointer-events-none" />
+      <div className="absolute top-[40%] right-[-10%] w-[250px] h-[250px] bg-[#d9d6fe] rounded-full blur-[90px] opacity-50 pointer-events-none" />
+
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md space-y-6"
+        transition={{ type: "spring", damping: 25, stiffness: 150 }}
+        className="w-full max-w-md space-y-8 relative z-10"
       >
-        <div className="text-center space-y-2">
-          <div className="w-20 h-20 bg-pink-100 rounded-3xl flex items-center justify-center mx-auto mb-4 border-2 border-black shadow-soft">
-            <PawPrint size={40} className="text-pink-500" />
+        {/* Header Area */}
+        <div className="text-center space-y-3">
+          <div className="relative inline-block">
+            {/* Halo Effect */}
+            <div className="absolute inset-0 bg-[#EAFD69] rounded-[2rem] blur-xl opacity-40 scale-125 animate-pulse" />
+            <div className="relative w-20 h-20 bg-gradient-to-br from-[#18234a] to-[#020d35] rounded-[2rem] flex items-center justify-center mx-auto shadow-ambient border border-white/20">
+              <PawPrint size={36} className="text-[#EAFD69]" />
+            </div>
           </div>
-          <h1 className="text-3xl font-black text-slate-800">ยินดีต้อนรับ!</h1>
-          <p className="text-slate-500 font-medium">กรุณาลงทะเบียนเพื่อเริ่มสะสมคะแนนนะคะ ✨</p>
+          <div className="space-y-1">
+            <h1 className="text-3xl font-black text-[#020d35] tracking-tight flex items-center justify-center gap-2">
+              สมัครสมาชิกใหม่ <Sparkles size={24} className="text-[#EAFD69] fill-[#EAFD69]" />
+            </h1>
+            <p className="text-[#45464E] text-xs font-bold uppercase tracking-[0.15em] opacity-70">
+              Join our premium pet sanctuary
+            </p>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-[2.5rem] border-2 border-black shadow-soft space-y-5">
-          {/* Name Section */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">ชื่อ</label>
-              <input 
-                required
-                type="text" 
-                value={formData.firstName}
-                onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                placeholder="ชื่อจริง"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">นามสกุล</label>
-              <input 
-                required
-                type="text" 
-                value={formData.lastName}
-                onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                placeholder="นามสกุล"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
-              />
-            </div>
-          </div>
-
-          {/* Gender and Age Section */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">เพศ</label>
-              <select 
-                value={formData.gender}
-                onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold appearance-none"
-              >
-                <option value="หญิง">หญิง</option>
-                <option value="ชาย">ชาย</option>
-                <option value="ไม่ระบุ">ไม่ระบุ</option>
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">อายุ</label>
-              <input 
-                type="number" 
-                value={formData.age}
-                onChange={(e) => setFormData({...formData, age: e.target.value})}
-                placeholder="ปี"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
-              />
-            </div>
-          </div>
-
-          {/* Contact Section */}
+        {/* Frosted Glass Form Container */}
+        <form 
+          onSubmit={handleSubmit} 
+          className="bg-white/75 backdrop-blur-2xl p-8 rounded-[3rem] shadow-ambient border border-white/40 space-y-6"
+        >
+          {/* Section 1: General Info */}
           <div className="space-y-4">
+            <div className="flex items-center gap-2 pb-1">
+              <User size={16} className="text-[#020d35]/60" />
+              <h4 className="text-[10px] font-black text-[#020d35] uppercase tracking-widest">ข้อมูลทั่วไป</h4>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">ชื่อจริง</label>
+                <input 
+                  required
+                  type="text" 
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                  placeholder="ชื่อ"
+                  className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">นามสกุล</label>
+                <input 
+                  required
+                  type="text" 
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                  placeholder="นามสกุล"
+                  className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">เพศ</label>
+                <select 
+                  value={formData.gender}
+                  onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                  className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all appearance-none"
+                >
+                  <option value="หญิง">หญิง</option>
+                  <option value="ชาย">ชาย</option>
+                  <option value="ไม่ระบุ">ไม่ระบุ</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">อายุ (ปี)</label>
+                <input 
+                  type="number" 
+                  value={formData.age}
+                  onChange={(e) => setFormData({...formData, age: e.target.value})}
+                  placeholder="อายุ"
+                  className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Contact Info */}
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center gap-2 pb-1">
+              <Mail size={16} className="text-[#020d35]/60" />
+              <h4 className="text-[10px] font-black text-[#020d35] uppercase tracking-widest">ข้อมูลการติดต่อ</h4>
+            </div>
+
             <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
-                <Phone size={12} className="text-pink-500" /> เบอร์โทรศัพท์
+              <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1 flex items-center gap-1">
+                <Phone size={10} className="text-pink-500" /> เบอร์โทรศัพท์
               </label>
               <input 
                 required
@@ -143,133 +173,133 @@ const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
                 value={formData.phone}
                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
                 placeholder="08X-XXX-XXXX"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+                className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
-                <Mail size={12} className="text-pink-500" /> อีเมล (ถ้ามี)
-              </label>
+              <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">อีเมล (ถ้ามี)</label>
               <input 
                 type="email" 
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
                 placeholder="example@email.com"
-                className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+                className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
               />
             </div>
           </div>
 
-          {/* Split Address Section */}
-          <div className="space-y-4 pt-2 border-t border-slate-50">
-            <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
-              <MapPin size={12} className="text-pink-500" /> ข้อมูลที่อยู่
-            </label>
+          {/* Section 3: Address Info */}
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center gap-2 pb-1">
+              <MapPin size={16} className="text-[#020d35]/60" />
+              <h4 className="text-[10px] font-black text-[#020d35] uppercase tracking-widest">ข้อมูลที่อยู่</h4>
+            </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 px-1 flex items-center gap-1 h-5">
-                   <Home size={12} /> เลขที่บ้าน
+                <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1 flex items-center gap-1">
+                   <Home size={10} /> เลขที่บ้าน
                 </label>
                 <input 
                   type="text" 
                   value={formData.houseNo}
                   onChange={(e) => setFormData({...formData, houseNo: e.target.value})}
                   placeholder="เช่น 123/4"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+                  className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">หมู่ที่</label>
+                <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">หมู่ที่</label>
                 <input 
                   type="text" 
                   value={formData.moo}
                   onChange={(e) => setFormData({...formData, moo: e.target.value})}
                   placeholder="เช่น 5"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+                  className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">ซอย</label>
+                <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">ซอย</label>
                 <input 
                   type="text" 
                   value={formData.soi}
                   onChange={(e) => setFormData({...formData, soi: e.target.value})}
                   placeholder="เช่น สุขุมวิท 1"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+                  className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">ถนน</label>
+                <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">ถนน</label>
                 <input 
                   type="text" 
                   value={formData.road}
                   onChange={(e) => setFormData({...formData, road: e.target.value})}
                   placeholder="เช่น รามคำแหง"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+                  className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">แขวง / ตำบล</label>
+                <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">แขวง / ตำบล</label>
                 <input 
                   type="text" 
                   value={formData.subDistrict}
                   onChange={(e) => setFormData({...formData, subDistrict: e.target.value})}
                   placeholder="ตำบล"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+                  className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">เขต / อำเภอ</label>
+                <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">เขต / อำเภอ</label>
                 <input 
                   type="text" 
                   value={formData.district}
                   onChange={(e) => setFormData({...formData, district: e.target.value})}
                   placeholder="อำเภอ"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+                  className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">จังหวัด</label>
+                <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">จังหวัด</label>
                 <input 
                   type="text" 
                   value={formData.province}
                   onChange={(e) => setFormData({...formData, province: e.target.value})}
                   placeholder="จังหวัด"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+                  className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 px-1 flex items-center h-5">รหัสไปรษณีย์</label>
+                <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">รหัสไปรษณีย์</label>
                 <input 
                   type="text" 
                   value={formData.postalCode}
                   onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
                   placeholder="10XXX"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-pink-200 outline-none text-base font-bold"
+                  className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#020d35]/10 outline-none text-sm font-bold text-[#020d35] transition-all placeholder:text-slate-400"
                 />
               </div>
             </div>
           </div>
 
+          {/* Submit Button - Signature Navy Gradient */}
           <button 
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black border-2 border-black shadow-[4px_4px_0px_0px_#000] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-4 bg-gradient-to-br from-[#18234a] to-[#020d35] text-white rounded-full font-black shadow-ambient active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm uppercase tracking-widest mt-4"
           >
-            {isSubmitting ? "กำลังบันทึก..." : (
+            {isSubmitting ? "กำลังบันทึกข้อมูล..." : (
               <>
-                เริ่มใช้งานเลย <ArrowRight size={20} strokeWidth={3} />
+                เริ่มใช้งานเลย <ArrowRight size={18} strokeWidth={3} />
               </>
             )}
           </button>
