@@ -428,9 +428,49 @@ const Index = () => {
   const registerMutation = useMutation({
     mutationFn: async (regData: any) => {
       if (!lineProfile?.userId || !store?.id) throw new Error("Missing context");
-      const { data: newCustomer } = await supabase.from('customers').insert([{ line_user_id: lineProfile.userId, display_name: lineProfile.displayName, avatar_url: lineProfile.pictureUrl, ...regData }]).select().single();
+      
+      // Map camelCase fields from form to snake_case database columns
+      const dbData = {
+        line_user_id: lineProfile.userId,
+        display_name: lineProfile.displayName,
+        avatar_url: lineProfile.pictureUrl,
+        first_name: regData.firstName,
+        last_name: regData.lastName,
+        gender: regData.gender,
+        age: regData.age?.toString(),
+        phone: regData.phone,
+        email: regData.email,
+        address: regData.address,
+        sub_district: regData.subDistrict,
+        district: regData.district,
+        province: regData.province,
+        postal_code: regData.postalCode,
+        house_no: regData.houseNo,
+        village_no: regData.moo,
+        soi: regData.soi,
+        road: regData.road
+      };
+
+      const { data: newCustomer, error: customerError } = await supabase
+        .from('customers')
+        .insert([dbData])
+        .select()
+        .single();
+        
+      if (customerError) throw customerError;
       if (!newCustomer) throw new Error("Failed to create customer");
-      await supabase.from('store_customers').insert([{ customer_id: newCustomer.id, store_id: store.id, points: 0, total_points: 0, tier: 'bronze' }]);
+
+      const { error: membershipError } = await supabase
+        .from('store_customers')
+        .insert([{ 
+          customer_id: newCustomer.id, 
+          store_id: store.id, 
+          points: 0, 
+          total_points: 0, 
+          tier: 'bronze' 
+        }]);
+        
+      if (membershipError) throw membershipError;
     },
     onSuccess: () => {
       toast.success('ลงทะเบียนเรียบร้อยแล้วค่ะ ✨');
