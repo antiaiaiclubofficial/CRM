@@ -28,7 +28,7 @@ const PetList = ({ pets, onPetClick, onViewAll, onToggleFavorite }: PetListProps
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4 px-1">
-        <h3 className="font-extrabold text-lg text-primary tracking-tight">Vessels of Joy 🐾</h3>
+        <h3 className="font-extrabold text-lg text-primary tracking-tight">My Lovely Pets 🐾</h3>
         <button 
           onClick={onViewAll} 
           className="text-[10px] text-primary font-black uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity"
