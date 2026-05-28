@@ -179,7 +179,7 @@ const AppointmentList = ({ appointments, onAddClick, onAppointmentClick }: Appoi
                   onClick={onAddClick}
                   className="bg-gradient-to-br from-[#18234a] to-[#020d35] text-white text-[10px] font-black px-4 py-2.5 rounded-full shadow-ambient"
                 >
-                  จองคิว 🐾
+                  จองคิว
                 </motion.button>
               </div>
             )}
