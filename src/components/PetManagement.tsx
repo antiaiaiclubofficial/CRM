@@ -18,23 +18,26 @@ const PetManagement = ({ pets, onBack, onViewDetails, onAddPet, onToggleFavorite
   return (
     <div className="space-y-8 relative min-h-[70vh]">
       {/* Header Area */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <button 
           onClick={onBack}
-          className="w-12 h-12 rounded-2xl bg-white shadow-ambient flex items-center justify-center text-[#020d35] active:scale-95 transition-all"
+          className="w-12 h-12 rounded-2xl bg-white shadow-ambient flex items-center justify-center text-[#020d35] active:scale-95 transition-all shrink-0"
         >
           <ArrowLeft size={20} strokeWidth={2.5} />
         </button>
-        <h2 className="text-xl font-black text-[#020d35] tracking-tight uppercase">สัตว์เลี้ยงของฉัน</h2>
+        <div className="flex-1 min-w-0 text-left">
+          <h2 className="text-xl font-black text-[#020d35] tracking-tight uppercase">สัตว์เลี้ยงของฉัน</h2>
+          <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mt-0.5">My Pets</p>
+        </div>
         {hasPets ? (
           <button 
             onClick={onAddPet}
-            className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#18234a] to-[#020d35] text-[#EAFD69] shadow-ambient flex items-center justify-center active:scale-95 transition-all"
+            className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#18234a] to-[#020d35] text-[#EAFD69] shadow-ambient flex items-center justify-center active:scale-95 transition-all shrink-0"
           >
             <Plus size={20} strokeWidth={3} />
           </button>
         ) : (
-          <div className="w-12" /> /* Spacer */
+          <div className="w-12 shrink-0" /> /* Spacer */
         )}
       </div>
 
