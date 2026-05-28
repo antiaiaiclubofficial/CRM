@@ -89,8 +89,8 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
             {/* Header */}
             <div className="pt-4 pb-4 px-8 flex justify-between items-center sticky top-0 bg-white/90 backdrop-blur-md z-10">
               <div>
-                <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mb-0.5">Booking Details</p>
                 <h3 className="font-black text-2xl text-[#020d35] tracking-tight">รายละเอียดการจอง</h3>
+                <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mt-0.5">Booking Details</p>
               </div>
               <button 
                 onClick={onClose} 

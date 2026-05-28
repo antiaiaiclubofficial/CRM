@@ -68,8 +68,8 @@ const PackageUseModal = ({ isOpen, onClose, customerPackage, onConfirmUse }: Pac
             {/* Header */}
             <div className="pt-8 pb-4 px-8 flex justify-between items-center bg-white rounded-t-[3.5rem] shrink-0">
               <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-0.5">Package Manager</p>
                 <h3 className="font-bold text-xl text-slate-800">รายละเอียดแพ็คเกจ</h3>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-0.5">Package Manager</p>
               </div>
               <button 
                 onClick={onClose} 

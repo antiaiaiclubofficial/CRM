@@ -38,8 +38,8 @@ const ServiceHistory = ({ historyData, filterPetName, onClearFilter, onServiceCl
       {/* Header Section */}
       <div className="flex justify-between items-end px-1">
         <div>
-          <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mb-1">Service Records</p>
           <h2 className="text-2xl font-black text-primary tracking-tight">ประวัติการใช้บริการ</h2>
+          <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mt-1">Service Records</p>
         </div>
         <div className="bg-white px-4 py-1.5 rounded-full shadow-ambient border border-white/40">
           <span className="text-[10px] font-black text-primary uppercase tracking-wider">ทั้งหมด {filteredData.length} ครั้ง</span>

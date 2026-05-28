@@ -99,8 +99,8 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               <ArrowLeft size={28} strokeWidth={2.5} />
             </button>
             <div className="flex-1 min-w-0">
-               <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mb-0.5">Physical Tracker</p>
                <h3 className="text-2xl font-black text-primary tracking-tight truncate">น้ำหนัก: {pet.name}</h3>
+               <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mt-0.5">Physical Tracker</p>
             </div>
           </div>
         ) : (

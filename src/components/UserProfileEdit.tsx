@@ -113,10 +113,10 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
             {/* Header */}
             <div className="flex justify-between items-center shrink-0 pt-4 pb-4 px-8 z-10 relative">
               <div>
-                <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mb-0.5">My Profile</p>
                 <h3 className="font-black text-2xl text-primary tracking-tight flex items-center gap-2">
                   ข้อมูลส่วนตัว <Sparkles size={18} className="text-[#EAFD69] fill-[#EAFD69]" />
                 </h3>
+                <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mt-0.5">My Profile</p>
               </div>
               <button 
                 onClick={handleSave} 
