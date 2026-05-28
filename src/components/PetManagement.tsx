@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { PawPrint, Plus, ArrowLeft, Heart, Sparkles } from 'lucide-react';
+import AnalogScaleIcon from './AnalogScaleIcon';
 
 interface PetManagementProps {
   pets: any[];
@@ -43,9 +44,8 @@ const PetManagement = ({ pets, onBack, onViewDetails, onAddPet, onToggleFavorite
 
       {/* Content Area */}
       {!hasPets ? (
-        /* Empty State - Redesigned according to DESIGN.md */
+        /* Empty State */
         <div className="relative py-12 px-4 flex flex-col items-center justify-center min-h-[55vh] overflow-hidden rounded-[3rem]">
-          {/* Liquid Background Blobs for Empty State */}
           <div className="absolute top-[10%] left-[-10%] w-[200px] h-[200px] bg-[#FFD8E4] rounded-full blur-[60px] opacity-70 pointer-events-none" />
           <div className="absolute bottom-[10%] right-[-10%] w-[220px] h-[220px] bg-[#EAFD69] rounded-full blur-[70px] opacity-50 pointer-events-none" />
 
@@ -55,7 +55,6 @@ const PetManagement = ({ pets, onBack, onViewDetails, onAddPet, onToggleFavorite
             transition={{ type: "spring", damping: 20 }}
             className="w-full max-w-sm bg-white/70 backdrop-blur-2xl p-8 rounded-[3rem] shadow-ambient border border-white/40 text-center space-y-8 relative z-10"
           >
-            {/* Tactile Icon Container with Halo Effect */}
             <div className="relative inline-block">
               <div className="absolute inset-0 bg-[#FFD8E4] rounded-[2.5rem] blur-xl opacity-60 scale-125 animate-pulse" />
               <div className="relative w-24 h-24 bg-gradient-to-br from-[#18234a] to-[#020d35] rounded-[2.5rem] flex items-center justify-center mx-auto shadow-ambient border border-white/20">
@@ -66,7 +65,6 @@ const PetManagement = ({ pets, onBack, onViewDetails, onAddPet, onToggleFavorite
               </div>
             </div>
 
-            {/* High-Contrast Typography */}
             <div className="space-y-3">
               <h3 className="text-2xl font-black text-[#020d35] tracking-tight flex items-center justify-center gap-2">
                 ยังไม่มีสมาชิกสี่ขา <Sparkles size={20} className="text-[#EAFD69] fill-[#EAFD69]" />
@@ -76,7 +74,6 @@ const PetManagement = ({ pets, onBack, onViewDetails, onAddPet, onToggleFavorite
               </p>
             </div>
 
-            {/* Signature Navy Gradient Button with Lime Spark Accent */}
             <button 
               onClick={onAddPet}
               className="w-full py-4 bg-gradient-to-br from-[#18234a] to-[#020d35] text-white rounded-full font-black shadow-ambient active:scale-95 transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-widest border-t border-white/10"
@@ -87,52 +84,71 @@ const PetManagement = ({ pets, onBack, onViewDetails, onAddPet, onToggleFavorite
           </motion.div>
         </div>
       ) : (
-        /* Pet List Grid */
-        <div className="grid grid-cols-1 gap-6">
-          {pets.map((pet, index) => (
-            <motion.div
-              key={pet.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              onClick={() => onViewDetails(pet)}
-              className="bg-white p-5 rounded-[2rem] shadow-ambient flex items-center gap-5 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all relative overflow-hidden group"
-            >
-              {/* Favorite Badge */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleFavorite(pet.id, !!pet.is_favorite);
-                }}
-                className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-[#F9F9F9] flex items-center justify-center text-pink-500 shadow-sm active:scale-90 transition-all"
+        /* Pet List Grid - 2 Columns Pastel Cards */
+        <div className="grid grid-cols-2 gap-4">
+          {pets.map((pet, index) => {
+            const bgColor = pet.card_bg_color || pet.cardBgColor || '#FFD8E4';
+            return (
+              <motion.div
+                key={pet.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                onClick={() => onViewDetails(pet)}
+                className="relative w-full rounded-[2.5rem] p-4 shadow-ambient flex flex-col justify-between cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all overflow-hidden"
+                style={{ backgroundColor: bgColor }}
               >
-                <Heart size={16} className={pet.is_favorite ? "fill-pink-500" : ""} />
-              </button>
+                {/* Soft overlay to match the exact design */}
+                <div className="absolute inset-0 bg-white/10 pointer-events-none" />
 
-              {/* Pet Image */}
-              <div className="w-20 h-20 rounded-2xl overflow-hidden bg-[#F3F3F3] shrink-0 border-2 border-white shadow-sm">
-                {pet.imageUrl ? (
-                  <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#18234a]/10 to-[#020d35]/10 text-[#020d35]/40">
-                    <PawPrint size={28} />
+                <div className="relative z-10 flex flex-col h-full justify-between">
+                  {/* Large White Rounded Image Container */}
+                  <div className="relative w-full aspect-[4/3] rounded-[1.8rem] overflow-hidden bg-white shadow-sm mb-4">
+                    {pet.imageUrl ? (
+                      <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[#020d35]/20">
+                        <PawPrint size={32} />
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
 
-              {/* Pet Info */}
-              <div className="min-w-0 flex-1 space-y-1">
-                <div className="flex items-center gap-2">
-                  <h4 className="text-lg font-black text-[#020d35] truncate">{pet.name}</h4>
-                  <span className="px-2.5 py-0.5 bg-[#F3F3F3] text-[#020d35] text-[10px] font-black rounded-full uppercase tracking-wider">
-                    {pet.type === 'dog' ? 'สุนัข' : pet.type === 'cat' ? 'แมว' : 'อื่นๆ'}
-                  </span>
+                  {/* Weight & Gender Row */}
+                  <div className="flex justify-between items-center mb-3 px-1">
+                    <span className="text-xs text-[#020d35] font-bold flex items-center gap-1">
+                      <AnalogScaleIcon size={14} className="text-[#020d35]/70" />
+                      {pet.weight || '-'} kg
+                    </span>
+                    <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-white/80 text-[#020d35] uppercase">
+                      {pet.gender || '-'}
+                    </span>
+                  </div>
+
+                  {/* Name & Breed Row */}
+                  <div className="flex justify-between items-end px-1">
+                    <div className="min-w-0 flex-1 pr-2 text-left">
+                      <h4 className="font-black text-[#020d35] text-lg truncate leading-tight">{pet.name}</h4>
+                      <p className="text-xs font-bold text-[#020d35]/60 truncate mt-0.5">{pet.breed || 'ไม่ระบุ'}</p>
+                    </div>
+                    
+                    {/* Favorite Heart Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleFavorite(pet.id, !!pet.is_favorite);
+                      }}
+                      className="p-2 bg-white rounded-full shadow-sm active:scale-90 transition-all shrink-0"
+                    >
+                      <Heart 
+                        size={14} 
+                        className={pet.is_favorite ? "text-pink-500 fill-pink-500" : "text-slate-300"} 
+                      />
+                    </button>
+                  </div>
                 </div>
-                <p className="text-xs font-bold text-[#45464E]/60 truncate">สายพันธุ์: {pet.breed || 'ไม่ระบุ'}</p>
-                <p className="text-xs font-bold text-[#45464E]/60">น้ำหนัก: {pet.weight ? `${pet.weight} กก.` : 'ยังไม่ได้บันทึก'}</p>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>
