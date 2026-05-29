@@ -34,18 +34,7 @@ const ServiceHistory = ({ historyData, filterPetName, onClearFilter, onServiceCl
     : historyData;
 
   return (
-    <div className="space-y-8 pb-24">
-      {/* Header Section */}
-      <div className="flex justify-between items-end px-1">
-        <div>
-          <h2 className="text-2xl font-black text-primary tracking-tight">ประวัติการใช้บริการ</h2>
-          <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mt-1">Service Records</p>
-        </div>
-        <div className="bg-white px-4 py-1.5 rounded-full shadow-ambient border border-white/40">
-          <span className="text-[10px] font-black text-primary uppercase tracking-wider">ทั้งหมด {filteredData.length} ครั้ง</span>
-        </div>
-      </div>
-
+    <div className="space-y-6 pb-24">
       {/* Filter Indicator */}
       {filterPetName && (
         <div className="flex items-center justify-between bg-white/80 backdrop-blur-md px-5 py-3 rounded-2xl shadow-ambient border border-white/40">

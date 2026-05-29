@@ -837,7 +837,26 @@ const Index = () => {
                   />
                 ) : (
                   <>
-                    {/* Sliding Tab Switcher for History Page */}
+                    {/* Main Header Section (Moved to top of the page) */}
+                    <div className="flex justify-between items-end px-1">
+                      <div>
+                        <h2 className="text-2xl font-black text-primary tracking-tight">
+                          {historySubTab === 'services' ? 'ประวัติการใช้บริการ' : 'ประวัติคะแนนสะสม'}
+                        </h2>
+                        <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mt-1">
+                          {historySubTab === 'services' ? 'Service Records' : 'Points Records'}
+                        </p>
+                      </div>
+                      {historySubTab === 'services' && (
+                        <div className="bg-white px-4 py-1.5 rounded-full shadow-ambient border border-white/40">
+                          <span className="text-[10px] font-black text-primary uppercase tracking-wider">
+                            ทั้งหมด {customerData?.serviceHistory?.length || 0} ครั้ง
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Sliding Tab Switcher for History Page (Moved below the header) */}
                     <div className="bg-white p-1.5 rounded-full flex gap-1 shadow-ambient border border-black/5 relative overflow-hidden">
                       <button 
                         onClick={() => setHistorySubTab('services')}
