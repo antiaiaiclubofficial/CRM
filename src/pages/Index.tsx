@@ -24,6 +24,7 @@ import HomeQuickActions from '@/components/HomeQuickActions';
 import AppointmentList from '@/components/AppointmentList';
 import AppointmentDetailModal from '@/components/AppointmentDetailModal';
 import BookingForm from '@/components/BookingForm';
+import PointsHistory from '@/components/PointsHistory';
 import { Home, Award, PawPrint, Megaphone, Calendar, History, Scissors, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -34,6 +35,7 @@ const Index = () => {
   const { profile: lineProfile, loading: liffLoading } = useLiff();
   const [activeTab, setActiveTab] = useState('home');
   const [promoSubTab, setPromoSubTab] = useState<'redeem' | 'my-coupons' | 'my-packages'>('redeem');
+  const [historySubTab, setHistorySubTab] = useState<'services' | 'points'>('services');
   const [isProfileEditing, setIsProfileEditing] = useState(false);
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -154,6 +156,14 @@ const Index = () => {
         };
       });
 
+      // ดึงข้อมูลประวัติคะแนนสะสม (Points Logs)
+      const { data: pointsLogsData } = await supabase
+        .from('points_logs')
+        .select('*')
+        .eq('customer_id', customer.id)
+        .eq('store_id', store.id)
+        .order('created_at', { ascending: false });
+
       // Fetch customer packages with templates and usage history
       const { data: packagesData } = await supabase
         .from('customer_packages')
@@ -211,6 +221,7 @@ const Index = () => {
         myCoupons,
         customerPackages,
         serviceHistory,
+        pointsLogs: pointsLogsData || [],
         appointments: (appointmentsData || []).map(apt => ({
           id: apt.id,
           petName: apt.pets?.name || 'Unknown',
@@ -508,7 +519,7 @@ const Index = () => {
       if (customerError) throw customerError;
       if (!newCustomer) throw new Error("Failed to create customer");
 
-      const { error: membershipError } = await supabase
+      const { error: membershipError = null } = await supabase
         .from('store_customers')
         .insert([{ 
           customer_id: newCustomer.id, 
@@ -818,17 +829,64 @@ const Index = () => {
             )}
 
             {activeTab === 'history' && (
-              <motion.div key="history-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <motion.div key="history-tab" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
                 {selectedHistoryItem ? (
                   <ServiceHistoryDetail 
                     service={selectedHistoryItem} 
                     onBack={() => setSelectedHistoryItem(null)} 
                   />
                 ) : (
-                  <ServiceHistory 
-                    historyData={customerData?.serviceHistory || []} 
-                    onServiceClick={(item) => setSelectedHistoryItem(item)}
-                  />
+                  <>
+                    {/* Sliding Tab Switcher for History Page */}
+                    <div className="bg-white p-1.5 rounded-full flex gap-1 shadow-ambient border border-black/5 relative overflow-hidden">
+                      <button 
+                        onClick={() => setHistorySubTab('services')}
+                        className="relative flex-1 py-3 px-3 flex items-center justify-center gap-1.5 transition-colors duration-300 z-10 group"
+                      >
+                        {historySubTab === 'services' && (
+                          <motion.div 
+                            layoutId="historyTabBg"
+                            className="absolute inset-0 bg-primary group-hover:bg-tertiary rounded-full shadow-lg transition-colors duration-300"
+                            transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                          />
+                        )}
+                        <span className={`relative z-10 text-[10px] font-black uppercase tracking-wider transition-colors duration-300 whitespace-nowrap ${
+                          historySubTab === 'services' ? 'text-white group-hover:text-primary' : 'text-primary/50 group-hover:text-primary'
+                        }`}>
+                          ประวัติบริการ
+                        </span>
+                      </button>
+                      <button 
+                        onClick={() => setHistorySubTab('points')}
+                        className="relative flex-1 py-3 px-3 flex items-center justify-center gap-1.5 transition-colors duration-300 z-10 group"
+                      >
+                        {historySubTab === 'points' && (
+                          <motion.div 
+                            layoutId="historyTabBg"
+                            className="absolute inset-0 bg-primary group-hover:bg-tertiary rounded-full shadow-lg transition-colors duration-300"
+                            transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                          />
+                        )}
+                        <span className={`relative z-10 text-[10px] font-black uppercase tracking-wider transition-colors duration-300 whitespace-nowrap ${
+                          historySubTab === 'points' ? 'text-white group-hover:text-primary' : 'text-primary/50 group-hover:text-primary'
+                        }`}>
+                          ประวัติคะแนน
+                        </span>
+                      </button>
+                    </div>
+
+                    {historySubTab === 'services' ? (
+                      <ServiceHistory 
+                        historyData={customerData?.serviceHistory || []} 
+                        onServiceClick={(item) => setSelectedHistoryItem(item)}
+                      />
+                    ) : (
+                      <PointsHistory 
+                        logs={customerData?.pointsLogs || []} 
+                        currentPoints={customerData?.membership?.points || 0}
+                      />
+                    )}
+                  </>
                 )}
               </motion.div>
             )}
