@@ -16,34 +16,40 @@ const HomeQuickActions = ({ onCouponsClick, onAppointmentClick, onPackagesClick 
       <motion.button
         whileTap={{ scale: 0.95 }}
         onClick={onAppointmentClick}
-        className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 p-3 bg-tertiary rounded-2xl shadow-sm border-none transition-all relative overflow-hidden group h-16"
+        className="flex flex-col items-center justify-center gap-2 p-3 bg-tertiary rounded-2xl shadow-sm border-none transition-all relative overflow-hidden group h-20"
       >
-        <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center text-tertiary shadow-sm shrink-0">
-          <Calendar size={14} strokeWidth={2.5} />
+        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-tertiary shadow-sm shrink-0">
+          <Calendar size={16} strokeWidth={2.5} />
         </div>
-        <span className="font-black text-primary text-[9px] uppercase tracking-wider truncate">Book Now</span>
+        <span className="font-black text-primary text-[10px] uppercase tracking-wider truncate w-full text-center">
+          Book Now
+        </span>
       </motion.button>
 
       <motion.button
         whileTap={{ scale: 0.95 }}
         onClick={onCouponsClick}
-        className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 p-3 bg-white rounded-2xl shadow-sm border-none transition-all relative overflow-hidden group h-16"
+        className="flex flex-col items-center justify-center gap-2 p-3 bg-white rounded-2xl shadow-sm border-none transition-all relative overflow-hidden group h-20"
       >
-        <div className="w-7 h-7 bg-surface-low rounded-lg flex items-center justify-center text-primary shadow-sm shrink-0">
-          <Ticket size={14} strokeWidth={2.5} />
+        <div className="w-8 h-8 bg-surface-low rounded-full flex items-center justify-center text-primary shadow-sm shrink-0">
+          <Ticket size={16} strokeWidth={2.5} />
         </div>
-        <span className="font-black text-primary text-[9px] uppercase tracking-wider truncate">My Deals</span>
+        <span className="font-black text-primary text-[10px] uppercase tracking-wider truncate w-full text-center">
+          My Deals
+        </span>
       </motion.button>
 
       <motion.button
         whileTap={{ scale: 0.95 }}
         onClick={onPackagesClick}
-        className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 p-3 bg-white rounded-2xl shadow-sm border-none transition-all relative overflow-hidden group h-16"
+        className="flex flex-col items-center justify-center gap-2 p-3 bg-white rounded-2xl shadow-sm border-none transition-all relative overflow-hidden group h-20"
       >
-        <div className="w-7 h-7 bg-surface-low rounded-lg flex items-center justify-center text-primary shadow-sm shrink-0">
-          <Box size={14} strokeWidth={2.5} />
+        <div className="w-8 h-8 bg-surface-low rounded-full flex items-center justify-center text-primary shadow-sm shrink-0">
+          <Box size={16} strokeWidth={2.5} />
         </div>
-        <span className="font-black text-primary text-[9px] uppercase tracking-wider truncate">My Package</span>
+        <span className="font-black text-primary text-[10px] uppercase tracking-wider truncate w-full text-center">
+          My Package
+        </span>
       </motion.button>
     </div>
   );
