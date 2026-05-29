@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Ticket, Scissors, Sparkles, Gift, ShowerHead, Leaf, Hand, Tag, Heart, 
@@ -37,6 +37,8 @@ interface PromotionsProps {
   onUseCoupon: (coupon: any) => void;
   onUsePackage: (pkg: any) => void;
   tiers?: any[];
+  activeSubTab?: 'redeem' | 'my-coupons' | 'my-packages';
+  onSubTabChange?: (tab: 'redeem' | 'my-coupons' | 'my-packages') => void;
 }
 
 const iconMap: Record<string, LucideIcon> = {
@@ -178,9 +180,21 @@ const Promotions = ({
   onBuyPackage,
   onUseCoupon,
   onUsePackage,
-  tiers
+  tiers,
+  activeSubTab,
+  onSubTabChange
 }: PromotionsProps) => {
-  const [activeTab, setActiveTab] = useState<'redeem' | 'my-coupons' | 'my-packages'>('redeem');
+  const [localActiveTab, setLocalActiveTab] = useState<'redeem' | 'my-coupons' | 'my-packages'>('redeem');
+  
+  const activeTab = activeSubTab !== undefined ? activeSubTab : localActiveTab;
+  
+  const setActiveTab = (tab: 'redeem' | 'my-coupons' | 'my-packages') => {
+    if (onSubTabChange) {
+      onSubTabChange(tab);
+    } else {
+      setLocalActiveTab(tab);
+    }
+  };
 
   const specialPromos = redeemableTemplates.filter(t => t.pointsRequired === 0);
   const regularRedeemables = redeemableTemplates.filter(t => t.pointsRequired > 0);
