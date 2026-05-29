@@ -33,6 +33,7 @@ const Index = () => {
   const queryClient = useQueryClient();
   const { profile: lineProfile, loading: liffLoading } = useLiff();
   const [activeTab, setActiveTab] = useState('home');
+  const [promoSubTab, setPromoSubTab] = useState<'redeem' | 'my-coupons' | 'my-packages'>('redeem');
   const [isProfileEditing, setIsProfileEditing] = useState(false);
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -734,8 +735,9 @@ const Index = () => {
                 />
                 <UpcomingAppointments appointments={customerData?.appointments || []} onViewAll={() => handleNavClick('appointments')} />
                 <HomeQuickActions 
-                  onCouponsClick={() => setActiveTab('promo')} 
+                  onCouponsClick={() => { setPromoSubTab('my-coupons'); setActiveTab('promo'); }} 
                   onAppointmentClick={() => { setActiveTab('appointments'); setIsBookingFormOpen(true); }} 
+                  onPackagesClick={() => { setPromoSubTab('my-packages'); setActiveTab('promo'); }}
                 />
                 <PetList 
                   pets={customerData?.pets || []} 
@@ -746,7 +748,13 @@ const Index = () => {
                     favoriteMutation.mutate({ petId: id, isFavorite: fav });
                   }}
                 />
-                <MyCouponsHomePreview coupons={customerData?.myCoupons?.slice(0, 5) || []} onViewAll={() => { setActiveTab('promo'); setTimeout(() => { document.getElementById('my-coupons-section')?.scrollIntoView({ behavior: 'smooth' }); }, 100); }} />
+                <MyCouponsHomePreview 
+                  coupons={customerData?.myCoupons?.slice(0, 5) || []} 
+                  onViewAll={() => { 
+                    setPromoSubTab('my-coupons'); 
+                    setActiveTab('promo'); 
+                  }} 
+                />
               </motion.div>
             )}
 
@@ -773,6 +781,8 @@ const Index = () => {
                    onUseCoupon={(c) => { setSelectedCouponToUse(c); setIsCouponUseModalOpen(true); }} 
                    onUsePackage={(pkg) => { setSelectedPackageToUse(pkg); setIsPackageUseModalOpen(true); }}
                    tiers={membershipTiers}
+                   activeSubTab={promoSubTab}
+                   onSubTabChange={setPromoSubTab}
                  />
               </motion.div>
             )}
