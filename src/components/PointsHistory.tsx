@@ -20,21 +20,21 @@ interface PointsHistoryProps {
 const PointsHistory = ({ logs, currentPoints }: PointsHistoryProps) => {
   return (
     <div className="space-y-6">
-      {/* Points Summary Card */}
-      <div className="bg-gradient-to-br from-[#18234a] to-[#020d35] p-6 rounded-[2.5rem] text-white relative overflow-hidden shadow-ambient">
-        <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-[#EAFD69]/10 rounded-full blur-2xl" />
+      {/* Points Summary Card - Reduced Size */}
+      <div className="bg-gradient-to-br from-[#18234a] to-[#020d35] p-4 rounded-2xl text-white relative overflow-hidden shadow-ambient">
+        <div className="absolute -right-6 -bottom-6 w-20 h-20 bg-[#EAFD69]/10 rounded-full blur-2xl" />
         <div className="relative z-10 flex justify-between items-center">
           <div>
-            <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">คะแนนคงเหลือปัจจุบัน</p>
-            <div className="flex items-baseline gap-1.5 mt-1">
-              <span className="text-4xl font-black text-[#EAFD69] tracking-tighter">
+            <p className="text-[9px] font-black text-white/50 uppercase tracking-widest">คะแนนคงเหลือปัจจุบัน</p>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="text-2xl font-black text-[#EAFD69] tracking-tighter">
                 {currentPoints.toLocaleString()}
               </span>
-              <span className="text-xs font-bold text-white/70 uppercase">คะแนน</span>
+              <span className="text-[10px] font-bold text-white/70 uppercase">คะแนน</span>
             </div>
           </div>
-          <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-[#EAFD69] border border-white/10">
-            <Coins size={24} className="animate-pulse" />
+          <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-[#EAFD69] border border-white/10">
+            <Coins size={18} className="animate-pulse" />
           </div>
         </div>
       </div>
