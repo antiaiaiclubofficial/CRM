@@ -102,6 +102,44 @@ const PetDetailView = ({
   const weightHistory = pet.weight_history || [];
   const vaccineHistory = pet.vaccine_history || [];
 
+  // คำนวณสถานะวัคซีนของน้องโดยอัตโนมัติ
+  const vaccineStatus = useMemo(() => {
+    if (!pet.vaccine_history || pet.vaccine_history.length === 0) {
+      return { text: "ยังไม่มีประวัติวัคซีน", color: "text-amber-500" };
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let hasOverdue = false;
+    let nextDue: Date | null = null;
+    
+    pet.vaccine_history.forEach(v => {
+      if (v.next_due_date) {
+        const dueDate = new Date(v.next_due_date);
+        dueDate.setHours(0, 0, 0, 0);
+        if (dueDate < today) {
+          hasOverdue = true;
+        } else {
+          if (!nextDue || dueDate < nextDue) {
+            nextDue = dueDate;
+          }
+        }
+      }
+    });
+    
+    if (hasOverdue) {
+      return { text: "เกินกำหนดฉีดวัคซีน ⚠️", color: "text-rose-500 font-black" };
+    }
+    
+    if (nextDue) {
+      const formattedDate = new Date(nextDue).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
+      return { text: `มีนัดถัดไป: ${formattedDate}`, color: "text-blue-500" };
+    }
+    
+    return { text: "ได้รับวัคซีนครบถ้วน", color: "text-emerald-500" };
+  }, [pet.vaccine_history]);
+
   // รวมประวัติกิจกรรมสุขภาพทั้งหมดและจัดเรียงตามเวลาล่าสุด
   const timelineItems = useMemo(() => {
     const items: { id: string | number; title: string; date: string; rawDate: Date; type: 'vaccine' | 'weight' | 'grooming' }[] = [];
@@ -329,6 +367,7 @@ const PetDetailView = ({
                     <div className="grid grid-cols-2 gap-6">
                       <HealthItem label="โรคประจำตัว" value={pet.medical_condition || 'ไม่มี'} />
                       <HealthItem label="ความยาวขน" value={pet.fur_length || '-'} />
+                      <HealthItem label="สถานะวัคซีน" value={<span className={vaccineStatus.color}>{vaccineStatus.text}</span>} />
                     </div>
                     <div className="mt-4 pt-4 border-t border-black/5">
                       <HealthItem label="ข้อควรระวัง" value={pet.precautions || 'ไม่มี'} />
@@ -452,10 +491,10 @@ const TabButton = ({ active, onClick, label }: { active: boolean; onClick: () =>
   </button>
 );
 
-const HealthItem = ({ label, value }: { label: string; value: string }) => (
+const HealthItem = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex flex-col gap-0.5">
     <p className="text-[10px] font-black text-primary/40 uppercase tracking-widest">{label}</p>
-    <p className="text-sm font-bold text-primary leading-tight">{value}</p>
+    <div className="text-sm font-bold text-primary leading-tight">{value}</div>
   </div>
 );
 
