@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import PetHealthOverview from './PetHealthOverview';
 import PetWeightChart from './PetWeightChart';
+import PetVaccineRecords from './PetVaccineRecords';
 
 interface Pet {
   id: string | number;
@@ -27,6 +28,7 @@ interface Pet {
   image_url: string;
   is_favorite?: boolean;
   weight_history?: { id: string | number; date: string; weight: number; }[];
+  vaccine_history?: { id: string; title: string; date: string; next_due_date?: string; description?: string; }[];
 }
 
 interface PetDetailViewProps {
@@ -40,6 +42,8 @@ interface PetDetailViewProps {
   onToggleFavorite: () => void;
   onAddWeight: (petId: string | number, weight: number) => Promise<void>;
   onDeleteWeight: (historyId: string | number) => Promise<void>;
+  onAddVaccine: (petId: string | number, data: { title: string; date: string; next_due_date: string; description: string }) => Promise<void>;
+  onDeleteVaccine: (id: string) => Promise<void>;
 }
 
 const petEmojiMap: Record<string, string> = {
@@ -60,10 +64,22 @@ const getPetDefaultEmoji = (type?: string) => {
   return petEmojiMap[type.toLowerCase()] || '🐾';
 };
 
-const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreferences, onToggleFavorite, onAddWeight, onDeleteWeight }: PetDetailViewProps) => {
+const PetDetailView = ({ 
+  pet, 
+  onBack, 
+  onStartEdit, 
+  onDeletePet, 
+  onEditPreferences, 
+  onToggleFavorite, 
+  onAddWeight, 
+  onDeleteWeight,
+  onAddVaccine,
+  onDeleteVaccine
+}: PetDetailViewProps) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showWeightDetail, setShowWeightDetail] = useState(false);
+  const [showVaccineDetail, setShowVaccineDetail] = useState(false);
 
   const healthData = useMemo(() => {
     let score = 70;
@@ -82,10 +98,15 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
   }, [pet]);
 
   const weightHistory = pet.weight_history || [];
+  const vaccineHistory = pet.vaccine_history || [];
 
   const handleHealthAction = (type: string) => {
     if (type === 'weight') {
       setShowWeightDetail(true);
+      setShowVaccineDetail(false);
+    } else if (type === 'vaccine') {
+      setShowVaccineDetail(true);
+      setShowWeightDetail(false);
     } else {
       setActiveTab('health');
     }
@@ -99,6 +120,8 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
     transition: { type: "spring", damping: 25, stiffness: 300 }
   };
 
+  const isSubViewOpen = showWeightDetail || showVaccineDetail;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -108,16 +131,18 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
     >
       {/* Compact Header Section */}
       <div className="px-1 pt-4">
-        {showWeightDetail ? (
+        {isSubViewOpen ? (
           <div className="flex items-center gap-4 mb-8 px-2">
             <button 
-              onClick={() => setShowWeightDetail(false)} 
+              onClick={() => { setShowWeightDetail(false); setShowVaccineDetail(false); }} 
               className="w-10 h-10 flex items-center justify-center text-primary/40 hover:text-primary hover:bg-slate-100 rounded-full active:scale-90 transition-all shrink-0"
             >
               <ArrowLeft size={28} strokeWidth={2.5} />
             </button>
             <div className="flex-1 min-w-0">
-               <h3 className="text-2xl font-black text-primary tracking-tight truncate">น้ำหนัก: {pet.name}</h3>
+               <h3 className="text-2xl font-black text-primary tracking-tight truncate">
+                 {showWeightDetail ? `น้ำหนัก: ${pet.name}` : `วัคซีน: ${pet.name}`}
+               </h3>
                <p className="text-[10px] font-black text-surface-variant opacity-40 uppercase tracking-[0.2em] mt-0.5">Physical Tracker</p>
             </div>
           </div>
@@ -185,6 +210,15 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
               petName={pet.name} 
               onAddWeight={(w) => onAddWeight(pet.id, w)} 
               onDeleteWeight={onDeleteWeight}
+            />
+        </div>
+      ) : showVaccineDetail ? (
+        <div className="px-4 pt-2">
+           <PetVaccineRecords 
+              data={vaccineHistory} 
+              petName={pet.name} 
+              onAddVaccine={(data) => onAddVaccine(pet.id, data)} 
+              onDeleteVaccine={onDeleteVaccine}
             />
         </div>
       ) : (

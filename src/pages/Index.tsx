@@ -108,7 +108,17 @@ const Index = () => {
       const { data: petsData } = await supabase.from('pets').select('*').eq('customer_id', customer.id).order('is_favorite', { ascending: false }).order('created_at', { ascending: true });
       
       const petIds = (petsData || []).map(p => p.id);
+      
+      // ดึงข้อมูลประวัติน้ำหนัก
       const { data: weightHistory } = await supabase.from('pet_weight_history').select('*').in('pet_id', petIds).order('date', { ascending: true });
+
+      // ดึงข้อมูลประวัติวัคซีน (pet_health_logs)
+      const { data: healthLogs } = await supabase
+        .from('pet_health_logs')
+        .select('*')
+        .in('pet_id', petIds)
+        .eq('type', 'vaccine')
+        .order('date', { ascending: true });
 
       const pets = (petsData || []).map(p => ({
         ...p,
@@ -121,6 +131,15 @@ const Index = () => {
             id: wh.id,
             date: new Date(wh.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }),
             weight: parseFloat(wh.weight)
+          })),
+        vaccine_history: (healthLogs || [])
+          .filter(hl => hl.pet_id === p.id)
+          .map(hl => ({
+            id: hl.id,
+            title: hl.title,
+            date: hl.date,
+            next_due_date: hl.next_due_date,
+            description: hl.description
           }))
       }));
 
@@ -663,6 +682,49 @@ const Index = () => {
     }
   });
 
+  // Mutation สำหรับเพิ่มประวัติวัคซีน
+  const addVaccineMutation = useMutation({
+    mutationFn: async ({ petId, data }: { petId: string | number; data: { title: string; date: string; next_due_date: string; description: string } }) => {
+      const { error } = await supabase
+        .from('pet_health_logs')
+        .insert([{
+          pet_id: petId,
+          type: 'vaccine',
+          title: data.title,
+          date: data.date,
+          next_due_date: data.next_due_date || null,
+          description: data.description || null,
+          status: 'completed'
+        }]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('บันทึกประวัติวัคซีนเรียบร้อยแล้วค่ะ 💉');
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    },
+    onError: () => {
+      toast.error('เกิดข้อผิดพลาดในการบันทึกข้อมูลค่ะ');
+    }
+  });
+
+  // Mutation สำหรับลบประวัติวัคซีน
+  const deleteVaccineMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('pet_health_logs')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('ลบประวัติวัคซีนเรียบร้อยแล้วค่ะ');
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    },
+    onError: () => {
+      toast.error('เกิดข้อผิดพลาดในการลบข้อมูลค่ะ');
+    }
+  });
+
   const handleNavClick = (tab: string) => {
     setActiveTab(tab);
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -822,6 +884,8 @@ const Index = () => {
                     }}
                     onAddWeight={async (id, w) => { await weightMutation.mutateAsync({ petId: id, weight: w }); }}
                     onDeleteWeight={async (historyId) => { await deleteWeightMutation.mutateAsync(historyId); }}
+                    onAddVaccine={async (id, data) => { await addVaccineMutation.mutateAsync({ petId: id, data }); }}
+                    onDeleteVaccine={async (id) => { await deleteVaccineMutation.mutateAsync(id); }}
                   />
                 ) : (
                   <PetManagement 
