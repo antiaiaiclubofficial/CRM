@@ -360,6 +360,7 @@ const PetDetailView = ({
            <PetVaccineRecords 
               data={vaccineHistory} 
               petName={pet.name} 
+              petType={pet.type}
               onAddVaccine={(data) => onAddVaccine(pet.id, data)} 
               onDeleteVaccine={onDeleteVaccine}
             />

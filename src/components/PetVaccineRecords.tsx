@@ -16,11 +16,12 @@ interface VaccineLog {
 interface PetVaccineRecordsProps {
   data: VaccineLog[];
   petName: string;
+  petType?: string;
   onAddVaccine: (data: { title: string; date: string; next_due_date: string; description: string }) => Promise<void>;
   onDeleteVaccine: (id: string) => Promise<void>;
 }
 
-const PetVaccineRecords = ({ data, petName, onAddVaccine, onDeleteVaccine }: PetVaccineRecordsProps) => {
+const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVaccine }: PetVaccineRecordsProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
@@ -150,6 +151,7 @@ const PetVaccineRecords = ({ data, petName, onAddVaccine, onDeleteVaccine }: Pet
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         petName={petName} 
+        petType={petType}
         onSave={onAddVaccine} 
       />
 
