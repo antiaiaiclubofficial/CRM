@@ -280,7 +280,7 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-500 px-1 flex items-center gap-1">
-                    <Calendar size={12} className="text-pink-500" /> นัดครั้งถัดไป
+                    <Calendar size={12} className="text-pink-500" /> เข็มถัดไป
                   </label>
                   <input 
                     type="date" 

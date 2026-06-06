@@ -75,7 +75,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
             </div>
             <div className="space-y-1">
               <span className="text-[9px] font-black text-[#020d35] bg-[#EAFD69] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                นัดหมายครั้งถัดไป
+                เข็มถัดไป
               </span>
               <h4 className="font-black text-white text-base mt-2 leading-tight">
                 {upcomingVaccine.title}
@@ -116,7 +116,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
                       {new Date(entry.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' })}
                       {entry.next_due_date && (
                         <span className="text-pink-500 font-black ml-1">
-                          • นัดถัดไป: {new Date(entry.next_due_date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' })}
+                          • เข็มถัดไป: {new Date(entry.next_due_date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' })}
                         </span>
                       )}
                     </p>

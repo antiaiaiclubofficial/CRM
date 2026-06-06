@@ -189,7 +189,7 @@ const PetDetailView = ({
     
     if (nextDue) {
       const formattedDate = new Date(nextDue).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
-      return { text: `มีนัดถัดไป: ${formattedDate}`, type: "upcoming" as const };
+      return { text: `เข็มถัดไป: ${formattedDate}`, type: "upcoming" as const };
     }
     
     return { text: "ได้รับวัคซีนครบถ้วน", type: "success" as const };
