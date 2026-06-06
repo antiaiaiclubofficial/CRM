@@ -87,12 +87,12 @@ const PetHealthOverview = ({ score, statusText, subStatusText, lastUpdate, onAct
 const HealthActionCard = ({ icon, label, onClick, color, iconColor }: { icon: any, label: string, onClick: () => void, color: string, iconColor: string }) => (
   <button 
     onClick={onClick}
-    className={`${color} rounded-xl p-3.5 flex flex-row items-center justify-center gap-3 group active:scale-95 transition-all shadow-sm border border-black/5 w-full`}
+    className={`${color} rounded-xl p-3.5 flex flex-row items-center justify-center gap-3 group active:scale-95 transition-all shadow-sm border border-black/5 w-full text-center`}
   >
     <div className={`w-10 h-10 bg-white rounded-lg flex items-center justify-center ${iconColor} shadow-sm group-hover:scale-110 transition-transform shrink-0`}>
       {icon}
     </div>
-    <span className="text-sm font-black text-primary uppercase tracking-tight">{label}</span>
+    <span className="text-sm font-black text-primary uppercase tracking-tight text-center">{label}</span>
   </button>
 );
 
