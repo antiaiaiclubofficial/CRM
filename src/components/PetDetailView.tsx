@@ -42,6 +42,24 @@ interface PetDetailViewProps {
   onDeleteWeight: (historyId: string | number) => Promise<void>;
 }
 
+const petEmojiMap: Record<string, string> = {
+  'สุนัข': '🐶',
+  'dog': '🐶',
+  'แมว': '🐱',
+  'cat': '🐱',
+  'กระต่าย': '🐰',
+  'rabbit': '🐰',
+  'หนูแฮมสเตอร์': '🐹',
+  'hamster': '🐹',
+  'นก': '🦜',
+  'bird': '🦜'
+};
+
+const getPetDefaultEmoji = (type?: string) => {
+  if (!type) return '🐾';
+  return petEmojiMap[type.toLowerCase()] || '🐾';
+};
+
 const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreferences, onToggleFavorite, onAddWeight, onDeleteWeight }: PetDetailViewProps) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -117,9 +135,13 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
                 <div className="absolute inset-0 bg-tertiary/15 rounded-full blur-xl scale-125" />
                 <div 
                   onClick={() => onStartEdit(pet)}
-                  className="relative w-20 h-20 rounded-full overflow-hidden bg-white shadow-ambient border-none cursor-pointer active:scale-95 transition-all"
+                  className="relative w-20 h-20 rounded-full overflow-hidden bg-white shadow-ambient border-none cursor-pointer active:scale-95 transition-all flex items-center justify-center"
                 >
-                  <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
+                  {pet.image_url ? (
+                    <img src={pet.image_url} alt={pet.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-4xl">{getPetDefaultEmoji(pet.type)}</span>
+                  )}
                 </div>
               </div>
               
@@ -314,7 +336,7 @@ const PetDetailView = ({ pet, onBack, onStartEdit, onDeletePet, onEditPreference
   );
 };
 
-const TabButton = ({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) => (
+const TabButton = ({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) => (
   <button 
     onClick={onClick}
     className="relative flex-1 py-2.5 px-3 flex items-center justify-center gap-1 transition-colors duration-300 z-10 group"
@@ -334,14 +356,14 @@ const TabButton = ({ active, onClick, label }: { active: boolean, onClick: () =>
   </button>
 );
 
-const HealthItem = ({ label, value }: { label: string, value: string }) => (
+const HealthItem = ({ label, value }: { label: string; value: string }) => (
   <div className="flex flex-col gap-0.5">
     <p className="text-[10px] font-black text-primary/40 uppercase tracking-widest">{label}</p>
     <p className="text-sm font-bold text-primary leading-tight">{value}</p>
   </div>
 );
 
-const TimelineItem = ({ title, date, type }: { title: string, date: string, type: string }) => (
+const TimelineItem = ({ title, date, type }: { title: string; date: string; type: string }) => (
   <div className="relative">
     <div className={`absolute -left-[51px] top-0 w-9 h-9 rounded-full border-4 border-white shadow-ambient flex items-center justify-center z-10 ${
       type === 'vaccine' ? 'bg-[#E0F7F9] text-[#2BC0D3]' : 
