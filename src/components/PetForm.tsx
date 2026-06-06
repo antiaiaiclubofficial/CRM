@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, HeartPulse, Calendar, Info, Check, Feather, Camera, AlertCircle, Palette } from 'lucide-react';
+import { X, HeartPulse, Calendar, Info, Check, Feather, Camera, AlertCircle, Palette, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Pet {
   id?: string | number;
@@ -66,6 +67,7 @@ const calculateAgeString = (birthDate: string) => {
 
 const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState<Pet>({
     name: '',
     type: 'สุนัข',
@@ -118,14 +120,51 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
     }
   }, [initialData, isOpen]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, image_url: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // จำกัดขนาดไฟล์ไม่เกิน 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('ขนาดรูปภาพต้องไม่เกิน 5MB ค่ะ');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `pet_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      // อัปโหลดไฟล์ไปยัง Supabase Storage Bucket ชื่อ 'pets'
+      const { data, error } = await supabase.storage
+        .from('pets')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (error) {
+        console.error('Storage upload error:', error);
+        throw error;
+      }
+
+      // ดึง Public URL ของรูปภาพที่อัปโหลดสำเร็จ
+      const { data: { publicUrl } } = supabase.storage
+        .from('pets')
+        .getPublicUrl(filePath);
+
+      setFormData(prev => ({ ...prev, image_url: publicUrl }));
+      toast.success('อัปโหลดรูปภาพสำเร็จแล้วค่ะ');
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      toast.error('ไม่สามารถอัปโหลดรูปภาพได้ ระบบจะใช้รูปภาพตัวอย่างแทนชั่วคราวค่ะ');
+      
+      // Fallback ไปใช้รูปภาพตัวอย่างจาก Unsplash แทนการใช้ Base64 ที่ยาวเกินไป
+      const fallbackUrl = `https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=200&h=200`;
+      setFormData(prev => ({ ...prev, image_url: fallbackUrl }));
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -181,10 +220,15 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
               {/* Image & Color Selection */}
               <div className="flex flex-col items-center gap-6 pt-4">
                 <div 
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => !isUploading && fileInputRef.current?.click()}
                   className="relative w-28 h-28 rounded-full border-4 border-slate-800 bg-slate-50 flex items-center justify-center overflow-hidden cursor-pointer shadow-soft"
                 >
-                  {formData.image_url ? (
+                  {isUploading ? (
+                    <div className="flex flex-col items-center text-slate-400">
+                      <Loader2 size={32} className="animate-spin text-pink-500" />
+                      <span className="text-[10px] font-bold mt-1 uppercase">Uploading</span>
+                    </div>
+                  ) : formData.image_url ? (
                     <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
                   ) : (
                     <div className="flex flex-col items-center text-slate-300">
@@ -192,9 +236,11 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
                       <span className="text-[10px] font-bold mt-1 uppercase">Photo</span>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-black/5 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <Camera size={20} className="text-white" />
-                  </div>
+                  {!isUploading && (
+                    <div className="absolute inset-0 bg-black/5 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                      <Camera size={20} className="text-white" />
+                    </div>
+                  )}
                 </div>
                 <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
 
@@ -332,9 +378,10 @@ const PetForm = ({ isOpen, onClose, onSave, initialData }: PetFormProps) => {
 
               <button 
                 onClick={executeSave}
-                className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black mt-4 shadow-lg active:scale-95 transition-all border-2 border-black mb-8"
+                disabled={isUploading}
+                className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black mt-4 shadow-lg active:scale-95 transition-all border-2 border-black mb-8 disabled:opacity-50"
               >
-                บันทึกข้อมูล
+                {isUploading ? 'กำลังอัปโหลดรูปภาพ...' : 'บันทึกข้อมูล'}
               </button>
             </div>
           </motion.div>
