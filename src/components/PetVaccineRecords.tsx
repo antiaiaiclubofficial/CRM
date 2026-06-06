@@ -46,8 +46,8 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      {/* Header & Add Button (ย้ายขึ้นมาด้านบนสุด) */}
-      <div className="bg-white p-6 rounded-xl shadow-ambient relative overflow-hidden">
+      {/* Header & Add Button (Lime Spark CTA) */}
+      <div className="bg-white p-6 rounded-[2.5rem] shadow-ambient relative overflow-hidden">
         <div className="flex justify-between items-center">
           <div>
             <h4 className="text-lg font-black text-primary tracking-tight">ประวัติการรับวัคซีน</h4>
@@ -55,30 +55,33 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
           </div>
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="w-12 h-12 bg-[#E0F7F9] text-[#2BC0D3] rounded-2xl shadow-lg shadow-[#2BC0D3]/10 flex items-center justify-center active:scale-90 transition-all"
+            className="w-12 h-12 bg-[#EAFD69] text-[#020d35] rounded-2xl shadow-lg shadow-[#EAFD69]/20 flex items-center justify-center active:scale-90 transition-all"
           >
             <Plus size={24} strokeWidth={3} />
           </button>
         </div>
       </div>
 
-      {/* Upcoming Vaccine Alert Card (ย้ายลงมาอยู่ด้านล่างหัวข้อ) */}
+      {/* Upcoming Vaccine Alert Card (Signature Navy Gradient + Lime Spark Text) */}
       {upcomingVaccine && (
-        <div className="bg-gradient-to-br from-[#E0F7F9] to-[#B2EBF2] p-5 rounded-[2rem] border border-[#80DEEA] shadow-sm relative overflow-hidden">
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-[#2BC0D3]/10 rounded-full blur-2xl" />
+        <div className="bg-gradient-to-br from-[#18234a] to-[#020d35] p-6 rounded-[2.5rem] shadow-ambient relative overflow-hidden text-white">
+          {/* Soft liquid glow background */}
+          <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-[#EAFD69]/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute -left-6 -top-6 w-24 h-24 bg-white/5 rounded-full blur-xl pointer-events-none" />
+          
           <div className="flex items-start gap-4 relative z-10">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#2BC0D3] shrink-0 shadow-sm">
+            <div className="w-11 h-11 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-[#EAFD69] shrink-0 border border-white/10">
               <Clock size={20} />
             </div>
-            <div>
-              <span className="text-[9px] font-black text-[#00838F] bg-white/60 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            <div className="space-y-1">
+              <span className="text-[9px] font-black text-[#020d35] bg-[#EAFD69] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                 นัดหมายครั้งถัดไป
               </span>
-              <h4 className="font-black text-[#00838F] text-sm mt-1.5 leading-tight">
+              <h4 className="font-black text-white text-base mt-2 leading-tight">
                 {upcomingVaccine.title}
               </h4>
-              <p className="text-xs font-bold text-[#00838F] mt-1">
-                วันที่นัด: {new Date(upcomingVaccine.next_due_date!).toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' })}
+              <p className="text-xs font-bold text-white/70">
+                วันที่นัด: <span className="text-[#EAFD69] font-black">{new Date(upcomingVaccine.next_due_date!).toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
               </p>
             </div>
           </div>
@@ -100,10 +103,10 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-white p-5 rounded-[2rem] shadow-ambient flex justify-between items-center group border border-black/5"
+                className="bg-white p-5 rounded-[2rem] shadow-ambient flex justify-between items-center group border-none"
               >
                 <div className="flex items-center gap-4 min-w-0 flex-1">
-                  <div className="w-11 h-11 bg-[#E0F7F9] rounded-2xl flex items-center justify-center text-[#2BC0D3] shrink-0">
+                  <div className="w-11 h-11 bg-primary/5 rounded-2xl flex items-center justify-center text-primary shrink-0">
                     <Syringe size={20} />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -134,8 +137,8 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
               </motion.div>
             ))
           ) : (
-            <div className="text-center py-16 bg-white rounded-[2.5rem] shadow-ambient border border-black/5 p-8 flex flex-col items-center justify-center">
-              <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 mb-4 border border-slate-100">
+            <div className="text-center py-16 bg-white rounded-[2.5rem] shadow-ambient border-none p-8 flex flex-col items-center justify-center">
+              <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 mb-4">
                 <Syringe size={28} />
               </div>
               <h3 className="text-base font-black text-primary mb-1">ยังไม่มีประวัติวัคซีน</h3>
@@ -170,7 +173,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative w-full max-w-[320px] bg-white rounded-[2.5rem] shadow-ambient p-8 text-center border border-black/5"
+              className="relative w-full max-w-[320px] bg-white rounded-[2.5rem] shadow-ambient p-8 text-center border-none"
             >
               <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
                 <AlertTriangle size={32} className="text-red-500" />

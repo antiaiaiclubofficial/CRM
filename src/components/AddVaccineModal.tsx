@@ -16,103 +16,100 @@ interface AddVaccineModalProps {
 interface VaccinePreset {
   title: string;
   ageLabel: string;
-  nextDueOffsetDays?: number; // จำนวนวันสำหรับคำนวณวันนัดถัดไป
+  nextDueOffsetDays?: number;
   description: string;
 }
 
-// โปรแกรมวัคซีนสำหรับสุนัข
 const dogPresets: VaccinePreset[] = [
   {
     title: "วัคซีนรวมป้องกัน 5 โรค ครั้งที่ 1",
     ageLabel: "8 สัปดาห์",
-    nextDueOffsetDays: 28, // 4 สัปดาห์
+    nextDueOffsetDays: 28,
     description: "วัคซีนพื้นฐานเริ่มต้น (ป้องกันไข้หัด, ลำไส้อักเสบ, เลปโตสไปโรซิส, ตับอักเสบ, พาราอินฟูลเอนซ่า)"
   },
   {
     title: "วัคซีนรวมป้องกัน 5 โรค ครั้งที่ 2",
     ageLabel: "12 สัปดาห์",
-    nextDueOffsetDays: 28, // 4 สัปดาห์
+    nextDueOffsetDays: 28,
     description: "กระตุ้นภูมิคุ้มกันครั้งที่ 2"
   },
   {
     title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 1",
     ageLabel: "14 สัปดาห์",
-    nextDueOffsetDays: 28, // 4 สัปดาห์
+    nextDueOffsetDays: 28,
     description: "วัคซีนไฟต์บังคับตามกฎหมาย"
   },
   {
     title: "วัคซีนรวมป้องกัน 5 โรค ครั้งที่ 3",
     ageLabel: "16 สัปดาห์",
-    nextDueOffsetDays: 365, // 1 ปี
+    nextDueOffsetDays: 365,
     description: "กระตุ้นภูมิคุ้มกันครบรส"
   },
   {
     title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 2",
     ageLabel: "18 สัปดาห์",
-    nextDueOffsetDays: 365, // 1 ปี
+    nextDueOffsetDays: 365,
     description: "กระตุ้นภูมิคุ้มกันพิษสุนัขบ้า"
   },
   {
     title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 3",
     ageLabel: "1 ปี",
-    nextDueOffsetDays: 365, // 1 ปี
+    nextDueOffsetDays: 365,
     description: "กระตุ้นซ้ำทุกๆ 1 ปี"
   },
   {
     title: "วัคซีนโรคหลอดลมอักเสบติดต่อ (Bordetella)",
     ageLabel: "ทางเลือก",
-    nextDueOffsetDays: 365, // 1 ปี
+    nextDueOffsetDays: 365,
     description: "ให้ผ่านทางรูจมูกหรือทางปาก เพื่อป้องกันโรคหลอดลมอักเสบติดต่อ"
   }
 ];
 
-// โปรแกรมวัคซีนสำหรับแมว
 const catPresets: VaccinePreset[] = [
   {
     title: "วัคซีนรวมป้องกันโรคหัด + หวัดแมว ครั้งที่ 1",
     ageLabel: "8 สัปดาห์",
-    nextDueOffsetDays: 28, // 4 สัปดาห์
+    nextDueOffsetDays: 28,
     description: "วัคซีนพื้นฐานเริ่มต้น"
   },
   {
     title: "วัคซีนรวมป้องกันโรคหัด + หวัดแมว ครั้งที่ 2",
     ageLabel: "12 สัปดาห์",
-    nextDueOffsetDays: 28, // 4 สัปดาห์
+    nextDueOffsetDays: 28,
     description: "กระตุ้นภูมิคุ้มกันครั้งที่ 2"
   },
   {
     title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 1",
     ageLabel: "14 สัปดาห์",
-    nextDueOffsetDays: 28, // 4 สัปดาห์
+    nextDueOffsetDays: 28,
     description: "วัคซีนไฟต์บังคับตามกฎหมาย"
   },
   {
     title: "วัคซีนรวมป้องกันโรคหัด + หวัดแมว ครั้งที่ 3",
     ageLabel: "16 สัปดาห์",
-    nextDueOffsetDays: 365, // 1 ปี
+    nextDueOffsetDays: 365,
     description: "ฉีดร่วมกับวัคซีนลิวคีเมีย ครั้งที่ 1"
   },
   {
     title: "วัคซีนลิวคีเมีย ครั้งที่ 1",
     ageLabel: "16 สัปดาห์",
-    nextDueOffsetDays: 28, // 4 สัปดาห์
+    nextDueOffsetDays: 28,
     description: "ควรทำการตรวจหาเชื้อลิวคีเมียในกระแสเลือดก่อนฉีดเข็มแรกเสมอ"
   },
   {
     title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 2",
     ageLabel: "18 สัปดาห์",
-    nextDueOffsetDays: 365, // 1 ปี
+    nextDueOffsetDays: 365,
     description: "กระตุ้นภูมิคุ้มกันพิษสุนัขบ้า"
   },
   {
     title: "วัคซีนลิวคีเมีย ครั้งที่ 2",
     ageLabel: "20 สัปดาห์",
-    nextDueOffsetDays: 365, // 1 ปี
+    nextDueOffsetDays: 365,
     description: "กระตุ้นภูมิคุ้มกันลิวคีเมีย"
   }
 ];
 
-// ฟังก์ชันช่วยแปลงวันที่ปัจจุบันให้เป็น YYYY-MM-DD ตาม Time Zone ของเครื่องผู้ใช้
 const getLocalDateString = (date = new Date()) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -128,14 +125,11 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ตรวจสอบประเภทสัตว์เลี้ยงเพื่อเลือก Preset
   const isCat = petType?.toLowerCase() === 'cat' || petType === 'แมว';
   const presets = isCat ? catPresets : dogPresets;
 
-  // เมื่อเปลี่ยน Preset หรือเปลี่ยนวันที่ฉีด ให้คำนวณวันนัดถัดไปและคำอธิบายอัตโนมัติ
   useEffect(() => {
     if (selectedPresetIndex === 'custom') {
-      // ถ้าเลือกกำหนดเอง ไม่ต้องคำนวณทับ
       return;
     }
 
@@ -154,10 +148,9 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
     }
   }, [selectedPresetIndex, date, presets]);
 
-  // รีเซ็ตฟอร์มเมื่อเปิด Modal
   useEffect(() => {
     if (isOpen) {
-      setSelectedPresetIndex('0'); // เลือก Preset แรกเป็นค่าเริ่มต้นเพื่อความสะดวก
+      setSelectedPresetIndex('0');
       setDate(getLocalDateString());
       setNextDueDate('');
       setDescription('');
@@ -208,7 +201,7 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3.5rem] shadow-2xl max-h-[92vh] flex flex-col"
+            className="relative w-full max-w-[390px] bg-white rounded-t-[3.5rem] shadow-2xl max-h-[92vh] flex flex-col border-none"
           >
             {/* Header */}
             <div className="pt-8 pb-4 px-8 flex justify-between items-center bg-white rounded-t-[3.5rem] shrink-0">
@@ -220,16 +213,16 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
               </div>
               <button 
                 onClick={onClose} 
-                className="p-2 bg-slate-100 rounded-full text-slate-400 active:scale-90 transition-transform"
+                className="p-2.5 bg-slate-100 rounded-full text-slate-400 active:scale-90 transition-transform"
               >
-                <X size={20} />
+                <X size={18} strokeWidth={2.5} />
               </button>
             </div>
 
             {/* Form Content */}
             <form onSubmit={handleSubmit} className="px-8 pb-10 overflow-y-auto no-scrollbar flex-1 space-y-5">
               <div className="flex flex-col items-center py-2">
-                <div className="w-14 h-14 bg-[#E0F7F9] rounded-[2rem] flex items-center justify-center text-[#2BC0D3] shadow-inner">
+                <div className="w-14 h-14 bg-primary/5 rounded-[2rem] flex items-center justify-center text-primary shadow-inner">
                   <Syringe size={28} />
                 </div>
               </div>
@@ -237,12 +230,12 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
               {/* Preset Selector */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 px-1 flex items-center gap-1">
-                  <Sparkles size={12} className="text-amber-500" /> เลือกโปรแกรมวัคซีนแนะนำ
+                  <Sparkles size={12} className="text-[#EAFD69] fill-[#EAFD69]" /> เลือกโปรแกรมวัคซีนแนะนำ
                 </label>
                 <select
                   value={selectedPresetIndex}
                   onChange={(e) => setSelectedPresetIndex(e.target.value)}
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-[#2BC0D3]/20 outline-none text-sm font-bold text-slate-800 transition-all appearance-none"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-primary/10 outline-none text-sm font-bold text-slate-800 transition-all appearance-none"
                 >
                   {presets.map((preset, idx) => (
                     <option key={idx} value={idx.toString()}>
@@ -253,7 +246,7 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
                 </select>
               </div>
 
-              {/* Custom Title Input (Only shown if 'custom' is selected) */}
+              {/* Custom Title Input */}
               {selectedPresetIndex === 'custom' && (
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }}
@@ -267,7 +260,7 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="เช่น วัคซีนรวม 5 โรค, พิษสุนัขบ้า"
-                    className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-[#2BC0D3]/20 outline-none text-sm font-bold text-slate-800 transition-all"
+                    className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-primary/10 outline-none text-sm font-bold text-slate-800 transition-all"
                   />
                 </motion.div>
               )}
@@ -282,7 +275,7 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
                     required
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-[#2BC0D3]/20 outline-none text-sm font-bold text-slate-800 transition-all"
+                    className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-primary/10 outline-none text-sm font-bold text-slate-800 transition-all"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -293,7 +286,7 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
                     type="date" 
                     value={nextDueDate}
                     onChange={(e) => setNextDueDate(e.target.value)}
-                    className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-[#2BC0D3]/20 outline-none text-sm font-bold text-slate-800 transition-all"
+                    className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-primary/10 outline-none text-sm font-bold text-slate-800 transition-all"
                   />
                 </div>
               </div>
@@ -306,24 +299,25 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="เช่น โรงพยาบาลสัตว์ทองหล่อ, คุณหมอสมชาย"
-                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-[#2BC0D3]/20 outline-none text-sm font-bold text-slate-800 transition-all min-h-[80px]"
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-primary/10 outline-none text-sm font-bold text-slate-800 transition-all min-h-[80px]"
                 />
               </div>
 
               {/* Warning Note about Bathing */}
-              <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 flex gap-2.5 items-start">
+              <div className="bg-amber-50 p-4 rounded-2xl border-none flex gap-2.5 items-start">
                 <Info size={16} className="text-amber-500 shrink-0 mt-0.5" />
                 <p className="text-[10px] text-amber-700 font-bold leading-relaxed">
                   * ข้อควรปฏิบัติสำคัญ: งดการอาบน้ำให้น้องหมาและน้องแมวเป็นเวลาอย่างน้อย 7 วันหลังฉีดวัคซีน เพื่อความปลอดภัยของสัตว์เลี้ยงค่ะ
                 </p>
               </div>
 
+              {/* Submit Button (Signature Navy Gradient) */}
               <button 
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-4 bg-gradient-to-br from-[#18234a] to-[#020d35] text-white rounded-full font-bold shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                {isSubmitting ? 'กำลังบันทึก...' : <><Check size={20} className="text-emerald-400" /> บันทึกข้อมูล</>}
+                {isSubmitting ? 'กำลังบันทึก...' : <><Check size={20} className="text-[#EAFD69]" /> บันทึกข้อมูล</>}
               </button>
             </form>
           </motion.div>
