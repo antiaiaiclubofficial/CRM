@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Syringe, Pill, Stethoscope } from 'lucide-react';
+import { Heart, Syringe } from 'lucide-react';
 import AnalogScaleIcon from './AnalogScaleIcon';
 
 interface PetHealthOverviewProps {
@@ -63,35 +63,21 @@ const PetHealthOverview = ({ score, statusText, subStatusText, lastUpdate, onAct
         </div>
       </div>
 
-      {/* Quick Actions Grid (2x2) */}
+      {/* Quick Actions Grid (1x2) */}
       <div className="grid grid-cols-2 gap-4">
         <HealthActionCard 
-          icon={<Syringe size={20} />} 
+          icon={<Syringe size={22} />} 
           label="วัคซีน" 
           onClick={() => onActionClick('vaccine')} 
           color="bg-[#E0F7F9]" 
           iconColor="text-[#2BC0D3]"
         />
         <HealthActionCard 
-          icon={<Pill size={20} />} 
-          label="ยา" 
-          onClick={() => onActionClick('medicine')} 
-          color="bg-[#FFF0F3]" 
-          iconColor="text-[#FF5C8A]"
-        />
-        <HealthActionCard 
-          icon={<AnalogScaleIcon size={20} />} 
+          icon={<AnalogScaleIcon size={22} />} 
           label="น้ำหนัก" 
           onClick={() => onActionClick('weight')} 
           color="bg-[#F0F2FF]" 
           iconColor="text-[#5C7CFF]"
-        />
-        <HealthActionCard 
-          icon={<Stethoscope size={20} />} 
-          label="ตรวจสุขภาพ" 
-          onClick={() => onActionClick('checkup')} 
-          color="bg-[#F2F9F0]" 
-          iconColor="text-[#64C44F]"
         />
       </div>
     </div>
@@ -101,12 +87,12 @@ const PetHealthOverview = ({ score, statusText, subStatusText, lastUpdate, onAct
 const HealthActionCard = ({ icon, label, onClick, color, iconColor }: { icon: any, label: string, onClick: () => void, color: string, iconColor: string }) => (
   <button 
     onClick={onClick}
-    className={`${color} rounded-lg p-5 flex flex-col items-center justify-center gap-2 group active:scale-95 transition-all shadow-sm border border-black/5 h-28`}
+    className={`${color} rounded-lg p-5 flex flex-col items-center justify-center gap-3 group active:scale-95 transition-all shadow-sm border border-black/5 h-32`}
   >
-    <div className={`w-12 h-12 bg-white rounded-full flex items-center justify-center ${iconColor} shadow-sm group-hover:scale-110 transition-transform`}>
+    <div className={`w-14 h-14 bg-white rounded-full flex items-center justify-center ${iconColor} shadow-sm group-hover:scale-110 transition-transform`}>
       {icon}
     </div>
-    <span className="text-[13px] font-black text-primary uppercase tracking-tight">{label}</span>
+    <span className="text-[14px] font-black text-primary uppercase tracking-tight">{label}</span>
   </button>
 );
 
