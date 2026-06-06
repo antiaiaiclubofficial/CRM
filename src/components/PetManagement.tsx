@@ -89,11 +89,13 @@ const PetManagement = ({ pets, onBack, onViewDetails, onAddPet, onToggleFavorite
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
                 onClick={() => onViewDetails(pet)}
-                className="relative w-full rounded-[2.5rem] p-4 shadow-ambient flex flex-col justify-between cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all overflow-hidden"
-                style={{ backgroundColor: bgColor }}
+                className="relative w-full rounded-[2.5rem] p-4 shadow-ambient flex flex-col justify-between cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all overflow-hidden bg-white"
               >
-                {/* Soft overlay to match the exact design */}
-                <div className="absolute inset-0 bg-white/10 pointer-events-none" />
+                {/* Softened background overlay (40% opacity) to match home page */}
+                <div 
+                  className="absolute inset-0 opacity-40" 
+                  style={{ backgroundColor: bgColor }} 
+                />
 
                 <div className="relative z-10 flex flex-col h-full justify-between">
                   {/* Large White Rounded Image Container */}
