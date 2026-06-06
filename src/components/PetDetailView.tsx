@@ -102,10 +102,40 @@ const PetDetailView = ({
   const weightHistory = pet.weight_history || [];
   const vaccineHistory = pet.vaccine_history || [];
 
-  // คำนวณสถานะวัคซีนของน้องโดยอัตโนมัติ
+  // Calculate next vaccine countdown and info
+  const nextVaccineInfo = useMemo(() => {
+    if (!pet.vaccine_history || pet.vaccine_history.length === 0) {
+      return null;
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Filter vaccines with future next_due_date
+    const upcoming = pet.vaccine_history
+      .filter(v => v.next_due_date)
+      .map(v => {
+        const dueDate = new Date(v.next_due_date!);
+        dueDate.setHours(0, 0, 0, 0);
+        const diffTime = dueDate.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return {
+          title: v.title,
+          dueDate,
+          daysRemaining: diffDays,
+          formattedDate: new Date(v.next_due_date!).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' })
+        };
+      })
+      .filter(v => v.daysRemaining >= 0)
+      .sort((a, b) => a.daysRemaining - b.daysRemaining);
+      
+    return upcoming[0] || null;
+  }, [pet.vaccine_history]);
+
+  // Calculate vaccine status text and type
   const vaccineStatus = useMemo(() => {
     if (!pet.vaccine_history || pet.vaccine_history.length === 0) {
-      return { text: "ยังไม่มีประวัติวัคซีน", color: "text-amber-500" };
+      return { text: "ยังไม่มีประวัติวัคซีน", type: "warning" as const };
     }
     
     const today = new Date();
@@ -129,15 +159,15 @@ const PetDetailView = ({
     });
     
     if (hasOverdue) {
-      return { text: "เกินกำหนดฉีดวัคซีน ⚠️", color: "text-rose-500 font-black" };
+      return { text: "เกินกำหนดฉีดวัคซีน ⚠️", type: "danger" as const };
     }
     
     if (nextDue) {
       const formattedDate = new Date(nextDue).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
-      return { text: `มีนัดถัดไป: ${formattedDate}`, color: "text-blue-500" };
+      return { text: `มีนัดถัดไป: ${formattedDate}`, type: "upcoming" as const };
     }
     
-    return { text: "ได้รับวัคซีนครบถ้วน", color: "text-emerald-500" };
+    return { text: "ได้รับวัคซีนครบถ้วน", type: "success" as const };
   }, [pet.vaccine_history]);
 
   // รวมประวัติกิจกรรมสุขภาพทั้งหมดและจัดเรียงตามเวลาล่าสุด
@@ -337,6 +367,12 @@ const PetDetailView = ({
                     statusText={healthData.status}
                     subStatusText={healthData.subStatus}
                     lastUpdate="วันนี้"
+                    weight={pet.weight}
+                    vaccineStatusText={vaccineStatus.text}
+                    vaccineStatusType={vaccineStatus.type}
+                    nextVaccineDays={nextVaccineInfo ? nextVaccineInfo.daysRemaining : null}
+                    nextVaccineName={nextVaccineInfo ? nextVaccineInfo.title : null}
+                    nextVaccineDate={nextVaccineInfo ? nextVaccineInfo.formattedDate : null}
                     onActionClick={handleHealthAction}
                   />
 
@@ -367,7 +403,7 @@ const PetDetailView = ({
                     <div className="grid grid-cols-2 gap-6">
                       <HealthItem label="โรคประจำตัว" value={pet.medical_condition || 'ไม่มี'} />
                       <HealthItem label="ความยาวขน" value={pet.fur_length || '-'} />
-                      <HealthItem label="สถานะวัคซีน" value={<span className={vaccineStatus.color}>{vaccineStatus.text}</span>} />
+                      <HealthItem label="สถานะวัคซีน" value={<span className={vaccineStatus.type === 'danger' ? 'text-rose-500 font-black' : 'text-primary'}>{vaccineStatus.text}</span>} />
                     </div>
                     <div className="mt-4 pt-4 border-t border-black/5">
                       <HealthItem label="ข้อควรระวัง" value={pet.precautions || 'ไม่มี'} />
