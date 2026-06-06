@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Syringe, Calendar, Plus, Trash2, AlertTriangle, Clock, Info } from 'lucide-react';
+import { Syringe, Calendar, Plus, Trash2, AlertTriangle, Clock } from 'lucide-react';
 import AddVaccineModal from './AddVaccineModal';
 
 interface VaccineLog {
@@ -46,30 +46,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      {/* Upcoming Vaccine Alert Card */}
-      {upcomingVaccine && (
-        <div className="bg-gradient-to-br from-[#E0F7F9] to-[#B2EBF2] p-5 rounded-[2rem] border border-[#80DEEA] shadow-sm relative overflow-hidden">
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-[#2BC0D3]/10 rounded-full blur-2xl" />
-          <div className="flex items-start gap-4 relative z-10">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#2BC0D3] shrink-0 shadow-sm">
-              <Clock size={20} />
-            </div>
-            <div>
-              <span className="text-[9px] font-black text-[#00838F] bg-white/60 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                นัดหมายครั้งถัดไป
-              </span>
-              <h4 className="font-black text-[#006064] text-sm mt-1.5">
-                {upcomingVaccine.title}
-              </h4>
-              <p className="text-xs font-bold text-[#00838F] mt-1">
-                วันที่นัด: {new Date(upcomingVaccine.next_due_date!).toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' })}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Header & Add Button */}
+      {/* Header & Add Button (ย้ายขึ้นมาด้านบนสุด) */}
       <div className="bg-white p-6 rounded-xl shadow-ambient relative overflow-hidden">
         <div className="flex justify-between items-center">
           <div>
@@ -84,6 +61,29 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
           </button>
         </div>
       </div>
+
+      {/* Upcoming Vaccine Alert Card (ย้ายลงมาอยู่ด้านล่างหัวข้อ) */}
+      {upcomingVaccine && (
+        <div className="bg-gradient-to-br from-[#E0F7F9] to-[#B2EBF2] p-5 rounded-[2rem] border border-[#80DEEA] shadow-sm relative overflow-hidden">
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-[#2BC0D3]/10 rounded-full blur-2xl" />
+          <div className="flex items-start gap-4 relative z-10">
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#2BC0D3] shrink-0 shadow-sm">
+              <Clock size={20} />
+            </div>
+            <div>
+              <span className="text-[9px] font-black text-[#00838F] bg-white/60 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                นัดหมายครั้งถัดไป
+              </span>
+              <h4 className="font-black text-[#00838F] text-sm mt-1.5 leading-tight">
+                {upcomingVaccine.title}
+              </h4>
+              <p className="text-xs font-bold text-[#00838F] mt-1">
+                วันที่นัด: {new Date(upcomingVaccine.next_due_date!).toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Vaccine Timeline List */}
       <div className="space-y-4">
