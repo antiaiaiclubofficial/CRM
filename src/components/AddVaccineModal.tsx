@@ -12,9 +12,17 @@ interface AddVaccineModalProps {
   onSave: (data: { title: string; date: string; next_due_date: string; description: string }) => Promise<void>;
 }
 
+// ฟังก์ชันช่วยแปลงวันที่ปัจจุบันให้เป็น YYYY-MM-DD ตาม Time Zone ของเครื่องผู้ใช้
+const getLocalDateString = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const AddVaccineModal = ({ isOpen, onClose, petName, onSave }: AddVaccineModalProps) => {
   const [title, setTitle] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(getLocalDateString()); // ใช้วันที่ตาม Time Zone ของเครื่องผู้ใช้
   const [nextDueDate, setNextDueDate] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

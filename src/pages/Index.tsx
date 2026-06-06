@@ -30,6 +30,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import Register from './Register';
 
+// ฟังก์ชันช่วยแปลงวันที่ปัจจุบันให้เป็น YYYY-MM-DD ตาม Time Zone ของเครื่องผู้ใช้
+const getLocalDateString = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const Index = () => {
   const queryClient = useQueryClient();
   const { profile: lineProfile, loading: liffLoading } = useLiff();
@@ -606,7 +614,7 @@ const Index = () => {
       if (savedPetId && weight) {
         const weightNum = parseFloat(weight);
         if (!isNaN(weightNum)) {
-          const today = new Date().toISOString().split('T')[0];
+          const today = getLocalDateString(); // ใช้วันที่ตาม Time Zone ของเครื่องผู้ใช้
           const { data: existing } = await supabase
             .from('pet_weight_history')
             .select('*')
@@ -641,7 +649,7 @@ const Index = () => {
       // Update the main pet weight
       await supabase.from('pets').update({ weight: weight.toString() }).eq('id', petId);
       
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateString(); // ใช้วันที่ตาม Time Zone ของเครื่องผู้ใช้
       
       // Check for existing record for today
       const { data: existing } = await supabase
