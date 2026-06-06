@@ -63,21 +63,21 @@ const PetHealthOverview = ({ score, statusText, subStatusText, lastUpdate, onAct
         </div>
       </div>
 
-      {/* Quick Actions Grid (1x2) */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Quick Actions Grid (Horizontal Layout) */}
+      <div className="grid grid-cols-2 gap-3">
         <HealthActionCard 
-          icon={<Syringe size={22} />} 
-          label="วัคซีน" 
-          onClick={() => onActionClick('vaccine')} 
-          color="bg-[#E0F7F9]" 
-          iconColor="text-[#2BC0D3]"
-        />
-        <HealthActionCard 
-          icon={<AnalogScaleIcon size={22} />} 
+          icon={<AnalogScaleIcon size={18} />} 
           label="น้ำหนัก" 
           onClick={() => onActionClick('weight')} 
           color="bg-[#F0F2FF]" 
           iconColor="text-[#5C7CFF]"
+        />
+        <HealthActionCard 
+          icon={<Syringe size={18} />} 
+          label="วัคซีน" 
+          onClick={() => onActionClick('vaccine')} 
+          color="bg-[#E0F7F9]" 
+          iconColor="text-[#2BC0D3]"
         />
       </div>
     </div>
@@ -87,12 +87,12 @@ const PetHealthOverview = ({ score, statusText, subStatusText, lastUpdate, onAct
 const HealthActionCard = ({ icon, label, onClick, color, iconColor }: { icon: any, label: string, onClick: () => void, color: string, iconColor: string }) => (
   <button 
     onClick={onClick}
-    className={`${color} rounded-lg p-5 flex flex-col items-center justify-center gap-3 group active:scale-95 transition-all shadow-sm border border-black/5 h-32`}
+    className={`${color} rounded-xl p-3.5 flex flex-row items-center justify-center gap-3 group active:scale-95 transition-all shadow-sm border border-black/5 w-full`}
   >
-    <div className={`w-14 h-14 bg-white rounded-full flex items-center justify-center ${iconColor} shadow-sm group-hover:scale-110 transition-transform`}>
+    <div className={`w-10 h-10 bg-white rounded-lg flex items-center justify-center ${iconColor} shadow-sm group-hover:scale-110 transition-transform shrink-0`}>
       {icon}
     </div>
-    <span className="text-[14px] font-black text-primary uppercase tracking-tight">{label}</span>
+    <span className="text-sm font-black text-primary uppercase tracking-tight">{label}</span>
   </button>
 );
 
