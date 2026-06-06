@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Pencil, Heart, PawPrint, Tag, Plus, HeartPulse, Trash2, AlertTriangle, X,
-  LayoutGrid, Activity, History, FileText, Stethoscope, Syringe, ChevronRight, Scale
+  LayoutGrid, Activity, History, FileText, Stethoscope, Syringe, ChevronRight, Scale, Scissors
 } from 'lucide-react';
 import PetHealthOverview from './PetHealthOverview';
 import PetWeightChart from './PetWeightChart';
@@ -27,7 +27,7 @@ interface Pet {
   custom_preferences?: { id: string; label: string; value: string; }[];
   image_url: string;
   is_favorite?: boolean;
-  weight_history?: { id: string | number; date: string; weight: number; }[];
+  weight_history?: { id: string | number; date: string; weight: number; rawDate?: string; }[];
   vaccine_history?: { id: string; title: string; date: string; next_due_date?: string; description?: string; }[];
 }
 
@@ -44,6 +44,7 @@ interface PetDetailViewProps {
   onDeleteWeight: (historyId: string | number) => Promise<void>;
   onAddVaccine: (petId: string | number, data: { title: string; date: string; next_due_date: string; description: string }) => Promise<void>;
   onDeleteVaccine: (id: string) => Promise<void>;
+  serviceHistory: any[];
 }
 
 const petEmojiMap: Record<string, string> = {
@@ -74,7 +75,8 @@ const PetDetailView = ({
   onAddWeight, 
   onDeleteWeight,
   onAddVaccine,
-  onDeleteVaccine
+  onDeleteVaccine,
+  serviceHistory
 }: PetDetailViewProps) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -99,6 +101,54 @@ const PetDetailView = ({
 
   const weightHistory = pet.weight_history || [];
   const vaccineHistory = pet.vaccine_history || [];
+
+  // รวมประวัติกิจกรรมสุขภาพทั้งหมดและจัดเรียงตามเวลาล่าสุด
+  const timelineItems = useMemo(() => {
+    const items: { id: string | number; title: string; date: string; rawDate: Date; type: 'vaccine' | 'weight' | 'grooming' }[] = [];
+
+    // 1. ประวัติวัคซีน
+    if (pet.vaccine_history) {
+      pet.vaccine_history.forEach(v => {
+        items.push({
+          id: `vaccine-${v.id}`,
+          title: `ฉีดวัคซีน: ${v.title}`,
+          date: new Date(v.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
+          rawDate: new Date(v.date),
+          type: 'vaccine'
+        });
+      });
+    }
+
+    // 2. ประวัติน้ำหนัก
+    if (pet.weight_history) {
+      pet.weight_history.forEach(w => {
+        const rDate = w.rawDate ? new Date(w.rawDate) : new Date();
+        items.push({
+          id: `weight-${w.id}`,
+          title: `บันทึกน้ำหนัก: ${w.weight} kg`,
+          date: rDate.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
+          rawDate: rDate,
+          type: 'weight'
+        });
+      });
+    }
+
+    // 3. ประวัติการรับบริการ (อาบน้ำตัดขน)
+    const petServices = serviceHistory.filter(s => s.petName === pet.name);
+    petServices.forEach(s => {
+      const rDate = s.rawDate ? new Date(s.rawDate) : new Date();
+      items.push({
+        id: `service-${s.id}`,
+        title: `รับบริการ: ${s.service}`,
+        date: rDate.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
+        rawDate: rDate,
+        type: 'grooming'
+      });
+    });
+
+    // จัดเรียงจากใหม่ล่าสุดไปเก่าสุด
+    return items.sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
+  }, [pet, serviceHistory]);
 
   const handleHealthAction = (type: string) => {
     if (type === 'weight') {
@@ -287,10 +337,22 @@ const PetDetailView = ({
                   
                   <div className="space-y-4 px-2">
                     <h3 className="text-lg font-bold text-primary tracking-tight">ไทม์ไลน์สุขภาพ</h3>
-                    <div className="relative pl-10 space-y-8 before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-[2px] before:bg-surface-container">
-                       <TimelineItem title="รับบริการอาบน้ำตัดขน" date="15 พ.ค. 2569" type="grooming" />
-                       <TimelineItem title="ฉีดวัคซีนรวม (รายปี)" date="10 พ.ค. 2569" type="vaccine" />
-                    </div>
+                    {timelineItems.length > 0 ? (
+                      <div className="relative pl-10 space-y-8 before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-[2px] before:bg-surface-container">
+                        {timelineItems.map((item) => (
+                          <TimelineItem 
+                            key={item.id}
+                            title={item.title} 
+                            date={item.date} 
+                            type={item.type} 
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 bg-white rounded-xl border border-black/5">
+                        <p className="text-xs font-bold text-surface-variant opacity-40 italic">ยังไม่มีประวัติกิจกรรมสุขภาพ</p>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -401,9 +463,12 @@ const TimelineItem = ({ title, date, type }: { title: string; date: string; type
   <div className="relative">
     <div className={`absolute -left-[51px] top-0 w-9 h-9 rounded-full border-4 border-white shadow-ambient flex items-center justify-center z-10 ${
       type === 'vaccine' ? 'bg-[#E0F7F9] text-[#2BC0D3]' : 
-      type === 'grooming' ? 'bg-[#FFF0F3] text-[#FF5C8A]' : 'bg-[#F2F9F0] text-[#64C44F]'
+      type === 'grooming' ? 'bg-[#FFF0F3] text-[#FF5C8A]' : 
+      type === 'weight' ? 'bg-[#F0F2FF] text-[#5C7CFF]' : 'bg-[#F2F9F0] text-[#64C44F]'
     }`}>
-      {type === 'vaccine' ? <Syringe size={16} /> : type === 'grooming' ? <FileText size={16} /> : <Stethoscope size={16} />}
+      {type === 'vaccine' ? <Syringe size={16} /> : 
+       type === 'grooming' ? <Scissors size={16} /> : 
+       type === 'weight' ? <Scale size={16} /> : <Stethoscope size={16} />}
     </div>
     <div>
       <h5 className="text-sm font-black text-primary tracking-tight">{title}</h5>

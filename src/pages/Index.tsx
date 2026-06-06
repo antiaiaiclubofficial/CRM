@@ -130,7 +130,8 @@ const Index = () => {
           .map(wh => ({
             id: wh.id,
             date: new Date(wh.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }),
-            weight: parseFloat(wh.weight)
+            weight: parseFloat(wh.weight),
+            rawDate: wh.date
           })),
         vaccine_history: (healthLogs || [])
           .filter(hl => hl.pet_id === p.id)
@@ -171,7 +172,8 @@ const Index = () => {
           notes: h.note,
           shampooUsed: 'แชมพูสูตรอ่อนโยนพิเศษสำหรับผิวแพ้ง่าย',
           spaTreatment: 'สปาโอโซนบำรุงรากขน',
-          groomerNotes: 'น้องน่ารักและให้ความร่วมมือดีมากค่ะ'
+          groomerNotes: 'น้องน่ารักและให้ความร่วมมือดีมากค่ะ',
+          rawDate: h.created_at
         };
       });
 
@@ -886,6 +888,7 @@ const Index = () => {
                     onDeleteWeight={async (historyId) => { await deleteWeightMutation.mutateAsync(historyId); }}
                     onAddVaccine={async (id, data) => { await addVaccineMutation.mutateAsync({ petId: id, data }); }}
                     onDeleteVaccine={async (id) => { await deleteVaccineMutation.mutateAsync(id); }}
+                    serviceHistory={customerData?.serviceHistory || []}
                   />
                 ) : (
                   <PetManagement 
