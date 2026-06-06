@@ -13,6 +13,24 @@ interface PetManagementProps {
   onToggleFavorite: (id: string | number, isFavorite: boolean) => void;
 }
 
+const petEmojiMap: Record<string, string> = {
+  'สุนัข': '🐶',
+  'dog': '🐶',
+  'แมว': '🐱',
+  'cat': '🐱',
+  'กระต่าย': '🐰',
+  'rabbit': '🐰',
+  'หนูแฮมสเตอร์': '🐹',
+  'hamster': '🐹',
+  'นก': '🦜',
+  'bird': '🦜'
+};
+
+const getPetDefaultEmoji = (type?: string) => {
+  if (!type) return '🐾';
+  return petEmojiMap[type.toLowerCase()] || '🐾';
+};
+
 const PetManagement = ({ pets, onBack, onViewDetails, onAddPet, onToggleFavorite }: PetManagementProps) => {
   const hasPets = pets && pets.length > 0;
 
@@ -99,12 +117,12 @@ const PetManagement = ({ pets, onBack, onViewDetails, onAddPet, onToggleFavorite
 
                 <div className="relative z-10 flex flex-col h-full justify-between">
                   {/* Large White Rounded Image Container */}
-                  <div className="relative w-full aspect-[4/3] rounded-[1.8rem] overflow-hidden bg-white shadow-sm mb-4">
+                  <div className="relative w-full aspect-[4/3] rounded-[1.8rem] overflow-hidden bg-white shadow-sm mb-4 flex items-center justify-center">
                     {pet.imageUrl ? (
                       <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[#020d35]/20">
-                        <PawPrint size={32} />
+                      <div className="w-full h-full flex items-center justify-center text-5xl bg-slate-50/50">
+                        {getPetDefaultEmoji(pet.type)}
                       </div>
                     )}
                   </div>

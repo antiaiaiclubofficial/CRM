@@ -15,6 +15,7 @@ interface Pet {
   weight?: string;
   gender?: string;
   is_favorite?: boolean;
+  type?: string;
 }
 
 interface PetListProps {
@@ -23,6 +24,24 @@ interface PetListProps {
   onViewAll?: () => void;
   onToggleFavorite?: (e: React.MouseEvent, petId: number, currentFav: boolean) => void;
 }
+
+const petEmojiMap: Record<string, string> = {
+  'สุนัข': '🐶',
+  'dog': '🐶',
+  'แมว': '🐱',
+  'cat': '🐱',
+  'กระต่าย': '🐰',
+  'rabbit': '🐰',
+  'หนูแฮมสเตอร์': '🐹',
+  'hamster': '🐹',
+  'นก': '🦜',
+  'bird': '🦜'
+};
+
+const getPetDefaultEmoji = (type?: string) => {
+  if (!type) return '🐾';
+  return petEmojiMap[type.toLowerCase()] || '🐾';
+};
 
 const PetList = ({ pets, onPetClick, onViewAll, onToggleFavorite }: PetListProps) => {
   return (
@@ -56,9 +75,15 @@ const PetList = ({ pets, onPetClick, onViewAll, onToggleFavorite }: PetListProps
                 
                 {/* Content container */}
                 <div className="relative z-10 flex flex-col h-full justify-between">
-                  {/* Image Area - Adjusted border radius to match container proportions */}
-                  <div className="relative w-full h-24 rounded-[1.8rem] overflow-hidden bg-white shadow-sm mb-3">
-                    <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+                  {/* Image Area */}
+                  <div className="relative w-full h-24 rounded-[1.8rem] overflow-hidden bg-white shadow-sm mb-3 flex items-center justify-center">
+                    {pet.imageUrl ? (
+                      <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-4xl bg-slate-50/50">
+                        {getPetDefaultEmoji(pet.type)}
+                      </div>
+                    )}
                   </div>
 
                   {/* Weight & Gender Row */}
@@ -67,7 +92,6 @@ const PetList = ({ pets, onPetClick, onViewAll, onToggleFavorite }: PetListProps
                       <AnalogScaleIcon size={12} />
                       {pet.weight || '-'} kg
                     </span>
-                    {/* Changed justify-center to justify-end to align with the right edge */}
                     <div className="w-10 flex justify-end shrink-0">
                       <span className="text-[8px] font-black px-2 py-0.5 rounded-full bg-white/60 text-primary uppercase block text-center truncate">
                         {pet.gender || '-'}
@@ -82,7 +106,6 @@ const PetList = ({ pets, onPetClick, onViewAll, onToggleFavorite }: PetListProps
                       <p className="text-[9px] font-bold text-primary/40 truncate uppercase tracking-tighter">{pet.breed}</p>
                     </div>
                     
-                    {/* Changed justify-center to justify-end to align with the right edge */}
                     <div className="w-10 flex justify-end shrink-0">
                       {onToggleFavorite && (
                         <button
