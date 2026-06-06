@@ -752,8 +752,15 @@ const Index = () => {
                 />
                 <PetList 
                   pets={customerData?.pets || []} 
-                  onPetClick={(p: any) => { setSelectedPetId(p.id); setActiveTab('pets'); }} 
-                  onViewAll={() => setActiveTab('pets')} 
+                  onPetClick={(p: any) => { 
+                    setSelectedPetId(p.id); 
+                    setActiveTab('pets'); 
+                    mainScrollRef.current?.scrollTo({ top: 0 });
+                  }} 
+                  onViewAll={() => {
+                    setActiveTab('pets');
+                    mainScrollRef.current?.scrollTo({ top: 0 });
+                  }} 
                   onToggleFavorite={(e, id, fav) => {
                     e.stopPropagation();
                     favoriteMutation.mutate({ petId: id, isFavorite: fav });
@@ -820,7 +827,10 @@ const Index = () => {
                   <PetManagement 
                     pets={customerData?.pets || []} 
                     onBack={() => setActiveTab('home')} 
-                    onViewDetails={(p: any) => setSelectedPetId(p.id)} 
+                    onViewDetails={(p: any) => {
+                      setSelectedPetId(p.id);
+                      mainScrollRef.current?.scrollTo({ top: 0 });
+                    }} 
                     onAddPet={handleAddPetClick}
                     onToggleFavorite={(id, fav) => favoriteMutation.mutate({ petId: id, isFavorite: fav })}
                   />
