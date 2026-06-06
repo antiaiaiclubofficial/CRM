@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Pencil, Heart, PawPrint, Tag, Plus, HeartPulse, Trash2, AlertTriangle, X,
-  LayoutGrid, Activity, History, FileText, Stethoscope, Syringe, ChevronRight, Scale, Scissors
+  LayoutGrid, Activity, History, FileText, Stethoscope, Syringe, ChevronRight, Scale, Scissors, Gift, Cake
 } from 'lucide-react';
 import PetHealthOverview from './PetHealthOverview';
 import PetWeightChart from './PetWeightChart';
@@ -101,6 +101,31 @@ const PetDetailView = ({
 
   const weightHistory = pet.weight_history || [];
   const vaccineHistory = pet.vaccine_history || [];
+
+  // ตรวจสอบว่าเป็นวันเกิดของน้องหรือไม่
+  const isBirthday = useMemo(() => {
+    if (!pet.birth_date) return false;
+    const today = new Date();
+    const birth = new Date(pet.birth_date);
+    return today.getDate() === birth.getDate() && today.getMonth() === birth.getMonth();
+  }, [pet.birth_date]);
+
+  // คำนวณส่วนต่างน้ำหนักและวันที่ชั่งน้ำหนักครั้งก่อนหน้า
+  const weightDiffInfo = useMemo(() => {
+    const history = pet.weight_history || [];
+    if (history.length < 2) return null;
+    
+    const latest = history[history.length - 1];
+    const prev = history[history.length - 2];
+    const diff = latest.weight - prev.weight;
+    const formattedDiff = diff > 0 ? `+${diff.toFixed(1)}` : diff.toFixed(1);
+    
+    return {
+      diff: formattedDiff,
+      isGain: diff >= 0,
+      prevDate: prev.date
+    };
+  }, [pet.weight_history]);
 
   // Calculate next vaccine countdown and info
   const nextVaccineInfo = useMemo(() => {
@@ -362,12 +387,45 @@ const PetDetailView = ({
                   transition={slideVariants.transition}
                   className="space-y-10"
                 >
+                  {/* Birthday Celebration Banner */}
+                  {isBirthday && (
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="bg-gradient-to-r from-[#FFD8E4] via-[#FFE3BC] to-[#E1BEE7] p-6 rounded-[2.5rem] border-2 border-white shadow-ambient text-center relative overflow-hidden"
+                    >
+                      {/* Confetti decorative elements */}
+                      <div className="absolute -left-4 -top-4 text-3xl opacity-20 select-none">🎈🎉✨</div>
+                      <div className="absolute -right-4 -bottom-4 text-3xl opacity-20 select-none">🎁🎂🧁</div>
+                      
+                      <div className="relative z-10 flex flex-col items-center gap-3">
+                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-pink-500">
+                          <Cake size={24} className="animate-bounce" />
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-black text-primary tracking-tight">
+                            สุขสันต์วันเกิดนะค๊าบ! 🎉
+                          </h4>
+                          <p className="text-xs font-bold text-slate-700 mt-1 leading-relaxed">
+                            วันนี้เป็นวันเกิดครบรอบ <span className="font-black text-pink-600 underline">{pet.age}</span> ของน้อง <span className="font-black text-primary">{pet.name}</span> ขอให้น้องมีความสุข สุขภาพแข็งแรง ร่าเริงสดใสในทุกๆ วันนะคะ! 🐾🎂
+                          </p>
+                        </div>
+                        <div className="inline-flex items-center gap-1.5 bg-white/60 px-3.5 py-1.5 rounded-full border border-white/80 text-[10px] font-black text-pink-600 uppercase tracking-wider mt-1">
+                          <Gift size={12} /> รับของขวัญวันเกิดพิเศษที่หน้าร้านได้เลยค่ะ!
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
                   <PetHealthOverview 
                     score={healthData.score}
                     statusText={healthData.status}
                     subStatusText={healthData.subStatus}
                     lastUpdate="วันนี้"
                     weight={pet.weight}
+                    weightDiff={weightDiffInfo?.diff}
+                    weightDiffIsGain={weightDiffInfo?.isGain}
+                    prevWeightDate={weightDiffInfo?.prevDate}
                     vaccineStatusText={vaccineStatus.text}
                     vaccineStatusType={vaccineStatus.type}
                     nextVaccineDays={nextVaccineInfo ? nextVaccineInfo.daysRemaining : null}
