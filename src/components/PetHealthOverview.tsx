@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { motion } from 'react-id';
+import { motion } from 'framer-motion';
 import { Heart, Syringe, Calendar, AlertCircle, CheckCircle2, Clock, ChevronRight, Scale } from 'lucide-react';
 import AnalogScaleIcon from './AnalogScaleIcon';
 
