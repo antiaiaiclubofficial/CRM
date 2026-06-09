@@ -13,6 +13,8 @@ interface PetHealthOverviewProps {
   weight: string;
   vaccineStatusText: string;
   vaccineStatusType: 'success' | 'warning' | 'danger' | 'upcoming';
+  nextVaccineName?: string | null;
+  nextVaccineDate?: string | null;
   onActionClick: (type: string) => void;
 }
 
@@ -24,6 +26,8 @@ const PetHealthOverview = ({
   weight,
   vaccineStatusText,
   vaccineStatusType,
+  nextVaccineName,
+  nextVaccineDate,
   onActionClick 
 }: PetHealthOverviewProps) => {
 
@@ -162,9 +166,18 @@ const PetHealthOverview = ({
 
           <div className="space-y-3 px-1 relative z-10">
             {/* Status Badge */}
-            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold ${vaccineConfig.bg} ${vaccineConfig.text}`}>
-              {vaccineConfig.icon}
-              <span>{vaccineStatusText}</span>
+            <div className="flex flex-wrap gap-2">
+              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold ${vaccineConfig.bg} ${vaccineConfig.text}`}>
+                {vaccineConfig.icon}
+                <span>{vaccineStatusText}</span>
+              </div>
+              
+              {nextVaccineName && nextVaccineDate && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-blue-100 bg-blue-50 text-blue-600 text-xs font-bold">
+                  <Clock size={14} />
+                  <span>เข็มถัดไป: {nextVaccineName} ({nextVaccineDate})</span>
+                </div>
+              )}
             </div>
           </div>
         </motion.div>

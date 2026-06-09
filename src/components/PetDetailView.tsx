@@ -41,6 +41,30 @@ interface PetDetailViewProps {
   serviceHistory?: any[];
 }
 
+// ฟังก์ชันช่วยคำนวณประมาณการวันฉีดวัคซีนเข็มถัดไป
+const estimateNextDueDate = (title: string, dateStr: string): string => {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
+
+  const titleLower = title.toLowerCase();
+  let daysToAdd = 365; // ค่าเริ่มต้นเป็นกระตุ้นรายปี (365 วัน)
+
+  // ถ้าเป็นเข็มแรกๆ ของลูกหมา/ลูกแมว มักจะห่างกัน 4 สัปดาห์ (28 วัน)
+  if (titleLower.includes('ครั้งที่ 1') || titleLower.includes('เข็มที่ 1') || titleLower.includes('1st')) {
+    daysToAdd = 28;
+  } else if (titleLower.includes('ครั้งที่ 2') || titleLower.includes('เข็มที่ 2') || titleLower.includes('2nd')) {
+    daysToAdd = 28;
+  }
+
+  const nextDate = new Date(date.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+  
+  // แปลงกลับเป็น YYYY-MM-DD
+  const year = nextDate.getFullYear();
+  const month = String(nextDate.getMonth() + 1).padStart(2, '0');
+  const day = String(nextDate.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const PetDetailView = ({ 
   pet, 
   onBack, 
@@ -64,10 +88,40 @@ const PetDetailView = ({
   // คำนวณสถานะวัคซีนเบื้องต้น
   let vaccineStatusText = 'ยังไม่มีประวัติวัคซีน';
   let vaccineStatusType: 'success' | 'warning' | 'danger' | 'upcoming' = 'warning';
+  let nextVaccineName: string | null = null;
+  let nextVaccineDate: string | null = null;
+
+  const isCat = pet.type === 'แมว';
 
   if (vaccineLogs.length > 0) {
+    const latestVaccine = vaccineLogs[vaccineLogs.length - 1];
     vaccineStatusText = 'ได้รับวัคซีนตามกำหนดการล่าสุดแล้ว';
     vaccineStatusType = 'success';
+
+    // คำนวณวันประมาณการถัดไปจากวัคซีนล่าสุด
+    const estimatedDateStr = estimateNextDueDate(latestVaccine.title, latestVaccine.date);
+    
+    if (estimatedDateStr) {
+      const nextDate = new Date(estimatedDateStr);
+      nextVaccineDate = nextDate.toLocaleDateString('th-TH', {
+        day: 'numeric',
+        month: 'short',
+        year: '2-digit'
+      });
+
+      // กำหนดชื่อเข็มถัดไปแบบประมาณการ
+      if (latestVaccine.title.includes('ครั้งที่ 1')) {
+        nextVaccineName = latestVaccine.title.replace('ครั้งที่ 1', 'ครั้งที่ 2');
+      } else if (latestVaccine.title.includes('ครั้งที่ 2')) {
+        nextVaccineName = latestVaccine.title.replace('ครั้งที่ 2', 'ครั้งที่ 3');
+      } else {
+        nextVaccineName = `${latestVaccine.title.split(' ครั้งที่')[0]} (กระตุ้นประจำปี)`;
+      }
+    }
+  } else {
+    // หากยังไม่มีประวัติวัคซีนเลย แนะนำเข็มแรกตามประเภทสัตว์เลี้ยง
+    nextVaccineName = isCat ? 'วัคซีนรวมหัด+หวัดแมว เข็มที่ 1' : 'วัคซีนรวม 5 โรค เข็มที่ 1';
+    nextVaccineDate = 'แนะนำที่อายุ 8 สัปดาห์';
   }
 
   // คำนวณคะแนนสุขภาพเบื้องต้น
@@ -147,6 +201,8 @@ const PetDetailView = ({
               weight={currentWeight}
               vaccineStatusText={vaccineStatusText}
               vaccineStatusType={vaccineStatusType}
+              nextVaccineName={nextVaccineName}
+              nextVaccineDate={nextVaccineDate}
               onActionClick={(tab) => setActiveTab(tab)}
             />
           </TabsContent>
