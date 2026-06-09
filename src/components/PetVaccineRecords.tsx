@@ -129,7 +129,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
           </span>
         </div>
 
-        <div className="relative py-4">
+        <div className="relative py-3">
           {/* Background Line - Centered vertically at 30px (16px padding-top + 14px half of dot height) */}
           {/* Adjusted left/right to 14px (half of w-7 dot width) to perfectly align with dot centers */}
           <div className="absolute left-[14px] right-[14px] top-[30px] -translate-y-0 h-1 bg-slate-100 rounded-full z-0" />
