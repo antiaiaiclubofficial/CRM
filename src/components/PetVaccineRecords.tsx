@@ -60,8 +60,8 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
   const isCat = petType?.toLowerCase() === 'cat' || petType === 'แมว';
   const milestones = isCat ? catMilestones : dogMilestones;
   const milestoneLabels = isCat 
-    ? ["เข็ม 1 (8สัปดาห์)", "เข็ม 2 (12สัปดาห์)", "เข็ม 3 (14สัปดาห์)", "เข็ม 4 (16สัปดาห์)", "เข็ม 5 (18สัปดาห์)"]
-    : ["เข็ม 1 (8สัปดาห์)", "เข็ม 2 (12สัปดาห์)", "เข็ม 3 (14สัปดาห์)", "เข็ม 4 (16สัปดาห์)", "เข็ม 5 (18สัปดาห์)"];
+    ? ["เข็ม 1 (8 สัปดาห์)", "เข็ม 2 (12 สัปดาห์)", "เข็ม 3 (14 สัปดาห์)", "เข็ม 4 (16 สัปดาห์)", "เข็ม 5 (18 สัปดาห์)"]
+    : ["เข็ม 1 (8 สัปดาห์)", "เข็ม 2 (12 สัปดาห์)", "เข็ม 3 (14 สัปดาห์)", "เข็ม 4 (16 สัปดาห์)", "เข็ม 5 (18 สัปดาห์)"];
 
   // ค้นหาข้อมูลการฉีดจริงของวัคซีนแต่ละเข็ม
   const getVaccineExecution = (stepNum: number) => {
@@ -130,10 +130,10 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
         </div>
 
         <div className="relative py-4">
-          {/* Background Line - Centered vertically at 30px */}
-          <div className="absolute left-[10%] right-[10%] top-[30px] h-1.5 bg-slate-100 rounded-full z-0" />
-          {/* Active Progress Line - Centered vertically at 30px */}
-          <div className="absolute left-[10%] right-[10%] top-[30px] h-1.5 z-0 overflow-hidden rounded-full">
+          {/* Background Line - Centered vertically at 14px (half of dot height 28px) */}
+          <div className="absolute left-[10%] right-[10%] top-[14px] h-1.5 bg-slate-100 rounded-full z-0" />
+          {/* Active Progress Line - Centered vertically at 14px */}
+          <div className="absolute left-[10%] right-[10%] top-[14px] h-1.5 z-0 overflow-hidden rounded-full">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}

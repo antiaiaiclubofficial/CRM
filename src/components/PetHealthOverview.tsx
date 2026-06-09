@@ -95,8 +95,8 @@ const PetHealthOverview = ({
   const isCat = petType?.toLowerCase() === 'cat' || petType === 'แมว';
   const milestones = isCat ? catMilestones : dogMilestones;
   const milestoneLabels = isCat 
-    ? ["เข็ม 1 (8สัปดาห์)", "เข็ม 2 (12สัปดาห์)", "เข็ม 3 (14สัปดาห์)", "เข็ม 4 (16สัปดาห์)", "เข็ม 5 (18สัปดาห์)"]
-    : ["เข็ม 1 (8สัปดาห์)", "เข็ม 2 (12สัปดาห์)", "เข็ม 3 (14สัปดาห์)", "เข็ม 4 (16สัปดาห์)", "เข็ม 5 (18สัปดาห์)"];
+    ? ["เข็ม 1 (8 สัปดาห์)", "เข็ม 2 (12 สัปดาห์)", "เข็ม 3 (14 สัปดาห์)", "เข็ม 4 (16 สัปดาห์)", "เข็ม 5 (18 สัปดาห์)"]
+    : ["เข็ม 1 (8 สัปดาห์)", "เข็ม 2 (12 สัปดาห์)", "เข็ม 3 (14 สัปดาห์)", "เข็ม 4 (16 สัปดาห์)", "เข็ม 5 (18 สัปดาห์)"];
 
   // ค้นหาข้อมูลการฉีดจริงของวัคซีนแต่ละเข็ม
   const getVaccineExecution = (stepNum: number) => {
@@ -267,10 +267,10 @@ const PetHealthOverview = ({
 
             {/* Milestone Progress Bar - Unified Column Layout */}
             <div className="relative py-2">
-              {/* Background Line - Centered vertically at 20px */}
-              <div className="absolute left-[10%] right-[10%] top-[20px] h-1 bg-slate-100 rounded-full z-0" />
-              {/* Active Progress Line - Centered vertically at 20px */}
-              <div className="absolute left-[10%] right-[10%] top-[20px] h-1 z-0 overflow-hidden rounded-full">
+              {/* Background Line - Centered vertically at 12px (half of dot height 24px) */}
+              <div className="absolute left-[10%] right-[10%] top-[12px] h-1 bg-slate-100 rounded-full z-0" />
+              {/* Active Progress Line - Centered vertically at 12px */}
+              <div className="absolute left-[10%] right-[10%] top-[12px] h-1 z-0 overflow-hidden rounded-full">
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercentage}%` }}
@@ -351,6 +351,10 @@ const PetHealthOverview = ({
               <div className="pt-2 border-t border-slate-50 flex items-center gap-2 text-amber-600">
                 <AlertCircle size={16} />
                 <p className="text-xs font-black">ยังไม่มีประวัติการรับวัคซีนในระบบค่ะ แนะนำให้เริ่มบันทึกข้อมูลวัคซีน</p>
+              </div>
+            ) : completedCount < 5 ? (
+              <div className="pt-2 border-t border-slate-50">
+                <p className="text-xs font-bold text-slate-400">ยังมีวัคซีนแนะนำที่ยังไม่ได้รับค่ะ แนะนำให้พาน้องไปรับวัคซีนตามกำหนดการนะคะ 🐾</p>
               </div>
             ) : (
               <div className="pt-2 border-t border-slate-50">
