@@ -231,7 +231,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
           {/* Adjusted left/right to 14px (half of w-7 dot width) to perfectly align with dot centers */}
           <div className="absolute left-[17px] right-[17px] top-[30px] -translate-y-1/2 h-1 bg-slate-100 rounded-full z-0" />
           {/* Active Progress Line - Centered vertically at 26px */}
-          <div className="absolute left-[17px] right-[17px] top-[26px] -translate-y-1/2 h-1 z-0 overflow-hidden rounded-full">
+          <div className="absolute left-[17px] right-[17px] top-[30px] -translate-y-1/2 h-1 z-0 overflow-hidden rounded-full">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
