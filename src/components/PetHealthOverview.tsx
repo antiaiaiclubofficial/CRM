@@ -184,7 +184,7 @@ const PetHealthOverview = ({
                     <p className="text-xs font-black text-primary mt-0.5">
                       {nextVaccineDays < 0 
                         ? `เกินกำหนดมาแล้ว ${Math.abs(nextVaccineDays)} วัน` 
-                        : `แนะนำว่าอีก ${nextVaccineDays} วันควรฉีดเข็มถัดไป`}
+                        : `คำแนะนำ: อีก ${nextVaccineDays} วันควรฉีดเข็มถัดไป`}
                     </p>
                   ) : (
                     <p className="text-xs font-black text-primary mt-0.5">
