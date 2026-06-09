@@ -222,9 +222,9 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
         <div className="relative py-4">
           {/* Background Line - Centered vertically at 30px (16px padding-top + 14px half of dot height) */}
           {/* Adjusted left/right to 14px (half of w-7 dot width) to perfectly align with dot centers */}
-          <div className="absolute left-[19px] right-[19px] top-[36px] -translate-y-1/2 h-1 bg-slate-100 rounded-full z-0" />
+          <div className="absolute left-[14px] right-[14px] top-[30px] -translate-y-1/2 h-1.5 bg-slate-100 rounded-full z-0" />
           {/* Active Progress Line - Centered vertically at 30px */}
-          <div className="absolute left-[19px] right-[19px] top-[36px] -translate-y-1/2 h-1 z-0 overflow-hidden rounded-full">
+          <div className="absolute left-[14px] right-[14px] top-[30px] -translate-y-1/2 h-1.5 z-0 overflow-hidden rounded-full">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
@@ -277,6 +277,16 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
             })}
           </div>
         </div>
+
+        {/* Recommended Vaccine Reminder Text */}
+        {completedCount < 5 && (
+          <div className="pt-3 border-t border-slate-50 flex items-start gap-2 text-slate-500">
+            <AlertCircle size={14} className="text-pink-500 shrink-0 mt-0.5" />
+            <p className="text-[11px] font-bold leading-relaxed">
+              ยังมีวัคซีนแนะนำที่ยังไม่ได้รับค่ะ แนะนำให้พาน้องไปรับวัคซีนตามกำหนดการนะคะ 🐾
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Upcoming Vaccine Alert Card (Signature Navy Gradient + Lime Spark Text) */}
@@ -318,7 +328,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
               <motion.div 
                 key={entry.id} 
                 initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 className="bg-white p-5 rounded-[2rem] shadow-ambient flex justify-between items-center group border-none"
               >
