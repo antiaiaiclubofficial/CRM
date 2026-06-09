@@ -307,7 +307,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
 
       {/* Vaccine Timeline List */}
       <div className="space-y-4">
-        <div className="flex justify-between items-center px-1">
+        <div className="flex justify-between items-center px-5">
           <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest">รายการวัคซีนทั้งหมด</h4>
           <span className="text-[10px] font-bold text-slate-400 uppercase">{data.length} รายการ</span>
         </div>
