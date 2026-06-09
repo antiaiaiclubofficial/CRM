@@ -354,8 +354,9 @@ const PetHealthOverview = ({
                 <p className="text-xs font-black">ยังไม่มีประวัติการรับวัคซีนในระบบค่ะ แนะนำให้เริ่มบันทึกข้อมูลวัคซีน</p>
               </div>
             ) : completedCount < 5 ? (
-              <div className="pt-2 border-t border-slate-50">
-                <p className="text-xs font-bold text-slate-400">ยังมีวัคซีนแนะนำที่ยังไม่ได้รับค่ะ แนะนำให้พาน้องไปรับวัคซีนตามกำหนดการนะคะ 🐾</p>
+              <div className="pt-2 border-t border-slate-50 flex items-center gap-2 text-slate-500">
+                <AlertCircle size={14} className="text-pink-500 shrink-0" />
+                <p className="text-xs font-bold leading-relaxed">ยังมีวัคซีนแนะนำที่ยังไม่ได้รับค่ะ แนะนำให้พาน้องไปรับวัคซีนตามกำหนดการนะคะ 🐾</p>
               </div>
             ) : (
               <div className="pt-2 border-t border-slate-50">
