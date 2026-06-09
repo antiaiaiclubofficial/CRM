@@ -189,7 +189,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
       className="space-y-6"
     >
       {/* Header & Add Button (Lime Spark CTA) */}
-      <div className="bg-white p-6 rounded-[2.5rem] shadow-ambient relative overflow-hidden">
+      <div className="bg-white p-5 rounded-[2rem] shadow-ambient relative overflow-hidden">
         <div className="flex justify-between items-center">
           <div>
             <h4 className="text-lg font-black text-primary tracking-tight">ประวัติการรับวัคซีน</h4>
@@ -205,7 +205,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
       </div>
 
       {/* Milestone Progress Card - Unified Column Layout */}
-      <div className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 space-y-4">
+      <div className="bg-white p-5 rounded-[2rem] shadow-ambient border border-black/5 space-y-4">
         <div className="flex justify-between items-center">
           <span className="text-xs font-black text-primary tracking-normal">โปรแกรมวัคซีนแนะนำ (จิ้มเข็มเพื่อดูรายละเอียด)</span>
           <span className="text-xs font-black text-pink-500 bg-pink-50 px-3 py-1 rounded-full">
@@ -281,7 +281,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
 
       {/* Upcoming Vaccine Alert Card (Signature Navy Gradient + Lime Spark Text) */}
       {upcomingVaccine && (
-        <div className="bg-gradient-to-br from-[#18234a] to-[#020d35] p-6 rounded-[2.5rem] shadow-ambient relative overflow-hidden text-white">
+        <div className="bg-gradient-to-br from-[#18234a] to-[#020d35] p-5 rounded-[2rem] shadow-ambient relative overflow-hidden text-white">
           {/* Soft liquid glow background */}
           <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-[#EAFD69]/10 rounded-full blur-2xl pointer-events-none" />
           <div className="absolute -left-6 -top-6 w-24 h-24 bg-white/5 rounded-full blur-xl pointer-events-none" />

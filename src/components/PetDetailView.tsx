@@ -394,7 +394,7 @@ const PetDetailView = ({
       </div>
 
       {showWeightDetail ? (
-        <div className="px-4 pt-2">
+        <div className="px-1 pt-2">
            <PetWeightChart 
               data={weightHistory} 
               petName={pet.name} 
@@ -403,7 +403,7 @@ const PetDetailView = ({
             />
         </div>
       ) : showVaccineDetail ? (
-        <div className="px-4 pt-2">
+        <div className="px-1 pt-2">
            <PetVaccineRecords 
               data={vaccineHistory} 
               petName={pet.name} 
