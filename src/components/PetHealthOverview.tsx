@@ -155,7 +155,7 @@ const PetHealthOverview = ({
                 <Syringe size={20} />
               </div>
               <div>
-                <h4 className="font-black text-primary text-sm">สถานะวัคซีน</h4>
+                <h4 className="font-black text-primary text-sm">สถานะการฉีดวัคซีน</h4>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vaccination Status</p>
               </div>
             </div>
@@ -172,10 +172,10 @@ const PetHealthOverview = ({
                 <span>{vaccineStatusText}</span>
               </div>
               
-              {nextVaccineName && nextVaccineDate && (
+              {nextVaccineName && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-blue-100 bg-blue-50 text-blue-600 text-xs font-bold">
                   <Clock size={14} />
-                  <span>เข็มถัดไป: {nextVaccineName} ({nextVaccineDate})</span>
+                  <span>วัคซีนเข็มถัดไป: {nextVaccineName}</span>
                 </div>
               )}
             </div>
