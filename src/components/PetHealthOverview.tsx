@@ -198,6 +198,11 @@ const PetHealthOverview = ({
                 <AlertCircle size={16} />
                 <p className="text-xs font-black">กรุณาพาน้องไปรับวัคซีนที่เกินกำหนดโดยเร็วที่สุดค่ะ</p>
               </div>
+            ) : vaccineStatusType === 'warning' ? (
+              <div className="pt-2 border-t border-slate-50 flex items-center gap-2 text-amber-600">
+                <AlertCircle size={16} />
+                <p className="text-xs font-black">ยังไม่มีประวัติการรับวัคซีนในระบบค่ะ แนะนำให้เริ่มบันทึกข้อมูลวัคซีน</p>
+              </div>
             ) : (
               <div className="pt-2 border-t border-slate-50">
                 <p className="text-xs font-bold text-slate-400">น้องได้รับวัคซีนครบถ้วนตามกำหนดการปัจจุบันแล้วค่ะ ✨</p>
