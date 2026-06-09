@@ -1,8 +1,8 @@
 "use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Heart, Syringe, Calendar, AlertCircle, CheckCircle2, Clock, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Heart, Syringe, Calendar, AlertCircle, CheckCircle2, Clock, ChevronRight, X, AlertTriangle } from 'lucide-react';
 import AnalogScaleIcon from './AnalogScaleIcon';
 
 interface PetHealthOverviewProps {
@@ -24,6 +24,22 @@ interface PetHealthOverviewProps {
   petType?: string;
 }
 
+const dogMilestones = [
+  { step: 1, title: "วัคซีนรวมป้องกัน 5 โรค ครั้งที่ 1", age: "8 สัปดาห์", desc: "วัคซีนพื้นฐานเริ่มต้น (ป้องกันไข้หัด, ลำไส้อักเสบ, เลปโตสไปโรซิส, ตับอักเสบ, พาราอินฟูลเอนซ่า)" },
+  { step: 2, title: "วัคซีนรวมป้องกัน 5 โรค ครั้งที่ 2", age: "12 สัปดาห์", desc: "กระตุ้นภูมิคุ้มกันครั้งที่ 2" },
+  { step: 3, title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 1", age: "14 สัปดาห์", desc: "วัคซีนไฟต์บังคับตามกฎหมาย" },
+  { step: 4, title: "วัคซีนรวมป้องกัน 5 โรค ครั้งที่ 3", age: "16 สัปดาห์", desc: "กระตุ้นภูมิคุ้มกันครบรส" },
+  { step: 5, title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 2", age: "18 สัปดาห์", desc: "กระตุ้นภูมิคุ้มกันพิษสุนัขบ้า" }
+];
+
+const catMilestones = [
+  { step: 1, title: "วัคซีนรวมป้องกันโรคหัด + หวัดแมว ครั้งที่ 1", age: "8 สัปดาห์", desc: "วัคซีนพื้นฐานเริ่มต้นเพื่อสร้างภูมิคุ้มกัน" },
+  { step: 2, title: "วัคซีนรวมป้องกันโรคหัด + หวัดแมว ครั้งที่ 2", age: "12 สัปดาห์", desc: "กระตุ้นภูมิคุ้มกันครั้งที่ 2" },
+  { step: 3, title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 1", age: "14 สัปดาห์", desc: "วัคซีนไฟต์บังคับตามกฎหมาย" },
+  { step: 4, title: "วัคซีนรวมป้องกันโรคหัด + หวัดแมว ครั้งที่ 3", age: "16 สัปดาห์", desc: "ฉีดร่วมกับวัคซีนลิวคีเมีย ครั้งที่ 1" },
+  { step: 5, title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 2", age: "18 สัปดาห์", desc: "กระตุ้นภูมิคุ้มกันพิษสุนัขบ้า" }
+];
+
 const PetHealthOverview = ({ 
   score, 
   statusText, 
@@ -41,6 +57,7 @@ const PetHealthOverview = ({
   vaccineHistory = [],
   petType = 'สุนัข'
 }: PetHealthOverviewProps) => {
+  const [selectedMilestoneStep, setSelectedMilestoneStep] = useState<number | null>(null);
 
   // Get vaccine status color and icon
   const getVaccineStatusConfig = () => {
@@ -76,13 +93,14 @@ const PetHealthOverview = ({
   const vaccineConfig = getVaccineStatusConfig();
 
   const isCat = petType?.toLowerCase() === 'cat' || petType === 'แมว';
+  const milestones = isCat ? catMilestones : dogMilestones;
   const milestoneLabels = isCat 
     ? ["เข็ม 1 (8สัปดาห์)", "เข็ม 2 (12สัปดาห์)", "เข็ม 3 (14สัปดาห์)", "เข็ม 4 (16สัปดาห์)", "เข็ม 5 (18สัปดาห์)"]
     : ["เข็ม 1 (8สัปดาห์)", "เข็ม 2 (12สัปดาห์)", "เข็ม 3 (14สัปดาห์)", "เข็ม 4 (16สัปดาห์)", "เข็ม 5 (18สัปดาห์)"];
 
-  // ตรวจสอบว่าวัคซีนแต่ละเข็ม (1-5) ได้รับการฉีดจริงหรือไม่ โดยอิงจากชื่อวัคซีน
-  const checkStepCompleted = (stepNum: number) => {
-    return vaccineHistory.some(v => {
+  // ค้นหาข้อมูลการฉีดจริงของวัคซีนแต่ละเข็ม
+  const getVaccineExecution = (stepNum: number) => {
+    return vaccineHistory.find(v => {
       const title = v.title || '';
       if (isCat) {
         if (stepNum === 1) return title.includes('ครั้งที่ 1') && (title.includes('หัด') || title.includes('หวัดแมว'));
@@ -101,12 +119,19 @@ const PetHealthOverview = ({
     });
   };
 
-  const completedStepsList = [1, 2, 3, 4, 5].map(step => checkStepCompleted(step));
+  const completedStepsList = [1, 2, 3, 4, 5].map(step => !!getVaccineExecution(step));
   const completedCount = completedStepsList.filter(Boolean).length;
 
   // คำนวณเปอร์เซ็นต์ความคืบหน้าโดยอิงจากเข็มสูงสุดที่ฉีดแล้ว
   const highestCompletedStep = completedStepsList.reduce((highest, completed, idx) => completed ? idx + 1 : highest, 0);
   const progressPercentage = highestCompletedStep > 1 ? ((highestCompletedStep - 1) / 4) * 100 : 0;
+
+  const selectedMilestoneInfo = selectedMilestoneStep 
+    ? milestones.find(m => m.step === selectedMilestoneStep) 
+    : null;
+  const selectedMilestoneExecution = selectedMilestoneStep 
+    ? getVaccineExecution(selectedMilestoneStep) 
+    : null;
 
   return (
     <div className="space-y-6">
@@ -202,15 +227,13 @@ const PetHealthOverview = ({
         </motion.div>
 
         {/* Vaccine Dashboard Card */}
-        <motion.div 
-          whileTap={{ scale: 0.99 }}
-          onClick={() => onActionClick('vaccine')}
-          className="bg-white p-5 rounded-[2rem] shadow-ambient border border-black/5 flex flex-col justify-between gap-4 cursor-pointer hover:border-primary/10 transition-all relative overflow-hidden group"
+        <div 
+          className="bg-white p-5 rounded-[2rem] shadow-ambient border border-black/5 flex flex-col justify-between gap-4 relative overflow-hidden"
         >
           <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl pointer-events-none" />
           
           <div className="flex justify-between items-start relative z-10">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => onActionClick('vaccine')}>
               <div className="w-10 h-10 bg-pink-50 rounded-xl flex items-center justify-center text-pink-500 shrink-0">
                 <Syringe size={20} />
               </div>
@@ -219,15 +242,18 @@ const PetHealthOverview = ({
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vaccination Status</p>
               </div>
             </div>
-            <div className="w-8 h-8 bg-slate-50 rounded-full flex items-center justify-center text-primary/40 group-hover:bg-[#EAFD69] group-hover:text-primary transition-colors">
+            <button 
+              onClick={() => onActionClick('vaccine')}
+              className="w-8 h-8 bg-slate-50 rounded-full flex items-center justify-center text-primary/40 hover:bg-[#EAFD69] hover:text-primary transition-colors"
+            >
               <ChevronRight size={14} strokeWidth={3} />
-            </div>
+            </button>
           </div>
 
           <div className="space-y-4 px-1 relative z-10">
             {/* Status Header with Progress */}
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-black text-primary/40 uppercase tracking-widest">สถานะล่าสุด</span>
+              <span className="text-[10px] font-black text-primary/40 uppercase tracking-widest">สถานะล่าสุด (จิ้มเข็มเพื่อดูรายละเอียด)</span>
               <span className="text-[10px] font-black text-primary/60">
                 ความคืบหน้า {completedCount}/5 เข็ม
               </span>
@@ -261,12 +287,16 @@ const PetHealthOverview = ({
                   const subLabel = label.includes('(') ? label.substring(label.indexOf('(')) : '';
 
                   return (
-                    <div key={step} className="flex flex-col items-center flex-1 min-w-0">
+                    <button 
+                      key={step} 
+                      onClick={() => setSelectedMilestoneStep(step)}
+                      className="flex flex-col items-center flex-1 min-w-0 focus:outline-none group"
+                    >
                       {/* Dot */}
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 group-active:scale-95 ${
                         isCompleted 
                           ? 'bg-pink-500 border-pink-500 text-white scale-110 shadow-sm' 
-                          : 'bg-white border-slate-200 text-slate-300'
+                          : 'bg-white border-slate-200 text-slate-300 hover:border-pink-300'
                       }`}>
                         {isCompleted ? (
                           <CheckCircle2 size={10} className="text-white" />
@@ -288,7 +318,7 @@ const PetHealthOverview = ({
                           </span>
                         )}
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -328,9 +358,80 @@ const PetHealthOverview = ({
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
 
       </div>
+
+      {/* Milestone Detail Overlay */}
+      <AnimatePresence>
+        {selectedMilestoneStep !== null && selectedMilestoneInfo && (
+          <div className="fixed inset-0 z-[130] flex items-center justify-center px-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedMilestoneStep(null)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              className="relative w-full max-w-[320px] bg-white rounded-[2.5rem] shadow-2xl p-8 text-center border-none z-10"
+            >
+              <button 
+                onClick={() => setSelectedMilestoneStep(null)}
+                className="absolute top-6 right-6 p-2 bg-slate-100 rounded-full text-slate-400 active:scale-90 transition-transform"
+              >
+                <X size={16} />
+              </button>
+
+              <div className="w-16 h-16 bg-pink-50 rounded-[2rem] flex items-center justify-center mx-auto mb-4 text-pink-500">
+                <Syringe size={32} />
+              </div>
+
+              <span className="text-[10px] font-black text-pink-500 bg-pink-50 px-3 py-1 rounded-full uppercase tracking-wider">
+                เข็มที่ {selectedMilestoneStep} (อายุ {selectedMilestoneInfo.age})
+              </span>
+
+              <h3 className="text-lg font-black text-primary mt-4 mb-2 leading-tight">
+                {selectedMilestoneInfo.title}
+              </h3>
+              
+              <p className="text-xs font-bold text-slate-500 leading-relaxed mb-6">
+                {selectedMilestoneInfo.desc}
+              </p>
+
+              <div className="border-t border-slate-100 pt-4">
+                {selectedMilestoneExecution ? (
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full flex items-center gap-1">
+                      <CheckCircle2 size={12} /> ฉีดแล้วเมื่อวันที่
+                    </span>
+                    <span className="text-sm font-black text-primary mt-1">
+                      {new Date(selectedMilestoneExecution.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </span>
+                    {selectedMilestoneExecution.description && (
+                      <span className="text-[10px] font-medium text-slate-400 mt-1">
+                        ({selectedMilestoneExecution.description})
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-[10px] font-black text-rose-600 bg-rose-50 px-3 py-1 rounded-full flex items-center gap-1">
+                      <AlertTriangle size={12} /> ยังไม่ได้ฉีด
+                    </span>
+                    <p className="text-[10px] font-bold text-slate-400 mt-2 leading-relaxed">
+                      แนะนำให้พาน้องไปรับวัคซีนตามกำหนดการเพื่อสุขภาพที่ดีค่ะ
+                    </p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
