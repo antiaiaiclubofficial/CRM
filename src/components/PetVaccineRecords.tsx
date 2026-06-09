@@ -40,15 +40,38 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
     .filter(v => v.next_due_date && new Date(v.next_due_date) >= new Date())
     .sort((a, b) => new Date(a.next_due_date!).getTime() - new Date(b.next_due_date!).getTime())[0];
 
-  // คำนวณจำนวนเข็มที่ได้รับจริง (สูงสุด 5 เข็มสำหรับ Milestone)
-  const completedSteps = Math.min(5, data.length);
-  // คำนวณเปอร์เซ็นต์เส้นเชื่อมระหว่างจุด (เข็ม 1 อยู่ที่ 0%, เข็ม 5 อยู่ที่ 100%)
-  const progressPercentage = completedSteps > 1 ? ((completedSteps - 1) / 4) * 100 : 0;
-
   const isCat = petType?.toLowerCase() === 'cat' || petType === 'แมว';
   const milestoneLabels = isCat 
     ? ["เข็ม 1 (8สัปดาห์)", "เข็ม 2 (12สัปดาห์)", "เข็ม 3 (14สัปดาห์)", "เข็ม 4 (16สัปดาห์)", "เข็ม 5 (18สัปดาห์)"]
     : ["เข็ม 1 (8สัปดาห์)", "เข็ม 2 (12สัปดาห์)", "เข็ม 3 (14สัปดาห์)", "เข็ม 4 (16สัปดาห์)", "เข็ม 5 (18สัปดาห์)"];
+
+  // ตรวจสอบว่าวัคซีนแต่ละเข็ม (1-5) ได้รับการฉีดจริงหรือไม่ โดยอิงจากชื่อวัคซีน
+  const checkStepCompleted = (stepNum: number) => {
+    return data.some(v => {
+      const title = v.title || '';
+      if (isCat) {
+        if (stepNum === 1) return title.includes('ครั้งที่ 1') && (title.includes('หัด') || title.includes('หวัดแมว'));
+        if (stepNum === 2) return title.includes('ครั้งที่ 2') && (title.includes('หัด') || title.includes('หวัดแมว'));
+        if (stepNum === 3) return title.includes('พิษสุนัขบ้า') && title.includes('ครั้งที่ 1');
+        if (stepNum === 4) return title.includes('ครั้งที่ 3') && (title.includes('หัด') || title.includes('หวัดแมว'));
+        if (stepNum === 5) return title.includes('พิษสุนัขบ้า') && title.includes('ครั้งที่ 2');
+      } else {
+        if (stepNum === 1) return title.includes('ครั้งที่ 1') && title.includes('5 โรค');
+        if (stepNum === 2) return title.includes('ครั้งที่ 2') && title.includes('5 โรค');
+        if (stepNum === 3) return title.includes('พิษสุนัขบ้า') && title.includes('ครั้งที่ 1');
+        if (stepNum === 4) return title.includes('ครั้งที่ 3') && title.includes('5 โรค');
+        if (stepNum === 5) return title.includes('พิษสุนัขบ้า') && title.includes('ครั้งที่ 2');
+      }
+      return false;
+    });
+  };
+
+  const completedStepsList = [1, 2, 3, 4, 5].map(step => checkStepCompleted(step));
+  const completedCount = completedStepsList.filter(Boolean).length;
+
+  // คำนวณเปอร์เซ็นต์ความคืบหน้าโดยอิงจากเข็มสูงสุดที่ฉีดแล้ว
+  const highestCompletedStep = completedStepsList.reduce((highest, completed, idx) => completed ? idx + 1 : highest, 0);
+  const progressPercentage = highestCompletedStep > 1 ? ((highestCompletedStep - 1) / 4) * 100 : 0;
 
   return (
     <motion.div 
@@ -77,7 +100,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
         <div className="flex justify-between items-center">
           <span className="text-xs font-black text-primary">โปรแกรมวัคซีนแนะนำ</span>
           <span className="text-xs font-black text-pink-500 bg-pink-50 px-3 py-1 rounded-full">
-            สำเร็จ {completedSteps}/5 เข็ม
+            สำเร็จ {completedCount}/5 เข็ม
           </span>
         </div>
 
@@ -96,7 +119,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
           
           <div className="relative z-10 flex justify-between items-start">
             {[1, 2, 3, 4, 5].map((step, idx) => {
-              const isCompleted = step <= completedSteps;
+              const isCompleted = completedStepsList[idx];
               const label = milestoneLabels[idx];
               const mainLabel = `เข็ม ${step}`;
               const subLabel = label.includes('(') ? label.substring(label.indexOf('(')) : '';
