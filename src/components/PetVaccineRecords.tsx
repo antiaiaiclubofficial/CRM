@@ -312,13 +312,13 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
           <span className="text-[10px] font-bold text-slate-400 uppercase">{data.length} รายการ</span>
         </div>
 
-        <div className="space-y-0">
+        <div className="space-y-3">
           {sortedData.length > 0 ? (
             sortedData.map((entry, i) => (
               <motion.div 
                 key={entry.id} 
                 initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
                 className="bg-white p-5 rounded-[2rem] shadow-ambient flex justify-between items-center group border-none"
               >
