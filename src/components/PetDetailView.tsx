@@ -167,7 +167,7 @@ const PetDetailView = ({
   // คำนวณสถานะวัคซีน
   const vaccineStatus = useMemo(() => {
     if (!pet.vaccine_history || pet.vaccine_history.length === 0) {
-      return { text: "ยังไม่มีประวัติวัคซีน", type: "warning" as const };
+      return { text: "ยังไม่ฉีด", type: "warning" as const };
     }
     
     const today = new Date();
@@ -190,29 +190,11 @@ const PetDetailView = ({
       }
     });
 
-    // ค้นหาวัคซีนล่าสุดที่ฉีดแล้ว
-    const sortedVaccines = [...pet.vaccine_history].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    const latestVaccine = sortedVaccines[0];
-    
-    let latestVaccineText = "ได้รับวัคซีนแล้ว";
-    if (latestVaccine) {
-      const title = latestVaccine.title;
-      if (title.startsWith("วัคซีน")) {
-        latestVaccineText = `ฉีด${title}แล้ว`;
-      } else {
-        latestVaccineText = `ฉีดวัคซีน${title}แล้ว`;
-      }
-    }
-    
     if (hasOverdue) {
-      return { text: "เกินกำหนดฉีดวัคซีน ⚠️", type: "danger" as const };
+      return { text: "ยังไม่ฉีด", type: "danger" as const };
     }
     
-    if (nextDue) {
-      return { text: latestVaccineText, type: "upcoming" as const };
-    }
-    
-    return { text: latestVaccineText, type: "success" as const };
+    return { text: "ฉีดแล้ว", type: "success" as const };
   }, [pet.vaccine_history]);
 
   // รวมประวัติกิจกรรมสุขภาพทั้งหมดและจัดเรียงตามเวลาล่าสุด
@@ -487,26 +469,26 @@ const PetDetailView = ({
                       <HealthItem label="ความยาวขน" value={pet.fur_length || '-'} />
                     </div>
                     
-                    {/* สถานะวัคซีน (ปรับปรุงการจัดวางเป็นแนวตั้งเพื่อป้องกันการล้นขอบ) */}
-                    <div className="pt-2 space-y-2">
+                    {/* สถานะวัคซีน (บรรทัดเดียวกันทั้งสถานะและปุ่ม) */}
+                    <div className="pt-2 space-y-1.5">
                       <p className="text-[10px] font-black text-primary/40 uppercase tracking-widest">สถานะวัคซีน</p>
-                      <div className="flex flex-col gap-2">
-                        <div className={`flex items-center gap-2 px-4 py-3 rounded-2xl border text-xs font-bold ${
+                      <div className="flex items-center justify-between gap-3">
+                        <div className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold flex-1 ${
                           vaccineStatus.type === 'danger' || vaccineStatus.type === 'warning'
-                            ? 'bg-rose-50 border-rose-100 text-rose-700'
-                            : 'bg-emerald-50 border-emerald-100 text-emerald-700'
+                            ? 'bg-rose-50 border-rose-100 text-rose-600'
+                            : 'bg-emerald-50 border-emerald-100 text-emerald-600'
                         }`}>
                           {vaccineStatus.type === 'danger' || vaccineStatus.type === 'warning' ? (
-                            <AlertCircle size={16} className="text-rose-500 shrink-0" />
+                            <AlertCircle size={14} className="text-rose-500 shrink-0" />
                           ) : (
-                            <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+                            <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
                           )}
-                          <span className="break-words">{vaccineStatus.text}</span>
+                          <span className="truncate">{vaccineStatus.text}</span>
                         </div>
                         
                         <button
                           onClick={() => setShowVaccineDetail(true)}
-                          className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-primary rounded-2xl text-xs font-bold flex items-center justify-center gap-1 transition-all"
+                          className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-primary rounded-xl text-xs font-bold flex items-center gap-1 transition-all shrink-0"
                         >
                           <span>จัดการวัคซีน</span>
                           <ChevronRight size={14} strokeWidth={2.5} />
