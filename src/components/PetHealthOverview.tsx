@@ -20,6 +20,8 @@ interface PetHealthOverviewProps {
   nextVaccineName: string | null;
   nextVaccineDate: string | null;
   onActionClick: (type: string) => void;
+  vaccineHistory?: any[];
+  petType?: string;
 }
 
 const PetHealthOverview = ({ 
@@ -32,7 +34,9 @@ const PetHealthOverview = ({
   vaccineStatusType,
   nextVaccineDays,
   nextVaccineName,
-  onActionClick 
+  onActionClick,
+  vaccineHistory = [],
+  petType = 'สุนัข'
 }: PetHealthOverviewProps) => {
 
   // Get vaccine status color and icon
@@ -67,6 +71,15 @@ const PetHealthOverview = ({
   };
 
   const vaccineConfig = getVaccineStatusConfig();
+
+  // คำนวณจำนวนเข็มที่ได้รับจริง (สูงสุด 5 เข็มสำหรับ Milestone)
+  const completedSteps = Math.min(5, vaccineHistory.length);
+  const progressPercentage = (completedSteps / 5) * 100;
+
+  const isCat = petType?.toLowerCase() === 'cat' || petType === 'แมว';
+  const milestoneLabels = isCat 
+    ? ["เข็ม 1 (8สัปดาห์)", "เข็ม 2 (12สัปดาห์)", "เข็ม 3 (14สัปดาห์)", "เข็ม 4 (16สัปดาห์)", "เข็ม 5 (18สัปดาห์)"]
+    : ["เข็ม 1 (8สัปดาห์)", "เข็ม 2 (12สัปดาห์)", "เข็ม 3 (14สัปดาห์)", "เข็ม 4 (16สัปดาห์)", "เข็ม 5 (18สัปดาห์)"];
 
   return (
     <div className="space-y-6">
@@ -168,11 +181,70 @@ const PetHealthOverview = ({
             </div>
           </div>
 
-          <div className="space-y-3 px-1 relative z-10">
+          <div className="space-y-4 px-1 relative z-10">
             {/* Status Badge */}
-            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold ${vaccineConfig.bg} ${vaccineConfig.text}`}>
-              {vaccineConfig.icon}
-              <span>{vaccineStatusText}</span>
+            <div className="flex justify-between items-center">
+              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold ${vaccineConfig.bg} ${vaccineConfig.text}`}>
+                {vaccineConfig.icon}
+                <span>{vaccineStatusText}</span>
+              </div>
+              <span className="text-[10px] font-black text-primary/60">
+                ความคืบหน้า {completedSteps}/5 เข็ม
+              </span>
+            </div>
+
+            {/* Milestone Progress Bar */}
+            <div className="py-2">
+              <div className="relative flex items-center justify-between">
+                {/* Background Line */}
+                <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-slate-100 rounded-full z-0" />
+                {/* Active Progress Line */}
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPercentage}%` }}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-pink-500 rounded-full z-0"
+                  transition={{ duration: 1, ease: "easeOut" }}
+                />
+                
+                {/* Milestone Dots */}
+                {[1, 2, 3, 4, 5].map((step) => {
+                  const isCompleted = step <= completedSteps;
+                  return (
+                    <div key={step} className="relative z-10 flex flex-col items-center">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
+                        isCompleted 
+                          ? 'bg-pink-500 border-pink-500 text-white scale-110 shadow-sm' 
+                          : 'bg-white border-slate-200 text-slate-300'
+                      }`}>
+                        {isCompleted ? (
+                          <CheckCircle2 size={10} className="text-white" />
+                        ) : (
+                          <span className="text-[8px] font-black">{step}</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Milestone Labels */}
+              <div className="flex justify-between mt-2 px-0.5">
+                {milestoneLabels.map((label, idx) => {
+                  const isCompleted = (idx + 1) <= completedSteps;
+                  return (
+                    <span 
+                      key={idx} 
+                      className={`text-[7px] font-black text-center w-10 leading-tight transition-colors duration-500 ${
+                        isCompleted ? 'text-pink-600' : 'text-slate-400'
+                      }`}
+                    >
+                      {label.split(' ')[0]}
+                      <br />
+                      <span className="opacity-60">{label.split(' ')[1]}</span>
+                    </span>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Countdown / Next Due Info */}

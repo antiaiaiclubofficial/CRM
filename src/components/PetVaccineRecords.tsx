@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Syringe, Calendar, Plus, Trash2, AlertTriangle, Clock } from 'lucide-react';
+import { Syringe, Calendar, Plus, Trash2, AlertTriangle, Clock, CheckCircle2 } from 'lucide-react';
 import AddVaccineModal from './AddVaccineModal';
 
 interface VaccineLog {
@@ -40,6 +40,15 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
     .filter(v => v.next_due_date && new Date(v.next_due_date) >= new Date())
     .sort((a, b) => new Date(a.next_due_date!).getTime() - new Date(b.next_due_date!).getTime())[0];
 
+  // คำนวณจำนวนเข็มที่ได้รับจริง (สูงสุด 5 เข็มสำหรับ Milestone)
+  const completedSteps = Math.min(5, data.length);
+  const progressPercentage = (completedSteps / 5) * 100;
+
+  const isCat = petType?.toLowerCase() === 'cat' || petType === 'แมว';
+  const milestoneLabels = isCat 
+    ? ["เข็ม 1 (8สัปดาห์)", "เข็ม 2 (12สัปดาห์)", "เข็ม 3 (14สัปดาห์)", "เข็ม 4 (16สัปดาห์)", "เข็ม 5 (18สัปดาห์)"]
+    : ["เข็ม 1 (8สัปดาห์)", "เข็ม 2 (12สัปดาห์)", "เข็ม 3 (14สัปดาห์)", "เข็ม 4 (16สัปดาห์)", "เข็ม 5 (18สัปดาห์)"];
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -59,6 +68,69 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
           >
             <Plus size={24} strokeWidth={3} />
           </button>
+        </div>
+      </div>
+
+      {/* Milestone Progress Card */}
+      <div className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 space-y-4">
+        <div className="flex justify-between items-center">
+          <span className="text-xs font-black text-primary">โปรแกรมวัคซีนแนะนำ</span>
+          <span className="text-xs font-black text-pink-500 bg-pink-50 px-3 py-1 rounded-full">
+            สำเร็จ {completedSteps}/5 เข็ม
+          </span>
+        </div>
+
+        <div className="py-4">
+          <div className="relative flex items-center justify-between">
+            {/* Background Line */}
+            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1.5 bg-slate-100 rounded-full z-0" />
+            {/* Active Progress Line */}
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPercentage}%` }}
+              className="absolute left-0 top-1/2 -translate-y-1/2 h-1.5 bg-pink-500 rounded-full z-0"
+              transition={{ duration: 1, ease: "easeOut" }}
+            />
+            
+            {/* Milestone Dots */}
+            {[1, 2, 3, 4, 5].map((step) => {
+              const isCompleted = step <= completedSteps;
+              return (
+                <div key={step} className="relative z-10 flex flex-col items-center">
+                  <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
+                    isCompleted 
+                      ? 'bg-pink-500 border-pink-500 text-white scale-110 shadow-md' 
+                      : 'bg-white border-slate-200 text-slate-300'
+                  }`}>
+                    {isCompleted ? (
+                      <CheckCircle2 size={14} className="text-white" />
+                    ) : (
+                      <span className="text-xs font-black">{step}</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* Milestone Labels */}
+          <div className="flex justify-between mt-3 px-0.5">
+            {milestoneLabels.map((label, idx) => {
+              const isCompleted = (idx + 1) <= completedSteps;
+              return (
+                <span 
+                  key={idx} 
+                  className={`text-[9px] font-black text-center w-14 leading-tight transition-colors duration-500 ${
+                    isCompleted ? 'text-pink-600' : 'text-slate-400'
+                  }`}
+                >
+                  {label.split(' ')[0]}
+                  <br />
+                  <span className="opacity-60 text-[8px]">{label.split(' ')[1]}</span>
+                </span>
+              );
+            })}
+          </div>
         </div>
       </div>
 

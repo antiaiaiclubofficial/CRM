@@ -437,6 +437,8 @@ const PetDetailView = ({
                     nextVaccineName={nextVaccineInfo ? nextVaccineInfo.title : null}
                     nextVaccineDate={nextVaccineInfo ? nextVaccineInfo.formattedDate : null}
                     onActionClick={handleHealthAction}
+                    vaccineHistory={vaccineHistory}
+                    petType={pet.type}
                   />
 
                   <div className="pt-4 flex flex-col items-center gap-4">
