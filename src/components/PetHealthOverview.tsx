@@ -182,15 +182,18 @@ const PetHealthOverview = ({
           </div>
 
           <div className="space-y-4 px-1 relative z-10">
-            {/* Status Badge */}
+            {/* Status Header with Progress */}
             <div className="flex justify-between items-center">
-              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold ${vaccineConfig.bg} ${vaccineConfig.text}`}>
-                {vaccineConfig.icon}
-                <span>{vaccineStatusText}</span>
-              </div>
+              <span className="text-[10px] font-black text-primary/40 uppercase tracking-widest">สถานะล่าสุด</span>
               <span className="text-[10px] font-black text-primary/60">
                 ความคืบหน้า {completedSteps}/5 เข็ม
               </span>
+            </div>
+
+            {/* Status Badge - Full Width */}
+            <div className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-bold ${vaccineConfig.bg} ${vaccineConfig.text} w-full`}>
+              <div className="shrink-0">{vaccineConfig.icon}</div>
+              <span className="leading-relaxed break-words">{vaccineStatusText}</span>
             </div>
 
             {/* Milestone Progress Bar */}
