@@ -127,7 +127,7 @@ const PetDetailView = ({
     };
   }, [pet.weight_history]);
 
-  // Calculate next vaccine countdown and info
+  // คำนวณข้อมูลวัคซีนถัดไปและจำนวนวันแนะนำ
   const nextVaccineInfo = useMemo(() => {
     if (!pet.vaccine_history || pet.vaccine_history.length === 0) {
       return null;
@@ -136,7 +136,7 @@ const PetDetailView = ({
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    // Filter vaccines with future next_due_date
+    // กรองวัคซีนที่มีวันนัดหมายถัดไปในอนาคต
     const upcoming = pet.vaccine_history
       .filter(v => v.next_due_date)
       .map(v => {
@@ -157,7 +157,7 @@ const PetDetailView = ({
     return upcoming[0] || null;
   }, [pet.vaccine_history]);
 
-  // Calculate vaccine status text and type
+  // คำนวณสถานะวัคซีน
   const vaccineStatus = useMemo(() => {
     if (!pet.vaccine_history || pet.vaccine_history.length === 0) {
       return { text: "ยังไม่มีประวัติวัคซีน", type: "warning" as const };
