@@ -16,7 +16,6 @@ interface AddVaccineModalProps {
 interface VaccinePreset {
   title: string;
   ageLabel: string;
-  nextDueOffsetDays?: number;
   description: string;
 }
 
@@ -24,43 +23,36 @@ const dogPresets: VaccinePreset[] = [
   {
     title: "วัคซีนรวมป้องกัน 5 โรค ครั้งที่ 1",
     ageLabel: "8 สัปดาห์",
-    nextDueOffsetDays: 28,
     description: "วัคซีนพื้นฐานเริ่มต้น (ป้องกันไข้หัด, ลำไส้อักเสบ, เลปโตสไปโรซิส, ตับอักเสบ, พาราอินฟูลเอนซ่า)"
   },
   {
     title: "วัคซีนรวมป้องกัน 5 โรค ครั้งที่ 2",
     ageLabel: "12 สัปดาห์",
-    nextDueOffsetDays: 28,
     description: "กระตุ้นภูมิคุ้มกันครั้งที่ 2"
   },
   {
     title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 1",
     ageLabel: "14 สัปดาห์",
-    nextDueOffsetDays: 28,
     description: "วัคซีนไฟต์บังคับตามกฎหมาย"
   },
   {
     title: "วัคซีนรวมป้องกัน 5 โรค ครั้งที่ 3",
     ageLabel: "16 สัปดาห์",
-    nextDueOffsetDays: 365,
     description: "กระตุ้นภูมิคุ้มกันครบรส"
   },
   {
     title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 2",
     ageLabel: "18 สัปดาห์",
-    nextDueOffsetDays: 365,
     description: "กระตุ้นภูมิคุ้มกันพิษสุนัขบ้า"
   },
   {
     title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 3",
     ageLabel: "1 ปี",
-    nextDueOffsetDays: 365,
     description: "กระตุ้นซ้ำทุกๆ 1 ปี"
   },
   {
     title: "วัคซีนโรคหลอดลมอักเสบติดต่อ (Bordetella)",
     ageLabel: "ทางเลือก",
-    nextDueOffsetDays: 365,
     description: "ให้ผ่านทางรูจมูกหรือทางปาก เพื่อป้องกันโรคหลอดลมอักเสบติดต่อ"
   }
 ];
@@ -69,43 +61,36 @@ const catPresets: VaccinePreset[] = [
   {
     title: "วัคซีนรวมป้องกันโรคหัด + หวัดแมว ครั้งที่ 1",
     ageLabel: "8 สัปดาห์",
-    nextDueOffsetDays: 28,
     description: "วัคซีนพื้นฐานเริ่มต้น"
   },
   {
     title: "วัคซีนรวมป้องกันโรคหัด + หวัดแมว ครั้งที่ 2",
     ageLabel: "12 สัปดาห์",
-    nextDueOffsetDays: 28,
     description: "กระตุ้นภูมิคุ้มกันครั้งที่ 2"
   },
   {
     title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 1",
     ageLabel: "14 สัปดาห์",
-    nextDueOffsetDays: 28,
     description: "วัคซีนไฟต์บังคับตามกฎหมาย"
   },
   {
     title: "วัคซีนรวมป้องกันโรคหัด + หวัดแมว ครั้งที่ 3",
     ageLabel: "16 สัปดาห์",
-    nextDueOffsetDays: 365,
     description: "ฉีดร่วมกับวัคซีนลิวคีเมีย ครั้งที่ 1"
   },
   {
     title: "วัคซีนลิวคีเมีย ครั้งที่ 1",
     ageLabel: "16 สัปดาห์",
-    nextDueOffsetDays: 28,
     description: "ควรทำการตรวจหาเชื้อลิวคีเมียในกระแสเลือดก่อนฉีดเข็มแรกเสมอ"
   },
   {
     title: "วัคซีนป้องกันโรคพิษสุนัขบ้า ครั้งที่ 2",
     ageLabel: "18 สัปดาห์",
-    nextDueOffsetDays: 365,
     description: "กระตุ้นภูมิคุ้มกันพิษสุนัขบ้า"
   },
   {
     title: "วัคซีนลิวคีเมีย ครั้งที่ 2",
     ageLabel: "20 สัปดาห์",
-    nextDueOffsetDays: 365,
     description: "กระตุ้นภูมิคุ้มกันลิวคีเมีย"
   }
 ];
@@ -121,7 +106,6 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
   const [selectedPresetIndex, setSelectedPresetIndex] = useState<string>('custom');
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(getLocalDateString());
-  const [nextDueDate, setNextDueDate] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -137,22 +121,13 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
     if (preset) {
       setTitle(preset.title);
       setDescription(preset.description);
-
-      if (preset.nextDueOffsetDays && date) {
-        const baseDate = new Date(date);
-        baseDate.setDate(baseDate.getDate() + preset.nextDueOffsetDays);
-        setNextDueDate(getLocalDateString(baseDate));
-      } else {
-        setNextDueDate('');
-      }
     }
-  }, [selectedPresetIndex, date, presets]);
+  }, [selectedPresetIndex, presets]);
 
   useEffect(() => {
     if (isOpen) {
       setSelectedPresetIndex('0');
       setDate(getLocalDateString());
-      setNextDueDate('');
       setDescription('');
     }
   }, [isOpen]);
@@ -171,11 +146,10 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
       await onSave({
         title: finalTitle,
         date,
-        next_due_date: nextDueDate,
+        next_due_date: '', // ส่งค่าว่างเนื่องจากไม่ต้องการระบุเข็มถัดไปแล้ว
         description: description.trim()
       });
       setTitle('');
-      setNextDueDate('');
       setDescription('');
       onClose();
     } catch (error) {
@@ -265,30 +239,18 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
                 </motion.div>
               )}
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 px-1 flex items-center gap-1">
-                    <Calendar size={12} /> วันที่ฉีด
-                  </label>
-                  <input 
-                    type="date" 
-                    required
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-primary/10 outline-none text-sm font-bold text-slate-800 transition-all"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 px-1 flex items-center gap-1">
-                    <Calendar size={12} className="text-pink-500" /> เข็มถัดไป
-                  </label>
-                  <input 
-                    type="date" 
-                    value={nextDueDate}
-                    onChange={(e) => setNextDueDate(e.target.value)}
-                    className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-primary/10 outline-none text-sm font-bold text-slate-800 transition-all"
-                  />
-                </div>
+              {/* Date Input (ปรับเป็นความกว้างเต็มเนื่องจากไม่มีช่องเข็มถัดไปแล้ว) */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 px-1 flex items-center gap-1">
+                  <Calendar size={12} /> วันที่ฉีด
+                </label>
+                <input 
+                  type="date" 
+                  required
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-primary/10 outline-none text-sm font-bold text-slate-800 transition-all"
+                />
               </div>
 
               <div className="space-y-1.5">
