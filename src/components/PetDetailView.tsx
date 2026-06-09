@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Pencil, Heart, PawPrint, Tag, Plus, HeartPulse, Trash2, AlertTriangle, X,
   LayoutGrid, Activity, History, FileText, Stethoscope, Syringe, ChevronRight, Scale, Scissors, Gift, Cake,
-  Droplet, Sparkles, DollarSign, Calendar
+  Droplet, Sparkles, DollarSign, Calendar, AlertCircle, CheckCircle2
 } from 'lucide-react';
 import PetHealthOverview from './PetHealthOverview';
 import PetWeightChart from './PetWeightChart';
@@ -487,18 +487,31 @@ const PetDetailView = ({
                       <HealthItem label="ความยาวขน" value={pet.fur_length || '-'} />
                     </div>
                     
-                    {/* สถานะวัคซีน (เต็มบรรทัด และโดดเด่นกว่าส่วนอื่น) */}
-                    <div className="pt-2">
-                      <HealthItem 
-                        label="สถานะวัคซีน" 
-                        value={
-                          <span className={`text-lg font-black leading-tight block ${
-                            vaccineStatus.type === 'danger' ? 'text-rose-500' : 'text-primary'
-                          }`}>
-                            {vaccineStatus.text}
-                          </span>
-                        } 
-                      />
+                    {/* สถานะวัคซีน (เต็มบรรทัด มีกรอบและสีตามสถานะ พร้อมปุ่มไปหน้าจัดการวัคซีน) */}
+                    <div className="pt-2 space-y-1.5">
+                      <p className="text-[10px] font-black text-primary/40 uppercase tracking-widest">สถานะวัคซีน</p>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-bold flex-1 ${
+                          vaccineStatus.type === 'danger' || vaccineStatus.type === 'warning'
+                            ? 'bg-rose-50 border-rose-100 text-rose-700'
+                            : 'bg-emerald-50 border-emerald-100 text-emerald-700'
+                        }`}>
+                          {vaccineStatus.type === 'danger' || vaccineStatus.type === 'warning' ? (
+                            <AlertCircle size={16} className="text-rose-500 shrink-0" />
+                          ) : (
+                            <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+                          )}
+                          <span className="truncate">{vaccineStatus.text}</span>
+                        </div>
+                        
+                        <button
+                          onClick={() => setShowVaccineDetail(true)}
+                          className="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-primary rounded-xl text-xs font-bold flex items-center gap-1 transition-all shrink-0"
+                        >
+                          <span>จัดการวัคซีน</span>
+                          <ChevronRight size={14} strokeWidth={2.5} />
+                        </button>
+                      </div>
                     </div>
                     
                     {/* เส้นคั่น */}
