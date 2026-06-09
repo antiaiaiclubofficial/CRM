@@ -188,7 +188,7 @@ const PetHealthOverview = ({
                     </p>
                   ) : (
                     <p className="text-xs font-black text-primary mt-0.5">
-                      แนะนำให้พาน้องไปรับวัคซีนเข็มแรกตามกำหนดการค่ะ
+                      ถึงกำหนดการฉีดวัคซีนเข็มแรกให้น้องๆแล้วค่ะ
                     </p>
                   )}
                 </div>
@@ -196,12 +196,12 @@ const PetHealthOverview = ({
             ) : vaccineStatusType === 'danger' ? (
               <div className="pt-2 border-t border-slate-50 flex items-center gap-2 text-rose-500">
                 <AlertCircle size={16} />
-                <p className="text-xs font-black">กรุณาพาน้องไปรับวัคซีนที่เกินกำหนดโดยเร็วที่สุดค่ะ</p>
+                <p className="text-xs font-black">ถึงกำหนดการฉีดวัคซีนให้น้องๆแล้วค่ะ</p>
               </div>
             ) : vaccineStatusType === 'warning' ? (
               <div className="pt-2 border-t border-slate-50 flex items-center gap-2 text-amber-600">
                 <AlertCircle size={16} />
-                <p className="text-xs font-black">ยังไม่มีประวัติการรับวัคซีนในระบบค่ะ แนะนำให้เริ่มบันทึกข้อมูลวัคซีน</p>
+                <p className="text-xs font-black">ยังไม่มีประวัติการรับวัคซีนในระบบ แนะนำให้ฉีดวัคซีนก่อนเข้ารับบริการค่ะ</p>
               </div>
             ) : (
               <div className="pt-2 border-t border-slate-50">
