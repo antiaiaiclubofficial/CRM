@@ -252,10 +252,15 @@ const PetHealthOverview = ({
 
           <div className="space-y-4 px-1 relative z-10">
             {/* Status Header with Progress */}
-            <div className="flex justify-between items-center gap-2">
-              <span className="text-[10px] font-black text-primary/40 uppercase tracking-normal whitespace-nowrap">
-                สถานะล่าสุด <span className="text-[9px] text-slate-400 font-bold">(จิ้มเพื่อดูรายละเอียด)</span>
-              </span>
+            <div className="flex justify-between items-start gap-2">
+              <div className="flex flex-col">
+                <span className="text-xs font-black text-primary tracking-tight">
+                  โปรแกรมวัคซีนแนะนำ
+                </span>
+                <span className="text-[9px] text-slate-400 font-bold mt-0.5">
+                  (จิ้มเพื่อดูรายละเอียด)
+                </span>
+              </div>
               <span className="text-[10px] font-black text-primary/60 whitespace-nowrap shrink-0">
                 {completedCount}/5 เข็ม
               </span>

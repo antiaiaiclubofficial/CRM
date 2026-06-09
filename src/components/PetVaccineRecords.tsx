@@ -184,8 +184,8 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
 
   return (
     <motion.div 
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
       {/* Header & Add Button (Lime Spark CTA) */}
@@ -206,10 +206,15 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
 
       {/* Milestone Progress Card - Unified Column Layout */}
       <div className="bg-white p-5 rounded-[2rem] shadow-ambient border border-black/5 space-y-4">
-        <div className="flex justify-between items-center gap-2">
-          <span className="text-xs font-black text-primary tracking-tight whitespace-nowrap">
-            โปรแกรมวัคซีนแนะนำ <span className="text-[10px] text-slate-400 font-bold">(จิ้มเพื่อดูรายละเอียด)</span>
-          </span>
+        <div className="flex justify-between items-start gap-2">
+          <div className="flex flex-col">
+            <span className="text-sm font-black text-primary tracking-tight">
+              โปรแกรมวัคซีนแนะนำ
+            </span>
+            <span className="text-[10px] text-slate-400 font-bold mt-0.5">
+              (จิ้มเพื่อดูรายละเอียด)
+            </span>
+          </div>
           <span className="text-xs font-black text-pink-600 bg-pink-50 px-3 py-1 rounded-full whitespace-nowrap shrink-0">
             {completedCount}/5 เข็ม
           </span>
