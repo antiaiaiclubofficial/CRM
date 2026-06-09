@@ -222,9 +222,9 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
         <div className="relative py-4">
           {/* Background Line - Centered vertically at 30px (16px padding-top + 14px half of dot height) */}
           {/* Adjusted left/right to 14px (half of w-7 dot width) to perfectly align with dot centers */}
-          <div className="absolute left-[19px] right-[19px] top-[35px] -translate-y-1/2 h-1 bg-slate-100 rounded-full z-0" />
+          <div className="absolute left-[19px] right-[19px] top-[36px] -translate-y-1/2 h-1 bg-slate-100 rounded-full z-0" />
           {/* Active Progress Line - Centered vertically at 30px */}
-          <div className="absolute left-[19px] right-[19px] top-[35px] -translate-y-1/2 h-1 z-0 overflow-hidden rounded-full">
+          <div className="absolute left-[19px] right-[19px] top-[36px] -translate-y-1/2 h-1 z-0 overflow-hidden rounded-full">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
