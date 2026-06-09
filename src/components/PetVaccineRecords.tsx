@@ -209,7 +209,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
         <div className="flex justify-between items-start gap-2">
           <div className="flex flex-col">
             <span className="text-sm font-black text-primary tracking-tight">
-              โปรแกรมวัคซีนแนะนำ
+              วัคซีนที่น้องๆควรฉีด
             </span>
             <span className="text-[10px] text-slate-400 font-bold mt-0.5">
               (จิ้มเพื่อดูรายละเอียด)
