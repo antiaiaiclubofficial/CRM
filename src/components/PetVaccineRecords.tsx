@@ -312,7 +312,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
           <span className="text-[10px] font-bold text-slate-400 uppercase">{data.length} รายการ</span>
         </div>
 
-        <div className="space-y-0">
+        <div className="space-y-3">
           {sortedData.length > 0 ? (
             sortedData.map((entry, i) => (
               <motion.div 
