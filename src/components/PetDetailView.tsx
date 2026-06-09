@@ -476,16 +476,33 @@ const PetDetailView = ({
                   transition={slideVariants.transition}
                   className="space-y-6"
                 >
-                  <div className="bg-white rounded-xl p-6 shadow-ambient border border-black/5">
-                    <h3 className="text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                  <div className="bg-white rounded-[2.5rem] p-6 shadow-ambient border border-black/5 space-y-5">
+                    <h3 className="text-lg font-bold text-primary flex items-center gap-2">
                       <HeartPulse size={20} className="text-pink-500" /> รายละเอียดสุขภาพ
                     </h3>
+                    
+                    {/* โรคประจำตัว & ความยาวขน (2 Columns) */}
                     <div className="grid grid-cols-2 gap-6">
                       <HealthItem label="โรคประจำตัว" value={pet.medical_condition || 'ไม่มี'} />
                       <HealthItem label="ความยาวขน" value={pet.fur_length || '-'} />
-                      <HealthItem label="สถานะวัคซีน" value={<span className={vaccineStatus.type === 'danger' ? 'text-rose-500 font-black' : 'text-primary'}>{vaccineStatus.text}</span>} />
                     </div>
-                    <div className="mt-4 pt-4 border-t border-black/5">
+                    
+                    {/* สถานะวัคซีน (เต็มบรรทัด และโดดเด่นกว่าส่วนอื่น) */}
+                    <div className="pt-2">
+                      <HealthItem 
+                        label="สถานะวัคซีน" 
+                        value={
+                          <span className={`text-lg font-black leading-tight block ${
+                            vaccineStatus.type === 'danger' ? 'text-rose-500' : 'text-primary'
+                          }`}>
+                            {vaccineStatus.text}
+                          </span>
+                        } 
+                      />
+                    </div>
+                    
+                    {/* เส้นคั่น */}
+                    <div className="border-t border-black/5 pt-4">
                       <HealthItem label="ข้อควรระวัง" value={pet.precautions || 'ไม่มี'} />
                     </div>
                   </div>
@@ -505,7 +522,7 @@ const PetDetailView = ({
                       </div>
                     ) : (
                       <div className="text-center py-8 bg-white rounded-xl border border-black/5">
-                        <p className="text-xs font-bold text-surface-variant opacity-40 italic">ยังไม่มีประวัติกิจกรรมสุขภาพ</p>
+                        <p className="text-xs font-bold text-surface-variant opacity-40 italic text-center">ยังไม่มีประวัติกิจกรรมสุขภาพ</p>
                       </div>
                     )}
                   </div>
