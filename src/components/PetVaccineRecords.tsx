@@ -209,7 +209,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
         <div className="flex justify-between items-center">
           <span className="text-xs font-black text-primary tracking-normal">โปรแกรมวัคซีนแนะนำ (จิ้มเข็มเพื่อดูรายละเอียด)</span>
           <span className="text-xs font-black text-pink-500 bg-pink-50 px-3 py-1 rounded-full">
-           {completedCount}/5 เข็ม
+            {completedCount}/5 เข็ม
           </span>
         </div>
 
