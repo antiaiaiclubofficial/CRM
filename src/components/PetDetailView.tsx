@@ -2,32 +2,43 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Edit, Trash2, Heart } from 'lucide-react';
 import PetHealthOverview from './PetHealthOverview';
-import PetWeightTracker from './PetWeightTracker';
+import PetWeightChart from './PetWeightChart';
 import PetVaccineRecords from './PetVaccineRecords';
-
-interface HealthLog {
-  id: string;
-  pet_id: string;
-  type: 'weight' | 'vaccine' | 'medical' | 'other';
-  title: string;
-  value: string;
-  date: string;
-  description: string;
-  created_at: string;
-}
+import PetIDCard from './PetIDCard';
 
 interface PetDetailViewProps {
   pet: {
-    id: string;
+    id: string | number;
     name: string;
     type: string;
     breed?: string;
-    birthdate?: string;
+    age?: string;
+    birth_date?: string;
+    gender?: string;
+    weight?: string;
+    medical_condition?: string;
+    precautions?: string;
+    fur_length?: string;
+    image_url?: string;
+    card_bg_color?: string;
+    is_favorite?: boolean;
+    weight_history?: Array<{ id: string | number; date: string; weight: number }>;
+    vaccine_history?: Array<{ id: string; title: string; date: string; next_due_date?: string; description?: string }>;
   };
-  healthLogs: HealthLog[];
-  onAddLog: (type: 'weight' | 'vaccine', data: any) => Promise<void>;
-  onDeleteLog: (id: string) => Promise<void>;
+  onBack: () => void;
+  onStartEdit: (pet: any) => void;
+  onDeletePet: (id: any) => void;
+  totalServiceCost?: number;
+  onViewServiceHistoryForPet?: () => void;
+  onEditPreferences?: () => void;
+  onToggleFavorite: () => void;
+  onAddWeight: (id: any, weight: number) => Promise<void>;
+  onDeleteWeight: (historyId: any) => Promise<void>;
+  onAddVaccine: (id: any, data: any) => Promise<void>;
+  onDeleteVaccine: (id: any) => Promise<void>;
+  serviceHistory?: any[];
 }
 
 // ฟังก์ชันช่วยคำนวณประมาณการวันฉีดวัคซีนเข็มถัดไป
@@ -54,20 +65,25 @@ const estimateNextDueDate = (title: string, dateStr: string): string => {
   return `${year}-${month}-${day}`;
 };
 
-const PetDetailView = ({ pet, healthLogs, onAddLog, onDeleteLog }: PetDetailViewProps) => {
+const PetDetailView = ({ 
+  pet, 
+  onBack, 
+  onStartEdit, 
+  onDeletePet, 
+  onToggleFavorite, 
+  onAddWeight, 
+  onDeleteWeight, 
+  onAddVaccine, 
+  onDeleteVaccine 
+}: PetDetailViewProps) => {
   const [activeTab, setActiveTab] = useState('overview');
 
   // กรองข้อมูลน้ำหนัก
-  const weightLogs = healthLogs
-    .filter(log => log.type === 'weight')
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  
-  const currentWeight = weightLogs[0]?.value || '';
+  const weightLogs = pet.weight_history || [];
+  const currentWeight = weightLogs.length > 0 ? weightLogs[weightLogs.length - 1].weight.toString() : (pet.weight || '');
 
   // กรองข้อมูลวัคซีน
-  const vaccineLogs = healthLogs
-    .filter(log => log.type === 'vaccine')
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const vaccineLogs = pet.vaccine_history || [];
 
   // คำนวณสถานะวัคซีนและประมาณการเข็มถัดไป
   let vaccineStatusText = 'ยังไม่มีประวัติวัคซีน';
@@ -77,7 +93,7 @@ const PetDetailView = ({ pet, healthLogs, onAddLog, onDeleteLog }: PetDetailView
   let nextVaccineDate: string | null = null;
 
   if (vaccineLogs.length > 0) {
-    const latestVaccine = vaccineLogs[0];
+    const latestVaccine = vaccineLogs[vaccineLogs.length - 1];
     
     // คำนวณวันประมาณการถัดไปจากวัคซีนล่าสุด
     const estimatedDateStr = estimateNextDueDate(latestVaccine.title, latestVaccine.date);
@@ -141,10 +157,48 @@ const PetDetailView = ({ pet, healthLogs, onAddLog, onDeleteLog }: PetDetailView
     return 'ควรดูแลเพิ่มเติม 🩺';
   };
 
+  const mappedPetForCard = {
+    id: typeof pet.id === 'number' ? pet.id : parseInt(pet.id) || 0,
+    name: pet.name,
+    type: pet.type,
+    breed: pet.breed || '',
+    age: pet.age || '',
+    birth_date: pet.birth_date,
+    gender: pet.gender || '',
+    weight: pet.weight || '',
+    medicalCondition: pet.medical_condition || '',
+    precautions: pet.precautions || '',
+    color: pet.card_bg_color || '#FFD8E4',
+    icon: pet.type === 'แมว' ? '🐱' : '🐶',
+    furLength: pet.fur_length,
+    customPreferences: []
+  };
+
   return (
     <div className="w-full max-w-[390px] mx-auto bg-slate-50/50 min-h-screen pb-24">
+      {/* Header with Back, Favorite, Edit, and Delete buttons */}
+      <div className="flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100">
+        <div className="flex items-center gap-3">
+          <button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+            <ArrowLeft size={20} />
+          </button>
+          <h3 className="font-bold text-lg text-slate-800">รายละเอียดน้อง{pet.name}</h3>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={onToggleFavorite} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+            <Heart size={20} className={pet.is_favorite ? 'text-pink-500 fill-pink-500' : 'text-slate-400'} />
+          </button>
+          <button onClick={() => onStartEdit(pet)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-blue-500">
+            <Edit size={20} />
+          </button>
+          <button onClick={() => onDeletePet(pet.id)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-red-500">
+            <Trash2 size={20} />
+          </button>
+        </div>
+      </div>
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4">
+        <div className="bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4">
           <TabsList className="grid w-full grid-cols-3 bg-slate-100/80 p-1 rounded-2xl">
             <TabsTrigger value="overview" className="rounded-xl font-bold text-xs py-2.5">ภาพรวม</TabsTrigger>
             <TabsTrigger value="weight" className="rounded-xl font-bold text-xs py-2.5">น้ำหนัก</TabsTrigger>
@@ -153,12 +207,13 @@ const PetDetailView = ({ pet, healthLogs, onAddLog, onDeleteLog }: PetDetailView
         </div>
 
         <div className="px-6 pt-6">
-          <TabsContent value="overview" className="mt-0 outline-none">
+          <TabsContent value="overview" className="mt-0 outline-none space-y-6">
+            <PetIDCard pet={mappedPetForCard} />
             <PetHealthOverview 
               score={healthScore}
               statusText={getStatusText(healthScore)}
               subStatusText={subStatusText}
-              lastUpdate={healthLogs[0] ? new Date(healthLogs[0].date).toLocaleDateString('th-TH') : 'ไม่มีข้อมูล'}
+              lastUpdate={weightLogs.length > 0 ? weightLogs[weightLogs.length - 1].date : 'ไม่มีข้อมูล'}
               weight={currentWeight}
               vaccineStatusText={vaccineStatusText}
               vaccineStatusType={vaccineStatusType}
@@ -170,11 +225,15 @@ const PetDetailView = ({ pet, healthLogs, onAddLog, onDeleteLog }: PetDetailView
           </TabsContent>
 
           <TabsContent value="weight" className="mt-0 outline-none">
-            <PetWeightTracker 
+            <PetWeightChart 
               petName={pet.name}
-              logs={weightLogs}
-              onAddWeight={(value, date) => onAddLog('weight', { value, date })}
-              onDeleteWeight={onDeleteLog}
+              data={weightLogs}
+              onAddWeight={async (w) => {
+                await onAddWeight(pet.id, w);
+              }}
+              onDeleteWeight={async (historyId) => {
+                await onDeleteWeight(historyId);
+              }}
             />
           </TabsContent>
 
@@ -182,9 +241,13 @@ const PetDetailView = ({ pet, healthLogs, onAddLog, onDeleteLog }: PetDetailView
             <PetVaccineRecords 
               petName={pet.name}
               petType={pet.type}
-              logs={vaccineLogs}
-              onAddVaccine={(data) => onAddLog('vaccine', data)}
-              onDeleteVaccine={onDeleteLog}
+              data={vaccineLogs}
+              onAddVaccine={async (data) => {
+                await onAddVaccine(pet.id, data);
+              }}
+              onDeleteVaccine={async (id) => {
+                await onDeleteVaccine(id);
+              }}
             />
           </TabsContent>
         </div>
