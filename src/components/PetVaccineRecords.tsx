@@ -42,7 +42,8 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
 
   // คำนวณจำนวนเข็มที่ได้รับจริง (สูงสุด 5 เข็มสำหรับ Milestone)
   const completedSteps = Math.min(5, data.length);
-  const progressPercentage = (completedSteps / 5) * 100;
+  // คำนวณเปอร์เซ็นต์เส้นเชื่อมระหว่างจุด (เข็ม 1 อยู่ที่ 0%, เข็ม 5 อยู่ที่ 100%)
+  const progressPercentage = completedSteps > 1 ? ((completedSteps - 1) / 4) * 100 : 0;
 
   const isCat = petType?.toLowerCase() === 'cat' || petType === 'แมว';
   const milestoneLabels = isCat 
@@ -71,7 +72,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
         </div>
       </div>
 
-      {/* Milestone Progress Card */}
+      {/* Milestone Progress Card - Unified Column Layout */}
       <div className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 space-y-4">
         <div className="flex justify-between items-center">
           <span className="text-xs font-black text-primary">โปรแกรมวัคซีนแนะนำ</span>
@@ -80,23 +81,29 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
           </span>
         </div>
 
-        <div className="py-4">
-          <div className="relative flex items-center justify-between">
-            {/* Background Line */}
-            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1.5 bg-slate-100 rounded-full z-0" />
-            {/* Active Progress Line */}
+        <div className="relative py-4">
+          {/* Background Line - Centered vertically at 30px */}
+          <div className="absolute left-[10%] right-[10%] top-[30px] h-1.5 bg-slate-100 rounded-full z-0" />
+          {/* Active Progress Line - Centered vertically at 30px */}
+          <div className="absolute left-[10%] right-[10%] top-[30px] h-1.5 z-0 overflow-hidden rounded-full">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
-              className="absolute left-0 top-1/2 -translate-y-1/2 h-1.5 bg-pink-500 rounded-full z-0"
+              className="h-full bg-pink-500 rounded-full"
               transition={{ duration: 1, ease: "easeOut" }}
             />
-            
-            {/* Milestone Dots */}
-            {[1, 2, 3, 4, 5].map((step) => {
+          </div>
+          
+          <div className="relative z-10 flex justify-between items-start">
+            {[1, 2, 3, 4, 5].map((step, idx) => {
               const isCompleted = step <= completedSteps;
+              const label = milestoneLabels[idx];
+              const mainLabel = `เข็ม ${step}`;
+              const subLabel = label.includes('(') ? label.substring(label.indexOf('(')) : '';
+
               return (
-                <div key={step} className="relative z-10 flex flex-col items-center">
+                <div key={step} className="flex flex-col items-center flex-1 min-w-0">
+                  {/* Dot */}
                   <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
                     isCompleted 
                       ? 'bg-pink-500 border-pink-500 text-white scale-110 shadow-md' 
@@ -108,26 +115,21 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
                       <span className="text-xs font-black">{step}</span>
                     )}
                   </div>
+                  
+                  {/* Label */}
+                  <div className="text-center mt-3 flex flex-col items-center w-full px-0.5">
+                    <span className={`text-[9px] font-black leading-none transition-colors duration-500 whitespace-nowrap ${
+                      isCompleted ? 'text-pink-600' : 'text-slate-400'
+                    }`}>
+                      {mainLabel}
+                    </span>
+                    {subLabel && (
+                      <span className="text-[8px] font-bold text-slate-400 opacity-80 mt-1 whitespace-nowrap">
+                        {subLabel}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-          
-          {/* Milestone Labels */}
-          <div className="flex justify-between mt-3 px-0.5">
-            {milestoneLabels.map((label, idx) => {
-              const isCompleted = (idx + 1) <= completedSteps;
-              return (
-                <span 
-                  key={idx} 
-                  className={`text-[9px] font-black text-center w-14 leading-tight transition-colors duration-500 ${
-                    isCompleted ? 'text-pink-600' : 'text-slate-400'
-                  }`}
-                >
-                  {label.split(' ')[0]}
-                  <br />
-                  <span className="opacity-60 text-[8px]">{label.split(' ')[1]}</span>
-                </span>
               );
             })}
           </div>

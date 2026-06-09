@@ -199,10 +199,10 @@ const PetHealthOverview = ({
 
             {/* Milestone Progress Bar - Unified Column Layout */}
             <div className="relative py-2">
-              {/* Background Line */}
-              <div className="absolute left-[10%] right-[10%] top-[14px] h-1 bg-slate-100 rounded-full z-0" />
-              {/* Active Progress Line */}
-              <div className="absolute left-[10%] right-[10%] top-[14px] h-1 z-0 overflow-hidden rounded-full">
+              {/* Background Line - Centered vertically at 20px */}
+              <div className="absolute left-[10%] right-[10%] top-[20px] h-1 bg-slate-100 rounded-full z-0" />
+              {/* Active Progress Line - Centered vertically at 20px */}
+              <div className="absolute left-[10%] right-[10%] top-[20px] h-1 z-0 overflow-hidden rounded-full">
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercentage}%` }}
