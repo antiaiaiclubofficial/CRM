@@ -182,17 +182,21 @@ const PetDetailView = ({
         }
       }
     });
+
+    // ค้นหาวัคซีนล่าสุดที่ฉีดแล้ว
+    const sortedVaccines = [...pet.vaccine_history].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const latestVaccine = sortedVaccines[0];
+    const latestVaccineText = latestVaccine ? `ฉีดวัคซีน${latestVaccine.title}แล้ว` : "ได้รับวัคซีนแล้ว";
     
     if (hasOverdue) {
       return { text: "เกินกำหนดฉีดวัคซีน ⚠️", type: "danger" as const };
     }
     
     if (nextDue) {
-      const formattedDate = new Date(nextDue).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
-      return { text: `เข็มถัดไป: ${formattedDate}`, type: "upcoming" as const };
+      return { text: latestVaccineText, type: "upcoming" as const };
     }
     
-    return { text: "ได้รับวัคซีนครบถ้วน", type: "success" as const };
+    return { text: latestVaccineText, type: "success" as const };
   }, [pet.vaccine_history]);
 
   // รวมประวัติกิจกรรมสุขภาพทั้งหมดและจัดเรียงตามเวลาล่าสุด
