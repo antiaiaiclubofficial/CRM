@@ -134,7 +134,7 @@ const PetHealthOverview = ({
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Weight Tracker</p>
               </div>
             </div>
-            <div className="w-8 h-8 bg-slate-50 rounded-full flex items-center justify-center text-primary/40 group-hover:bg-primary group-hover:text-white transition-colors">
+            <div className="w-8 h-8 bg-slate-50 rounded-full flex items-center justify-center text-primary/40 group-hover:bg-[#EAFD69] group-hover:text-primary transition-colors">
               <ChevronRight size={14} strokeWidth={3} />
             </div>
           </div>
@@ -163,7 +163,7 @@ const PetHealthOverview = ({
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vaccination Status</p>
               </div>
             </div>
-            <div className="w-8 h-8 bg-slate-50 rounded-full flex items-center justify-center text-primary/40 group-hover:bg-primary group-hover:text-white transition-colors">
+            <div className="w-8 h-8 bg-slate-50 rounded-full flex items-center justify-center text-primary/40 group-hover:bg-[#EAFD69] group-hover:text-primary transition-colors">
               <ChevronRight size={14} strokeWidth={3} />
             </div>
           </div>
@@ -188,7 +188,7 @@ const PetHealthOverview = ({
                     </p>
                   ) : (
                     <p className="text-xs font-black text-primary mt-0.5">
-                      ถึงกำหนดการฉีดวัคซีนเข็มแรกให้น้องๆแล้วค่ะ
+                      แนะนำให้พาน้องไปรับวัคซีนเข็มแรกตามกำหนดการค่ะ
                     </p>
                   )}
                 </div>
@@ -196,12 +196,12 @@ const PetHealthOverview = ({
             ) : vaccineStatusType === 'danger' ? (
               <div className="pt-2 border-t border-slate-50 flex items-center gap-2 text-rose-500">
                 <AlertCircle size={16} />
-                <p className="text-xs font-black">ถึงกำหนดการฉีดวัคซีนให้น้องๆแล้วค่ะ</p>
+                <p className="text-xs font-black">กรุณาพาน้องไปรับวัคซีนที่เกินกำหนดโดยเร็วที่สุดค่ะ</p>
               </div>
             ) : vaccineStatusType === 'warning' ? (
               <div className="pt-2 border-t border-slate-50 flex items-center gap-2 text-amber-600">
                 <AlertCircle size={16} />
-                <p className="text-xs font-black">ยังไม่มีประวัติการรับวัคซีนในระบบ แนะนำให้ฉีดวัคซีนก่อนเข้ารับบริการค่ะ</p>
+                <p className="text-xs font-black">ยังไม่มีประวัติการรับวัคซีนในระบบค่ะ แนะนำให้เริ่มบันทึกข้อมูลวัคซีน</p>
               </div>
             ) : (
               <div className="pt-2 border-t border-slate-50">
