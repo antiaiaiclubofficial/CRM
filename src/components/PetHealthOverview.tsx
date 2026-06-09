@@ -30,6 +30,9 @@ const PetHealthOverview = ({
   subStatusText, 
   lastUpdate,
   weight,
+  weightDiff,
+  weightDiffIsGain,
+  prevWeightDate,
   vaccineStatusText,
   vaccineStatusType,
   nextVaccineDays,
@@ -153,9 +156,18 @@ const PetHealthOverview = ({
             </div>
           </div>
 
-          <div className="flex items-baseline gap-1.5 px-1 relative z-10">
-            <span className="text-3xl font-black text-primary tracking-tighter">{weight || '-'}</span>
-            <span className="text-xs font-bold text-slate-400 uppercase">กิโลกรัม (kg)</span>
+          <div className="flex justify-between items-baseline px-1 relative z-10">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-3xl font-black text-primary tracking-tighter">{weight || '-'}</span>
+              <span className="text-xs font-bold text-slate-400 uppercase">กิโลกรัม (kg)</span>
+            </div>
+            {weightDiff && (
+              <div className={`flex items-center gap-1 text-xs font-black px-3 py-1 rounded-full ${
+                weightDiffIsGain ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
+              }`}>
+                <span>{weightDiff} kg</span>
+              </div>
+            )}
           </div>
         </motion.div>
 
