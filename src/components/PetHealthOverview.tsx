@@ -252,10 +252,12 @@ const PetHealthOverview = ({
 
           <div className="space-y-4 px-1 relative z-10">
             {/* Status Header with Progress */}
-            <div className="flex justify-between items-center">
-              <span className="text-[10px] font-black text-primary/40 uppercase tracking-normal">สถานะล่าสุด (จิ้มเพื่อดูรายละเอียด)</span>
-              <span className="text-[10px] font-black text-primary/60">
-                ความคืบหน้า {completedCount}/5 เข็ม
+            <div className="flex justify-between items-center gap-2">
+              <span className="text-[10px] font-black text-primary/40 uppercase tracking-normal whitespace-nowrap">
+                สถานะล่าสุด <span className="text-[9px] text-slate-400 font-bold">(จิ้มเพื่อดูรายละเอียด)</span>
+              </span>
+              <span className="text-[10px] font-black text-primary/60 whitespace-nowrap shrink-0">
+                {completedCount}/5 เข็ม
               </span>
             </div>
 
@@ -266,12 +268,12 @@ const PetHealthOverview = ({
             </div>
 
             {/* Milestone Progress Bar - Unified Column Layout */}
-            <div className="relative py-1">
-              {/* Background Line - Centered vertically at 20px (8px padding-top + 12px half of dot height) */}
+            <div className="relative pt-2 pb-0">
+              {/* Background Line - Centered vertically at 16px (8px padding-top + 8px half of dot height) */}
               {/* Adjusted left/right to 12px (half of w-6 dot width) to perfectly align with dot centers */}
-              <div className="absolute left-[17px] right-[17px] top-[20px] -translate-y-1/5 h-1 bg-slate-100 rounded-full z-0" />
-              {/* Active Progress Line - Centered vertically at 20px */}
-              <div className="absolute left-[17px] right-[17px] top-[20px] -translate-y-1/5 h-1 z-0 overflow-hidden rounded-full">
+              <div className="absolute left-[17px] right-[17px] top-[16px] -translate-y-1/5 h-1 bg-slate-100 rounded-full z-0" />
+              {/* Active Progress Line - Centered vertically at 16px */}
+              <div className="absolute left-[17px] right-[17px] top-[16px] -translate-y-1/5 h-1 z-0 overflow-hidden rounded-full">
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercentage}%` }}
@@ -307,7 +309,7 @@ const PetHealthOverview = ({
                       </div>
                       
                       {/* Label */}
-                      <div className="text-center mt-2 flex flex-col items-center w-full px-0.5">
+                      <div className="text-center mt-1.5 flex flex-col items-center w-full px-0.5">
                         <span className={`text-[9px] font-black leading-none transition-colors duration-500 whitespace-nowrap ${
                           isCompleted ? 'text-pink-600' : 'text-slate-400'
                         }`}>
@@ -354,7 +356,7 @@ const PetHealthOverview = ({
                 <p className="text-xs font-black">ยังไม่มีประวัติการรับวัคซีนในระบบค่ะ แนะนำให้เริ่มบันทึกข้อมูลวัคซีน</p>
               </div>
             ) : completedCount < 5 ? (
-              <div className="pt-2 border-t border-slate-50 flex items-center gap-2 text-slate-500">
+              <div className="pt-2.5 border-t border-slate-100 flex items-center gap-2 text-slate-500">
                 <AlertCircle size={14} className="text-pink-500 shrink-0" />
                 <p className="text-xs font-bold leading-relaxed">ยังมีวัคซีนแนะนำที่ยังไม่ได้รับค่ะ แนะนำให้พาน้องไปรับวัคซีนตามกำหนดการนะคะ 🐾</p>
               </div>

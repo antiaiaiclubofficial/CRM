@@ -184,8 +184,8 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
       className="space-y-6"
     >
       {/* Header & Add Button (Lime Spark CTA) */}
@@ -206,10 +206,12 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
 
       {/* Milestone Progress Card - Unified Column Layout */}
       <div className="bg-white p-5 rounded-[2rem] shadow-ambient border border-black/5 space-y-4">
-        <div className="flex justify-between items-center">
-          <span className="text-xs font-black text-primary tracking-normal">โปรแกรมวัคซีนแนะนำ (จิ้มเข็มเพื่อดูรายละเอียด)</span>
-          <span className="text-xs font-black text-pink-500 bg-pink-50 px-3 py-1 rounded-full">
-           สำเร็จ {completedCount}/5 เข็ม
+        <div className="flex justify-between items-center gap-2">
+          <span className="text-xs font-black text-primary tracking-tight whitespace-nowrap">
+            โปรแกรมวัคซีนแนะนำ <span className="text-[10px] text-slate-400 font-bold">(จิ้มเพื่อดูรายละเอียด)</span>
+          </span>
+          <span className="text-xs font-black text-pink-600 bg-pink-50 px-3 py-1 rounded-full whitespace-nowrap shrink-0">
+            {completedCount}/5 เข็ม
           </span>
         </div>
 
@@ -219,12 +221,12 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
           <span className="leading-relaxed break-words">{vaccineStatus.text}</span>
         </div>
 
-        <div className="relative py-4">
-          {/* Background Line - Centered vertically at 30px (16px padding-top + 14px half of dot height) */}
+        <div className="relative pt-3 pb-1">
+          {/* Background Line - Centered vertically at 26px (12px padding-top + 14px half of dot height) */}
           {/* Adjusted left/right to 14px (half of w-7 dot width) to perfectly align with dot centers */}
-          <div className="absolute left-[14px] right-[14px] top-[30px] -translate-y-1/2 h-1.5 bg-slate-100 rounded-full z-0" />
-          {/* Active Progress Line - Centered vertically at 30px */}
-          <div className="absolute left-[14px] right-[14px] top-[30px] -translate-y-1/2 h-1.5 z-0 overflow-hidden rounded-full">
+          <div className="absolute left-[14px] right-[14px] top-[26px] -translate-y-1/2 h-1.5 bg-slate-100 rounded-full z-0" />
+          {/* Active Progress Line - Centered vertically at 26px */}
+          <div className="absolute left-[14px] right-[14px] top-[26px] -translate-y-1/2 h-1.5 z-0 overflow-hidden rounded-full">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
@@ -260,7 +262,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
                   </div>
                   
                   {/* Label */}
-                  <div className="text-center mt-3 flex flex-col items-center w-full px-0.5">
+                  <div className="text-center mt-2 flex flex-col items-center w-full px-0.5">
                     <span className={`text-[9px] font-black leading-none transition-colors duration-500 whitespace-nowrap ${
                       isCompleted ? 'text-pink-600' : 'text-slate-400'
                     }`}>
@@ -280,7 +282,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
 
         {/* Recommended Vaccine Reminder Text */}
         {completedCount < 5 && (
-          <div className="pt-3 border-t border-slate-50 flex items-center gap-2 text-slate-500">
+          <div className="pt-2.5 border-t border-slate-100 flex items-center gap-2 text-slate-500">
             <AlertCircle size={14} className="text-pink-500 shrink-0" />
             <p className="text-[11px] font-bold leading-relaxed">
               ยังมีวัคซีนแนะนำที่ยังไม่ได้รับค่ะ แนะนำให้พาน้องไปรับวัคซีนตามกำหนดการนะคะ 🐾
