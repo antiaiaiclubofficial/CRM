@@ -164,10 +164,10 @@ const PetDetailView = ({
     return upcoming[0] || null;
   }, [pet.vaccine_history]);
 
-  // คำนวณสถานะวัคซีน
-  const vaccineStatus = useMemo(() => {
+  // คำนวณสถานะวัคซีนแบบละเอียด (แสดงชื่อวัคซีนล่าสุด) สำหรับหน้าภาพรวม
+  const detailedVaccineStatus = useMemo(() => {
     if (!pet.vaccine_history || pet.vaccine_history.length === 0) {
-      return { text: "ยังไม่ฉีด", type: "warning" as const };
+      return { text: "ยังไม่มีประวัติวัคซีน", type: "warning" as const };
     }
     
     const today = new Date();
@@ -186,6 +186,52 @@ const PetDetailView = ({
           if (!nextDue || dueDate < nextDue) {
             nextDue = dueDate;
           }
+        }
+      }
+    });
+
+    // ค้นหาวัคซีนล่าสุดที่ฉีดแล้ว
+    const sortedVaccines = [...pet.vaccine_history].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const latestVaccine = sortedVaccines[0];
+    
+    let latestVaccineText = "ได้รับวัคซีนแล้ว";
+    if (latestVaccine) {
+      const title = latestVaccine.title;
+      if (title.startsWith("วัคซีน")) {
+        latestVaccineText = `ฉีด${title}แล้ว`;
+      } else {
+        latestVaccineText = `ฉีดวัคซีน${title}แล้ว`;
+      }
+    }
+    
+    if (hasOverdue) {
+      return { text: "เกินกำหนดฉีดวัคซีน ⚠️", type: "danger" as const };
+    }
+    
+    if (nextDue) {
+      return { text: latestVaccineText, type: "upcoming" as const };
+    }
+    
+    return { text: latestVaccineText, type: "success" as const };
+  }, [pet.vaccine_history]);
+
+  // คำนวณสถานะวัคซีนแบบย่อ (แสดงเพียง 'ฉีดแล้ว' หรือ 'ยังไม่ฉีด') สำหรับหน้าสุขภาพ
+  const simplifiedVaccineStatus = useMemo(() => {
+    if (!pet.vaccine_history || pet.vaccine_history.length === 0) {
+      return { text: "ยังไม่ฉีด", type: "warning" as const };
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let hasOverdue = false;
+    
+    pet.vaccine_history.forEach(v => {
+      if (v.next_due_date) {
+        const dueDate = new Date(v.next_due_date);
+        dueDate.setHours(0, 0, 0, 0);
+        if (dueDate < today) {
+          hasOverdue = true;
         }
       }
     });
@@ -428,8 +474,8 @@ const PetDetailView = ({
                     weightDiff={weightDiffInfo?.diff}
                     weightDiffIsGain={weightDiffInfo?.isGain}
                     prevWeightDate={weightDiffInfo?.prevDate}
-                    vaccineStatusText={vaccineStatus.text}
-                    vaccineStatusType={vaccineStatus.type}
+                    vaccineStatusText={detailedVaccineStatus.text}
+                    vaccineStatusType={detailedVaccineStatus.type}
                     nextVaccineDays={nextVaccineInfo ? nextVaccineInfo.daysRemaining : null}
                     nextVaccineName={nextVaccineInfo ? nextVaccineInfo.title : null}
                     nextVaccineDate={nextVaccineInfo ? nextVaccineInfo.formattedDate : null}
@@ -469,21 +515,21 @@ const PetDetailView = ({
                       <HealthItem label="ความยาวขน" value={pet.fur_length || '-'} />
                     </div>
                     
-                    {/* สถานะวัคซีน (บรรทัดเดียวกันทั้งสถานะและปุ่ม) */}
+                    {/* สถานะวัคซีน (บรรทัดเดียวกันทั้งสถานะและปุ่ม แสดงแบบย่อ) */}
                     <div className="pt-2 space-y-1.5">
                       <p className="text-[10px] font-black text-primary/40 uppercase tracking-widest">สถานะวัคซีน</p>
                       <div className="flex items-center justify-between gap-3">
                         <div className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold flex-1 ${
-                          vaccineStatus.type === 'danger' || vaccineStatus.type === 'warning'
+                          simplifiedVaccineStatus.type === 'danger' || simplifiedVaccineStatus.type === 'warning'
                             ? 'bg-rose-50 border-rose-100 text-rose-600'
                             : 'bg-emerald-50 border-emerald-100 text-emerald-600'
                         }`}>
-                          {vaccineStatus.type === 'danger' || vaccineStatus.type === 'warning' ? (
+                          {simplifiedVaccineStatus.type === 'danger' || simplifiedVaccineStatus.type === 'warning' ? (
                             <AlertCircle size={14} className="text-rose-500 shrink-0" />
                           ) : (
                             <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
                           )}
-                          <span className="truncate">{vaccineStatus.text}</span>
+                          <span className="truncate">{simplifiedVaccineStatus.text}</span>
                         </div>
                         
                         <button
