@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Syringe, Calendar, AlertCircle, CheckCircle2, Clock, ChevronRight, Scale, TrendingUp, TrendingDown } from 'lucide-react';
+import { Heart, Syringe, Calendar, AlertCircle, CheckCircle2, Clock, ChevronRight } from 'lucide-react';
 import AnalogScaleIcon from './AnalogScaleIcon';
 
 interface PetHealthOverviewProps {
@@ -11,9 +11,9 @@ interface PetHealthOverviewProps {
   subStatusText: string;
   lastUpdate: string;
   weight: string;
-  weightDiff?: string | null;
+  weightDiff?: string;
   weightDiffIsGain?: boolean;
-  prevWeightDate?: string | null;
+  prevWeightDate?: string;
   vaccineStatusText: string;
   vaccineStatusType: 'success' | 'warning' | 'danger' | 'upcoming';
   nextVaccineDays: number | null;
@@ -28,14 +28,10 @@ const PetHealthOverview = ({
   subStatusText, 
   lastUpdate,
   weight,
-  weightDiff,
-  weightDiffIsGain,
-  prevWeightDate,
   vaccineStatusText,
   vaccineStatusType,
   nextVaccineDays,
   nextVaccineName,
-  nextVaccineDate,
   onActionClick 
 }: PetHealthOverviewProps) => {
 
@@ -143,26 +139,9 @@ const PetHealthOverview = ({
             </div>
           </div>
 
-          <div className="flex items-center justify-between px-1 relative z-10">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-3xl font-black text-primary tracking-tighter">{weight || '-'}</span>
-              <span className="text-xs font-bold text-slate-400 uppercase">กิโลกรัม (kg)</span>
-            </div>
-
-            {/* ส่วนต่างน้ำหนักและวันที่ครั้งก่อนหน้า */}
-            {weightDiff && prevWeightDate && (
-              <div className="flex flex-col items-end">
-                <span className={`inline-flex items-center gap-1 text-xs font-black px-2.5 py-1 rounded-full ${
-                  weightDiffIsGain ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
-                }`}>
-                  {weightDiffIsGain ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                  {weightDiff} kg
-                </span>
-                <span className="text-[9px] font-bold text-slate-400 mt-1">
-                  เมื่อ {prevWeightDate}
-                </span>
-              </div>
-            )}
+          <div className="flex items-baseline gap-1.5 px-1 relative z-10">
+            <span className="text-3xl font-black text-primary tracking-tighter">{weight || '-'}</span>
+            <span className="text-xs font-bold text-slate-400 uppercase">กิโลกรัม (kg)</span>
           </div>
         </motion.div>
 
@@ -197,17 +176,21 @@ const PetHealthOverview = ({
             </div>
 
             {/* Countdown / Next Due Info */}
-            {nextVaccineDays !== null ? (
+            {nextVaccineName ? (
               <div className="pt-2 border-t border-slate-50 flex justify-between items-center">
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase">วัคซีนถัดไป: {nextVaccineName}</p>
-                  <p className="text-xs font-black text-primary mt-0.5">กำหนดฉีด: {nextVaccineDate}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase">เหลืออีก</span>
-                  <span className="text-lg font-black text-pink-500 tracking-tight">
-                    {nextVaccineDays} วัน
-                  </span>
+                  {nextVaccineDays !== null ? (
+                    <p className="text-xs font-black text-primary mt-0.5">
+                      {nextVaccineDays < 0 
+                        ? `เกินกำหนดมาแล้ว ${Math.abs(nextVaccineDays)} วัน` 
+                        : `แนะนำว่าอีก ${nextVaccineDays} วันควรฉีดเข็มถัดไป`}
+                    </p>
+                  ) : (
+                    <p className="text-xs font-black text-primary mt-0.5">
+                      แนะนำให้พาน้องไปรับวัคซีนเข็มแรกตามกำหนดการค่ะ
+                    </p>
+                  )}
                 </div>
               </div>
             ) : vaccineStatusType === 'danger' ? (
