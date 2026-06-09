@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Syringe, Calendar, Plus, Trash2, AlertTriangle, Clock, CheckCircle2, X } from 'lucide-react';
+import { Syringe, Calendar, Plus, Trash2, AlertTriangle, Clock, CheckCircle2, X, AlertCircle } from 'lucide-react';
 import AddVaccineModal from './AddVaccineModal';
 
 interface VaccineLog {
@@ -98,6 +98,90 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
     ? getVaccineExecution(selectedMilestoneStep) 
     : null;
 
+  // คำนวณสถานะวัคซีนแบบละเอียดให้เหมือนกับหน้าภาพรวม
+  const vaccineStatus = useMemo(() => {
+    if (!data || data.length === 0) {
+      return { text: "ยังไม่มีประวัติวัคซีน", type: "warning" as const };
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let hasOverdue = false;
+    let nextDue: Date | null = null;
+    
+    data.forEach(v => {
+      if (v.next_due_date) {
+        const dueDate = new Date(v.next_due_date);
+        dueDate.setHours(0, 0, 0, 0);
+        if (dueDate < today) {
+          hasOverdue = true;
+        } else {
+          if (!nextDue || dueDate < nextDue) {
+            nextDue = dueDate;
+          }
+        }
+      }
+    });
+
+    // ค้นหาวัคซีนล่าสุดที่ฉีดแล้ว
+    const sortedVaccines = [...data].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const latestVaccine = sortedVaccines[0];
+    
+    let latestVaccineText = "ได้รับวัคซีนแล้ว";
+    if (latestVaccine) {
+      const title = latestVaccine.title;
+      if (title.startsWith("วัคซีน")) {
+        latestVaccineText = `ฉีด${title}แล้ว`;
+      } else {
+        latestVaccineText = `ฉีดวัคซีน${title}แล้ว`;
+      }
+    }
+    
+    if (hasOverdue) {
+      return { text: "เกินกำหนดฉีดวัคซีน ⚠️", type: "danger" as const };
+    }
+    
+    if (nextDue) {
+      return { text: latestVaccineText, type: "upcoming" as const };
+    }
+    
+    return { text: latestVaccineText, type: "success" as const };
+  }, [data]);
+
+  // ดึงการตั้งค่าสีและไอคอนของกล่องสถานะ
+  const getVaccineStatusConfig = (type: 'success' | 'warning' | 'danger' | 'upcoming') => {
+    switch (type) {
+      case 'danger':
+        return {
+          bg: 'bg-rose-50 border-rose-100',
+          text: 'text-rose-600',
+          icon: <AlertCircle size={18} className="text-rose-500" />
+        };
+      case 'warning':
+        return {
+          bg: 'bg-amber-50 border-amber-100',
+          text: 'text-amber-600',
+          icon: <AlertCircle size={18} className="text-amber-500" />
+        };
+      case 'upcoming':
+        return {
+          bg: 'bg-blue-50 border-blue-100',
+          text: 'text-blue-600',
+          icon: <Clock size={18} className="text-blue-500" />
+        };
+      case 'success':
+      default:
+        return {
+          bg: 'bg-emerald-50 border-emerald-100',
+          text: 'text-emerald-600',
+          icon: <CheckCircle2 size={18} className="text-emerald-500" />
+        };
+    }
+  };
+
+  const vaccineConfig = getVaccineStatusConfig(vaccineStatus.type);
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -123,18 +207,24 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
       {/* Milestone Progress Card - Unified Column Layout */}
       <div className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 space-y-4">
         <div className="flex justify-between items-center">
-          <span className="text-xs font-black text-primary tracking-normal">โปรแกรมวัคซีนแนะนำ (จิ้มเพื่อดูรายละเอียด)</span>
+          <span className="text-xs font-black text-primary tracking-normal">โปรแกรมวัคซีนแนะนำ (จิ้มเข็มเพื่อดูรายละเอียด)</span>
           <span className="text-xs font-black text-pink-500 bg-pink-50 px-3 py-1 rounded-full">
             สำเร็จ {completedCount}/5 เข็ม
           </span>
         </div>
 
-        <div className="relative py-3">
+        {/* Status Badge - Full Width (เหมือนกับหน้าภาพรวม) */}
+        <div className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-bold ${vaccineConfig.bg} ${vaccineConfig.text} w-full`}>
+          <div className="shrink-0">{vaccineConfig.icon}</div>
+          <span className="leading-relaxed break-words">{vaccineStatus.text}</span>
+        </div>
+
+        <div className="relative py-4">
           {/* Background Line - Centered vertically at 30px (16px padding-top + 14px half of dot height) */}
           {/* Adjusted left/right to 14px (half of w-7 dot width) to perfectly align with dot centers */}
-          <div className="absolute left-[14px] right-[14px] top-[30px] -translate-y-0 h-1 bg-slate-100 rounded-full z-0" />
+          <div className="absolute left-[14px] right-[14px] top-[30px] -translate-y-1/2 h-1.5 bg-slate-100 rounded-full z-0" />
           {/* Active Progress Line - Centered vertically at 30px */}
-          <div className="absolute left-[14px] right-[14px] top-[30px] -translate-y-0 h-1 z-0 overflow-hidden rounded-full">
+          <div className="absolute left-[14px] right-[14px] top-[30px] -translate-y-1/2 h-1.5 z-0 overflow-hidden rounded-full">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
