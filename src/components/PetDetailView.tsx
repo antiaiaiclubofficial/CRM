@@ -4,7 +4,8 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Pencil, Heart, PawPrint, Tag, Plus, HeartPulse, Trash2, AlertTriangle, X,
-  LayoutGrid, Activity, History, FileText, Stethoscope, Syringe, ChevronRight, Scale, Scissors, Gift, Cake
+  LayoutGrid, Activity, History, FileText, Stethoscope, Syringe, ChevronRight, Scale, Scissors, Gift, Cake,
+  Droplet, Sparkles, DollarSign, Calendar
 } from 'lucide-react';
 import PetHealthOverview from './PetHealthOverview';
 import PetWeightChart from './PetWeightChart';
@@ -82,6 +83,7 @@ const PetDetailView = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showWeightDetail, setShowWeightDetail] = useState(false);
   const [showVaccineDetail, setShowVaccineDetail] = useState(false);
+  const [selectedServiceDetail, setSelectedServiceDetail] = useState<any | null>(null);
 
   const healthData = useMemo(() => {
     let score = 70;
@@ -101,6 +103,11 @@ const PetDetailView = ({
 
   const weightHistory = pet.weight_history || [];
   const vaccineHistory = pet.vaccine_history || [];
+
+  // กรองประวัติการใช้บริการเฉพาะของน้องตัวนี้
+  const petServices = useMemo(() => {
+    return serviceHistory.filter(s => s.petName === pet.name);
+  }, [serviceHistory, pet.name]);
 
   // ตรวจสอบว่าเป็นวันเกิดของน้องหรือไม่
   const isBirthday = useMemo(() => {
@@ -186,7 +193,16 @@ const PetDetailView = ({
     // ค้นหาวัคซีนล่าสุดที่ฉีดแล้ว
     const sortedVaccines = [...pet.vaccine_history].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     const latestVaccine = sortedVaccines[0];
-    const latestVaccineText = latestVaccine ? `ฉีดวัคซีน${latestVaccine.title}แล้ว` : "ได้รับวัคซีนแล้ว";
+    
+    let latestVaccineText = "ได้รับวัคซีนแล้ว";
+    if (latestVaccine) {
+      const title = latestVaccine.title;
+      if (title.startsWith("วัคซีน")) {
+        latestVaccineText = `ฉีด${title}แล้ว`;
+      } else {
+        latestVaccineText = `ฉีดวัคซีน${title}แล้ว`;
+      }
+    }
     
     if (hasOverdue) {
       return { text: "เกินกำหนดฉีดวัคซีน ⚠️", type: "danger" as const };
@@ -231,7 +247,6 @@ const PetDetailView = ({
     }
 
     // 3. ประวัติการรับบริการ (อาบน้ำตัดขน)
-    const petServices = serviceHistory.filter(s => s.petName === pet.name);
     petServices.forEach(s => {
       const rDate = s.rawDate ? new Date(s.rawDate) : new Date();
       items.push({
@@ -245,7 +260,7 @@ const PetDetailView = ({
 
     // จัดเรียงจากใหม่ล่าสุดไปเก่าสุด
     return items.sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
-  }, [pet, serviceHistory]);
+  }, [pet, petServices]);
 
   const handleHealthAction = (type: string) => {
     if (type === 'weight') {
@@ -504,12 +519,104 @@ const PetDetailView = ({
                   animate={slideVariants.animate} 
                   exit={slideVariants.exit} 
                   transition={slideVariants.transition}
-                  className="py-20 text-center"
+                  className="space-y-4"
                 >
-                   <div className="w-16 h-16 bg-surface-container-low rounded-full flex items-center justify-center mx-auto mb-4">
-                     <History size={28} className="text-primary/10" />
-                   </div>
-                   <p className="text-primary/30 font-black uppercase tracking-widest text-[10px]">ยังไม่มีข้อมูลประวัติการรักษา</p>
+                  {selectedServiceDetail ? (
+                    <div className="space-y-6">
+                      {/* Service Detail Sub-view */}
+                      <div className="flex items-center gap-3 mb-4">
+                        <button 
+                          onClick={() => setSelectedServiceDetail(null)} 
+                          className="p-2 bg-slate-100 rounded-full text-slate-500 active:scale-90 transition-transform"
+                        >
+                          <ArrowLeft size={16} />
+                        </button>
+                        <span className="text-xs font-black text-slate-400 uppercase tracking-wider">ย้อนกลับ</span>
+                      </div>
+
+                      <div className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 space-y-5">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-primary/5 rounded-2xl flex items-center justify-center text-2xl">
+                            {selectedServiceDetail.icon}
+                          </div>
+                          <div>
+                            <h4 className="font-black text-primary text-base leading-tight">{selectedServiceDetail.service}</h4>
+                            <p className="text-[10px] font-bold text-slate-400 mt-1">{selectedServiceDetail.date}</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
+                          <div className="flex items-center gap-2">
+                            <DollarSign size={16} className="text-emerald-500" />
+                            <div>
+                              <p className="text-[9px] font-bold text-slate-400 uppercase">ค่าบริการ</p>
+                              <p className="text-xs font-black text-primary">฿{selectedServiceDetail.price}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Droplet size={16} className="text-blue-500" />
+                            <div>
+                              <p className="text-[9px] font-bold text-slate-400 uppercase">แชมพูที่ใช้</p>
+                              <p className="text-xs font-black text-primary">{selectedServiceDetail.shampooUsed || 'สูตรอ่อนโยน'}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {selectedServiceDetail.spaTreatment && (
+                          <div className="flex items-start gap-2.5 pt-2">
+                            <Sparkles size={16} className="text-amber-500 shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-[9px] font-bold text-slate-400 uppercase">ทรีทเมนต์สปา</p>
+                              <p className="text-xs font-bold text-slate-700">{selectedServiceDetail.spaTreatment}</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {selectedServiceDetail.groomerNotes && (
+                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">บันทึกจากช่าง</p>
+                            <p className="text-xs font-bold text-slate-600 leading-relaxed">"{selectedServiceDetail.groomerNotes}"</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : petServices.length > 0 ? (
+                    <div className="space-y-3">
+                      {petServices.map((item) => (
+                        <motion.div
+                          key={item.id}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => setSelectedServiceDetail(item)}
+                          className="bg-white p-5 rounded-[2rem] shadow-ambient border border-black/5 flex items-center justify-between gap-4 cursor-pointer group"
+                        >
+                          <div className="flex items-center gap-4 min-w-0 flex-1">
+                            <div className="w-11 h-11 bg-primary/5 rounded-2xl flex items-center justify-center text-xl shrink-0">
+                              {item.icon}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <h5 className="font-black text-primary text-sm truncate leading-tight">{item.service}</h5>
+                              <p className="text-[10px] font-bold text-slate-400 mt-1 flex items-center gap-1">
+                                <Calendar size={10} /> {item.date} • ฿{item.price}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="w-8 h-8 bg-slate-50 rounded-full flex items-center justify-center text-primary/40 group-hover:bg-primary group-hover:text-white transition-colors shrink-0">
+                            <ChevronRight size={12} strokeWidth={3} />
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-16 bg-white rounded-[2.5rem] shadow-ambient border border-black/5 p-8 flex flex-col items-center justify-center">
+                      <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 mb-4">
+                        <History size={28} />
+                      </div>
+                      <h3 className="text-base font-black text-primary mb-1">ยังไม่มีประวัติการใช้บริการ</h3>
+                      <p className="text-xs font-bold text-surface-variant opacity-60 max-w-[200px] leading-relaxed">
+                        เมื่อน้องเข้ารับบริการอาบน้ำตัดขนที่ร้าน ประวัติการดูแลจะแสดงที่นี่โดยอัตโนมัติค่ะ 🐾
+                      </p>
+                    </div>
+                  )}
                 </motion.div>
               )}
 
