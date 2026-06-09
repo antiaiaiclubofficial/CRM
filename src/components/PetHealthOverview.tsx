@@ -179,7 +179,7 @@ const PetHealthOverview = ({
             {nextVaccineName ? (
               <div className="pt-2 border-t border-slate-50 flex justify-between items-center">
                 <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase">วัคซีนถัดไป: {nextVaccineName}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">สถานะการฉีดวัคซีน: {nextVaccineName}</p>
                   {nextVaccineDays !== null ? (
                     <p className="text-xs font-black text-primary mt-0.5">
                       {nextVaccineDays < 0 
