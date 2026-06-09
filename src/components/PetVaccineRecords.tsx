@@ -322,7 +322,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
                 transition={{ delay: i * 0.05 }}
                 className="bg-white p-5 rounded-[2rem] shadow-ambient flex justify-between items-center group border-none"
               >
-                <div className="flex items-center gap-0 min-w-0 flex-1">
+                <div className="flex items-center gap-4 min-w-0 flex-1">
                   <div className="w-11 h-11 bg-primary/5 rounded-2xl flex items-center justify-center text-primary shrink-0">
                     <Syringe size={20} />
                   </div>
