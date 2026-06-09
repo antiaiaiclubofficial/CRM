@@ -162,10 +162,17 @@ const PetHealthOverview = ({
               <span className="text-xs font-bold text-slate-400 uppercase">กิโลกรัม (kg)</span>
             </div>
             {weightDiff && (
-              <div className={`flex items-center gap-1 text-xs font-black px-3 py-1 rounded-full ${
-                weightDiffIsGain ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
-              }`}>
-                <span>{weightDiff} kg</span>
+              <div className="flex flex-col items-end gap-1">
+                <div className={`flex items-center gap-1 text-xs font-black px-3 py-1 rounded-full ${
+                  weightDiffIsGain ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
+                }`}>
+                  <span>{weightDiff} kg</span>
+                </div>
+                {prevWeightDate && (
+                  <span className="text-[9px] font-bold text-slate-400">
+                    จากวันที่: {prevWeightDate}
+                  </span>
+                )}
               </div>
             )}
           </div>
