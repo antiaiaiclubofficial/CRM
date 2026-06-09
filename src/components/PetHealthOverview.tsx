@@ -266,7 +266,7 @@ const PetHealthOverview = ({
             </div>
 
             {/* Milestone Progress Bar - Unified Column Layout */}
-            <div className="relative py-2">
+            <div className="relative py-1">
               {/* Background Line - Centered vertically at 20px (8px padding-top + 12px half of dot height) */}
               {/* Adjusted left/right to 12px (half of w-6 dot width) to perfectly align with dot centers */}
               <div className="absolute left-[12px] right-[12px] top-[20px] -translate-y-1/2 h-1 bg-slate-100 rounded-full z-0" />
