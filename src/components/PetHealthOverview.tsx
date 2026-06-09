@@ -253,7 +253,7 @@ const PetHealthOverview = ({
           <div className="space-y-4 px-1 relative z-10">
             {/* Status Header with Progress */}
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-black text-primary/40 uppercase tracking-normal">สถานะล่าสุด (จิ้มเข็มเพื่อดูรายละเอียด)</span>
+              <span className="text-[10px] font-black text-primary/40 uppercase tracking-normal">สถานะล่าสุด (จิ้มเพื่อดูรายละเอียด)</span>
               <span className="text-[10px] font-black text-primary/60">
                 ความคืบหน้า {completedCount}/5 เข็ม
               </span>
