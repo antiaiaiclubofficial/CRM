@@ -255,13 +255,13 @@ const PetHealthOverview = ({
             <div className="flex justify-between items-start gap-2">
               <div className="flex flex-col">
                 <span className="text-xs font-black text-primary tracking-tight">
-                  โปรแกรมวัคซีนแนะนำ
+                  สถานะล่าสุด
                 </span>
                 <span className="text-[9px] text-slate-400 font-bold mt-0.5">
                   (จิ้มเพื่อดูรายละเอียด)
                 </span>
               </div>
-              <span className="text-[10px] font-black text-primary/60 whitespace-nowrap shrink-0">
+              <span className="text-xs font-black text-pink-600 bg-pink-50 px-3 py-1 rounded-full whitespace-nowrap shrink-0">
                 {completedCount}/5 เข็ม
               </span>
             </div>
