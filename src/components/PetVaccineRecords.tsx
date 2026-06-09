@@ -280,8 +280,8 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
 
         {/* Recommended Vaccine Reminder Text */}
         {completedCount < 5 && (
-          <div className="pt-3 border-t border-slate-50 flex items-start gap-2 text-slate-500">
-            <AlertCircle size={14} className="text-pink-500 shrink-0 mt-0.5" />
+          <div className="pt-3 border-t border-slate-50 flex items-center gap-2 text-slate-500">
+            <AlertCircle size={14} className="text-pink-500 shrink-0" />
             <p className="text-[11px] font-bold leading-relaxed">
               ยังมีวัคซีนแนะนำที่ยังไม่ได้รับค่ะ แนะนำให้พาน้องไปรับวัคซีนตามกำหนดการนะคะ 🐾
             </p>
@@ -317,7 +317,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
 
       {/* Vaccine Timeline List */}
       <div className="space-y-4">
-        <div className="flex justify-between items-center pl-5 pr-8">
+        <div className="flex justify-between items-center px-1">
           <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest">รายการวัคซีนทั้งหมด</h4>
           <span className="text-[10px] font-bold text-slate-400 uppercase">{data.length} รายการ</span>
         </div>
@@ -328,7 +328,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
               <motion.div 
                 key={entry.id} 
                 initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
                 className="bg-white p-5 rounded-[2rem] shadow-ambient flex justify-between items-center group border-none"
               >
