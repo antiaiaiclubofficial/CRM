@@ -123,7 +123,7 @@ const PetVaccineRecords = ({ data, petName, petType, onAddVaccine, onDeleteVacci
       {/* Milestone Progress Card - Unified Column Layout */}
       <div className="bg-white p-6 rounded-[2.5rem] shadow-ambient border border-black/5 space-y-4">
         <div className="flex justify-between items-center">
-          <span className="text-xs font-black text-primary tracking-normal">โปรแกรมวัคซีนแนะนำ (จิ้มเพื่อดูรายละเอียด)</span>
+          <span className="text-s font-black text-primary tracking-normal">โปรแกรมวัคซีนแนะนำ (จิ้มเพื่อดูรายละเอียด)</span>
           <span className="text-xs font-black text-pink-500 bg-pink-50 px-3 py-1 rounded-full">
             สำเร็จ {completedCount}/5 เข็ม
           </span>
