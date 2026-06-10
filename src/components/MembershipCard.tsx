@@ -95,6 +95,9 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
   const currentTierColor = getTierColor(currentTier);
   const currentTierGradient = getTierGradient(currentTier);
 
+  // Find index of current tier for magnification calculations
+  const currentTierIdx = sortedTiers.findIndex(t => t.tier_key === currentTier.tier_key || t.id === currentTier.id);
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -193,7 +196,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                 />
               </div>
               
-              {/* Milestone Dots */}
+              {/* Milestone Dots with Magnification Effect */}
               <div className="relative z-10 flex justify-between items-center">
                 {sortedTiers.map((tier, index) => {
                   const isUnlocked = totalAccumulatedPoints >= tier.min_points;
@@ -202,44 +205,87 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                   const shortName = tier.name.split(' ')[0];
                   const tierColor = getTierColor(tier);
                   
+                  // Magnification calculations
+                  const distance = index - currentTierIdx;
+                  
+                  // 1. Calculate X offset to compress non-active items closer to each other
+                  let xOffset = 0;
+                  if (distance < 0) {
+                    // Past items shift right (towards center)
+                    xOffset = (currentTierIdx - index) * 8;
+                  } else if (distance > 0) {
+                    // Future items shift left (towards center)
+                    xOffset = (index - currentTierIdx) * -8;
+                  }
+
+                  // 2. Calculate scale based on distance
+                  let scale = 0.8; // Distant items
+                  if (distance === 0) {
+                    scale = 1.35; // Current item (Magnified)
+                  } else if (Math.abs(distance) === 1) {
+                    scale = 0.95; // Adjacent items
+                  }
+
+                  // 3. Calculate opacity based on distance
+                  let opacity = 0.6;
+                  if (distance === 0) {
+                    opacity = 1.0;
+                  } else if (Math.abs(distance) === 1) {
+                    opacity = 0.85;
+                  }
+
                   return (
-                    <div key={tier.id || tier.tier_key} className="flex flex-col items-center">
+                    <motion.div 
+                      key={tier.id || tier.tier_key} 
+                      className="flex flex-col items-center flex-1"
+                      animate={{ x: xOffset }}
+                      transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                    >
                       {/* Dot - Solid background to block the progress line behind it */}
-                      <div 
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 opacity-100 ${
+                      <motion.div 
+                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center opacity-100 ${
                           isCurrent
-                            ? 'scale-125 ring-4 ring-white/30 z-20 text-[#020d35]'
-                            : isUnlocked 
-                            ? 'scale-90 z-10 text-[#020d35]/60' 
-                            : 'bg-[#020d35] border-white/20 text-white/30 scale-90 z-10'
+                            ? 'ring-4 ring-white/30 z-20 text-[#020d35]'
+                            : 'z-10'
                         }`}
+                        animate={{ scale: scale }}
+                        transition={{ type: "spring", stiffness: 200, damping: 20 }}
                         style={isUnlocked ? {
                           backgroundColor: tierColor,
                           borderColor: isCurrent ? '#FFFFFF' : tierColor,
                           boxShadow: isCurrent ? `0 0 15px ${tierColor}` : `0 0 5px ${tierColor}33`
-                        } : {}}
+                        } : {
+                          backgroundColor: '#020d35',
+                          borderColor: 'rgba(255, 255, 255, 0.2)',
+                        }}
                       >
                         {React.cloneElement(tierIcon as React.ReactElement, { 
                           size: isCurrent ? 11 : 9,
                           className: isCurrent ? 'text-[#020d35]' : isUnlocked ? 'text-[#020d35]/60' : 'text-white/30'
                         })}
-                      </div>
+                      </motion.div>
+                      
                       {/* Mini Label */}
-                      <span 
-                        className={`text-[8px] mt-1.5 transition-all duration-500 ${
-                          isCurrent ? 'font-black scale-110' : 'font-bold'
+                      <motion.span 
+                        className={`text-[8px] mt-1.5 whitespace-nowrap ${
+                          isCurrent ? 'font-black' : 'font-bold'
                         }`}
+                        animate={{ 
+                          scale: isCurrent ? 1.1 : 0.9,
+                          opacity: opacity
+                        }}
+                        transition={{ type: "spring", stiffness: 200, damping: 20 }}
                         style={{ 
                           color: isCurrent 
                             ? tierColor 
                             : isUnlocked 
-                            ? `${tierColor}99` 
-                            : 'rgba(255, 255, 255, 0.25)' 
+                            ? `${tierColor}` 
+                            : 'rgba(255, 255, 255, 0.4)' 
                         }}
                       >
                         {shortName}
-                      </span>
-                    </div>
+                      </motion.span>
+                    </motion.div>
                   );
                 })}
               </div>
