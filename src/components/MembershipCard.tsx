@@ -37,9 +37,18 @@ const getTierColor = (tier: any) => {
   if (key.includes('platinum')) return '#BBDEFB';
   if (key.includes('vip')) return '#E1BEE7';
   
-  // Fallback: try to parse hex from color_class (e.g. bg-[#FFD8E4])
   const match = tier.color_class?.match(/#([A-Fa-f0-9]{6})/);
   return match ? `#${match[1]}` : '#EAFD69';
+};
+
+const getTierGradient = (tier: any) => {
+  const key = (tier.tier_key || tier.id || '').toLowerCase();
+  if (key.includes('bronze')) return 'linear-gradient(135deg, #3b1424 0%, #15030a 100%)';
+  if (key.includes('silver')) return 'linear-gradient(135deg, #11331d 0%, #030f07 100%)';
+  if (key.includes('gold')) return 'linear-gradient(135deg, #382311 0%, #120a03 100%)';
+  if (key.includes('platinum')) return 'linear-gradient(135deg, #112538 0%, #030b12 100%)';
+  if (key.includes('vip')) return 'linear-gradient(135deg, #281138 0%, #0b0312 100%)';
+  return 'linear-gradient(135deg, #18234a 0%, #020d35 100%)';
 };
 
 const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile, onShowQR, onTierClick, tiers }: MembershipCardProps) => {
@@ -84,15 +93,20 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
   }
 
   const currentTierColor = getTierColor(currentTier);
+  const currentTierGradient = getTierGradient(currentTier);
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative w-full min-h-[250px] overflow-hidden py-5 px-6 rounded-3xl bg-liquid-primary shadow-ambient border-none flex flex-col justify-between"
+      className="relative w-full min-h-[250px] overflow-hidden py-5 px-6 rounded-3xl shadow-ambient border-none flex flex-col justify-between transition-all duration-500"
+      style={{ background: currentTierGradient }}
     >
-      {/* Liquid Background Elements */}
-      <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-tertiary/10 rounded-full blur-3xl" />
+      {/* Liquid Background Elements with Dynamic Tier Color */}
+      <div 
+        className="absolute top-[-20%] right-[-10%] w-64 h-64 rounded-full blur-3xl opacity-20 transition-all duration-500" 
+        style={{ backgroundColor: currentTierColor }}
+      />
       <div className="absolute bottom-[-20%] left-[-10%] w-48 h-48 bg-white/5 rounded-full blur-2xl" />
 
       <div className="relative z-10 flex flex-col h-full justify-between space-y-4">
@@ -104,7 +118,10 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
             onClick={onTierClick}
           >
             <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Membership Status</p>
-            <span className="bg-tertiary text-primary text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block">
+            <span 
+              className="text-primary text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block transition-colors duration-500"
+              style={{ backgroundColor: currentTierColor }}
+            >
               {currentTier.name.toUpperCase()}
             </span>
           </div>
@@ -125,7 +142,12 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
             <div className="space-y-0.5">
               <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">คะแนนที่ใช้ได้ (Balance)</p>
               <div className="flex items-baseline gap-1.5">
-                <span className="text-4xl font-black text-tertiary leading-none tracking-tighter">{redeemablePoints.toLocaleString()}</span>
+                <span 
+                  className="text-4xl font-black leading-none tracking-tighter transition-colors duration-500"
+                  style={{ color: currentTierColor }}
+                >
+                  {redeemablePoints.toLocaleString()}
+                </span>
                 <span className="text-[10px] font-black text-white/70 uppercase">pts</span>
               </div>
             </div>
@@ -141,8 +163,9 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               </motion.button>
               
               <div 
-                className="flex items-center gap-1 justify-end text-tertiary mb-0.5 cursor-pointer active:scale-95 transition-transform"
+                className="flex items-center gap-1 justify-end mb-0.5 cursor-pointer active:scale-95 transition-transform"
                 onClick={onTierClick}
+                style={{ color: currentTierColor }}
               >
                 <span className="text-[9px] font-black uppercase tracking-widest">คะแนนสะสมทั้งหมด</span>
               </div>
