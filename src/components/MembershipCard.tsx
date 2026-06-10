@@ -68,35 +68,14 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
     pointsNeeded = nextTier.min_points - totalAccumulatedPoints;
   }
 
-  // Calculate overall progress percentage across milestones
-  let overallProgress = 0;
-  if (N > 1) {
-    const lastTier = sortedTiers[N - 1];
-    if (totalAccumulatedPoints >= lastTier.min_points) {
-      overallProgress = 100;
-    } else {
-      // Find current segment
-      let segmentIndex = 0;
-      for (let i = 0; i < N - 1; i++) {
-        if (totalAccumulatedPoints >= sortedTiers[i].min_points && totalAccumulatedPoints < sortedTiers[i + 1].min_points) {
-          segmentIndex = i;
-          break;
-        }
-      }
-      const currentMin = sortedTiers[segmentIndex].min_points;
-      const nextMin = sortedTiers[segmentIndex + 1].min_points;
-      const segmentProgress = (totalAccumulatedPoints - currentMin) / (nextMin - currentMin);
-      overallProgress = ((segmentIndex + segmentProgress) / (N - 1)) * 100;
-    }
-  } else {
-    overallProgress = 100;
-  }
-
   const currentTierColor = getTierColor(currentTier);
   const currentTierGradient = getTierGradient(currentTier);
 
-  // Find index of current tier for magnification calculations
+  // Find index of current tier for splitting past and future tiers
   const currentTierIdx = sortedTiers.findIndex(t => t.tier_key === currentTier.tier_key || t.id === currentTier.id);
+
+  const pastTiers = sortedTiers.slice(0, currentTierIdx);
+  const futureTiers = sortedTiers.slice(currentTierIdx + 1);
 
   return (
     <motion.div 
@@ -179,115 +158,100 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
           {/* Milestone Progress Section */}
           <div className="space-y-2 pt-1">
             <div className="relative pt-2 pb-1">
-              {/* Background Line */}
-              <div className="absolute left-[12px] right-[12px] top-[20px] -translate-y-1/2 h-1 bg-white/10 rounded-full z-0" />
-              
-              {/* Active Progress Line */}
-              <div className="absolute left-[12px] right-[12px] top-[20px] -translate-y-1/2 h-1 z-0 overflow-hidden rounded-full">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${overallProgress}%` }}
-                  transition={{ duration: 1.5, ease: "easeOut" }}
-                  className="h-full rounded-full"
-                  style={{ 
-                    backgroundColor: currentTierColor,
-                    boxShadow: `0 0 12px ${currentTierColor}99`
-                  }}
-                />
-              </div>
-              
-              {/* Milestone Dots with Magnification Effect */}
-              <div className="relative z-10 flex justify-between items-center">
-                {sortedTiers.map((tier, index) => {
-                  const isUnlocked = totalAccumulatedPoints >= tier.min_points;
-                  const isCurrent = currentTier.tier_key === tier.tier_key || currentTier.id === tier.id;
-                  const tierIcon = iconMap[tier.icon_name] || <PawPrint size={10} />;
-                  const shortName = tier.name.split(' ')[0];
-                  const tierColor = getTierColor(tier);
-                  
-                  // Magnification calculations
-                  const distance = index - currentTierIdx;
-                  
-                  // 1. Calculate X offset to compress non-active items closer to each other
-                  let xOffset = 0;
-                  if (distance < 0) {
-                    // Past items shift right (towards center)
-                    xOffset = (currentTierIdx - index) * 8;
-                  } else if (distance > 0) {
-                    // Future items shift left (towards center)
-                    xOffset = (index - currentTierIdx) * -8;
-                  }
+              {/* Milestone Stack Layout */}
+              <div className="relative z-10 flex items-center justify-between w-full">
+                
+                {/* 1. Past Tiers Stack (Completed) */}
+                <div className="flex items-center shrink-0">
+                  <div className="flex items-center -space-x-2">
+                    {pastTiers.map((tier, idx) => {
+                      const tierColor = getTierColor(tier);
+                      const tierIcon = iconMap[tier.icon_name] || <PawPrint size={8} />;
+                      return (
+                        <div 
+                          key={tier.id || tier.tier_key} 
+                          className="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center shadow-md relative"
+                          style={{ backgroundColor: tierColor, zIndex: idx }}
+                        >
+                          {React.cloneElement(tierIcon as React.ReactElement, { 
+                            size: 9,
+                            className: 'text-[#020d35]'
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {pastTiers.length > 0 && (
+                    <span className="text-[8px] font-black text-white/40 ml-2 uppercase tracking-wider">
+                      Passed
+                    </span>
+                  )}
+                </div>
 
-                  // 2. Calculate scale based on distance
-                  let scale = 0.8; // Distant items
-                  if (distance === 0) {
-                    scale = 1.35; // Current item (Magnified)
-                  } else if (Math.abs(distance) === 1) {
-                    scale = 0.95; // Adjacent items
-                  }
+                {/* 2. Active Connector Line (Glowing) */}
+                <div className="flex-1 mx-3 h-0.5 bg-white/10 relative overflow-hidden rounded-full">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: '100%' }}
+                    className="h-full"
+                    style={{ 
+                      backgroundColor: currentTierColor,
+                      boxShadow: `0 0 8px ${currentTierColor}`
+                    }}
+                  />
+                </div>
 
-                  // 3. Calculate opacity based on distance
-                  let opacity = 0.6;
-                  if (distance === 0) {
-                    opacity = 1.0;
-                  } else if (Math.abs(distance) === 1) {
-                    opacity = 0.85;
-                  }
+                {/* 3. Current Tier (Magnified Focus) */}
+                <div className="flex flex-col items-center shrink-0 z-20 scale-125 mx-1">
+                  <div 
+                    className="w-7 h-7 rounded-full border-2 border-white ring-4 ring-white/30 flex items-center justify-center shadow-lg"
+                    style={{ 
+                      backgroundColor: currentTierColor,
+                      boxShadow: `0 0 15px ${currentTierColor}`
+                    }}
+                  >
+                    {React.cloneElement((iconMap[currentTier.icon_name] || <PawPrint />) as React.ReactElement, { 
+                      size: 11,
+                      className: 'text-[#020d35]'
+                    })}
+                  </div>
+                  <span 
+                    className="text-[8px] mt-2 font-black uppercase tracking-wider"
+                    style={{ color: currentTierColor }}
+                  >
+                    {currentTier.name.split(' ')[0]}
+                  </span>
+                </div>
 
-                  return (
-                    <motion.div 
-                      key={tier.id || tier.tier_key} 
-                      className="flex flex-col items-center flex-1"
-                      animate={{ x: xOffset }}
-                      transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                    >
-                      {/* Dot - Solid background to block the progress line behind it */}
-                      <motion.div 
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center opacity-100 ${
-                          isCurrent
-                            ? 'ring-4 ring-white/30 z-20 text-[#020d35]'
-                            : 'z-10'
-                        }`}
-                        animate={{ scale: scale }}
-                        transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                        style={isUnlocked ? {
-                          backgroundColor: tierColor,
-                          borderColor: isCurrent ? '#FFFFFF' : tierColor,
-                          boxShadow: isCurrent ? `0 0 15px ${tierColor}` : `0 0 5px ${tierColor}33`
-                        } : {
-                          backgroundColor: '#020d35',
-                          borderColor: 'rgba(255, 255, 255, 0.2)',
-                        }}
-                      >
-                        {React.cloneElement(tierIcon as React.ReactElement, { 
-                          size: isCurrent ? 11 : 9,
-                          className: isCurrent ? 'text-[#020d35]' : isUnlocked ? 'text-[#020d35]/60' : 'text-white/30'
-                        })}
-                      </motion.div>
-                      
-                      {/* Mini Label */}
-                      <motion.span 
-                        className={`text-[8px] mt-1.5 whitespace-nowrap ${
-                          isCurrent ? 'font-black' : 'font-bold'
-                        }`}
-                        animate={{ 
-                          scale: isCurrent ? 1.1 : 0.9,
-                          opacity: opacity
-                        }}
-                        transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                        style={{ 
-                          color: isCurrent 
-                            ? tierColor 
-                            : isUnlocked 
-                            ? `${tierColor}` 
-                            : 'rgba(255, 255, 255, 0.4)' 
-                        }}
-                      >
-                        {shortName}
-                      </motion.span>
-                    </motion.div>
-                  );
-                })}
+                {/* 4. Locked Connector Line (Dashed) */}
+                <div className="flex-1 mx-3 h-px border-t border-dashed border-white/20" />
+
+                {/* 5. Future Tiers Stack (Locked) */}
+                <div className="flex items-center shrink-0">
+                  {futureTiers.length > 0 && (
+                    <span className="text-[8px] font-black text-white/20 mr-2 uppercase tracking-wider">
+                      Locked
+                    </span>
+                  )}
+                  <div className="flex items-center -space-x-2">
+                    {futureTiers.map((tier, idx) => {
+                      const tierIcon = iconMap[tier.icon_name] || <PawPrint size={8} />;
+                      return (
+                        <div 
+                          key={tier.id || tier.tier_key} 
+                          className="w-6 h-6 rounded-full bg-[#020d35] border border-white/10 flex items-center justify-center relative"
+                          style={{ zIndex: idx }}
+                        >
+                          {React.cloneElement(tierIcon as React.ReactElement, { 
+                            size: 9,
+                            className: 'text-white/20'
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
               </div>
             </div>
 
