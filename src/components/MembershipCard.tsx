@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Crown, PawPrint, QrCode, Zap, Star, Diamond } from 'lucide-react';
+import { Crown, PawPrint, QrCode, Zap, Star, Diamond, Gem } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface MembershipCardProps {
@@ -14,11 +14,11 @@ interface MembershipCardProps {
 }
 
 const iconMap: Record<string, any> = {
-  PawPrint: <PawPrint size={12} />,
-  Star: <Star size={12} />,
-  Crown: <Crown size={12} />,
-  Gem: <Zap size={12} />,
-  Diamond: <Diamond size={12} />,
+  PawPrint: <PawPrint size={10} />,
+  Star: <Star size={10} />,
+  Crown: <Crown size={10} />,
+  Gem: <Gem size={10} />,
+  Diamond: <Diamond size={10} />,
 };
 
 const defaultTiers = [
@@ -31,24 +31,44 @@ const defaultTiers = [
 
 const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile, onShowQR, onTierClick, tiers }: MembershipCardProps) => {
   const activeTiers = tiers && tiers.length > 0 ? tiers : defaultTiers;
+  const sortedTiers = [...activeTiers].sort((a, b) => a.min_points - b.min_points);
+  const N = sortedTiers.length;
   
   // Calculate current tier based on lifetime accumulated points
-  const currentTier = [...activeTiers].reverse().find(t => totalAccumulatedPoints >= t.min_points) || activeTiers[0];
+  const currentTier = [...sortedTiers].reverse().find(t => totalAccumulatedPoints >= t.min_points) || sortedTiers[0];
   
   // Calculate next tier info
-  const nextTierIndex = activeTiers.findIndex(t => t.tier_key === currentTier.tier_key || t.id === currentTier.id) + 1;
-  const nextTier = activeTiers[nextTierIndex];
+  const nextTierIndex = sortedTiers.findIndex(t => t.tier_key === currentTier.tier_key || t.id === currentTier.id) + 1;
+  const nextTier = sortedTiers[nextTierIndex];
   
-  let progressPercentage = 100;
   let pointsNeeded = 0;
-  
   if (nextTier) {
     pointsNeeded = nextTier.min_points - totalAccumulatedPoints;
-    // Calculate progress as actual absolute ratio of current points to next goal
-    progressPercentage = Math.min(100, Math.max(0, (totalAccumulatedPoints / nextTier.min_points) * 100));
   }
 
-  const currentIcon = iconMap[currentTier.icon_name] || <PawPrint size={12} />;
+  // Calculate overall progress percentage across milestones
+  let overallProgress = 0;
+  if (N > 1) {
+    const lastTier = sortedTiers[N - 1];
+    if (totalAccumulatedPoints >= lastTier.min_points) {
+      overallProgress = 100;
+    } else {
+      // Find current segment
+      let segmentIndex = 0;
+      for (let i = 0; i < N - 1; i++) {
+        if (totalAccumulatedPoints >= sortedTiers[i].min_points && totalAccumulatedPoints < sortedTiers[i + 1].min_points) {
+          segmentIndex = i;
+          break;
+        }
+      }
+      const currentMin = sortedTiers[segmentIndex].min_points;
+      const nextMin = sortedTiers[segmentIndex + 1].min_points;
+      const segmentProgress = (totalAccumulatedPoints - currentMin) / (nextMin - currentMin);
+      overallProgress = ((segmentIndex + segmentProgress) / (N - 1)) * 100;
+    }
+  } else {
+    overallProgress = 100;
+  }
 
   return (
     <motion.div 
@@ -109,23 +129,60 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                 className="flex items-center gap-1 justify-end text-tertiary mb-0.5 cursor-pointer active:scale-95 transition-transform"
                 onClick={onTierClick}
               >
-                {React.cloneElement(currentIcon as React.ReactElement, { fill: "currentColor" })}
                 <span className="text-[9px] font-black uppercase tracking-widest">คะแนนสะสมทั้งหมด</span>
               </div>
               <p className="text-sm font-black text-white leading-none tracking-tighter">{totalAccumulatedPoints.toLocaleString()}</p>
             </div>
           </div>
 
-          {/* Progress Section */}
+          {/* Milestone Progress Section */}
           <div className="space-y-2">
-            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-              <motion.div 
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPercentage}%` }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-                className="bg-[#EAFD69] h-full rounded-full shadow-[0_0_12px_rgba(234,253,105,0.6)]"
-              />
+            <div className="relative pt-3 pb-1">
+              {/* Background Line */}
+              <div className="absolute left-[12px] right-[12px] top-[24px] -translate-y-1/2 h-1 bg-white/10 rounded-full z-0" />
+              
+              {/* Active Progress Line */}
+              <div className="absolute left-[12px] right-[12px] top-[24px] -translate-y-1/2 h-1 z-0 overflow-hidden rounded-full">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${overallProgress}%` }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                  className="h-full bg-[#EAFD69] rounded-full shadow-[0_0_12px_rgba(234,253,105,0.6)]"
+                />
+              </div>
+              
+              {/* Milestone Dots */}
+              <div className="relative z-10 flex justify-between items-center">
+                {sortedTiers.map((tier, index) => {
+                  const isUnlocked = totalAccumulatedPoints >= tier.min_points;
+                  const tierIcon = iconMap[tier.icon_name] || <PawPrint size={10} />;
+                  const shortName = tier.name.split(' ')[0];
+                  
+                  return (
+                    <div key={tier.id || tier.tier_key} className="flex flex-col items-center">
+                      {/* Dot */}
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
+                        isUnlocked 
+                          ? 'bg-[#EAFD69] border-[#EAFD69] text-[#020d35] scale-110 shadow-[0_0_10px_rgba(234,253,105,0.4)]' 
+                          : 'bg-[#020d35] border-white/20 text-white/40'
+                      }`}>
+                        {React.cloneElement(tierIcon as React.ReactElement, { 
+                          size: 10,
+                          className: isUnlocked ? 'text-[#020d35]' : 'text-white/40'
+                        })}
+                      </div>
+                      {/* Mini Label */}
+                      <span className={`text-[8px] font-black mt-1 transition-colors duration-500 ${
+                        isUnlocked ? 'text-[#EAFD69]' : 'text-white/30'
+                      }`}>
+                        {shortName}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
+
             <div className="flex justify-center items-center text-center">
               <p className="text-[11px] font-black text-white/70 uppercase tracking-tight">
                 {nextTier 
