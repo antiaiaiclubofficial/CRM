@@ -197,6 +197,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               <div className="relative z-10 flex justify-between items-center">
                 {sortedTiers.map((tier, index) => {
                   const isUnlocked = totalAccumulatedPoints >= tier.min_points;
+                  const isCurrent = currentTier.tier_key === tier.tier_key || currentTier.id === tier.id;
                   const tierIcon = iconMap[tier.icon_name] || <PawPrint size={10} />;
                   const shortName = tier.name.split(' ')[0];
                   const tierColor = getTierColor(tier);
@@ -206,25 +207,35 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                       {/* Dot */}
                       <div 
                         className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
-                          isUnlocked 
-                            ? 'scale-110 text-[#020d35]' 
-                            : 'bg-[#020d35] border-white/20 text-white/40'
+                          isCurrent
+                            ? 'scale-125 ring-4 ring-white/30 z-20 text-[#020d35]'
+                            : isUnlocked 
+                            ? 'scale-95 opacity-60 text-[#020d35] z-10' 
+                            : 'bg-[#020d35] border-white/20 text-white/30 scale-95 z-10'
                         }`}
                         style={isUnlocked ? {
                           backgroundColor: tierColor,
-                          borderColor: tierColor,
-                          boxShadow: `0 0 10px ${tierColor}66`
+                          borderColor: isCurrent ? '#FFFFFF' : tierColor,
+                          boxShadow: isCurrent ? `0 0 15px ${tierColor}` : `0 0 5px ${tierColor}33`
                         } : {}}
                       >
                         {React.cloneElement(tierIcon as React.ReactElement, { 
-                          size: 10,
-                          className: isUnlocked ? 'text-[#020d35]' : 'text-white/40'
+                          size: isCurrent ? 11 : 9,
+                          className: isUnlocked ? 'text-[#020d35]' : 'text-white/30'
                         })}
                       </div>
                       {/* Mini Label */}
                       <span 
-                        className="text-[8px] font-black mt-1 transition-colors duration-500"
-                        style={{ color: isUnlocked ? tierColor : 'rgba(255, 255, 255, 0.3)' }}
+                        className={`text-[8px] mt-1.5 transition-all duration-500 ${
+                          isCurrent ? 'font-black scale-110' : 'font-bold'
+                        }`}
+                        style={{ 
+                          color: isCurrent 
+                            ? tierColor 
+                            : isUnlocked 
+                            ? `${tierColor}99` 
+                            : 'rgba(255, 255, 255, 0.25)' 
+                        }}
                       >
                         {shortName}
                       </span>
