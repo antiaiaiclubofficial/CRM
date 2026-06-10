@@ -157,7 +157,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
 
           {/* Milestone Progress Section */}
           <div className="space-y-2 pt-1">
-            <div className="relative pt-2 pb-1">
+            <div className="relative pt-6 pb-1">
               {/* Milestone Stack Layout */}
               <div className="relative z-10 flex items-center justify-between w-full">
                 
@@ -182,8 +182,8 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                     })}
                   </div>
                   {pastTiers.length > 0 && (
-                    <span className="text-[8px] font-black text-white/40 ml-2 uppercase tracking-wider">
-                      Passed
+                    <span className="text-[8px] font-black text-white/50 ml-2 uppercase tracking-wider">
+                      Achieved
                     </span>
                   )}
                 </div>
@@ -201,8 +201,16 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                   />
                 </div>
 
-                {/* 3. Current Tier (Magnified Focus) */}
-                <div className="flex flex-col items-center shrink-0 z-20 scale-125 mx-1">
+                {/* 3. Current Tier (Magnified Focus with Absolute Label Above) */}
+                <div className="relative flex flex-col items-center shrink-0 z-20 scale-125 mx-1">
+                  {/* Absolute Label Above the Dot */}
+                  <span 
+                    className="absolute bottom-full mb-2 text-[8px] font-black uppercase tracking-wider whitespace-nowrap"
+                    style={{ color: currentTierColor }}
+                  >
+                    {currentTier.name.split(' ')[0]}
+                  </span>
+                  
                   <div 
                     className="w-7 h-7 rounded-full border-2 border-white ring-4 ring-white/30 flex items-center justify-center shadow-lg"
                     style={{ 
@@ -215,12 +223,6 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                       className: 'text-[#020d35]'
                     })}
                   </div>
-                  <span 
-                    className="text-[8px] mt-2 font-black uppercase tracking-wider"
-                    style={{ color: currentTierColor }}
-                  >
-                    {currentTier.name.split(' ')[0]}
-                  </span>
                 </div>
 
                 {/* 4. Locked Connector Line (Dashed) */}
