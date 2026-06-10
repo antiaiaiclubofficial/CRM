@@ -226,14 +226,16 @@ const PetHealthOverview = ({
           </div>
         </motion.div>
 
-        {/* Vaccine Dashboard Card */}
-        <div 
-          className="bg-white p-5 rounded-[2rem] shadow-ambient border border-black/5 flex flex-col justify-between gap-4 relative overflow-hidden"
+        {/* Vaccine Dashboard Card - Hoverable & Clickable Entire Card */}
+        <motion.div 
+          whileTap={{ scale: 0.99 }}
+          onClick={() => onActionClick('vaccine')}
+          className="bg-white p-5 rounded-[2rem] shadow-ambient border border-black/5 flex flex-col justify-between gap-4 cursor-pointer hover:border-primary/10 transition-all relative overflow-hidden group"
         >
           <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl pointer-events-none" />
           
           <div className="flex justify-between items-start relative z-10">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => onActionClick('vaccine')}>
+            <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-pink-50 rounded-xl flex items-center justify-center text-pink-500 shrink-0">
                 <Syringe size={20} />
               </div>
@@ -242,12 +244,9 @@ const PetHealthOverview = ({
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vaccination Status</p>
               </div>
             </div>
-            <button 
-              onClick={() => onActionClick('vaccine')}
-              className="w-8 h-8 bg-slate-50 rounded-full flex items-center justify-center text-primary/40 hover:bg-[#EAFD69] hover:text-primary transition-colors"
-            >
+            <div className="w-8 h-8 bg-slate-50 rounded-full flex items-center justify-center text-primary/40 group-hover:bg-[#EAFD69] group-hover:text-primary transition-colors">
               <ChevronRight size={14} strokeWidth={3} />
-            </button>
+            </div>
           </div>
 
           <div className="space-y-4 px-1 relative z-10">
@@ -276,9 +275,9 @@ const PetHealthOverview = ({
             <div className="relative pt-2 pb-0">
               {/* Background Line - Centered vertically at 16px (8px padding-top + 8px half of dot height) */}
               {/* Adjusted left/right to 12px (half of w-6 dot width) to perfectly align with dot centers */}
-              <div className="absolute left-[30px] right-[30px] top-[23px] -translate-y-1/5 h-1 bg-slate-100 rounded-full z-0" />
+              <div className="absolute left-[17px] right-[17px] top-[16px] -translate-y-1/5 h-1 bg-slate-100 rounded-full z-0" />
               {/* Active Progress Line - Centered vertically at 16px */}
-              <div className="absolute left-[30px] right-[30px] top-[23px] -translate-y-1/5 h-1 z-0 overflow-hidden rounded-full">
+              <div className="absolute left-[17px] right-[17px] top-[16px] -translate-y-1/5 h-1 z-0 overflow-hidden rounded-full">
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercentage}%` }}
@@ -297,7 +296,10 @@ const PetHealthOverview = ({
                   return (
                     <button 
                       key={step} 
-                      onClick={() => setSelectedMilestoneStep(step)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // ป้องกันการเปิดหน้าประวัติวัคซีนเมื่อกดเลือกเข็ม
+                        setSelectedMilestoneStep(step);
+                      }}
                       className="flex flex-col items-center flex-1 min-w-0 focus:outline-none group"
                     >
                       {/* Dot */}
@@ -371,7 +373,7 @@ const PetHealthOverview = ({
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
 
       </div>
 
