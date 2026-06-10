@@ -204,14 +204,14 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                   
                   return (
                     <div key={tier.id || tier.tier_key} className="flex flex-col items-center">
-                      {/* Dot */}
+                      {/* Dot - Solid background to block the progress line behind it */}
                       <div 
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
+                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 opacity-100 ${
                           isCurrent
                             ? 'scale-125 ring-4 ring-white/30 z-20 text-[#020d35]'
                             : isUnlocked 
-                            ? 'scale-95 opacity-60 text-[#020d35] z-10' 
-                            : 'bg-[#020d35] border-white/20 text-white/30 scale-95 z-10'
+                            ? 'scale-90 z-10 text-[#020d35]/60' 
+                            : 'bg-[#020d35] border-white/20 text-white/30 scale-90 z-10'
                         }`}
                         style={isUnlocked ? {
                           backgroundColor: tierColor,
@@ -221,7 +221,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                       >
                         {React.cloneElement(tierIcon as React.ReactElement, { 
                           size: isCurrent ? 11 : 9,
-                          className: isUnlocked ? 'text-[#020d35]' : 'text-white/30'
+                          className: isCurrent ? 'text-[#020d35]' : isUnlocked ? 'text-[#020d35]/60' : 'text-white/30'
                         })}
                       </div>
                       {/* Mini Label */}
