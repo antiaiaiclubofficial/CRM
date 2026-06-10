@@ -22,12 +22,25 @@ const iconMap: Record<string, any> = {
 };
 
 const defaultTiers = [
-  { id: 'bronze', name: 'Bronze Tier', min_points: 0, icon_name: 'PawPrint' },
-  { id: 'silver', name: 'Silver Tier', min_points: 300, icon_name: 'Star' },
-  { id: 'gold', name: 'Gold Tier', min_points: 700, icon_name: 'Crown' },
-  { id: 'platinum', name: 'Platinum Tier', min_points: 1000, icon_name: 'Gem' },
-  { id: 'vip', name: 'VIP Tier', min_points: 2000, icon_name: 'Diamond' },
+  { id: 'bronze', name: 'Bronze Tier', min_points: 0, icon_name: 'PawPrint', color_class: 'bg-[#FFD8E4]' },
+  { id: 'silver', name: 'Silver Tier', min_points: 300, icon_name: 'Star', color_class: 'bg-[#B2F2BB]' },
+  { id: 'gold', name: 'Gold Tier', min_points: 700, icon_name: 'Crown', color_class: 'bg-[#FFE3BC]' },
+  { id: 'platinum', name: 'Platinum Tier', min_points: 1000, icon_name: 'Gem', color_class: 'bg-[#BBDEFB]' },
+  { id: 'vip', name: 'VIP Tier', min_points: 2000, icon_name: 'Diamond', color_class: 'bg-[#E1BEE7]' },
 ];
+
+const getTierColor = (tier: any) => {
+  const key = (tier.tier_key || tier.id || '').toLowerCase();
+  if (key.includes('bronze')) return '#FFD8E4';
+  if (key.includes('silver')) return '#B2F2BB';
+  if (key.includes('gold')) return '#FFE3BC';
+  if (key.includes('platinum')) return '#BBDEFB';
+  if (key.includes('vip')) return '#E1BEE7';
+  
+  // Fallback: try to parse hex from color_class (e.g. bg-[#FFD8E4])
+  const match = tier.color_class?.match(/#([A-Fa-f0-9]{6})/);
+  return match ? `#${match[1]}` : '#EAFD69';
+};
 
 const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile, onShowQR, onTierClick, tiers }: MembershipCardProps) => {
   const activeTiers = tiers && tiers.length > 0 ? tiers : defaultTiers;
@@ -69,6 +82,8 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
   } else {
     overallProgress = 100;
   }
+
+  const currentTierColor = getTierColor(currentTier);
 
   return (
     <motion.div 
@@ -147,7 +162,11 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                   initial={{ width: 0 }}
                   animate={{ width: `${overallProgress}%` }}
                   transition={{ duration: 1.5, ease: "easeOut" }}
-                  className="h-full bg-[#EAFD69] rounded-full shadow-[0_0_12px_rgba(234,253,105,0.6)]"
+                  className="h-full rounded-full"
+                  style={{ 
+                    backgroundColor: currentTierColor,
+                    boxShadow: `0 0 12px ${currentTierColor}99`
+                  }}
                 />
               </div>
               
@@ -157,24 +176,33 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                   const isUnlocked = totalAccumulatedPoints >= tier.min_points;
                   const tierIcon = iconMap[tier.icon_name] || <PawPrint size={10} />;
                   const shortName = tier.name.split(' ')[0];
+                  const tierColor = getTierColor(tier);
                   
                   return (
                     <div key={tier.id || tier.tier_key} className="flex flex-col items-center">
                       {/* Dot */}
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
-                        isUnlocked 
-                          ? 'bg-[#EAFD69] border-[#EAFD69] text-[#020d35] scale-110 shadow-[0_0_10px_rgba(234,253,105,0.4)]' 
-                          : 'bg-[#020d35] border-white/20 text-white/40'
-                      }`}>
+                      <div 
+                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
+                          isUnlocked 
+                            ? 'scale-110 text-[#020d35]' 
+                            : 'bg-[#020d35] border-white/20 text-white/40'
+                        }`}
+                        style={isUnlocked ? {
+                          backgroundColor: tierColor,
+                          borderColor: tierColor,
+                          boxShadow: `0 0 10px ${tierColor}66`
+                        } : {}}
+                      >
                         {React.cloneElement(tierIcon as React.ReactElement, { 
                           size: 10,
                           className: isUnlocked ? 'text-[#020d35]' : 'text-white/40'
                         })}
                       </div>
                       {/* Mini Label */}
-                      <span className={`text-[8px] font-black mt-1 transition-colors duration-500 ${
-                        isUnlocked ? 'text-[#EAFD69]' : 'text-white/30'
-                      }`}>
+                      <span 
+                        className="text-[8px] font-black mt-1 transition-colors duration-500"
+                        style={{ color: isUnlocked ? tierColor : 'rgba(255, 255, 255, 0.3)' }}
+                      >
                         {shortName}
                       </span>
                     </div>
