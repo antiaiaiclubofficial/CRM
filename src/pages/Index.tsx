@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useLiff } from '@/hooks/use-liff';
+import { useLiff } from '@/contexts/LiffContext';
 import MembershipCard from '@/components/MembershipCard';
 import PetList from '@/components/PetList';
 import PetDetailView from '@/components/PetDetailView';
@@ -40,7 +40,7 @@ const getLocalDateString = (date = new Date()) => {
 
 const Index = () => {
   const queryClient = useQueryClient();
-  const { profile: lineProfile, loading: liffLoading } = useLiff();
+  const { liffProfile: lineProfile, isLoading: liffLoading } = useLiff();
   const [activeTab, setActiveTab] = useState('home');
   const [promoSubTab, setPromoSubTab] = useState<'redeem' | 'my-coupons' | 'my-packages'>('redeem');
   const [historySubTab, setHistorySubTab] = useState<'services' | 'points'>('services');
