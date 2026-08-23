@@ -40,7 +40,7 @@ const getLocalDateString = (date = new Date()) => {
 
 const Index = () => {
   const queryClient = useQueryClient();
-  const { liffProfile: lineProfile, isLoading: liffLoading } = useLiff();
+  const { liffProfile: lineProfile, store: contextStore, customer: contextCustomer, isLoading: liffLoading } = useLiff();
   const [activeTab, setActiveTab] = useState('home');
   const [promoSubTab, setPromoSubTab] = useState<'redeem' | 'my-coupons' | 'my-packages'>('redeem');
   const [historySubTab, setHistorySubTab] = useState<'services' | 'points'>('services');
@@ -78,14 +78,8 @@ const Index = () => {
     return () => scrollContainer?.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const { data: store, isLoading: storeLoading } = useQuery({
-    queryKey: ['current_store'],
-    queryFn: async () => {
-      const targetStoreId = 'b0f3c613-f742-4c86-951a-eaa65c8b1667';
-      const { data } = await supabase.from('stores').select('*').eq('id', targetStoreId).maybeSingle();
-      return data;
-    }
-  });
+  const store = contextStore;
+  const storeLoading = liffLoading;
 
   // ดึงข้อมูลระดับสมาชิก (Membership Tiers) จากฐานข้อมูล
   const { data: membershipTiers, isLoading: tiersLoading } = useQuery({
@@ -105,12 +99,11 @@ const Index = () => {
   });
 
   const { data: customerData, isLoading: profileLoading } = useQuery({
-    queryKey: ['customer_profile', lineProfile?.userId, store?.id],
+    queryKey: ['customer_profile', contextCustomer?.id, store?.id],
     queryFn: async () => {
-      if (!lineProfile?.userId || !store?.id) return null;
+      if (!contextCustomer?.id || !store?.id) return null;
       
-      const { data: customer } = await supabase.from('customers').select('*').eq('line_user_id', lineProfile.userId).maybeSingle();
-      if (!customer) return null;
+      const customer = contextCustomer;
 
       const { data: membership } = await supabase.from('store_customers').select('*').eq('customer_id', customer.id).eq('store_id', store.id).maybeSingle();
       const { data: petsData } = await supabase.from('pets').select('*').eq('customer_id', customer.id).order('is_favorite', { ascending: false }).order('created_at', { ascending: true });
