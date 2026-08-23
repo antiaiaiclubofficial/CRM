@@ -6,35 +6,38 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const RegisterPage = () => {
-  const { store, liffProfile } = useLiff();
+  const { store, liffProfile, customer, membershipStatus } = useLiff();
   const navigate = useNavigate();
 
   const handleSave = async (formData: any) => {
     if (!store || !liffProfile) return;
     
     try {
-      // 1. ตรวจสอบว่ามี customer นี้ในระบบหรือยัง
-      let customerId;
-      const { data: existingCustomer } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('line_user_id', liffProfile.userId)
-        .single();
-        
-      if (existingCustomer) {
-        customerId = existingCustomer.id;
+      let customerId = customer?.id;
+      
+      if (membershipStatus === 'global_user' && customerId) {
         // อัปเดตข้อมูลเพิ่มเติม
         await supabase
           .from('customers')
           .update({
             first_name: formData.firstName,
             last_name: formData.lastName,
+            gender: formData.gender,
+            age: formData.age,
             phone: formData.phone,
             email: formData.email,
+            house_no: formData.houseNo,
+            moo: formData.moo,
+            soi: formData.soi,
+            road: formData.road,
+            sub_district: formData.subDistrict,
+            district: formData.district,
+            province: formData.province,
+            postal_code: formData.postalCode,
           })
           .eq('id', customerId);
       } else {
-        // สร้าง customer ใหม่
+        // สร้าง customer ใหม่ (สำหรับ guest)
         const { data: newCustomer, error: createError } = await supabase
           .from('customers')
           .insert({
@@ -94,13 +97,20 @@ const RegisterPage = () => {
         <h1 className="text-xl font-bold text-gray-900">{store.name}</h1>
       </header>
       
-      <main className="flex-1 w-full max-w-md mx-auto">
+      <main className="flex-1 w-full max-w-md mx-auto relative z-10 p-4">
+        {membershipStatus === 'global_user' && (
+          <div className="bg-blue-50 border border-blue-100 text-blue-800 p-4 rounded-xl mb-4 text-sm shadow-sm">
+            <p className="font-semibold mb-1">พบข้อมูลของคุณในระบบแล้ว! 🎉</p>
+            <p>คุณสามารถตรวจสอบความถูกต้องของข้อมูลด้านล่าง และกดยืนยันเพื่อสมัครเป็นสมาชิกของ {store.name} ได้ทันทีเลยครับ</p>
+          </div>
+        )}
         <Register 
           lineProfile={{
             ...liffProfile,
             phone: liffProfile.phone || '', // ถ้ามี
             email: liffProfile.email || '', // ถ้ามี
           }} 
+          initialData={customer}
           onSave={handleSave} 
           onSuccess={handleSuccess} 
         />

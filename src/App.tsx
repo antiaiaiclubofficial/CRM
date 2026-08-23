@@ -13,7 +13,7 @@ import { LiffError } from "@/components/auth/LiffError";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { isLoading, error, isMember } = useLiff();
+  const { isLoading, error, membershipStatus } = useLiff();
 
   if (isLoading) {
     return <LiffLoading />;
@@ -26,8 +26,8 @@ const AppContent = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={isMember ? <Index /> : <Navigate to="/register" replace />} />
-        <Route path="/register" element={!isMember ? <RegisterPage /> : <Navigate to="/" replace />} />
+        <Route path="/" element={membershipStatus === 'store_member' ? <Index /> : <Navigate to="/register" replace />} />
+        <Route path="/register" element={membershipStatus !== 'store_member' ? <RegisterPage /> : <Navigate to="/" replace />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

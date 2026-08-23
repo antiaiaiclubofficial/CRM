@@ -3,11 +3,13 @@ import liff from "@line/liff";
 import { supabase } from "@/integrations/supabase/client";
 import { Store, Customer } from "@/types";
 
+export type MembershipStatus = 'guest' | 'global_user' | 'store_member';
+
 interface LiffContextType {
   store: Store | null;
   liffProfile: any | null;
   customer: Customer | null;
-  isMember: boolean;
+  membershipStatus: MembershipStatus;
   isLoading: boolean;
   error: string | null;
 }
@@ -18,7 +20,7 @@ export const LiffProvider = ({ children }: { children: ReactNode }) => {
   const [store, setStore] = useState<Store | null>(null);
   const [liffProfile, setLiffProfile] = useState<any | null>(null);
   const [customer, setCustomer] = useState<Customer | null>(null);
-  const [isMember, setIsMember] = useState<boolean>(false);
+  const [membershipStatus, setMembershipStatus] = useState<MembershipStatus>('guest');
   
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,6 +82,7 @@ export const LiffProvider = ({ children }: { children: ReactNode }) => {
           .single();
 
         if (customerData) {
+          setCustomer(customerData as Customer);
           // ถ้าเจอใน customers ให้เช็คว่าเชื่อมกับร้านนี้หรือยัง (store_customers)
           const { data: storeCustomerLink } = await supabase
             .from("store_customers")
@@ -89,14 +92,13 @@ export const LiffProvider = ({ children }: { children: ReactNode }) => {
             .single();
 
           if (storeCustomerLink) {
-            setCustomer(customerData as Customer);
-            setIsMember(true);
+            setMembershipStatus('store_member');
           } else {
-            setIsMember(false);
+            setMembershipStatus('global_user');
           }
         } else {
           // ไม่เคยมีประวัติในระบบ customers เลย
-          setIsMember(false);
+          setMembershipStatus('guest');
         }
 
         setIsLoading(false);
@@ -111,7 +113,7 @@ export const LiffProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <LiffContext.Provider value={{ store, liffProfile, customer, isMember, isLoading, error }}>
+    <LiffContext.Provider value={{ store, liffProfile, customer, membershipStatus, isLoading, error }}>
       {children}
     </LiffContext.Provider>
   );

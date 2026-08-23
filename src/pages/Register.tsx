@@ -7,26 +7,27 @@ import { toast } from 'sonner';
 
 interface RegisterProps {
   lineProfile: any;
+  initialData?: any;
   onSuccess: () => void;
   onSave: (data: any) => Promise<void>;
 }
 
-const Register = ({ lineProfile, onSuccess, onSave }: RegisterProps) => {
+const Register = ({ lineProfile, initialData, onSuccess, onSave }: RegisterProps) => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    gender: 'หญิง',
-    age: '',
-    phone: lineProfile?.phone || '',
-    email: lineProfile?.email || '',
-    houseNo: '',
-    moo: '',
-    soi: '',
-    road: '',
-    subDistrict: '',
-    district: '',
-    province: '',
-    postalCode: '',
+    firstName: initialData?.first_name || '',
+    lastName: initialData?.last_name || '',
+    gender: initialData?.gender || 'หญิง',
+    age: initialData?.age || '',
+    phone: initialData?.phone || lineProfile?.phone || '',
+    email: initialData?.email || lineProfile?.email || '',
+    houseNo: initialData?.house_no || '',
+    moo: initialData?.moo || '',
+    soi: initialData?.soi || '',
+    road: initialData?.road || '',
+    subDistrict: initialData?.sub_district || '',
+    district: initialData?.district || '',
+    province: initialData?.province || '',
+    postalCode: initialData?.postal_code || '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
