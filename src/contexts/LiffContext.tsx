@@ -73,31 +73,19 @@ export const LiffProvider = ({ children }: { children: ReactNode }) => {
         const profile = await liff.getProfile();
         setLiffProfile(profile);
 
-        // 4. ตรวจสอบการเป็นสมาชิกของร้านค้านี้
-        // ค้นหา customer_id จาก table customers โดยใช้ line_user_id
-        const { data: customerData } = await supabase
-          .from("customers")
-          .select("*")
+        // 4. ตรวจสอบการเป็นสมาชิกของร้านค้านี้ โดยค้นหาจาก store_customers ด้วย line_user_id ที่ผูกไว้
+        const { data: storeCustomerLink } = await supabase
+          .from("store_customers")
+          .select("*, customers(*)")
           .eq("line_user_id", profile.userId)
+          .eq("store_id", storeData.id)
           .single();
 
-        if (customerData) {
-          setCustomer(customerData as Customer);
-          // ถ้าเจอใน customers ให้เช็คว่าเชื่อมกับร้านนี้หรือยัง (store_customers)
-          const { data: storeCustomerLink } = await supabase
-            .from("store_customers")
-            .select("*")
-            .eq("store_id", storeData.id)
-            .eq("customer_id", customerData.id)
-            .single();
-
-          if (storeCustomerLink) {
-            setMembershipStatus('store_member');
-          } else {
-            setMembershipStatus('global_user');
-          }
+        if (storeCustomerLink && storeCustomerLink.customers) {
+          setCustomer(storeCustomerLink.customers as Customer);
+          setMembershipStatus('store_member');
         } else {
-          // ไม่เคยมีประวัติในระบบ customers เลย
+          // ไม่พบใน store_customers (ยังไม่เป็นสมาชิกของร้านนี้ หรือมาใหม่เลย)
           setMembershipStatus('guest');
         }
 
