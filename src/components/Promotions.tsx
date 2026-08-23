@@ -365,21 +365,22 @@ const Promotions = ({
               </div>
             )}
 
-            {/* Exclusive Deals Section */}
+
+            {/* Special Promotions Section (Using Deals Data) */}
             {dealTemplates.length > 0 && (
               <div className="space-y-5">
                 <div className="flex items-center justify-between px-1">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 bg-[#EAFD69]/10 rounded-xl flex items-center justify-center text-[#020d35]">
-                      <Zap size={18} className="fill-[#EAFD69] text-[#020d35]" />
+                    <div className="w-9 h-9 bg-[#d9d6fe] rounded-xl flex items-center justify-center text-[#5c5b7d]">
+                      <Tag size={18} />
                     </div>
                     <div>
-                      <h2 className="text-lg font-black text-[#020d35] tracking-tight">ดีลสุดพิเศษสำหรับคุณ</h2>
-                      <p className="text-[10px] font-bold text-[#45464E] opacity-50 uppercase tracking-widest">Exclusive Hot Deals</p>
+                      <h2 className="text-lg font-black text-[#020d35] tracking-tight">โปรโมชั่นพิเศษ</h2>
+                      <p className="text-[10px] font-bold text-[#45464E] opacity-50 uppercase tracking-widest">Special Offers</p>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 px-1">
                   {dealTemplates.map((deal) => {
                     const isCollected = collectedCoupons.some(c => c.template_id === deal.id && c.is_deal);
@@ -391,13 +392,12 @@ const Promotions = ({
                           isCollected ? 'opacity-50' : ''
                         }`}
                       >
-                        {/* Soft glow background */}
-                        <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-[#EAFD69]/10 rounded-full blur-2xl" />
+                        <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-[#d9d6fe]/10 rounded-full blur-2xl" />
                         
                         <div className="relative z-10">
                           <div className="flex justify-between items-center mb-3">
-                            <span className="text-[9px] font-black text-[#020d35] bg-[#EAFD69] px-3 py-1 rounded-full uppercase tracking-wider">
-                              HOT DEAL
+                            <span className="text-[9px] font-black text-[#5c5b7d] bg-[#d9d6fe] px-3 py-1 rounded-full uppercase tracking-wider">
+                              PROMO
                             </span>
                             <span className="text-[10px] font-black text-[#020d35] bg-slate-100 px-3 py-1 rounded-full">
                               {deal.pointsRequired} pts
@@ -413,7 +413,7 @@ const Promotions = ({
                         
                         <div className="relative z-10 flex justify-between items-center pt-3 border-t border-slate-50">
                           <span className="text-[9px] font-bold text-[#45464E]/50 flex items-center gap-1">
-                            <Clock size={10} /> Exp: {deal.expiry}
+                            <Clock size={10} /> Valid: {deal.expiry}
                           </span>
                           <button 
                             onClick={() => onBuyDeal(deal, deal.pointsRequired)}
@@ -426,70 +426,7 @@ const Promotions = ({
                                 : 'bg-gradient-to-br from-[#18234a] to-[#020d35] text-white active:scale-95'
                             }`}
                           >
-                            {isCollected ? 'ซื้อแล้ว' : userPoints < deal.pointsRequired ? 'คะแนนไม่พอ' : 'ซื้อดีลนี้'}
-                          </button>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Special Promotions Section */}
-            {specialPromos.length > 0 && (
-              <div className="space-y-5">
-                <div className="flex items-center justify-between px-1">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 bg-[#d9d6fe] rounded-xl flex items-center justify-center text-[#5c5b7d]">
-                      <Tag size={18} />
-                    </div>
-                    <div>
-                      <h2 className="text-lg font-black text-[#020d35] tracking-tight">โปรโมชั่นพิเศษ</h2>
-                      <p className="text-[10px] font-bold text-[#45464E] opacity-50 uppercase tracking-widest">Special Offers</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 px-1">
-                  {specialPromos.map((promo) => {
-                    const isCollected = collectedCoupons.some(c => c.template_id === promo.id && !c.is_deal);
-                    return (
-                      <motion.div
-                        key={promo.id}
-                        whileTap={{ scale: isCollected ? 1 : 0.98 }}
-                        className={`relative flex-shrink-0 w-[280px] bg-white rounded-[2.5rem] p-6 overflow-hidden shadow-ambient border border-black/5 flex flex-col justify-between h-44 transition-all ${
-                          isCollected ? 'opacity-50' : ''
-                        }`}
-                      >
-                        <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-[#d9d6fe]/10 rounded-full blur-2xl" />
-                        
-                        <div className="relative z-10">
-                          <span className="text-[9px] font-black text-[#5c5b7d] bg-[#d9d6fe] px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">
-                            PROMO
-                          </span>
-                          <h3 className="text-sm font-black text-[#020d35] leading-tight truncate">
-                            {promo.title}
-                          </h3>
-                          <p className="text-[11px] font-bold text-[#45464E] opacity-70 mt-1.5 line-clamp-1">
-                            {promo.description}
-                          </p>
-                        </div>
-                        
-                        <div className="relative z-10 flex justify-between items-center pt-3 border-t border-slate-50">
-                          <span className="text-[9px] font-bold text-[#45464E]/50 flex items-center gap-1">
-                            <Clock size={10} /> Valid: {promo.expiry}
-                          </span>
-                          <button 
-                            onClick={() => onRedeemCoupon(promo, 0)}
-                            disabled={isCollected}
-                            className={`text-[10px] font-black px-4 py-2 rounded-full transition-all shadow-sm ${
-                              isCollected
-                                ? 'bg-slate-100 text-slate-400'
-                                : 'bg-gradient-to-br from-[#18234a] to-[#020d35] text-white active:scale-95'
-                            }`}
-                          >
-                            {isCollected ? 'เก็บแล้ว' : 'เก็บโปรโมชั่น'}
+                            {isCollected ? 'ซื้อแล้ว' : userPoints < deal.pointsRequired ? 'คะแนนไม่พอ' : 'แลกโปรนี้'}
                           </button>
                         </div>
                       </motion.div>

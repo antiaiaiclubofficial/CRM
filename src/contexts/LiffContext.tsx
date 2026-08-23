@@ -37,6 +37,11 @@ export const LiffProvider = ({ children }: { children: ReactNode }) => {
           liffId = sessionStorage.getItem("current_liff_id");
         }
         
+        // ถ้ารันบน Localhost และยังไม่มี liffId ให้จำลองร้าน Mellow Fellow Test ไปเลย จะได้เข้าดูหน้าเว็บได้ง่ายๆ
+        if (!liffId && (import.meta.env.DEV || window.location.hostname === 'localhost')) {
+          liffId = '2009880118-LZxzQe3c';
+        }
+
         if (!liffId) {
           throw new Error("ไม่พบข้อมูลร้านค้า กรุณาติดต่อร้านค้า");
         }
@@ -61,17 +66,29 @@ export const LiffProvider = ({ children }: { children: ReactNode }) => {
 
         setStore(storeData as Store);
 
-        // 3. Initialize LINE LIFF SDK
-        await liff.init({ liffId: storeData.liff_id });
-        
-        if (!liff.isLoggedIn()) {
-          // ถ้าเปิดผ่าน Browser ภายนอก จะต้องทำการ Login
-          liff.login();
-          return; // หยุดการทำงานชั่วคราว รอ redirect กลับมา
-        }
+        let profile;
 
-        const profile = await liff.getProfile();
-        setLiffProfile(profile);
+        if (import.meta.env.DEV || window.location.hostname === 'localhost') {
+          // โหมด Localhost ข้ามการ Login LINE และจำลองโปรไฟล์ นวล สุนัขสกุล
+          profile = {
+            userId: 'U1234567890abcdef',
+            displayName: 'นวล สุนัขสกุล (Local)',
+            pictureUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'
+          };
+          setLiffProfile(profile);
+        } else {
+          // 3. Initialize LINE LIFF SDK (สำหรับ Production)
+          await liff.init({ liffId: storeData.liff_id });
+          
+          if (!liff.isLoggedIn()) {
+            // ถ้าเปิดผ่าน Browser ภายนอก จะต้องทำการ Login
+            liff.login();
+            return; // หยุดการทำงานชั่วคราว รอ redirect กลับมา
+          }
+
+          profile = await liff.getProfile();
+          setLiffProfile(profile);
+        }
 
         // 4. ตรวจสอบการเป็นสมาชิกของร้านค้านี้ โดยค้นหาจาก store_customers ด้วย line_user_id ที่ผูกไว้
         const { data: storeCustomerLink } = await supabase

@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Phone, MapPin, Mail, Check, Home, Sparkles } from 'lucide-react';
+import { searchAddressByDistrict, searchAddressByAmphoe, searchAddressByProvince, searchAddressByZipcode } from 'thai-address-database';
 
 interface OwnerProfile {
   firstName: string;
@@ -35,6 +36,39 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
   });
   
   const [formData, setFormData] = React.useState(profile);
+  
+  // Thai Address Auto-suggest state
+  const [suggestions, setSuggestions] = React.useState<any[]>([]);
+  const [activeField, setActiveField] = React.useState<string | null>(null);
+
+  const handleAddressChange = (field: 'subDistrict' | 'district' | 'province' | 'postalCode', value: string) => {
+    setFormData({ ...formData, [field]: value });
+    
+    if (!value) {
+      setSuggestions([]);
+      return;
+    }
+
+    let results = [];
+    if (field === 'subDistrict') results = searchAddressByDistrict(value);
+    else if (field === 'district') results = searchAddressByAmphoe(value);
+    else if (field === 'province') results = searchAddressByProvince(value);
+    else if (field === 'postalCode') results = searchAddressByZipcode(value);
+
+    setSuggestions(results.slice(0, 5)); // Limit to 5 suggestions
+  };
+
+  const handleSelectSuggestion = (suggestion: any) => {
+    setFormData({
+      ...formData,
+      subDistrict: suggestion.district,
+      district: suggestion.amphoe,
+      province: suggestion.province,
+      postalCode: suggestion.zipcode.toString()
+    });
+    setSuggestions([]);
+    setActiveField(null);
+  };
 
   // Helper to parse the address string into parts
   const parseAddress = (addressStr: string) => {
@@ -223,8 +257,8 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1 flex items-center gap-1">
-                      <Home size={10} className="text-emerald-500" /> เลขที่บ้าน
+                    <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">
+                      <Home size={10} className="text-emerald-500 inline-block align-text-top mr-1" /> เลขที่บ้าน
                     </label>
                     <input 
                       type="text" 
@@ -270,48 +304,104 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 relative">
                     <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">แขวง / ตำบล</label>
                     <input 
                       type="text" 
                       value={formData.subDistrict}
-                      onChange={(e) => setFormData({...formData, subDistrict: e.target.value})}
+                      onChange={(e) => handleAddressChange('subDistrict', e.target.value)}
+                      onFocus={() => { setActiveField('subDistrict'); handleAddressChange('subDistrict', formData.subDistrict); }}
+                      onBlur={() => setTimeout(() => setActiveField(null), 200)}
                       placeholder="ตำบล"
                       className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
+                    <AnimatePresence>
+                      {activeField === 'subDistrict' && suggestions.length > 0 && (
+                        <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute top-[calc(100%+4px)] left-0 right-0 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden z-[60]">
+                          {suggestions.map((s, i) => (
+                            <div key={i} onClick={() => handleSelectSuggestion(s)} className="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0">
+                               <p className="text-xs font-bold text-[#020d35]">{s.district} » {s.amphoe} » {s.province}</p>
+                               <p className="text-[10px] text-slate-400">{s.zipcode}</p>
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 relative">
                     <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">เขต / อำเภอ</label>
                     <input 
                       type="text" 
                       value={formData.district}
-                      onChange={(e) => setFormData({...formData, district: e.target.value})}
+                      onChange={(e) => handleAddressChange('district', e.target.value)}
+                      onFocus={() => { setActiveField('district'); handleAddressChange('district', formData.district); }}
+                      onBlur={() => setTimeout(() => setActiveField(null), 200)}
                       placeholder="อำเภอ"
                       className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
+                    <AnimatePresence>
+                      {activeField === 'district' && suggestions.length > 0 && (
+                        <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute top-[calc(100%+4px)] left-0 right-0 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden z-[60]">
+                          {suggestions.map((s, i) => (
+                            <div key={i} onClick={() => handleSelectSuggestion(s)} className="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0">
+                               <p className="text-xs font-bold text-[#020d35]">{s.district} » {s.amphoe} » {s.province}</p>
+                               <p className="text-[10px] text-slate-400">{s.zipcode}</p>
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 relative">
                     <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">จังหวัด</label>
                     <input 
                       type="text" 
                       value={formData.province}
-                      onChange={(e) => setFormData({...formData, province: e.target.value})}
+                      onChange={(e) => handleAddressChange('province', e.target.value)}
+                      onFocus={() => { setActiveField('province'); handleAddressChange('province', formData.province); }}
+                      onBlur={() => setTimeout(() => setActiveField(null), 200)}
                       placeholder="จังหวัด"
                       className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
+                    <AnimatePresence>
+                      {activeField === 'province' && suggestions.length > 0 && (
+                        <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute top-[calc(100%+4px)] left-0 right-0 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden z-[60]">
+                          {suggestions.map((s, i) => (
+                            <div key={i} onClick={() => handleSelectSuggestion(s)} className="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0">
+                               <p className="text-xs font-bold text-[#020d35]">{s.district} » {s.amphoe} » {s.province}</p>
+                               <p className="text-[10px] text-slate-400">{s.zipcode}</p>
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 relative">
                     <label className="text-[10px] font-black text-[#45464E] opacity-60 uppercase tracking-widest px-1">รหัสไปรษณีย์</label>
                     <input 
                       type="text" 
                       value={formData.postalCode}
-                      onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
+                      onChange={(e) => handleAddressChange('postalCode', e.target.value)}
+                      onFocus={() => { setActiveField('postalCode'); handleAddressChange('postalCode', formData.postalCode); }}
+                      onBlur={() => setTimeout(() => setActiveField(null), 200)}
                       placeholder="10XXX"
                       className="w-full p-4 bg-[#F3F3F3]/60 focus:bg-white rounded-2xl border-none focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-bold text-[#020d35] transition-all"
                     />
+                    <AnimatePresence>
+                      {activeField === 'postalCode' && suggestions.length > 0 && (
+                        <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute top-[calc(100%+4px)] right-0 w-[200%] max-w-[280px] bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden z-[60]">
+                          {suggestions.map((s, i) => (
+                            <div key={i} onClick={() => handleSelectSuggestion(s)} className="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0">
+                               <p className="text-xs font-bold text-[#020d35]">{s.district} » {s.amphoe} » {s.province}</p>
+                               <p className="text-[10px] text-slate-400">{s.zipcode}</p>
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>

@@ -21,7 +21,7 @@ const Register = ({ lineProfile, initialData, onSuccess, onSave }: RegisterProps
     phone: initialData?.phone || lineProfile?.phone || '',
     email: initialData?.email || lineProfile?.email || '',
     houseNo: initialData?.house_no || '',
-    moo: initialData?.moo || '',
+    moo: initialData?.village_no || '',
     soi: initialData?.soi || '',
     road: initialData?.road || '',
     subDistrict: initialData?.sub_district || '',

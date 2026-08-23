@@ -46,13 +46,14 @@ const RegisterPage = () => {
           phone: formData.phone,
           email: formData.email,
           house_no: formData.houseNo,
-          moo: formData.moo,
+          village_no: formData.moo,
           soi: formData.soi,
           road: formData.road,
           sub_district: formData.subDistrict,
           district: formData.district,
           province: formData.province,
           postal_code: formData.postalCode,
+          address: formData.address,
         })
         .select()
         .single();
@@ -109,13 +110,14 @@ const RegisterPage = () => {
           age: pendingFormData.age,
           email: pendingFormData.email,
           house_no: pendingFormData.houseNo,
-          moo: pendingFormData.moo,
+          village_no: pendingFormData.moo,
           soi: pendingFormData.soi,
           road: pendingFormData.road,
           sub_district: pendingFormData.subDistrict,
           district: pendingFormData.district,
           province: pendingFormData.province,
           postal_code: pendingFormData.postalCode,
+          address: pendingFormData.address,
         })
         .eq('id', foundCustomer.id);
 

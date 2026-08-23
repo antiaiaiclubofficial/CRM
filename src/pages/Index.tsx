@@ -146,7 +146,7 @@ const Index = () => {
       }));
 
       const { data: coupons } = await supabase.from('customer_coupons').select('*, coupon_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).eq('status', 'unused');
-      const { data: deals } = await supabase.from('customers_deals').select('*, deal_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).eq('status', 'unused');
+      const { data: deals } = await supabase.from('customers_deals').select('*, promotion_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).eq('status', 'unused');
       
       const { data: appointmentsData } = await supabase.from('appointments').select('*, pets(name, image_url, breed), services(name, price)').eq('customer_id', customer.id).order('start_time', { ascending: true });
 
@@ -226,11 +226,11 @@ const Index = () => {
         })),
         ...(deals || []).map(d => ({
           ...d,
-          title: d.deal_templates?.title,
-          description: d.deal_templates?.description,
-          iconName: d.deal_templates?.icon_name,
-          bg: d.deal_templates?.bg_color,
-          pointsRequired: d.deal_templates?.points_required,
+          title: d.promotion_templates?.title,
+          description: d.promotion_templates?.description,
+          iconName: d.promotion_templates?.icon_name,
+          bg: d.promotion_templates?.bg_color,
+          pointsRequired: d.promotion_templates?.points_required,
           expiry: new Date(d.expires_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
           is_deal: true
         }))
@@ -296,10 +296,10 @@ const Index = () => {
   });
 
   const { data: dealTemplates } = useQuery({
-    queryKey: ['deal_templates', store?.id],
+    queryKey: ['promotion_templates', store?.id],
     queryFn: async () => {
       if (!store?.id) return [];
-      const { data } = await supabase.from('deal_templates').select('*').eq('store_id', store.id).eq('is_active', true);
+      const { data } = await supabase.from('promotion_templates').select('*').eq('store_id', store.id).eq('is_active', true);
       return (data || []).map(t => ({
         ...t,
         iconName: t.icon_name,

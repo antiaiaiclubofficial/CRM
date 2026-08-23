@@ -16,11 +16,13 @@ export interface Customer {
   gender?: string;
   age?: string;
   house_no?: string;
-  moo?: string;
+  village_no?: string;
   soi?: string;
   road?: string;
   sub_district?: string;
   district?: string;
   province?: string;
   postal_code?: string;
+  address?: string;
+  avatar_url?: string;
 }
