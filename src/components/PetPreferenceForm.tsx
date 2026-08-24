@@ -78,7 +78,7 @@ const PetPreferenceForm = ({ isOpen, onClose, onSave, initialData, petName }: Pe
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
+            className="relative w-full bg-white rounded-t-[3rem] max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl"
           >
             {/* Improved Sticky Header */}
             <div className="flex justify-between items-center sticky top-0 bg-white pt-8 pb-4 px-6 z-10 rounded-t-[3rem]">

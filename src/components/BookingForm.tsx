@@ -93,7 +93,7 @@ const BookingForm = ({ isOpen, onClose, pets, services, onConfirm, onAddPet }: B
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3rem] h-[85vh] overflow-hidden shadow-2xl flex flex-col"
+            className="relative w-full bg-white rounded-t-[3rem] h-[85vh] overflow-hidden shadow-2xl flex flex-col"
           >
             {/* Header */}
             <div className="flex justify-between items-center shrink-0 bg-white pt-8 pb-4 px-8 z-10 rounded-t-[3rem] border-b border-slate-50">

@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, QrCode, Share2, Download, Copy } from 'lucide-react';
+import QRCode from 'react-qr-code';
 
 interface QRCodeModalProps {
   isOpen: boolean;
@@ -28,7 +29,7 @@ const QRCodeModal = ({ isOpen, onClose, lineId, memberId }: QRCodeModalProps) =>
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3.5rem] shadow-2xl overflow-hidden"
+            className="relative w-full bg-white rounded-t-[3.5rem] shadow-2xl overflow-hidden"
           >
             {/* Header */}
             <div className="pt-8 pb-4 px-8 flex justify-between items-center">
@@ -60,22 +61,17 @@ const QRCodeModal = ({ isOpen, onClose, lineId, memberId }: QRCodeModalProps) =>
                 <div className="absolute top-4 left-4 w-8 h-8 border-t-4 border-l-4 border-pink-500 rounded-tl-xl" />
                 <div className="absolute top-4 right-4 w-8 h-8 border-t-4 border-r-4 border-pink-500 rounded-tr-xl" />
                 <div className="absolute bottom-4 left-4 w-8 h-8 border-b-4 border-l-4 border-pink-500 rounded-bl-xl" />
-                <div className="absolute bottom-4 right-4 w-8 h-8 border-b-4 border-r-4 border-pink-500 rounded-br-xl" />
-                
-                <div className="w-48 h-48 bg-slate-50 rounded-2xl flex items-center justify-center overflow-hidden">
-                  {/* Placeholder for QR Code - In a real app, this would be a generated QR */}
-                  <div className="relative w-40 h-40 grid grid-cols-4 grid-rows-4 gap-1 p-1 opacity-80">
-                    {[...Array(16)].map((_, i) => (
-                      <div 
-                        key={i} 
-                        className={`rounded-sm ${Math.random() > 0.4 ? 'bg-slate-800' : 'bg-transparent'}`} 
-                      />
-                    ))}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                       <div className="bg-white p-2 rounded-xl shadow-md border border-slate-100">
-                          <QrCode size={32} className="text-pink-500" />
-                       </div>
-                    </div>
+                <div className="w-48 h-48 bg-white rounded-2xl flex items-center justify-center p-4 z-10 relative">
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <QRCode
+                      value={memberId || "NO_ID"}
+                      size={160}
+                      style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                      viewBox={`0 0 160 160`}
+                      bgColor="#ffffff"
+                      fgColor="#1e293b"
+                      level="L"
+                    />
                   </div>
                 </div>
               </div>

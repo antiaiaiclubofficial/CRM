@@ -17,11 +17,28 @@
 html, body {
   margin: 0;
   padding: 0;
-  background-color: #F9F9F9;
+  background-color: #E5E7EB; /* Neutral grey background for the desktop area */
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
   height: auto;
   min-height: 100%;
+}
+
+/* Constrain the root app container to simulate a mobile device */
+#root {
+  max-width: 393px; /* iPhone 14 Pro width */
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #F9F9F9;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  position: relative;
+  /* Make position: fixed elements (like bottom navs) relative to this container */
+  transform: translateZ(0); 
+  transition: max-width 0.3s ease-in-out;
+}
+
+#root.foldable-view {
+  max-width: 768px; /* Foldable display width */
 }
 
 body {

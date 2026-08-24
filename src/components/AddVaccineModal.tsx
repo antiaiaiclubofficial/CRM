@@ -175,7 +175,7 @@ const AddVaccineModal = ({ isOpen, onClose, petName, petType, onSave }: AddVacci
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3.5rem] shadow-2xl max-h-[92vh] flex flex-col border-none"
+            className="relative w-full bg-white rounded-t-[3.5rem] shadow-2xl max-h-[92vh] flex flex-col border-none"
           >
             {/* Header */}
             <div className="pt-8 pb-4 px-8 flex justify-between items-center bg-white rounded-t-[3.5rem] shrink-0">

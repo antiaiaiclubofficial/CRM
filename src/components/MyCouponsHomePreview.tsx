@@ -15,6 +15,8 @@ interface Coupon {
   color: string;
   bg: string;
   pointsRequired: number;
+  status?: string;
+  used_at_str?: string | null;
 }
 
 interface MyCouponsHomePreviewProps {
@@ -51,7 +53,7 @@ const MyCouponsHomePreview = ({ coupons, onViewAll }: MyCouponsHomePreviewProps)
                 key={coupon.id}
                 whileTap={{ scale: 0.98 }}
                 onClick={onViewAll}
-                className="flex-shrink-0 w-[280px] bg-white p-6 rounded-3xl shadow-ambient border-none flex items-center gap-4 transition-all"
+                className={`flex-shrink-0 w-[280px] bg-white p-6 rounded-3xl shadow-ambient border-none flex items-center gap-4 transition-all ${coupon.status === 'used' ? 'opacity-40 grayscale' : ''}`}
               >
                 <div className={`w-14 h-14 ${coupon.bg} rounded-2xl flex items-center justify-center shadow-inner shrink-0`}>
                   <IconComponent size={24} className="text-primary/70" />
@@ -59,7 +61,9 @@ const MyCouponsHomePreview = ({ coupons, onViewAll }: MyCouponsHomePreviewProps)
                 <div className="flex-1 min-w-0">
                   <h4 className="font-black text-sm text-primary truncate leading-tight">{coupon.title}</h4>
                   <p className="text-[11px] font-bold text-surface-variant opacity-60 truncate mt-0.5">{coupon.description}</p>
-                  <p className="text-[10px] text-[#FF4B91] font-black mt-1.5 uppercase tracking-wider">EXP: {coupon.expiry}</p>
+                  <p className="text-[10px] text-[#FF4B91] font-black mt-1.5 uppercase tracking-wider">
+                    {coupon.status === 'used' ? `ใช้เมื่อ: ${coupon.used_at_str || '-'}` : `EXP: ${coupon.expiry}`}
+                  </p>
                 </div>
               </motion.div>
             );

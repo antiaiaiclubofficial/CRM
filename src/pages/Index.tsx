@@ -145,8 +145,10 @@ const Index = () => {
           }))
       }));
 
-      const { data: coupons } = await supabase.from('customer_coupons').select('*, coupon_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).eq('status', 'unused');
-      const { data: deals } = await supabase.from('customers_deals').select('*, promotion_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).eq('status', 'unused');
+      const { data: coupons } = await supabase.from('customer_coupons').select('*, coupon_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).order('created_at', { ascending: false });
+      const { data: deals } = await supabase.from('customers_deals').select('*, promotion_templates(*)').eq('customer_id', customer.id).eq('store_id', store.id).order('created_at', { ascending: false });
+      
+      const { data: couponCodes } = await supabase.from('coupon_codes').select('*').eq('customer_id', customer.id);
       
       const { data: appointmentsData } = await supabase.from('appointments').select('*, pets(name, image_url, breed), services(name, price)').eq('customer_id', customer.id).order('start_time', { ascending: true });
 
@@ -213,27 +215,66 @@ const Index = () => {
         usage_history: (usageHistory || []).filter(uh => uh.customer_package_id === pkg.id)
       }));
 
+      // Create a mutable array to pair codes uniquely with coupons
+      const availableCodes = [...(couponCodes || [])];
+
       const myCoupons = [
-        ...(coupons || []).map(c => ({
-          ...c,
-          title: c.coupon_templates?.title,
-          description: c.coupon_templates?.description,
-          iconName: c.coupon_templates?.icon_name,
-          bg: c.coupon_templates?.bg_color,
-          pointsRequired: c.coupon_templates?.points_required,
-          expiry: new Date(c.expires_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
-          is_deal: false
-        })),
-        ...(deals || []).map(d => ({
-          ...d,
-          title: d.promotion_templates?.title,
-          description: d.promotion_templates?.description,
-          iconName: d.promotion_templates?.icon_name,
-          bg: d.promotion_templates?.bg_color,
-          pointsRequired: d.promotion_templates?.points_required,
-          expiry: new Date(d.expires_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
-          is_deal: true
-        }))
+        ...(coupons || []).map(c => {
+          const codeIndex = availableCodes.findIndex(cc => cc.template_id === c.template_id);
+          let assignedCode = null;
+          let codeStatus = null;
+          let codeObj = null;
+          if (codeIndex !== -1) {
+            codeObj = availableCodes[codeIndex];
+            assignedCode = codeObj.code;
+            codeStatus = codeObj.status;
+            availableCodes.splice(codeIndex, 1);
+          }
+          
+          const finalStatus = codeStatus === 'used' ? 'used' : c.status;
+          
+          return {
+            ...c,
+            title: c.coupon_templates?.title,
+            description: c.coupon_templates?.description,
+            iconName: c.coupon_templates?.icon_name,
+            bg: c.coupon_templates?.bg_color,
+            pointsRequired: c.coupon_templates?.points_required,
+            expiry: new Date(c.expires_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
+            is_deal: false,
+            code: assignedCode,
+            status: finalStatus,
+            used_at_str: finalStatus === 'used' ? new Date(codeObj?.used_at || c.used_at || c.updated_at || new Date()).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : null
+          };
+        }),
+        ...(deals || []).map(d => {
+          const codeIndex = availableCodes.findIndex(cc => cc.template_id === d.template_id);
+          let assignedCode = null;
+          let codeStatus = null;
+          let codeObj = null;
+          if (codeIndex !== -1) {
+            codeObj = availableCodes[codeIndex];
+            assignedCode = codeObj.code;
+            codeStatus = codeObj.status;
+            availableCodes.splice(codeIndex, 1);
+          }
+          
+          const finalStatus = codeStatus === 'used' ? 'used' : d.status;
+          
+          return {
+            ...d,
+            title: d.promotion_templates?.title,
+            description: d.promotion_templates?.description,
+            iconName: d.promotion_templates?.icon_name,
+            bg: d.promotion_templates?.bg_color,
+            pointsRequired: d.promotion_templates?.points_required,
+            expiry: new Date(d.expires_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }),
+            is_deal: true,
+            code: assignedCode,
+            status: finalStatus,
+            used_at_str: finalStatus === 'used' ? new Date(codeObj?.used_at || d.used_at || d.updated_at || new Date()).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : null
+          };
+        })
       ];
 
       return {
@@ -399,6 +440,36 @@ const Index = () => {
     }
   });
 
+  const useCouponMutation = useMutation({
+    mutationFn: async (couponObj: any) => {
+      // 1. Update coupon_codes
+      if (couponObj.code) {
+        const { error: codeError } = await supabase
+          .from('coupon_codes')
+          .update({ status: 'used', used_at: new Date().toISOString() })
+          .eq('code', couponObj.code);
+        if (codeError) throw codeError;
+      }
+
+      // 2. Update customer_coupons or customers_deals
+      const tableName = couponObj.is_deal ? 'customers_deals' : 'customer_coupons';
+      const { error: couponError } = await supabase
+        .from(tableName)
+        .update({ status: 'used', updated_at: new Date().toISOString() }) // use updated_at just in case used_at doesn't exist on these tables
+        .eq('id', couponObj.id);
+        
+      if (couponError) throw couponError;
+    },
+    onSuccess: () => {
+      toast.success('ยืนยันการใช้สิทธิ์เรียบร้อยแล้วค่ะ ✅');
+      setIsCouponUseModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['customer_profile'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'เกิดข้อผิดพลาดในการยืนยันสิทธิ์');
+    }
+  });
+
   const cancelAppointmentMutation = useMutation({
     mutationFn: async (appointmentId: string) => {
       const { error } = await supabase.from('appointments').delete().eq('id', appointmentId);
@@ -436,6 +507,28 @@ const Index = () => {
       expiresAt.setDate(expiresAt.getDate() + (template.expiry_days || 365)); // Packages valid for 1 year by default
 
       if (type === 'coupon') {
+        // Generate an 8-character uppercase alphanumeric code (e.g., A8B2-X9M4)
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let generatedCode = '';
+        for (let i = 0; i < 8; i++) {
+          generatedCode += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        const formattedCode = `${generatedCode.slice(0, 4)}-${generatedCode.slice(4)}`;
+
+        // Insert into coupon_codes for POS usage
+        const { error: couponCodeError } = await supabase.from('coupon_codes').insert([{
+          code: formattedCode,
+          template_type: 'coupon',
+          template_id: template.id,
+          coupon_id: template.id,
+          customer_id: customerId,
+          status: 'active',
+          max_uses: 1,
+          store_id: storeId || null
+        }]);
+
+        if (couponCodeError) throw couponCodeError;
+
         await supabase.from('customer_coupons').insert([{
           template_id: template.id,
           customer_id: customerId,
@@ -444,6 +537,42 @@ const Index = () => {
           status: 'unused'
         }]);
       } else if (type === 'deal') {
+        // Quota check
+        if (template.usage_limit !== null && template.usage_limit !== undefined) {
+          const { count, error: countError } = await supabase
+            .from('coupon_codes')
+            .select('*', { count: 'exact', head: true })
+            .eq('template_id', template.id)
+            .eq('template_type', 'promotion');
+            
+          if (countError) throw countError;
+          if (count !== null && count >= template.usage_limit) {
+            throw new Error("ขออภัย สิทธิ์โปรโมชั่นนี้เต็มแล้ว");
+          }
+        }
+
+        // Generate an 8-character uppercase alphanumeric code (e.g., P8K9-M2W1)
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let generatedCode = '';
+        for (let i = 0; i < 8; i++) {
+          generatedCode += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        const formattedCode = `${generatedCode.slice(0, 4)}-${generatedCode.slice(4)}`;
+
+        // Insert into coupon_codes for POS usage
+        const { error: promoCodeError } = await supabase.from('coupon_codes').insert([{
+          code: formattedCode,
+          template_type: 'promotion',
+          template_id: template.id,
+          promotion_id: template.id,
+          customer_id: customerId,
+          status: 'active',
+          max_uses: 1,
+          store_id: storeId || null
+        }]);
+
+        if (promoCodeError) throw promoCodeError;
+
         await supabase.from('customers_deals').insert([{
           template_id: template.id,
           customer_id: customerId,
@@ -1023,7 +1152,7 @@ const Index = () => {
           setIsPetFormOpen(true);
         }}
       />
-      <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={() => {}} />
+      <CouponUseModal isOpen={isCouponUseModalOpen} onClose={() => setIsCouponUseModalOpen(false)} coupon={selectedCouponToUse} onConfirmUse={async () => { await useCouponMutation.mutateAsync(selectedCouponToUse); }} />
       <PackageUseModal isOpen={isPackageUseModalOpen} onClose={() => setIsPackageUseModalOpen(false)} customerPackage={selectedPackageToUse} onConfirmUse={async (id) => { await usePackageSessionMutation.mutateAsync(id); }} />
       <AppointmentDetailModal isOpen={isAppointmentDetailOpen} onClose={() => setIsAppointmentDetailOpen(false)} appointment={selectedAppointment} onDelete={(id) => cancelAppointmentMutation.mutate(id)} />
       <UserProfileEdit isOpen={isProfileEditing} onClose={() => setIsProfileEditing(false)} profile={mappedProfile} onSave={(data) => updateProfileMutation.mutate(data)} />

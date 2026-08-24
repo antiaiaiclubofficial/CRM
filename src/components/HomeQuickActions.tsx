@@ -35,7 +35,7 @@ const HomeQuickActions = ({ onCouponsClick, onAppointmentClick, onPackagesClick 
           <Ticket size={16} strokeWidth={2.5} />
         </div>
         <span className="font-black text-primary text-[10px] uppercase tracking-wider truncate w-full text-center">
-          My Deals
+          My Coupons
         </span>
       </motion.button>
 

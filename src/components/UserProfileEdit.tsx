@@ -134,7 +134,7 @@ const UserProfileEdit = ({ isOpen, onClose, profile, onSave }: UserProfileEditPr
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="relative w-full max-w-[390px] bg-[#F9F9F9] rounded-t-[3.5rem] h-[88vh] overflow-hidden shadow-ambient flex flex-col border-t border-white/40"
+            className="relative w-full bg-[#F9F9F9] rounded-t-[3.5rem] h-[88vh] overflow-hidden shadow-ambient flex flex-col border-t border-white/40"
           >
             {/* Liquid Background Blobs inside Bottom Sheet */}
             <div className="absolute top-[-10%] left-[-20%] w-[200px] h-[200px] bg-[#FFD8E4] rounded-full blur-[60px] opacity-50 pointer-events-none" />

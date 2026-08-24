@@ -15,6 +15,7 @@ interface Coupon {
   color: string;
   bg: string;
   conditions?: string[];
+  code?: string | null;
 }
 
 interface CouponUseModalProps {
@@ -27,7 +28,7 @@ interface CouponUseModalProps {
 const CouponUseModal = ({ isOpen, onClose, coupon, onConfirmUse }: CouponUseModalProps) => {
   if (!coupon) return null;
 
-  const couponCode = "PET-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+  const couponCode = coupon.code || ("PET-" + Math.random().toString(36).substring(2, 8).toUpperCase());
 
   return (
     <AnimatePresence>
@@ -45,7 +46,7 @@ const CouponUseModal = ({ isOpen, onClose, coupon, onConfirmUse }: CouponUseModa
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3.5rem] shadow-2xl max-h-[90vh] flex flex-col"
+            className="relative w-full bg-white rounded-t-[3.5rem] shadow-2xl max-h-[90vh] flex flex-col"
           >
             {/* Improved Header Area */}
             <div className="pt-8 pb-4 px-8 flex justify-between items-center bg-white rounded-t-[3.5rem]">

@@ -9,6 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { LiffProvider, useLiff } from "@/contexts/LiffContext";
 import { LiffLoading } from "@/components/auth/LiffLoading";
 import { LiffError } from "@/components/auth/LiffError";
+import { DesktopViewToggle } from "@/components/DesktopViewToggle";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => {
             }}
           />
           <AppContent />
+          <DesktopViewToggle />
         </TooltipProvider>
       </LiffProvider>
     </QueryClientProvider>

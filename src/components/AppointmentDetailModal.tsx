@@ -81,7 +81,7 @@ const AppointmentDetailModal = ({ isOpen, onClose, appointment, onDelete }: Appo
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3.5rem] shadow-2xl max-h-[92vh] overflow-y-auto no-scrollbar flex flex-col border-t border-white/20"
+            className="relative w-full bg-white rounded-t-[3.5rem] shadow-2xl max-h-[92vh] overflow-y-auto no-scrollbar flex flex-col border-t border-white/20"
           >
             {/* Drag Handle Indicator */}
             <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mt-4 shrink-0" />

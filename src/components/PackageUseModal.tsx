@@ -63,7 +63,7 @@ const PackageUseModal = ({ isOpen, onClose, customerPackage, onConfirmUse }: Pac
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="relative w-full max-w-[390px] bg-white rounded-t-[3.5rem] shadow-2xl max-h-[90vh] flex flex-col"
+            className="relative w-full bg-white rounded-t-[3.5rem] shadow-2xl max-h-[90vh] flex flex-col"
           >
             {/* Header */}
             <div className="pt-8 pb-4 px-8 flex justify-between items-center bg-white rounded-t-[3.5rem] shrink-0">
@@ -81,33 +81,33 @@ const PackageUseModal = ({ isOpen, onClose, customerPackage, onConfirmUse }: Pac
 
             <div className="px-8 pb-10 overflow-y-auto no-scrollbar flex-1 space-y-6">
               {/* Package Card Preview */}
-              <div className="bg-gradient-to-br from-[#18234a] to-[#020d35] p-6 rounded-3xl text-white relative overflow-hidden shadow-lg">
-                <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-[#EAFD69]/10 rounded-full blur-2xl" />
+              <div className="bg-gradient-to-br from-[#e9e5fa] to-[#e2e6f9] p-6 rounded-3xl text-[#020d35] relative overflow-hidden shadow-lg border border-white/50">
+                <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-white/40 rounded-full blur-2xl" />
                 
                 <div className="relative z-10 space-y-4">
                   <div>
-                    <span className="text-[9px] font-black text-[#020d35] bg-[#EAFD69] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="text-[9px] font-black text-[#5b21b6] bg-white px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
                       ACTIVE PACKAGE
                     </span>
-                    <h4 className="text-lg font-white mt-2 leading-tight text-white">{customerPackage.title}</h4>
-                    <p className="text-xs text-white/60 mt-1">{customerPackage.description}</p>
+                    <h4 className="text-lg font-black mt-2 leading-tight text-[#020d35]">{customerPackage.title}</h4>
+                    <p className="text-xs text-slate-600 mt-1">{customerPackage.description}</p>
                   </div>
 
-                  <div className="bg-white/10 p-4 rounded-2xl border border-white/10">
+                  <div className="bg-white/40 backdrop-blur-sm p-4 rounded-2xl border border-white/50 shadow-sm">
                     <div className="flex justify-between items-end mb-2">
-                      <span className="text-xs text-white/60 font-bold">จำนวนสิทธิ์คงเหลือ</span>
+                      <span className="text-xs text-slate-600 font-bold">จำนวนสิทธิ์คงเหลือ</span>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-3xl font-black text-[#EAFD69]">{customerPackage.remaining_sessions}</span>
-                        <span className="text-xs text-white/40">/ {customerPackage.total_sessions} ครั้ง</span>
+                        <span className="text-3xl font-black text-[#5b21b6]">{customerPackage.remaining_sessions}</span>
+                        <span className="text-xs text-slate-500">/ {customerPackage.total_sessions} ครั้ง</span>
                       </div>
                     </div>
                     
                     {/* Progress Bar */}
-                    <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                    <div className="w-full bg-white/60 h-2 rounded-full overflow-hidden shadow-inner">
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${progressPercentage}%` }}
-                        className="bg-[#EAFD69] h-full rounded-full"
+                        className="bg-gradient-to-r from-[#a855f7] to-[#7c3aed] h-full rounded-full"
                       />
                     </div>
                   </div>
@@ -117,7 +117,7 @@ const PackageUseModal = ({ isOpen, onClose, customerPackage, onConfirmUse }: Pac
               {/* Usage History */}
               <div className="space-y-3">
                 <h5 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                  <History size={16} className="text-[#EAFD69]" /> ประวัติการใช้งานแพ็คเกจ
+                  <History size={16} className="text-[#7c3aed]" /> ประวัติการใช้งานแพ็คเกจ
                 </h5>
                 
                 {customerPackage.usage_history && customerPackage.usage_history.length > 0 ? (
@@ -125,7 +125,7 @@ const PackageUseModal = ({ isOpen, onClose, customerPackage, onConfirmUse }: Pac
                     {customerPackage.usage_history.map((usage, idx) => (
                       <div key={usage.id} className="flex justify-between items-center bg-slate-50 p-3 rounded-2xl border border-slate-100">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 bg-[#EAFD69]/20 rounded-lg flex items-center justify-center text-[#020d35]">
+                          <div className="w-7 h-7 bg-[#e9e5fa] rounded-lg flex items-center justify-center text-[#5b21b6]">
                             <Calendar size={14} />
                           </div>
                           <span className="text-xs font-bold text-slate-700">
@@ -148,20 +148,20 @@ const PackageUseModal = ({ isOpen, onClose, customerPackage, onConfirmUse }: Pac
               {/* Conditions */}
               <div className="space-y-3">
                 <h5 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                  <Info size={16} className="text-[#EAFD69]" /> เงื่อนไขการใช้งานแพ็คเกจ
+                  <Info size={16} className="text-[#7c3aed]" /> เงื่อนไขการใช้งานแพ็คเกจ
                 </h5>
                 <ul className="space-y-1.5">
                   <li className="text-xs text-slate-500 flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#EAFD69] mt-1.5 shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#7c3aed] mt-1.5 shrink-0" />
                     กรุณาแจ้งพนักงานก่อนรับบริการเพื่อหักสิทธิ์ในระบบ
                   </li>
                   <li className="text-xs text-slate-500 flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#EAFD69] mt-1.5 shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#7c3aed] mt-1.5 shrink-0" />
                     สิทธิ์ในแพ็คเกจไม่สามารถแลกเปลี่ยนเป็นเงินสดได้
                   </li>
                   {customerPackage.expires_at && (
                     <li className="text-xs text-slate-500 flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#EAFD69] mt-1.5 shrink-0" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#7c3aed] mt-1.5 shrink-0" />
                       แพ็คเกจหมดอายุวันที่ {new Date(customerPackage.expires_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </li>
                   )}
