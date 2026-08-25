@@ -81,7 +81,7 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative w-full min-h-[250px] overflow-hidden py-5 px-6 rounded-3xl shadow-ambient border-none flex flex-col justify-between transition-all duration-500"
+      className="relative w-full min-h-[190px] overflow-hidden py-4 px-6 rounded-3xl shadow-ambient border-none flex flex-col justify-between transition-all duration-500"
       style={{ background: currentTierGradient }}
     >
       {/* Liquid Background Elements with Dynamic Tier Color */}
@@ -91,41 +91,33 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
       />
       <div className="absolute bottom-[-20%] left-[-10%] w-48 h-48 bg-white/5 rounded-full blur-2xl" />
 
-      <div className="relative z-10 flex flex-col h-full justify-between space-y-4">
+      <div className="relative z-10 flex flex-col h-full justify-between space-y-2">
         {/* Top Section */}
         <div className="flex justify-between items-start">
-          {/* Left Side: Membership Status - Clickable */}
-          <div 
-            className="space-y-1 cursor-pointer active:scale-95 transition-transform" 
-            onClick={onTierClick}
-          >
-            <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Membership Status</p>
-            <span 
-              className="text-primary text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block transition-colors duration-500"
-              style={{ backgroundColor: currentTierColor }}
+          {/* Left Side: Member ID, Name, and QR */}
+          <div className="text-left flex flex-col items-start gap-1">
+            <div className="space-y-0.5">
+              <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Member ID: {ownerProfile?.phone || 'N/A'}</p>
+              <h2 className="text-lg font-black text-white drop-shadow-md truncate max-w-[180px]">
+                {ownerProfile?.first_name} {ownerProfile?.last_name}
+              </h2>
+            </div>
+            <motion.button 
+              whileTap={{ scale: 0.9 }}
+              onClick={onShowQR}
+              className="mt-1 p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 text-white hover:bg-white/20 transition-colors shadow-sm"
             >
-              {currentTier.name.toUpperCase()}
-            </span>
+              <QrCode size={20} />
+            </motion.button>
           </div>
           
-          {/* Right Side: Member ID and Name */}
-          <div className="text-right space-y-0.5">
-            <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Member ID: {ownerProfile?.phone || 'N/A'}</p>
-            <h2 className="text-lg font-black text-white drop-shadow-md truncate max-w-[180px]">
-              {ownerProfile?.first_name} {ownerProfile?.last_name}
-            </h2>
-          </div>
-        </div>
-
-        {/* Bottom Group: Points & Progress */}
-        <div className="flex flex-col space-y-3">
-          {/* Points & Tier Display */}
-          <div className="flex justify-between items-end">
+          {/* Right Side: Available Points & Total Points */}
+          <div className="text-right space-y-2">
             <div className="space-y-0.5">
               <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">คะแนนที่ใช้ได้ (Balance)</p>
-              <div className="flex items-baseline gap-1.5">
+              <div className="flex items-baseline justify-end gap-1.5">
                 <span 
-                  className="text-4xl font-black leading-none tracking-tighter transition-colors duration-500"
+                  className="text-3xl font-black leading-none tracking-tighter transition-colors duration-500"
                   style={{ color: currentTierColor }}
                 >
                   {redeemablePoints.toLocaleString()}
@@ -133,17 +125,8 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
                 <span className="text-[10px] font-black text-white/70 uppercase">pts</span>
               </div>
             </div>
-            <div className="text-right flex flex-col items-end">
-              {/* QR Capsule Button */}
-              <motion.button 
-                whileTap={{ scale: 0.95 }}
-                onClick={onShowQR}
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white mb-2 hover:bg-white/20 transition-colors"
-              >
-                <QrCode size={12} />
-                <span className="text-[8px] font-black uppercase tracking-widest">My QR</span>
-              </motion.button>
-              
+            
+            <div className="flex flex-col items-end">
               <div 
                 className="flex items-center gap-1 justify-end mb-0.5 cursor-pointer active:scale-95 transition-transform"
                 onClick={onTierClick}
@@ -154,10 +137,21 @@ const MembershipCard = ({ totalAccumulatedPoints, redeemablePoints, ownerProfile
               <p className="text-sm font-black text-white leading-none tracking-tighter">{totalAccumulatedPoints.toLocaleString()}</p>
             </div>
           </div>
+        </div>
+
+        {/* Bottom Group: Points & Progress */}
+        <div className="flex flex-col space-y-3">
+
 
           {/* Milestone Progress Section */}
-          <div className="space-y-2 pt-1">
-            <div className="relative pt-6 pb-1">
+          <div 
+            className="space-y-2 pt-1 cursor-pointer active:scale-[0.98] transition-transform relative"
+            onClick={onTierClick}
+          >
+            <span className="absolute -top-2 left-0 text-[11px] font-bold text-white/50 uppercase tracking-widest">
+              Member Tier
+            </span>
+            <div className="relative pt-5 pb-0">
               {/* Milestone Stack Layout */}
               <div className="relative z-10 flex items-center justify-between w-full">
                 
